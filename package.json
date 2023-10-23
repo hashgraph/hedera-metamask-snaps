@@ -1,0 +1,27 @@
+{
+  "name": "@hashgraph/hedera-metamask-snaps",
+  "version": "1.0.0",
+  "description": "A collection of Hedera related Metamask snaps that expose and utilize Hedera functionality inside Metamask",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
+  },
+  "keywords": [
+    "hedera",
+    "metamask",
+    "snaps"
+  ],
+  "author": "Hedera Community Teams",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/hashgraph/hedera-metamask-snaps/issues"
+  },
+  "homepage": "https://github.com/hashgraph/hedera-metamask-snaps#readme",
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "prettier": "3.0.0"
+  }
+}
