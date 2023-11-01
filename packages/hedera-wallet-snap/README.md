@@ -1,4 +1,4 @@
-# @tuum-tech/hedera-wallet-snap-monorepo
+# @hashgraph/hedera-wallet-snap
 
 ## Getting Started
 

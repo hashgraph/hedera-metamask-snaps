@@ -1,18 +1,18 @@
 {
-  "name": "@tuum-tech/hedera-wallet-snap-monorepo",
+  "name": "@hashgraph/hedera-wallet-snap",
   "version": "0.1.0",
   "private": true,
   "description": "",
-  "homepage": "https://github.com/tuum-tech/hedera-wallet-snap#readme",
+  "homepage": "https://github.com/hashgraph/hedera-metamask-snaps#readme",
   "bugs": {
-    "url": "https://github.com/tuum-tech/hedera-wallet-snap/issues"
+    "url": "https://github.com/hashgraph/hedera-metamask-snaps/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tuum-tech/hedera-wallet-snap.git"
+    "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
-  "author": "",
+  "license": "Apache-2.0",
+  "author": "Tuum Tech, Hedera Smart Contracts Team",
   "workspaces": [
     "packages/*"
   ],
