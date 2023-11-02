@@ -3816,6 +3816,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hashgraph/hedera-wallet-snap@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@hashgraph/hedera-wallet-snap@workspace:."
+  dependencies:
+    "@metamask/eslint-config": ^11.1.0
+    "@metamask/eslint-config-jest": ^11.1.0
+    "@metamask/eslint-config-nodejs": ^11.1.0
+    "@metamask/eslint-config-typescript": ^11.1.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
+    eslint: ^8.38.0
+    eslint-config-prettier: ^9.0.0
+    eslint-plugin-import: ^2.28.1
+    eslint-plugin-jest: ^27.4.0
+    eslint-plugin-jsdoc: ^46.8.1
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.2.1
+    prettier: ^3.0.3
+    prettier-plugin-packagejson: ^2.4.5
+    typescript: ^5.2.2
+  languageName: unknown
+  linkType: soft
+
 "@hashgraph/proto@npm:2.13.0":
   version: 2.13.0
   resolution: "@hashgraph/proto@npm:2.13.0"
@@ -6825,29 +6848,6 @@ __metadata:
   checksum: a46f8e8129f9a69970d5a4e70a367886b0101624dccbee2494dd81e7294233ce28b356ff70b4a6b6cab65fd2a9fad165f0e25b6762a9fb65c611f19b7c3085ee
   languageName: node
   linkType: hard
-
-"@tuum-tech/hedera-wallet-snap-monorepo@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@tuum-tech/hedera-wallet-snap-monorepo@workspace:."
-  dependencies:
-    "@metamask/eslint-config": ^11.1.0
-    "@metamask/eslint-config-jest": ^11.1.0
-    "@metamask/eslint-config-nodejs": ^11.1.0
-    "@metamask/eslint-config-typescript": ^11.1.0
-    "@typescript-eslint/eslint-plugin": ^5.57.1
-    "@typescript-eslint/parser": ^5.57.1
-    eslint: ^8.38.0
-    eslint-config-prettier: ^9.0.0
-    eslint-plugin-import: ^2.28.1
-    eslint-plugin-jest: ^27.4.0
-    eslint-plugin-jsdoc: ^46.8.1
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-prettier: ^4.2.1
-    prettier: ^3.0.3
-    prettier-plugin-packagejson: ^2.4.5
-    typescript: ^5.2.2
-  languageName: unknown
-  linkType: soft
 
 "@tuum-tech/hedera-wallet-snap-site@workspace:packages/site":
   version: 0.0.0-use.local
