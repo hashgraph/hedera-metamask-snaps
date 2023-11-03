@@ -22,6 +22,7 @@
   "main": "dist/snap.js",
   "files": [
     "dist/snap.js",
+    "snap.config.js",
     "snap.manifest.json",
     "package.json",
     "images",
@@ -34,6 +35,7 @@
     "build:snap": "yarn build:snap:postprocess && mm-snap manifest --fix",
     "build:snap:eval": "mm-snap eval -b dist/snap.js",
     "build:snap:postprocess": "node ./postBuild.js",
+    "deploy": "npm run build && cd dist && npm publish",
     "clean": "rimraf dist build",
     "compile": "babel src -d lib",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
