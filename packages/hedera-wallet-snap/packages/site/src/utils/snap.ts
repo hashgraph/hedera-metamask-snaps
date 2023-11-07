@@ -1,7 +1,30 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2023 Tuum Tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
-import { SimpleTransfer } from '../types/snap';
+import {
+  GetAccountInfoRequestParams,
+  TransferCryptoRequestParams,
+} from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
   const accounts = (await window.ethereum.request({
@@ -102,7 +125,7 @@ export const sendHello = async (network: string, mirrorNodeUrl: string) => {
 export const getAccountInfo = async (
   network: string,
   mirrorNodeUrl: string,
-  accountId?: string,
+  getAccountInfoParams: GetAccountInfoRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -111,7 +134,13 @@ export const getAccountInfo = async (
       snapId: defaultSnapOrigin,
       request: {
         method: 'getAccountInfo',
-        params: { network, mirrorNodeUrl, accountId, ...externalAccountparams },
+        params: {
+          network,
+          mirrorNodeUrl,
+          accountId: getAccountInfoParams.accountId,
+          serviceFee: getAccountInfoParams.serviceFee,
+          ...externalAccountparams,
+        },
       },
     },
   });
@@ -144,9 +173,7 @@ export const getAccountBalance = async (
 export const transferCrypto = async (
   network: string,
   mirrorNodeUrl: string,
-  transfers: SimpleTransfer[],
-  memo?: string,
-  maxFee?: number,
+  transferCryptoParams: TransferCryptoRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -158,9 +185,10 @@ export const transferCrypto = async (
         params: {
           network,
           mirrorNodeUrl,
-          transfers,
-          memo,
-          maxFee,
+          transfers: transferCryptoParams.transfers,
+          memo: transferCryptoParams.memo,
+          maxFee: transferCryptoParams.maxFee,
+          serviceFee: transferCryptoParams.serviceFee,
           ...externalAccountparams,
         },
       },

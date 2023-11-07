@@ -1,3 +1,23 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2023 Tuum Tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import {
   AccountId,
   Client,
@@ -62,17 +82,17 @@ export class HederaServiceImpl implements HederaService {
     let client;
 
     if (this.network === 'testnet') {
-      // client = Client.forTestnet();
-      client = Client.forNetwork({
+      client = Client.forTestnet();
+      /* client = Client.forNetwork({
         'https://testnet-node00-00-grpc.hedera.com:443': new AccountId(3),
-      });
+      }); */
     } else if (this.network === 'previewnet') {
       client = Client.forPreviewnet();
     } else {
-      // client = Client.forMainnet();
-      client = Client.forNetwork({
+      client = Client.forMainnet();
+      /* client = Client.forNetwork({
         'https://node01-00-grpc.swirlds.com:443': new AccountId(4),
-      });
+      }); */
     }
 
     // NOTE: important, ensure that we pre-compute the health state of all nodes

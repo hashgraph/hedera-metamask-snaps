@@ -3816,9 +3816,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hashgraph/hedera-wallet-snap@workspace:.":
+"@hashgraph/hedera-wallet-snap-monorepo@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@hashgraph/hedera-wallet-snap@workspace:."
+  resolution: "@hashgraph/hedera-wallet-snap-monorepo@workspace:."
   dependencies:
     "@metamask/eslint-config": ^11.1.0
     "@metamask/eslint-config-jest": ^11.1.0
@@ -3836,6 +3836,69 @@ __metadata:
     prettier: ^3.0.3
     prettier-plugin-packagejson: ^2.4.5
     typescript: ^5.2.2
+  languageName: unknown
+  linkType: soft
+
+"@hashgraph/hedera-wallet-snap@workspace:packages/snap":
+  version: 0.0.0-use.local
+  resolution: "@hashgraph/hedera-wallet-snap@workspace:packages/snap"
+  dependencies:
+    "@babel/core": ^7.21.0
+    "@babel/plugin-proposal-decorators": ^7.21.0
+    "@babel/plugin-syntax-import-assertions": ^7.20.0
+    "@babel/plugin-transform-class-properties": ^7.22.5
+    "@babel/plugin-transform-flow-strip-types": ^7.21.0
+    "@babel/plugin-transform-private-methods": ^7.22.5
+    "@babel/preset-env": ^7.20.2
+    "@babel/preset-typescript": ^7.21.0
+    "@babel/register": ^7.18.9
+    "@babel/types": ^7.21.2
+    "@hashgraph/sdk": 2.31.0
+    "@lavamoat/allow-scripts": ^2.0.3
+    "@metamask/auto-changelog": ^3.1.0
+    "@metamask/eslint-config": ^11.1.0
+    "@metamask/eslint-config-jest": ^11.1.0
+    "@metamask/eslint-config-nodejs": ^11.1.0
+    "@metamask/eslint-config-typescript": ^11.1.0
+    "@metamask/key-tree": ^9.0.0
+    "@metamask/providers": 10.2.1
+    "@metamask/snaps-cli": ^0.32.2
+    "@metamask/snaps-jest": ^0.35.1-flask.1
+    "@metamask/snaps-types": ^1.0.1
+    "@metamask/snaps-ui": ^1.0.1
+    "@metamask/snaps-webpack-plugin": ^1.0.2
+    "@types/jest": ^29.5.0
+    "@types/lodash.clonedeep": ^4.5.7
+    "@types/normalize-url": ^4.2.0
+    "@typescript-eslint/eslint-plugin": ^5.57.1
+    "@typescript-eslint/parser": ^5.57.1
+    babel-loader: ^9.1.2
+    bignumber.js: ^9.1.1
+    chokidar-cli: ^3.0.0
+    concurrently: ^8.2.1
+    eslint: ^8.38.0
+    eslint-config-prettier: ^8.8.0
+    eslint-plugin-import: ^2.27.5
+    eslint-plugin-jest: ^27.2.1
+    eslint-plugin-jsdoc: ^40.1.2
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.2.1
+    eslint-webpack-plugin: ^4.0.1
+    ethers: ^6.3.0
+    fork-ts-checker-webpack-plugin: ^8.0.0
+    jest: ^29.5.0
+    lodash: ^4.17.21
+    lodash.clonedeep: ^4.5.0
+    normalize-url: ^8.0.0
+    prettier: ^2.8.7
+    prettier-plugin-packagejson: ^2.4.3
+    rimraf: ^5.0.0
+    ts-node: ^10.9.1
+    typescript: ^5.0.4
+    webpack: ^5.78.0
+    webpack-cli: ^5.0.1
+    webpack-merge: ^5.9.0
+    webpackbar: ^5.0.2
   languageName: unknown
   linkType: soft
 
@@ -6899,69 +6962,6 @@ __metadata:
     rimraf: ^5.0.0
     styled-components: 5.3.3
     typescript: ^5.0.4
-  languageName: unknown
-  linkType: soft
-
-"@tuum-tech/hedera-wallet-snap@workspace:packages/snap":
-  version: 0.0.0-use.local
-  resolution: "@tuum-tech/hedera-wallet-snap@workspace:packages/snap"
-  dependencies:
-    "@babel/core": ^7.21.0
-    "@babel/plugin-proposal-decorators": ^7.21.0
-    "@babel/plugin-syntax-import-assertions": ^7.20.0
-    "@babel/plugin-transform-class-properties": ^7.22.5
-    "@babel/plugin-transform-flow-strip-types": ^7.21.0
-    "@babel/plugin-transform-private-methods": ^7.22.5
-    "@babel/preset-env": ^7.20.2
-    "@babel/preset-typescript": ^7.21.0
-    "@babel/register": ^7.18.9
-    "@babel/types": ^7.21.2
-    "@hashgraph/sdk": 2.31.0
-    "@lavamoat/allow-scripts": ^2.0.3
-    "@metamask/auto-changelog": ^3.1.0
-    "@metamask/eslint-config": ^11.1.0
-    "@metamask/eslint-config-jest": ^11.1.0
-    "@metamask/eslint-config-nodejs": ^11.1.0
-    "@metamask/eslint-config-typescript": ^11.1.0
-    "@metamask/key-tree": ^9.0.0
-    "@metamask/providers": 10.2.1
-    "@metamask/snaps-cli": ^0.32.2
-    "@metamask/snaps-jest": ^0.35.1-flask.1
-    "@metamask/snaps-types": ^1.0.1
-    "@metamask/snaps-ui": ^1.0.1
-    "@metamask/snaps-webpack-plugin": ^1.0.2
-    "@types/jest": ^29.5.0
-    "@types/lodash.clonedeep": ^4.5.7
-    "@types/normalize-url": ^4.2.0
-    "@typescript-eslint/eslint-plugin": ^5.57.1
-    "@typescript-eslint/parser": ^5.57.1
-    babel-loader: ^9.1.2
-    bignumber.js: ^9.1.1
-    chokidar-cli: ^3.0.0
-    concurrently: ^8.2.1
-    eslint: ^8.38.0
-    eslint-config-prettier: ^8.8.0
-    eslint-plugin-import: ^2.27.5
-    eslint-plugin-jest: ^27.2.1
-    eslint-plugin-jsdoc: ^40.1.2
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-prettier: ^4.2.1
-    eslint-webpack-plugin: ^4.0.1
-    ethers: ^6.3.0
-    fork-ts-checker-webpack-plugin: ^8.0.0
-    jest: ^29.5.0
-    lodash: ^4.17.21
-    lodash.clonedeep: ^4.5.0
-    normalize-url: ^8.0.0
-    prettier: ^2.8.7
-    prettier-plugin-packagejson: ^2.4.3
-    rimraf: ^5.0.0
-    ts-node: ^10.9.1
-    typescript: ^5.0.4
-    webpack: ^5.78.0
-    webpack-cli: ^5.0.1
-    webpack-merge: ^5.9.0
-    webpackbar: ^5.0.2
   languageName: unknown
   linkType: soft
 

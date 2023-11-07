@@ -1,7 +1,26 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2023 Tuum Tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { Hbar, TransferTransaction, type Client } from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
-import { TUUMACCOUNTID } from '../../../../types/constants';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -18,7 +37,8 @@ import {
  * @param options.transfers - The list of transfers to take place.
  * @param options.memo - Memo to include in the transfer.
  * @param options.maxFee - Max fee to use in the transfer.
- * @param options.serviceFees - Service Fees.
+ * @param options.serviceFeesToPay - Service Fees to pay.
+ * @param options.serviceFeeToAddress - The address to send the fee to.
  * @param options.onBeforeConfirm - Function to execute before confirmation.
  */
 export async function transferCrypto(
@@ -28,13 +48,20 @@ export async function transferCrypto(
     transfers: SimpleTransfer[];
     memo: string | null;
     maxFee: number | null; // hbar
-    serviceFees: Record<string, number> | null;
+    serviceFeesToPay: Record<string, number> | null;
+    serviceFeeToAddress: string | null;
     onBeforeConfirm?: () => void;
   },
 ): Promise<TxReceipt> {
   const maxFee = options.maxFee
     ? new Hbar(options.maxFee.toFixed(8))
     : new Hbar(1);
+
+  let serviceFeeToAddr: string =
+    options.serviceFeeToAddress ?? '0x0000000000000000000000000000000000000000';
+  if (ethers.isAddress(serviceFeeToAddr)) {
+    serviceFeeToAddr = `0.0.${serviceFeeToAddr.slice(2)}`;
+  }
 
   const transaction = new TransferTransaction()
     .setTransactionMemo(options.memo ?? '')
@@ -50,13 +77,13 @@ export async function transferCrypto(
       transaction.addHbarTransfer(transfer.to, transfer.amount);
       outgoingHbarAmount += -transfer.amount;
 
-      // Service Fee to Tuum Tech's account
-      if (options.serviceFees) {
+      // Service Fee
+      if (options.serviceFeesToPay) {
         transaction.addHbarTransfer(
-          TUUMACCOUNTID,
-          options.serviceFees[transfer.asset],
+          serviceFeeToAddr,
+          options.serviceFeesToPay[transfer.asset],
         );
-        outgoingHbarAmount += -options.serviceFees[transfer.asset];
+        outgoingHbarAmount += -options.serviceFeesToPay[transfer.asset];
       }
     } else {
       const multiplier = Math.pow(
@@ -72,14 +99,16 @@ export async function transferCrypto(
 
       let amountToReduce = -(transfer.amount * multiplier);
 
-      // Service Fee to Tuum Tech's account
-      if (options.serviceFees) {
+      // Service Fee
+      if (options.serviceFeesToPay) {
         transaction.addTokenTransfer(
           transfer.asset,
-          TUUMACCOUNTID,
-          options.serviceFees[transfer.asset] * multiplier,
+          serviceFeeToAddr,
+          options.serviceFeesToPay[transfer.asset] * multiplier,
         );
-        amountToReduce += -(options.serviceFees[transfer.asset] * multiplier);
+        amountToReduce += -(
+          options.serviceFeesToPay[transfer.asset] * multiplier
+        );
       }
 
       transaction.addTokenTransfer(

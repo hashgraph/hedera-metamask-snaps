@@ -4,15 +4,15 @@
   "proposedName": "Hedera Wallet",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tuum-tech/hedera-wallet-snap.git"
+    "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "lIPUuxtJBK1FGTeeiLgxiTbw+95PgnIxXZKNEkSs16I=",
+    "shasum": "llXCdsRi8WiIuslcEWS1u2VDSGVzPLxpmkb0pGhWRy4=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",
         "iconPath": "images/icon.svg",
-        "packageName": "@tuum-tech/hedera-wallet-snap",
+        "packageName": "@hashgraph/hedera-wallet-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }

@@ -4,7 +4,12 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, SimpleTransfer } from '../../types/snap';
+import {
+  Account,
+  ServiceFee,
+  SimpleTransfer,
+  TransferCryptoRequestParams,
+} from '../../types/snap';
 import { shouldDisplayReconnectButton, transferCrypto } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
@@ -37,9 +42,6 @@ const TransferCrypto: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      // 1 ℏ
-      // 0.0.633893
-      // 0x7d871f006d97498ea338268a956af94ab2e65cdd
       const transfers: SimpleTransfer[] = [
         {
           asset: 'HBAR',
@@ -49,12 +51,23 @@ const TransferCrypto: FC<Props> = ({
       ];
       // const maxFee = 1; // Note that if you don't pass this, default is 1 HBAR
 
-      const response: any = await transferCrypto(
-        network,
-        mirrorNodeUrl,
+      const TUUMESERVICEADDRESS = '0x7d871f006d97498ea338268a956af94ab2e65cdd'; // 0.0.633893 if you want to use accountId
+      const serviceFee = {
+        percentageCut: 5,
+        toAddress: TUUMESERVICEADDRESS,
+      } as ServiceFee;
+
+      const transferCryptoParams = {
         transfers,
         sendMemo,
         undefined,
+        serviceFee,
+      } as TransferCryptoRequestParams;
+
+      const response: any = await transferCrypto(
+        network,
+        mirrorNodeUrl,
+        transferCryptoParams,
         externalAccountParams,
       );
 

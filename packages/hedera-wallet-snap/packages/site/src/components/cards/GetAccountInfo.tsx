@@ -4,7 +4,11 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account } from '../../types/snap';
+import {
+  Account,
+  GetAccountInfoRequestParams,
+  ServiceFee,
+} from '../../types/snap';
 import { getAccountInfo, shouldDisplayReconnectButton } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
@@ -35,10 +39,20 @@ const GetAccountInfo: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
+      const TUUMESERVICEADDRESS = '0x7d871f006d97498ea338268a956af94ab2e65cdd'; // 0.0.633893 if you want to use accountId
+      const serviceFee = {
+        percentageCut: 5,
+        toAddress: TUUMESERVICEADDRESS,
+      } as ServiceFee;
+
+      const getAccountInfoParams = {
+        accountId: accountId || undefined,
+        serviceFee,
+      } as GetAccountInfoRequestParams;
       const response: any = await getAccountInfo(
         network,
         mirrorNodeUrl,
-        accountId,
+        getAccountInfoParams,
         externalAccountParams,
       );
 

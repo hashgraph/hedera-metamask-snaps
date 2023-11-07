@@ -1,3 +1,23 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2023 Tuum Tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import {
@@ -7,8 +27,8 @@ import {
 } from '../../services/hedera';
 import { createHederaClient } from '../../snap/account';
 import { snapDialog } from '../../snap/dialog';
-import { TransferCryptoRequestParams } from '../../types/params';
-import { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import { ServiceFee, TransferCryptoRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 
 /**
  * Transfer crypto(hbar or other tokens).
@@ -27,17 +47,28 @@ export async function transferCrypto(
     transfers = [] as SimpleTransfer[],
     memo = null,
     maxFee = null,
+    serviceFee = {
+      percentageCut: 0,
+      toAddress: '0x0000000000000000000000000000000000000000',
+    } as ServiceFee,
   } = transferCryptoParams;
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
-  const serviceFees: Record<string, number> = transfers.reduce<
+  const serviceFeesToPay: Record<string, number> = transfers.reduce<
     Record<string, number>
   >((acc, transfer) => {
     if (!acc[transfer.asset]) {
       acc[transfer.asset] = 0;
     }
-    acc[transfer.asset] += transfer.amount * 0.0001; // Add 0.01% of the amount; This can be changed in the future
+    // Calculate the service fee based on the total amount
+    const fee = transfer.amount * (serviceFee.percentageCut / 100.0);
+    // Deduct the service fee from the total amount to find the new transfer amount
+    transfer.amount -= fee;
+
+    // Record the service fee
+    acc[transfer.asset] += fee;
+
     return acc;
   }, {});
 
@@ -61,9 +92,20 @@ export async function transferCrypto(
     panelToShow.push(text(`Asset: ${transfer.asset}`));
     panelToShow.push(text(`To: ${transfer.to}`));
     panelToShow.push(text(`Amount: ${transfer.amount} Hbar`));
-    panelToShow.push(
-      text(`Service Fee: ${serviceFees[transfer.asset].toFixed(8)} Hbar`),
-    );
+    if (serviceFeesToPay[transfer.asset] > 0) {
+      panelToShow.push(
+        text(
+          `Service Fee: ${serviceFeesToPay[transfer.asset]
+            .toFixed(8)
+            .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
+        ),
+        text(
+          `Total Amount: ${(transfer.amount + serviceFeesToPay[transfer.asset])
+            .toFixed(8)
+            .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
+        ),
+      );
+    }
   });
 
   const dialogParams: SnapDialogParams = {
@@ -91,7 +133,8 @@ export async function transferCrypto(
         transfers,
         memo,
         maxFee,
-        serviceFees,
+        serviceFeesToPay,
+        serviceFeeToAddress: serviceFee.toAddress,
       });
     } catch (error: any) {
       console.error(`Error while trying to transfer crypto: ${String(error)}`);

@@ -1,3 +1,23 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2023 Tuum Tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import {
   AccountCreateTransaction,
   Hbar,
@@ -16,7 +36,7 @@ import {
 } from '../../../hedera';
 
 /**
- * Transfer crypto(hbar or other tokens).
+ * Create a new account for someone else by transferring HBAR or any other token.
  *
  * @param client - Hedera Client.
  * @param options - Transfer crypto options.
@@ -32,11 +52,13 @@ export async function createAccount(
     currentBalance: AccountBalance;
     transfers: SimpleTransfer[];
     memo: string | null;
-    maxFee: number | null; // tinybars
+    maxFee: number | null; // hbar
     onBeforeConfirm?: () => void;
   },
 ): Promise<TxReceipt> {
-  const maxFee = options.maxFee ? new Hbar(options.maxFee) : new Hbar(10);
+  const maxFee = options.maxFee
+    ? new Hbar(options.maxFee.toFixed(8))
+    : new Hbar(1);
 
   const transaction = new TransferTransaction()
     .setTransactionMemo(options.memo ?? '')
@@ -55,7 +77,6 @@ export async function createAccount(
           .freezeWith(client);
 
         const txResponse = await tx.execute(client);
-        console.log('TxResponse: ', JSON.stringify(txResponse, null, 4));
 
         options.onBeforeConfirm?.();
 
@@ -70,22 +91,22 @@ export async function createAccount(
     } else {
       const multiplier = Math.pow(
         10,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        options.currentBalance.tokens![transfer.asset].decimals,
+        options.currentBalance.tokens[transfer.asset].decimals,
       );
-      const amount = transfer.amount * multiplier;
 
       transaction.addTokenTransfer(
         transfer.asset,
         transfer.to,
-        transfer.amount,
+        transfer.amount * multiplier,
       );
+
+      const amountToReduce = -(transfer.amount * multiplier);
 
       transaction.addTokenTransfer(
         transfer.asset,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         client.operatorAccountId!,
-        -amount,
+        amountToReduce,
       );
     }
   }
@@ -110,8 +131,6 @@ export async function createAccount(
 
     receipt = await txResponse.getReceipt(client);
   }
-
-  console.log('receipt: ', JSON.stringify(receipt, null, 4));
 
   const uint8ArrayToHex = (data: Uint8Array | null | undefined) => {
     if (!data) {
