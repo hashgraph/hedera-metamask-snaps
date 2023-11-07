@@ -62,17 +62,17 @@ export class HederaServiceImpl implements HederaService {
     let client;
 
     if (this.network === 'testnet') {
-      // client = Client.forTestnet();
-      client = Client.forNetwork({
+      client = Client.forTestnet();
+      /* client = Client.forNetwork({
         'https://testnet-node00-00-grpc.hedera.com:443': new AccountId(3),
-      });
+      }); */
     } else if (this.network === 'previewnet') {
       client = Client.forPreviewnet();
     } else {
-      // client = Client.forMainnet();
-      client = Client.forNetwork({
+      client = Client.forMainnet();
+      /* client = Client.forNetwork({
         'https://node01-00-grpc.swirlds.com:443': new AccountId(4),
-      });
+      }); */
     }
 
     // NOTE: important, ensure that we pre-compute the health state of all nodes

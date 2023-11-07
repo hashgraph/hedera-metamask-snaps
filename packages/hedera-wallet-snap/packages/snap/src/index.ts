@@ -97,10 +97,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       isValidGetAccountInfoRequest(request.params);
       return {
         currentAccount: state.currentAccount,
-        accountInfo: await getAccountInfo(
-          walletSnapParams,
-          request.params.accountId,
-        ),
+        accountInfo: await getAccountInfo(walletSnapParams, request.params),
       };
     }
     case 'getAccountBalance': {

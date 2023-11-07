@@ -1,24 +1,23 @@
 {
-  "name": "@tuum-tech/hedera-wallet-snap",
+  "name": "@hashgraph/hedera-wallet-snap",
   "version": "0.1.0",
-  "description": "Hedera Wallet unlocks wallet functionality via Metamask that any other apps can interact with, thereby turning Metamask into a native Hedera wallet without relying on Hedera JSON-RPC Relay.",
+  "description": "Hedera Wallet Snap unlocks wallet functionality via Metamask that any other apps can interact with, thereby turning Metamask into a native Hedera wallet without relying on Hedera JSON-RPC Relay.",
   "keywords": [
     "MetaMask",
     "Snaps",
     "Hedera Hashgraph",
     "HBAR"
   ],
-  "homepage": "https://github.com/tuum-tech/hedera-wallet-snap",
+  "homepage": "https://github.com/hashgraph/hedera-metamask-snaps#readme",
+  "bugs": {
+    "url": "https://github.com/hashgraph/hedera-metamask-snaps/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tuum-tech/hedera-wallet-snap.git"
+    "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
-  "author": {
-    "name": "Tuum Tech",
-    "email": "contact@tuum.tech",
-    "url": "https://tuum.tech"
-  },
+  "license": "Apache-2.0",
+  "author": "Tuum Tech, Hedera Smart Contracts Team",
   "main": "dist/snap.js",
   "files": [
     "dist/snap.js",
@@ -35,9 +34,9 @@
     "build:snap": "yarn build:snap:postprocess && mm-snap manifest --fix",
     "build:snap:eval": "mm-snap eval -b dist/snap.js",
     "build:snap:postprocess": "node ./postBuild.js",
-    "deploy": "npm run build && cd dist && npm publish",
     "clean": "rimraf dist build",
     "compile": "babel src -d lib",
+    "deploy": "npm run build && cd dist && npm publish",
     "lint": "yarn lint:eslint && yarn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",

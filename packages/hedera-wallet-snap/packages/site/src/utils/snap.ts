@@ -1,7 +1,10 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
-import { SimpleTransfer } from '../types/snap';
+import {
+  GetAccountInfoRequestParams,
+  TransferCryptoRequestParams,
+} from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
   const accounts = (await window.ethereum.request({
@@ -102,7 +105,7 @@ export const sendHello = async (network: string, mirrorNodeUrl: string) => {
 export const getAccountInfo = async (
   network: string,
   mirrorNodeUrl: string,
-  accountId?: string,
+  getAccountInfoParams: GetAccountInfoRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -111,7 +114,13 @@ export const getAccountInfo = async (
       snapId: defaultSnapOrigin,
       request: {
         method: 'getAccountInfo',
-        params: { network, mirrorNodeUrl, accountId, ...externalAccountparams },
+        params: {
+          network,
+          mirrorNodeUrl,
+          accountId: getAccountInfoParams.accountId,
+          serviceFee: getAccountInfoParams.serviceFee,
+          ...externalAccountparams,
+        },
       },
     },
   });
@@ -144,9 +153,7 @@ export const getAccountBalance = async (
 export const transferCrypto = async (
   network: string,
   mirrorNodeUrl: string,
-  transfers: SimpleTransfer[],
-  memo?: string,
-  maxFee?: number,
+  transferCryptoParams: TransferCryptoRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -158,9 +165,10 @@ export const transferCrypto = async (
         params: {
           network,
           mirrorNodeUrl,
-          transfers,
-          memo,
-          maxFee,
+          transfers: transferCryptoParams.transfers,
+          memo: transferCryptoParams.memo,
+          maxFee: transferCryptoParams.maxFee,
+          serviceFee: transferCryptoParams.serviceFee,
           ...externalAccountparams,
         },
       },

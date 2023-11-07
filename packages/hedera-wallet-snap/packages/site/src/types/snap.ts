@@ -41,10 +41,21 @@ export type SimpleTransfer = {
   amount: number;
 };
 
+export type ServiceFee = {
+  percentageCut: number;
+  toAddress: string;
+};
+
+export type GetAccountInfoRequestParams = {
+  accountId?: string;
+  serviceFee?: ServiceFee;
+};
+
 export type TransferCryptoRequestParams = {
   transfers: SimpleTransfer[];
   memo?: string;
-  maxFee?: number; // tinybars
+  maxFee?: number; // hbars
+  serviceFee?: ServiceFee;
 };
 
 export type ExternalAccountParams = {

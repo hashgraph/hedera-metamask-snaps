@@ -1,47 +1,53 @@
 import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 import {
   AccountBalance,
   SimpleHederaClient,
   SimpleTransfer,
 } from 'src/services/hedera';
-import { TUUMACCOUNTID } from '../types/constants';
 
 export type QueryCost = {
-  serviceFee: number;
-  estimatedCost: number;
+  serviceFeeToPay: number;
   maxCost: number;
 };
 
-export const calculateHederaQueryFees = (queryCost: BigNumber): QueryCost => {
-  const serviceFee = queryCost.multipliedBy(0.01); // 1% service fee to Tuum Tech for the query; This can be changed in the future
+export const calculateHederaQueryFees = (
+  queryCost: BigNumber,
+  serviceFeePercentage: number,
+): QueryCost => {
+  const serviceFee = queryCost.multipliedBy(serviceFeePercentage / 100.0); // The service fee is configurable
 
-  const estimatedCost = queryCost.plus(serviceFee);
+  const totalQueryCost = queryCost.plus(serviceFee);
 
   // add a 5% margin to allow for spot fluctuations
-  const maxCost = estimatedCost.multipliedBy(1.05);
+  const maxCost = totalQueryCost.multipliedBy(1.05);
 
   const serviceFeeResult = Number(serviceFee.toFixed(8));
-  const estimatedCostResult = Number(estimatedCost.toFixed(8));
   const maxCostResult = Number(maxCost.toFixed(8));
 
   return {
-    serviceFee: serviceFeeResult,
-    estimatedCost: estimatedCostResult,
+    serviceFeeToPay: serviceFeeResult,
     maxCost: maxCostResult,
   } as QueryCost;
 };
 
 export const deductServiceFee = async (
   currentBalance: AccountBalance,
-  serviceFee: number,
+  serviceFeeToPay: number,
+  serviceFeeToAddr: string,
   hederaClient: SimpleHederaClient,
 ) => {
   try {
+    let toAddress: string = serviceFeeToAddr;
+    if (ethers.isAddress(toAddress)) {
+      toAddress = `0.0.${toAddress.slice(2)}`;
+    }
+
     const transfers: SimpleTransfer[] = [
       {
         asset: 'HBAR',
-        to: TUUMACCOUNTID,
-        amount: serviceFee,
+        to: toAddress,
+        amount: serviceFeeToPay,
       } as SimpleTransfer,
     ];
     await hederaClient.transferCrypto({
@@ -49,7 +55,8 @@ export const deductServiceFee = async (
       transfers,
       memo: null,
       maxFee: null,
-      serviceFees: null,
+      serviceFeesToPay: null,
+      serviceFeeToAddress: null,
     });
   } catch (error: any) {
     // eslint-disable-next-line no-empty

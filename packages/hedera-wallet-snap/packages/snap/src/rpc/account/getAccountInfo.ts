@@ -1,4 +1,4 @@
-import { AccountId, AccountInfoQuery } from '@hashgraph/sdk';
+import { AccountInfoQuery } from '@hashgraph/sdk';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
@@ -6,7 +6,8 @@ import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
 import { AccountInfo } from '../../types/account';
-import { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import { GetAccountInfoRequestParams, ServiceFee } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import {
   calculateHederaQueryFees,
   deductServiceFee,
@@ -28,14 +29,22 @@ import {
  * currently not available and may not be the exact value at a provided timestamp.
  *
  * @param walletSnapParams - Wallet snap params.
- * @param accountId - Hedera Account Id.
+ * @param getAccountInfoParams - Parameters for getting acocunt info.
  * @returns Account Info.
  */
 export async function getAccountInfo(
   walletSnapParams: WalletSnapParams,
-  accountId?: string,
+  getAccountInfoParams: GetAccountInfoRequestParams,
 ): Promise<AccountInfo> {
   const { origin, state, mirrorNodeUrl } = walletSnapParams;
+
+  const {
+    accountId = '',
+    serviceFee = {
+      percentageCut: 0,
+      toAddress: '0x0000000000000000000000000000000000000000',
+    } as ServiceFee,
+  } = getAccountInfoParams;
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
@@ -44,15 +53,7 @@ export async function getAccountInfo(
   let accountInfo = {} as AccountInfo;
 
   try {
-    if (accountId && !_.isEmpty(accountId)) {
-      if (!AccountId.fromString(accountId)) {
-        console.error(
-          `Invalid Hedera Account Id '${accountId}' is not a valid account Id`,
-        );
-        throw new Error(
-          `Invalid Hedera Account Id '${accountId}' is not a valid account Id`,
-        );
-      }
+    if (accountId) {
       accountIdToUse = accountId;
     }
 
@@ -70,21 +71,47 @@ export async function getAccountInfo(
       const queryCost = (
         await query.getCost(hederaClient.getClient())
       ).toBigNumber();
-      const { serviceFee, estimatedCost, maxCost } =
-        calculateHederaQueryFees(queryCost);
+      const { serviceFeeToPay, maxCost } = calculateHederaQueryFees(
+        queryCost,
+        serviceFee.percentageCut,
+      );
+
+      const panelToShow = [
+        heading('Get account info'),
+        text(
+          `Note that since you didn't pass 'mirrorNodeUrl' parameter, the snap will query the Hedera Ledger node to retrieve the account information and this may have the following costs associated with the query.`,
+        ),
+        divider(),
+        text(
+          `Estimated Query Fee: ${queryCost
+            .toFixed(8)
+            .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
+        ),
+      ];
+
+      if (serviceFee.percentageCut > 0) {
+        panelToShow.push(
+          text(
+            `Service Fee: ${serviceFeeToPay
+              .toFixed(8)
+              .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
+          ),
+        );
+      }
+      panelToShow.push(
+        ...[
+          text(
+            `Estimated Max Query Fee: ${maxCost
+              .toFixed(8)
+              .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
+          ),
+          divider(),
+        ],
+      );
 
       const dialogParamsForHederaAccountId: SnapDialogParams = {
         type: 'confirmation',
-        content: await generateCommonPanel(origin, [
-          heading('Get account info'),
-          text(
-            `Note that since you didn't pass 'mirrorNodeUrl' parameter, the snap will query the Hedera Ledger node to retrieve the account information and this has the following costs associated with the query.`,
-          ),
-          divider(),
-          text(`Estimated Query Fee: ${estimatedCost.toFixed(8)} Hbar`),
-          text(`Max Query Fee: ${maxCost.toFixed(8)} Hbar`),
-          divider(),
-        ]),
+        content: await generateCommonPanel(origin, panelToShow),
       };
       const confirmed = await snapDialog(dialogParamsForHederaAccountId);
       if (!confirmed) {
@@ -99,7 +126,8 @@ export async function getAccountInfo(
       // Service Fee to Tuum Tech's account
       await deductServiceFee(
         state.accountState[hederaEvmAddress][network].accountInfo.balance,
-        serviceFee,
+        serviceFeeToPay,
+        serviceFee.toAddress,
         hederaClient,
       );
     } else {

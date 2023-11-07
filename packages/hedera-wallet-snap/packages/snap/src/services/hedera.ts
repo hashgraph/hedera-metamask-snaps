@@ -146,7 +146,8 @@ export type SimpleHederaClient = {
     transfers: SimpleTransfer[];
     memo: string | null;
     maxFee: number | null; // hbars
-    serviceFees: Record<string, number> | null;
+    serviceFeesToPay: Record<string, number> | null;
+    serviceFeeToAddress: string | null;
     onBeforeConfirm?: () => void;
   }): Promise<TxReceipt>;
 };
