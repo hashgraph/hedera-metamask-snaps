@@ -58,7 +58,7 @@ const ExternalAccount = forwardRef(({}, ref: Ref<GetExternalAccountRef>) => {
             <Form.Control
               size="lg"
               type="text"
-              placeholder="ECDSA_SECP256K1 or ED25519(Can be empty)"
+              placeholder="ED25519 or ECDSA_SECP256K1(Can be empty)"
               style={{ marginBottom: 8 }}
               onChange={(e) => setCurve(e.target.value)}
             />

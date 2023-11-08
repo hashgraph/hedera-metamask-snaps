@@ -86,18 +86,19 @@ export async function transferCrypto(
         outgoingHbarAmount += -options.serviceFeesToPay[transfer.asset];
       }
     } else {
-      const multiplier = Math.pow(
+      // TODO: Currently not implemented
+      /*       const multiplier = Math.pow(
         10,
         options.currentBalance.tokens[transfer.asset].decimals,
       );
 
+      let outgoingTokenAmount = transfer.amount * multiplier;
+
       transaction.addTokenTransfer(
         transfer.asset,
         transfer.to,
-        transfer.amount * multiplier,
+        outgoingTokenAmount,
       );
-
-      let amountToReduce = -(transfer.amount * multiplier);
 
       // Service Fee
       if (options.serviceFeesToPay) {
@@ -106,17 +107,16 @@ export async function transferCrypto(
           serviceFeeToAddr,
           options.serviceFeesToPay[transfer.asset] * multiplier,
         );
-        amountToReduce += -(
-          options.serviceFeesToPay[transfer.asset] * multiplier
-        );
+        outgoingTokenAmount +=
+          options.serviceFeesToPay[transfer.asset] * multiplier;
       }
 
       transaction.addTokenTransfer(
         transfer.asset,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         client.operatorAccountId!,
-        amountToReduce,
-      );
+        -outgoingTokenAmount,
+      ); */
     }
   }
 

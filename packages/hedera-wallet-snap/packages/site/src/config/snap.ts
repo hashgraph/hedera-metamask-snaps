@@ -28,4 +28,3 @@
  */
 export const defaultSnapOrigin =
   process.env.SNAP_ORIGIN ?? `local:http://localhost:9001`;
-// export const defaultSnapId = `npm:@tuum-tech/hedera-pulse`;
