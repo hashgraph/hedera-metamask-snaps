@@ -68,15 +68,18 @@ export async function getAccountInfo(
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
-  let accountIdToUse = hederaAccountId;
+  let accountIdToQuery = hederaAccountId;
+  let selfAccountId = true;
+  if (!_.isEmpty(accountId)) {
+    accountIdToQuery = accountId;
+    if (accountIdToQuery !== hederaAccountId) {
+      selfAccountId = false;
+    }
+  }
 
   let accountInfo = {} as AccountInfo;
 
   try {
-    if (accountId) {
-      accountIdToUse = accountId;
-    }
-
     if (_.isEmpty(mirrorNodeUrl)) {
       console.log('Retrieving account info using Hedera Ledger Node');
       const hederaClient = await createHederaClient(
@@ -87,7 +90,7 @@ export async function getAccountInfo(
       );
 
       // Create the account info query
-      const query = new AccountInfoQuery({ accountId: accountIdToUse });
+      const query = new AccountInfoQuery({ accountId: accountIdToQuery });
       const queryCost = (
         await query.getCost(hederaClient.getClient())
       ).toBigNumber();
@@ -99,7 +102,7 @@ export async function getAccountInfo(
       const panelToShow = [
         heading('Get account info'),
         text(
-          `Note that since you didn't pass 'mirrorNodeUrl' parameter, the snap will query the Hedera Ledger node to retrieve the account information and this may have the following costs associated with the query.`,
+          `Note that since you didn't pass 'mirrorNodeUrl' parameter, the snap will query the Hedera Ledger node to retrieve the account information and this may have the following costs associated with the query. Also, the token balance data will not be updated. If you want to update the complete account data and want to do it for free, be sure to pass 'mirrorNodeUrl' in your parameter.`,
         ),
         divider(),
         text(
@@ -141,7 +144,24 @@ export async function getAccountInfo(
 
       hederaClient.setMaxQueryPayment(maxCost.toFixed(8));
 
-      accountInfo = await hederaClient.getAccountInfo(accountIdToUse);
+      accountInfo = await hederaClient.getAccountInfo(accountIdToQuery);
+
+      if (selfAccountId) {
+        accountInfo.alias =
+          state.accountState[hederaEvmAddress][network].accountInfo.alias;
+        accountInfo.createdTime =
+          state.accountState[hederaEvmAddress][network].accountInfo.createdTime;
+        accountInfo.key =
+          state.accountState[hederaEvmAddress][network].accountInfo.key;
+        accountInfo.balance.timestamp =
+          state.accountState[hederaEvmAddress][
+            network
+          ].accountInfo.balance.timestamp;
+        accountInfo.balance.tokens =
+          state.accountState[hederaEvmAddress][
+            network
+          ].accountInfo.balance.tokens;
+      }
 
       // Service Fee to Tuum Tech's account
       await deductServiceFee(
@@ -153,39 +173,14 @@ export async function getAccountInfo(
     } else {
       console.log('Retrieving account info using Hedera Mirror node');
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-      accountInfo = await hederaService.getMirrorAccountInfo(accountIdToUse);
+      accountInfo = await hederaService.getMirrorAccountInfo(accountIdToQuery);
     }
 
     // Only change the state if we are retrieving account Id of the currently logged in user
     // Only change the values for which is necessary
-    if (_.isEmpty(accountId)) {
-      accountInfo.alias =
-        state.accountState[hederaEvmAddress][network].accountInfo.alias;
-      accountInfo.createdTime =
-        state.accountState[hederaEvmAddress][network].accountInfo.createdTime;
-      accountInfo.key.type =
-        state.accountState[hederaEvmAddress][network].accountInfo.key.type;
-      accountInfo.balance.tokens =
-        state.accountState[hederaEvmAddress][
-          network
-        ].accountInfo.balance.tokens;
-
-      state.accountState[hederaEvmAddress][network].accountInfo.balance.hbars =
-        accountInfo.balance.hbars;
-      state.accountState[hederaEvmAddress][
-        network
-      ].accountInfo.balance.timestamp = accountInfo.balance.timestamp;
-      state.accountState[hederaEvmAddress][network].accountInfo.expirationTime =
-        accountInfo.expirationTime;
-      state.accountState[hederaEvmAddress][
-        network
-      ].accountInfo.autoRenewPeriod = accountInfo.autoRenewPeriod;
-      state.accountState[hederaEvmAddress][network].accountInfo.ethereumNonce =
-        accountInfo.ethereumNonce;
-      state.accountState[hederaEvmAddress][network].accountInfo.isDeleted =
-        accountInfo.isDeleted;
-      state.accountState[hederaEvmAddress][network].accountInfo.stakingInfo =
-        accountInfo.stakingInfo;
+    if (selfAccountId) {
+      state.accountState[hederaEvmAddress][network].accountInfo = accountInfo;
+      state.currentAccount.balance = accountInfo.balance;
       await updateSnapState(state);
     }
   } catch (error: any) {

@@ -200,8 +200,14 @@ export class HederaServiceImpl implements HederaService {
         symbol: tokenInfo.symbol,
         tokenType: tokenInfo.type,
         supplyType: tokenInfo.supply_type,
-        totalSupply: tokenInfo.total_supply,
-        maxSupply: tokenInfo.max_supply,
+        totalSupply: (
+          Number(tokenInfo.total_supply) /
+          Math.pow(10, Number(tokenInfo.decimals))
+        ).toString(),
+        maxSupply: (
+          Number(tokenInfo.max_supply) /
+          Math.pow(10, Number(tokenInfo.decimals))
+        ).toString(),
       } as TokenBalance;
     });
 

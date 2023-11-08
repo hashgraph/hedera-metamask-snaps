@@ -46,13 +46,19 @@ export async function getAccountBalance(
       network,
     );
 
+    const hbarBalance = await hederaClient.getAccountBalance();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state.accountState[hederaEvmAddress][network].accountInfo.balance.hbars =
-      await hederaClient.getAccountBalance();
+      hbarBalance;
+    state.currentAccount.balance.hbars = hbarBalance;
+
+    const currentTimestamp = new Date().toISOString();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     state.accountState[hederaEvmAddress][
       network
-    ].accountInfo.balance.timestamp = new Date().toISOString();
+    ].accountInfo.balance.timestamp = currentTimestamp;
+    state.currentAccount.balance.timestamp = currentTimestamp;
+
     await updateSnapState(state);
   } catch (error: any) {
     console.error(

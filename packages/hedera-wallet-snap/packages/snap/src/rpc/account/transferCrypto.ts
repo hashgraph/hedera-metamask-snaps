@@ -55,6 +55,7 @@ export async function transferCrypto(
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
+  let shouldExecuteTransfer = false;
   const serviceFeesToPay: Record<string, number> = transfers.reduce<
     Record<string, number>
   >((acc, transfer) => {
@@ -72,6 +73,9 @@ export async function transferCrypto(
     // Record the service fee
     acc[transfer.asset] += fee;
 
+    if (transfer.asset === 'HBAR') {
+      shouldExecuteTransfer = true;
+    }
     return acc;
   }, {});
 
@@ -92,21 +96,33 @@ export async function transferCrypto(
     panelToShow.push(text(`Transaction #${txNumber}`));
     panelToShow.push(divider());
 
-    panelToShow.push(text(`Asset: ${transfer.asset}`));
-    panelToShow.push(text(`To: ${transfer.to}`));
-    panelToShow.push(text(`Amount: ${transfer.amount} Hbar`));
-    if (serviceFeesToPay[transfer.asset] > 0) {
+    if (transfer.asset === 'HBAR') {
+      panelToShow.push(text(`Asset: ${transfer.asset}`));
+      panelToShow.push(text(`To: ${transfer.to}`));
+      panelToShow.push(text(`Amount: ${transfer.amount} HBAR`));
+      if (serviceFeesToPay[transfer.asset] > 0) {
+        panelToShow.push(
+          text(
+            `Service Fee: ${serviceFeesToPay[transfer.asset]
+              .toFixed(8)
+              .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
+              transfer.asset === 'HBAR' ? 'HBAR' : ''
+            }`,
+          ),
+          text(
+            `Total Amount: ${(
+              transfer.amount + serviceFeesToPay[transfer.asset]
+            )
+              .toFixed(8)
+              .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
+              transfer.asset === 'HBAR' ? 'HBAR' : ''
+            }`,
+          ),
+        );
+      }
+    } else {
       panelToShow.push(
-        text(
-          `Service Fee: ${serviceFeesToPay[transfer.asset]
-            .toFixed(8)
-            .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
-        ),
-        text(
-          `Total Amount: ${(transfer.amount + serviceFeesToPay[transfer.asset])
-            .toFixed(8)
-            .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} Hbar`,
-        ),
+        text(`The transfer of '${transfer.asset}' is currently not supported`),
       );
     }
   });
@@ -118,6 +134,12 @@ export async function transferCrypto(
 
   if (await snapDialog(dialogParams)) {
     try {
+      if (!shouldExecuteTransfer) {
+        throw new Error(
+          `There are no transactions to execute. Please try again.`,
+        );
+      }
+
       let currentBalance =
         state.accountState[hederaEvmAddress][network].accountInfo.balance;
       if (!currentBalance) {
