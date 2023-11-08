@@ -62,7 +62,10 @@ export async function transferCrypto(
       acc[transfer.asset] = 0;
     }
     // Calculate the service fee based on the total amount
-    const fee = transfer.amount * (serviceFee.percentageCut / 100.0);
+    const fee = Number(
+      (transfer.amount * (serviceFee.percentageCut / 100.0)).toFixed(2),
+    );
+
     // Deduct the service fee from the total amount to find the new transfer amount
     transfer.amount -= fee;
 

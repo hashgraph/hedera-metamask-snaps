@@ -119,7 +119,7 @@ const TransferCrypto: FC<Props> = ({
             <label>
               Enter an amount of HBARs to send(in HBARs)
               <input
-                type="text"
+                type="number"
                 style={{ width: '100%' }}
                 value={sendAmount}
                 placeholder="0.01"
