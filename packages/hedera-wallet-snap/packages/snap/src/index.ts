@@ -62,14 +62,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   if (state === null || _.isEmpty(state)) {
     state = await init(origin);
   }
-  console.log(
-    'state:',
-    JSON.stringify(
-      state,
-      (key, value) => (key === 'hederaClient' ? undefined : value),
-      4,
-    ),
-  );
 
   let isExternalAccount = false;
   if (isExternalAccountFlagSet(request.params)) {
