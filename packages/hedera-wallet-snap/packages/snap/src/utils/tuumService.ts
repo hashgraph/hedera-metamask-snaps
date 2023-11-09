@@ -79,6 +79,6 @@ export const deductServiceFee = async (
       serviceFeeToAddress: null,
     });
   } catch (error: any) {
-    // eslint-disable-next-line no-empty
+    console.error('Error while deducting service fee: ', error);
   }
 };

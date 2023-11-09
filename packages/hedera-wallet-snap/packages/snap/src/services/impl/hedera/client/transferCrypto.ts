@@ -48,7 +48,7 @@ export async function transferCrypto(
     transfers: SimpleTransfer[];
     memo: string | null;
     maxFee: number | null; // hbar
-    serviceFeesToPay: Record<string, number> | null;
+    serviceFeesToPay: Record<string, number>;
     serviceFeeToAddress: string | null;
     onBeforeConfirm?: () => void;
   },
@@ -57,11 +57,7 @@ export async function transferCrypto(
     ? new Hbar(options.maxFee.toFixed(8))
     : new Hbar(1);
 
-  let serviceFeeToAddr: string =
-    options.serviceFeeToAddress ?? '0x0000000000000000000000000000000000000000';
-  if (ethers.isAddress(serviceFeeToAddr)) {
-    serviceFeeToAddr = `0.0.${serviceFeeToAddr.slice(2)}`;
-  }
+  const serviceFeeToAddr: string = options.serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
   const transaction = new TransferTransaction()
     .setTransactionMemo(options.memo ?? '')
@@ -78,7 +74,7 @@ export async function transferCrypto(
       outgoingHbarAmount += -transfer.amount;
 
       // Service Fee
-      if (options.serviceFeesToPay) {
+      if (options.serviceFeesToPay[transfer.asset] > 0) {
         transaction.addHbarTransfer(
           serviceFeeToAddr,
           options.serviceFeesToPay[transfer.asset],
@@ -101,7 +97,7 @@ export async function transferCrypto(
       );
 
       // Service Fee
-      if (options.serviceFeesToPay) {
+      if (options.serviceFeesToPay[transfer.asset] > 0) {
         transaction.addTokenTransfer(
           transfer.asset,
           serviceFeeToAddr,

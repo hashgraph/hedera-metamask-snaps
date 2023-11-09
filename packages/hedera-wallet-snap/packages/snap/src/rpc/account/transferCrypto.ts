@@ -49,7 +49,7 @@ export async function transferCrypto(
     maxFee = null,
     serviceFee = {
       percentageCut: 0,
-      toAddress: '0x0000000000000000000000000000000000000000',
+      toAddress: '0.0.98', // Hedera Fee collection account
     } as ServiceFee,
   } = transferCryptoParams;
 
