@@ -14,7 +14,7 @@ yarn install && yarn start
 
 ### Connect to official npm package @hashgraph/hedera-wallet-snap
 
-If you want to connect the example website to the official npm package [Hedera Wallet Snap Npm Package](https://www.npmjs.com/package/@hashgraph/hedera-wallet-snap), you'll need to pass this in your environment file ``SNAP_ORIGIN=`npm:@@hashgraph/hedera-wallet-snap`;``
+If you want to connect the example website to the official npm package [Hedera Wallet Snap Npm Package](https://www.npmjs.com/package/@hashgraph/hedera-wallet-snap), you'll need to pass this in your environment file ``SNAP_ORIGIN=`npm:@hashgraph/hedera-wallet-snap`;``
 
 ## Contributing
 
