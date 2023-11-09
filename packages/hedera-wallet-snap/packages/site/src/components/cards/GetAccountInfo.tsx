@@ -39,9 +39,9 @@ const GetAccountInfo: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const TUUMESERVICEADDRESS = '0x7d871f006d97498ea338268a956af94ab2e65cdd'; // 0.0.633893 if you want to use accountId
+      const TUUMESERVICEADDRESS = '0x0000000000000000000000000000000000000000';
       const serviceFee = {
-        percentageCut: 5,
+        percentageCut: 0, // Change this if you want to charge a service fee
         toAddress: TUUMESERVICEADDRESS,
       } as ServiceFee;
 
