@@ -75,7 +75,7 @@ export const deductServiceFee = async (
       transfers,
       memo: null,
       maxFee: null,
-      serviceFeesToPay: null,
+      serviceFeesToPay: {},
       serviceFeeToAddress: null,
     });
   } catch (error: any) {
