@@ -62,7 +62,7 @@ export async function getAccountInfo(
     accountId = '',
     serviceFee = {
       percentageCut: 0,
-      toAddress: '0x0000000000000000000000000000000000000000',
+      toAddress: '0.0.98', // Hedera Fee collection account
     } as ServiceFee,
   } = getAccountInfoParams;
 
@@ -163,13 +163,15 @@ export async function getAccountInfo(
           ].accountInfo.balance.tokens;
       }
 
-      // Service Fee to Tuum Tech's account
-      await deductServiceFee(
-        state.accountState[hederaEvmAddress][network].accountInfo.balance,
-        serviceFeeToPay,
-        serviceFee.toAddress,
-        hederaClient,
-      );
+      // Deduct service Fee if set
+      if (serviceFee.percentageCut > 0) {
+        await deductServiceFee(
+          state.accountState[hederaEvmAddress][network].accountInfo.balance,
+          serviceFeeToPay,
+          serviceFee.toAddress,
+          hederaClient,
+        );
+      }
     } else {
       console.log('Retrieving account info using Hedera Mirror node');
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);

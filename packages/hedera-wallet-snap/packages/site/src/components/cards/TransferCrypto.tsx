@@ -51,7 +51,7 @@ const TransferCrypto: FC<Props> = ({
       ];
       // const maxFee = 1; // Note that if you don't pass this, default is 1 HBAR
 
-      const TUUMESERVICEADDRESS = '0x0000000000000000000000000000000000000000';
+      const TUUMESERVICEADDRESS = '0.0.98'; // Hedera Fee collection account
       const serviceFee = {
         percentageCut: 0, // Change this if you want to charge a service fee
         toAddress: TUUMESERVICEADDRESS,
