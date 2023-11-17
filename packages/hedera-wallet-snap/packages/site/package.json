@@ -1,5 +1,5 @@
 {
-  "name": "@tuum-tech/hedera-wallet-snap-site",
+  "name": "@hashgraph/hedera-wallet-snap-site",
   "version": "0.1.0",
   "private": true,
   "license": "(MIT-0 OR Apache-2.0)",

@@ -122,6 +122,7 @@ jobs:
         run: task build
 
   publish-release:
+    if: github.actor == 'NanaEC' || github.actor == 'nathanklick' || github.actor == 'kpachhai'
     name: Publish Release
     runs-on: [self-hosted, Linux, large, ephemeral]
     needs:
