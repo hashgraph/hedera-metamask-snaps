@@ -1,8 +1,8 @@
 {
   "name": "@hashgraph/hedera-wallet-snap-site",
-  "version": "0.1.0",
+  "version": "0.1.0-SNAPSHOT",
   "private": true,
-  "license": "(MIT-0 OR Apache-2.0)",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "cross-env GATSBY_TELEMETRY_DISABLED=1 gatsby build",
     "clean": "rimraf public",
