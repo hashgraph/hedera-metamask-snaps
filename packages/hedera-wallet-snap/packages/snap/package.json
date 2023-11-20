@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-wallet-snap",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0-rc1",
   "description": "Hedera Wallet Snap unlocks wallet functionality via Metamask that any other apps can interact with, thereby turning Metamask into a native Hedera wallet without relying on Hedera JSON-RPC Relay.",
   "keywords": [
     "MetaMask",

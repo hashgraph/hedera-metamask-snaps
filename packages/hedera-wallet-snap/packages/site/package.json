@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-wallet-snap-site",
-  "version": "0.1.0-SNAPSHOT",
+  "version": "0.1.0-rc1",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
