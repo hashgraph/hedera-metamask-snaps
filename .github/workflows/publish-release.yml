@@ -18,7 +18,7 @@ on:
         required: false
         default: true
   pull_request:
-    branches: [fix-release-ci]
+    branches: [release/0.1]
 
 defaults:
   run:
