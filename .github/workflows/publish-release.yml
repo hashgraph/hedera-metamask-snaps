@@ -6,20 +6,24 @@ on:
         description: "Snap package name, should already exist under ./packages (eg: hedera-wallet-snap/packages/snap)"
         type: string
         required: true
+        default: "hedera-wallet-snap/packages/snap"
       tag:
         description: "Existing Tag to Publish (eg: v3.7.0)"
         type: string
         required: true
+        default: "v0.1.0-alpha1"
       dry-run-enabled:
         description: "Dry Run Enabled"
         type: boolean
         required: false
-        default: false
+        default: true
+  pull_request:
+    branches: [fix-release-ci]
 
 defaults:
   run:
     shell: bash
-    working-directory: ./packages/${{ github.event.inputs.snap-package-dir }}
+    working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}"
 
 permissions:
   contents: read
