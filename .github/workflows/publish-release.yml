@@ -14,12 +14,11 @@ on:
         description: "Dry Run Enabled"
         type: boolean
         required: false
-        default: false
+        default: true
 
 defaults:
   run:
     shell: bash
-    working-directory: ./packages/${{ github.event.inputs.snap-package-dir }}
 
 permissions:
   contents: read
@@ -28,6 +27,9 @@ jobs:
   validate-release:
     name: Validate Release
     runs-on: [self-hosted, Linux, medium, ephemeral]
+    defaults:
+      run:
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
     outputs:
       tag: ${{ steps.tag.outputs.name }}
       version: ${{ steps.tag.outputs.version }}
@@ -97,6 +99,9 @@ jobs:
   run-safety-checks:
     name: Safety Checks
     runs-on: [self-hosted, Linux, medium, ephemeral]
+    defaults:
+      run:
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
     steps:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -125,6 +130,9 @@ jobs:
     if: github.actor == 'NanaEC' || github.actor == 'nathanklick' || github.actor == 'kpachhai'
     name: Publish Release
     runs-on: [self-hosted, Linux, large, ephemeral]
+    defaults:
+      run:
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
     needs:
       - validate-release
       - run-safety-checks
