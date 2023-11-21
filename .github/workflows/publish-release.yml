@@ -121,6 +121,9 @@ jobs:
       - name: Setup yarn
         run: npm install -g yarn
 
+      - name: Yarn install
+        run: yarn install
+
       - name: Build Code
         run: npm run build
 
