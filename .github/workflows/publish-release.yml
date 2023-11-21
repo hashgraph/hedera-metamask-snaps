@@ -33,7 +33,7 @@ jobs:
     runs-on: [self-hosted, Linux, medium, ephemeral]
     defaults:
       run:
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
+        working-directory: "./packages/hedera-wallet-snap/packages/snap/"
     outputs:
       tag: ${{ steps.tag.outputs.name }}
       version: ${{ steps.tag.outputs.version }}
