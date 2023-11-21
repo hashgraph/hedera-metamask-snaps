@@ -118,6 +118,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Setup yarn
+        run: npm install -g yarn
+
       - name: Build Code
         run: npm run build
 
