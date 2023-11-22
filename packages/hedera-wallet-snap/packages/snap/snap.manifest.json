@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.0-rc1",
   "description": "Hedera Wallet unlocks wallet functionality via Metamask that any other apps can interact with, thereby turning Metamask into a native Hedera wallet without relying on Hedera JSON-RPC Relay.",
   "proposedName": "Hedera Wallet",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "V5GMmYntC2FeeDghjc3kwJ8tfjry5brsaScdUlwl2J4=",
+    "shasum": "t755D/6jLzU8aRfPcXfmrvdzQyRGynrwSA/j1YRwDJQ=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",
