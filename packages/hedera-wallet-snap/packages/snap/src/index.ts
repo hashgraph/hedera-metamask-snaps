@@ -19,8 +19,10 @@
  */
 
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { panel, text } from '@metamask/snaps-ui';
+import { copyable, heading, panel, text } from '@metamask/snaps-ui';
 
+import { providerErrors } from '@metamask/rpc-errors';
+import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { getAccountBalance } from './rpc/account/getAccountBalance';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
@@ -33,6 +35,7 @@ import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
   isValidGetAccountInfoRequest,
+  isValidSignMessageRequest,
   isValidTransferCryptoParams,
 } from './utils/params';
 
@@ -95,13 +98,49 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           type: 'confirmation',
           content: panel([
             text(`Hello, **${origin}**!`),
-            text('This custom confirmation is just for display purposes.'),
+            text(
+              "You are seeing this because you interacted with the 'hello' method",
+            ),
           ]),
         },
       });
       return {
         currentAccount: state.currentAccount,
       };
+
+    case 'signMessage': {
+      isValidSignMessageRequest(request.params);
+
+      const result = await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'confirmation',
+          content: panel([
+            heading('Signature request'),
+            text(
+              _.isEmpty(request.params.header)
+                ? 'Do you want to sign this message?'
+                : request.params.header,
+            ),
+            copyable(request.params.message),
+          ]),
+        },
+      });
+
+      if (!result) {
+        throw providerErrors.userRejectedRequest();
+      }
+
+      const { hederaEvmAddress, network } = state.currentAccount;
+      const { privateKey } =
+        state.accountState[hederaEvmAddress][network].keyStore;
+      const wallet: Wallet = new ethers.Wallet(privateKey);
+
+      return {
+        currentAccount: state.currentAccount,
+        signedMessage: wallet.signMessage(request.params.message),
+      };
+    }
     case 'getAccountInfo': {
       isValidGetAccountInfoRequest(request.params);
       return {
@@ -123,6 +162,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
     default:
-      throw new Error('Method not found.');
+      throw providerErrors.unsupportedMethod();
   }
 };

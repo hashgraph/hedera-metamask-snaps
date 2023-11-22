@@ -19,6 +19,7 @@
  */
 
 import { PrivateKey } from '@hashgraph/sdk';
+import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
@@ -88,7 +89,7 @@ export async function setCurrentAccount(
         )}'`,
       );
 
-      throw new Error(
+      throw providerErrors.unsupportedMethod(
         `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
           ', ',
         )}'`,
@@ -107,7 +108,7 @@ export async function setCurrentAccount(
           console.error(
             `You must use 'ECDSA_SECP256K1' as the curve if you want to import an EVM address. Please make sure to pass in the correct value for "curve".`,
           );
-          throw new Error(
+          throw providerErrors.unsupportedMethod(
             `You must use 'ECDSA_SECP256K1' as the curve if you want to import an EVM address. Please make sure to pass in the correct value for "curve".`,
           );
         }
@@ -136,16 +137,19 @@ export async function setCurrentAccount(
           connectedAddress = _connectedAddress;
           keyStore = _keyStore;
         } catch (error: any) {
+          const address = accountIdOrEvmAddress as string;
           console.error(
-            `Could not connect to '${
-              accountIdOrEvmAddress as string
-            }'. Please try again: ${String(error)}`,
+            `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
+              error,
+            )}`,
           );
-          throw new Error(
-            `Could not connect to '${
-              accountIdOrEvmAddress as string
-            }'. Please try again: ${String(error)}`,
-          );
+          throw providerErrors.custom({
+            code: 4200,
+            message: `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
+              error,
+            )}`,
+            data: address,
+          });
         }
       }
     } else {
@@ -155,7 +159,9 @@ export async function setCurrentAccount(
       const res = await generateWallet(connectedAddress);
       if (!res) {
         console.log('Failed to generate snap wallet for DID operations');
-        throw new Error('Failed to generate snap wallet for DID operations');
+        throw providerErrors.unsupportedMethod(
+          'Failed to generate snap wallet for DID operations',
+        );
       }
       keyStore.curve = 'ECDSA_SECP256K1';
       keyStore.privateKey = res.privateKey;
@@ -193,7 +199,7 @@ export async function setCurrentAccount(
     );
   } catch (error: any) {
     console.error(`Error while trying to get the account: ${String(error)}`);
-    throw new Error(`Error while trying to get the account: ${String(error)}`);
+    throw error;
   }
 }
 
@@ -247,7 +253,7 @@ async function connectEVMAccount(
         console.error(
           `The private key you passed was invalid for the EVM address '${evmAddress}'. Please try again.`,
         );
-        throw new Error(
+        throw providerErrors.unsupportedMethod(
           `The private key you passed was invalid for the EVM address '${evmAddress}'. Please try again.`,
         );
       }
@@ -260,7 +266,7 @@ async function connectEVMAccount(
       console.error(
         'Error while trying to retrieve the private key. Please try again.',
       );
-      throw new Error(
+      throw providerErrors.unsupportedMethod(
         'Error while trying to retrieve the private key. Please try again.',
       );
     }
@@ -341,22 +347,26 @@ async function connectHederaAccount(
         console.error(
           `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Public Key: ${publicKey}`,
         );
-        throw new Error(
-          `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Public Key: ${publicKey}`,
-        );
+        throw providerErrors.custom({
+          code: 4200,
+          message: `The Hedera account for public key ${publicKey} is not yet active. Please activate it by sending some HBAR to this account on '${network}'`,
+          data: publicKey,
+        });
       }
 
       if (accountInfo.key.type !== curve) {
         console.error(
-          `You passed '${curve}' as the digital signature algorithm to use but the account '${accountId}' was derived using '${
+          `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
             accountInfo.key.type ?? ''
           }' on '${network}'. Please make sure to pass in the correct value for "curve".`,
         );
-        throw new Error(
-          `You passed '${curve}' as the digital signature algorithm to use but the account '${accountId}' was derived using '${
+        throw providerErrors.custom({
+          code: 4200,
+          message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
             accountInfo.key.type ?? ''
           }' on '${network}'. Please make sure to pass in the correct value for "curve".`,
-        );
+          data: accountId,
+        });
       }
 
       const hederaClient = await getHederaClient(
@@ -389,15 +399,17 @@ async function connectHederaAccount(
         console.error(
           `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
         );
-        throw new Error(
-          `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
-        );
+        throw providerErrors.custom({
+          code: 4200,
+          message: `The private key you passed is not associated with this Hedera account on '${network}' that uses the elliptic curve '${curve}'`,
+          data: accountId,
+        });
       }
     } catch (error: any) {
       console.error(
         `Could not setup a Hedera client. Please try again: ${String(error)}`,
       );
-      throw new Error(
+      throw providerErrors.unsupportedMethod(
         `Could not setup a Hedera client. Please try again: ${String(error)}`,
       );
     }
@@ -461,9 +473,11 @@ export async function importMetaMaskAccount(
         console.error(
           `The Hedera account '${hederaAccountId}' is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
         );
-        throw new Error(
-          `The Hedera account '${hederaAccountId}' is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
-        );
+        throw providerErrors.custom({
+          code: 4200,
+          message: `This Hedera account is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
+          data: hederaAccountId,
+        });
       }
 
       balance = accountInfo.balance;
@@ -487,13 +501,14 @@ export async function importMetaMaskAccount(
       };
       await snapDialog(dialogParamsForHederaAccountId);
 
-      // TODO: Maybe offer the user an "Activate" option that will charge them "x" amount of ETH
       console.error(
         `This Hedera account is not yet active. Please activate it by sending some HBAR to this account. EVM Address: ${address}`,
       );
-      throw new Error(
-        `This Hedera account is not yet active. Please activate it by sending some HBAR to this account. EVM Address: ${address}`,
-      );
+      throw providerErrors.custom({
+        code: 4200,
+        message: `This Hedera account is not yet active on ${network}. Please activate it by sending some HBAR to this account`,
+        data: address,
+      });
     }
   }
 
@@ -545,9 +560,11 @@ export async function createHederaClient(
     console.error(
       `Could not setup a Hedera client with '${hederaAccountId}' at this time. Please try again later.`,
     );
-    throw new Error(
-      `Could not setup a Hedera client with '${hederaAccountId}' at this time. Please try again later.`,
-    );
+    throw providerErrors.custom({
+      code: 4200,
+      message: `Could not setup a Hedera client with ${hederaAccountId} on ${network} at this time. Please try again later.`,
+      data: hederaAccountId,
+    });
   }
 
   return hederaClient;

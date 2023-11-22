@@ -32,6 +32,7 @@ import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
 import { StakingInfoJson } from '@hashgraph/sdk/lib/account/AccountInfo';
+import { providerErrors } from '@metamask/rpc-errors';
 import { AccountInfo } from 'src/types/account';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
@@ -296,8 +297,17 @@ async function testClientOperatorMatch(client: Client) {
   }
 
   // under *no* cirumstances should this transaction succeed
-  throw new Error(
-    'unexpected success of intentionally-erroneous transaction to confirm account ID',
+  console.error(
+    'Unexpected success of intentionally-erroneous transaction to confirm account ID',
+  );
+  throw providerErrors.unsupportedMethod(
+    JSON.stringify({
+      accountIdOrEvmAddress: client.operatorAccountId
+        ? client.operatorAccountId.toString()
+        : '',
+      message:
+        'Unexpected success of intentionally-erroneous transaction to confirm account ID',
+    }),
   );
 }
 

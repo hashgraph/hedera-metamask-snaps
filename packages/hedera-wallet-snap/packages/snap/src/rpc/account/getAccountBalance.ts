@@ -18,6 +18,7 @@
  *
  */
 
+import { providerErrors } from '@metamask/rpc-errors';
 import { createHederaClient } from '../../snap/account';
 import { updateSnapState } from '../../snap/state';
 import { WalletSnapParams } from '../../types/state';
@@ -64,7 +65,7 @@ export async function getAccountBalance(
     console.error(
       `Error while trying to get account balance: ${String(error)}`,
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       `Error while trying to get account balance: ${String(error)}`,
     );
   }

@@ -3915,6 +3915,7 @@ __metadata:
     "@metamask/eslint-config-typescript": ^11.1.0
     "@metamask/key-tree": ^9.0.0
     "@metamask/providers": 10.2.1
+    "@metamask/rpc-errors": ^6.1.0
     "@metamask/snaps-cli": ^0.32.2
     "@metamask/snaps-jest": ^0.35.1-flask.1
     "@metamask/snaps-types": ^1.0.1
@@ -4932,6 +4933,16 @@ __metadata:
     "@metamask/utils": ^8.0.0
     fast-safe-stringify: ^2.0.6
   checksum: 7e1ee1a98972266af4a34f0bbc842cdc11dc565056f0b8fbc93aa95663a7027eab8ff1fecbe3e09c38a1dc199f8219a6c69b2237015b2fdb8de0e5b35027c3f8
+  languageName: node
+  linkType: hard
+
+"@metamask/rpc-errors@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "@metamask/rpc-errors@npm:6.1.0"
+  dependencies:
+    "@metamask/utils": ^8.1.0
+    fast-safe-stringify: ^2.0.6
+  checksum: 9f4821d804e2fcaa8987b0958d02c6d829b7c7db49740c811cb593f381d0c4b00dabb7f1802907f1b2f6126f7c0d83ec34219183d29650f5d24df014ac72906a
   languageName: node
   linkType: hard
 

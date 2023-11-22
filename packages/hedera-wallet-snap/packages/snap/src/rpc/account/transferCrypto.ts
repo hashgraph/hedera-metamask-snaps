@@ -18,6 +18,7 @@
  *
  */
 
+import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import {
@@ -135,8 +136,9 @@ export async function transferCrypto(
   if (await snapDialog(dialogParams)) {
     try {
       if (!shouldExecuteTransfer) {
-        throw new Error(
-          `There are no transactions to execute. Please try again.`,
+        console.error('There are no transactions to execute. Please try again');
+        throw providerErrors.unsupportedMethod(
+          'There are no transactions to execute. Please try again',
         );
       }
 
@@ -163,10 +165,10 @@ export async function transferCrypto(
       });
     } catch (error: any) {
       console.error(`Error while trying to transfer crypto: ${String(error)}`);
-      throw new Error(
+      throw providerErrors.unsupportedMethod(
         `Error while trying to transfer crypto: ${String(error)}`,
       );
     }
   }
-  throw new Error('User rejected the transaction');
+  throw providerErrors.userRejectedRequest();
 }

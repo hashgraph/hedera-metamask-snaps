@@ -27,6 +27,11 @@ export type ServiceFee = {
   toAddress: string;
 };
 
+export type SignMessageRequestParams = {
+  header?: string;
+  message: string;
+};
+
 export type GetAccountInfoRequestParams = {
   accountId?: string;
   serviceFee?: ServiceFee;
