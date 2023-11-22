@@ -102,6 +102,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
       };
+    case 'getCurrentAccount':
+      return {
+        currentAccount: state.currentAccount,
+      };
     case 'getAccountInfo': {
       isValidGetAccountInfoRequest(request.params);
       return {
