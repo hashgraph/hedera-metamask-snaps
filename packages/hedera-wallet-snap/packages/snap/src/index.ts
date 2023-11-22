@@ -138,7 +138,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
       return {
         currentAccount: state.currentAccount,
-        signedMessage: wallet.signMessage(request.params.message),
+        signedMessage: await wallet.signMessage(request.params.message),
       };
     }
     case 'getAccountInfo': {
