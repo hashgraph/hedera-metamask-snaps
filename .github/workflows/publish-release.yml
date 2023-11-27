@@ -27,9 +27,6 @@ jobs:
   validate-release:
     name: Validate Release
     runs-on: [self-hosted, Linux, medium, ephemeral]
-    defaults:
-      run:
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
     outputs:
       tag: ${{ steps.tag.outputs.name }}
       version: ${{ steps.tag.outputs.version }}
@@ -108,11 +105,6 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag || '' }}
 
-      - name: Install PNPM
-        uses: pnpm/action-setup@d882d12c64e032187b2edb46d3a0d003b7a43598 # v2.4.0
-        with:
-          version: 8.10.0
-
       - name: Setup Node
         uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
         with:
@@ -125,15 +117,12 @@ jobs:
         run: yarn install
 
       - name: Build Code
-        run: npm run build
+        run: yarn run build
 
   publish-release:
     if: github.actor == 'NanaEC' || github.actor == 'nathanklick' || github.actor == 'kpachhai'
     name: Publish Release
-    runs-on: [self-hosted, Linux, large, ephemeral]
-    defaults:
-      run:
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     needs:
       - validate-release
       - run-safety-checks
@@ -143,15 +132,13 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag || '' }}
 
-      - name: Install PNPM
-        uses: pnpm/action-setup@d882d12c64e032187b2edb46d3a0d003b7a43598 # v2.4.0
-        with:
-          version: 8.10.0
-
       - name: Setup Node
         uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
         with:
           node-version: 18
+
+      - name: Setup yarn
+        run: npm install -g yarn
 
       - name: Calculate Publish Arguments
         id: publish
@@ -166,7 +153,8 @@ jobs:
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish -- ${{ steps.publish.outputs.args }}
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
+        run: yarn publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
         uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1.13.0
