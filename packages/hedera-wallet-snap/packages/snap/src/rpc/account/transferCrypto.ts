@@ -19,7 +19,6 @@
  */
 
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import _ from 'lodash';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -79,13 +78,14 @@ export async function transferCrypto(
     return acc;
   }, {});
 
+  const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : 'N/A';
   const panelToShow = [
     text(`Origin: ${origin}`),
     divider(),
     heading('Transfer Crypto'),
     text('Are you sure you want to execute the following transaction(s)?'),
     divider(),
-    text(`Memo: ${memo === null || _.isEmpty(memo) ? 'N/A' : memo}`),
+    text(`Memo: ${strippedMemo}`),
     text(`Max Transaction Fee: ${maxFee ?? 1} Hbar`),
   ];
 
