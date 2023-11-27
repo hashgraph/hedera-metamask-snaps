@@ -31,7 +31,7 @@ const TransferCrypto: FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [sendToAddress, setSendToAddress] = useState('');
-  const [sendMemo, setSendMemo] = useState('');
+  const [memo, setMemo] = useState('');
   const [sendAmount, setSendAmount] = useState(0);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
@@ -59,7 +59,7 @@ const TransferCrypto: FC<Props> = ({
 
       const transferCryptoParams = {
         transfers,
-        sendMemo,
+        memo,
         undefined,
         serviceFee,
       } as TransferCryptoRequestParams;
@@ -110,9 +110,9 @@ const TransferCrypto: FC<Props> = ({
               <input
                 type="text"
                 style={{ width: '100%' }}
-                value={sendMemo}
+                value={memo}
                 placeholder="Memo"
-                onChange={(e) => setSendMemo(e.target.value)}
+                onChange={(e) => setMemo(e.target.value)}
               />
             </label>
             <br />

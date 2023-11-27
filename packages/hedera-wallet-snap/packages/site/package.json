@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-wallet-snap-site",
-  "version": "0.1.0-rc1",
+  "version": "0.1.0-rc2",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
@@ -25,7 +25,7 @@
     ]
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.34.1",
+    "@hashgraph/sdk": "^2.38.0",
     "@metamask/providers": "^9.0.0",
     "bignumber.js": "^9.1.2",
     "bootstrap": "^5.3.2",
