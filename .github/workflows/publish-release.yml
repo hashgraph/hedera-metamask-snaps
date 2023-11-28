@@ -156,7 +156,7 @@ jobs:
         working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
         run: |
           yarn install
-          yarn publish ${{ steps.publish.outputs.args }}
+          yarn npm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
         uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1.13.0
