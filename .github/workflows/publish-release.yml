@@ -150,7 +150,8 @@ jobs:
           [[ "${{ github.event.inputs.dry-run-enabled }}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
           echo "args=${PUBLISH_ARGS}" >>"${GITHUB_OUTPUT}"
           # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ".npmrc"
+          echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
+          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
 
       - name: Publish Release
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
