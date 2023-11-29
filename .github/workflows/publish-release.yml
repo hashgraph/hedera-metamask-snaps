@@ -159,7 +159,6 @@ jobs:
         working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
         run: |
           pnpm i
-          pnpm run build
           pnpm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
