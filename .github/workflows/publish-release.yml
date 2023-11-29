@@ -146,7 +146,7 @@ jobs:
         id: publish
         working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
         run: |
-          PUBLISH_ARGS="--access public"
+          PUBLISH_ARGS="--access public --no-git-checks"
           [[ "${{ github.event.inputs.dry-run-enabled }}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
           echo "args=${PUBLISH_ARGS}" >>"${GITHUB_OUTPUT}"
           # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
