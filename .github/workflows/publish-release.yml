@@ -166,8 +166,8 @@ jobs:
         uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1.13.0
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         with:
-          tag: ${{ steps.validate-release.outputs.tag }}
-          prerelease: ${{ steps.validate-release.outputs.prerelease == 'true' }}
+          tag: ${{ needs.validate-release.outputs.tag }}
+          prerelease: ${{ needs.validate-release.outputs.prerelease == 'true' }}
           draft: false
           generateReleaseNotes: true
           skipIfReleaseExists: true
