@@ -412,7 +412,7 @@ async function connectHederaAccount(
 /**
  * Veramo Import metamask account.
  *
- * @param origin - Source.
+ * @param _origin - Source.
  * @param state - IdentitySnapState.
  * @param network - Hedera network.
  * @param mirrorNode - Hedera mirror node URL.
@@ -420,7 +420,7 @@ async function connectHederaAccount(
  * @param keyStore - Keystore for private, public keys and EVM address.
  */
 export async function importMetaMaskAccount(
-  origin: string,
+  _origin: string,
   state: WalletSnapState,
   network: string,
   mirrorNode: string,
