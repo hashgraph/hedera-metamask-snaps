@@ -324,7 +324,7 @@ async function connectHederaAccount(
       const publicKey =
         PrivateKey.fromString(privateKey).publicKey.toStringRaw();
       if (_.isEmpty(accountInfo)) {
-        const dialogParamsForHederaAccountId: SnapDialogParams = {
+        /* const dialogParamsForHederaAccountId: SnapDialogParams = {
           type: 'alert',
           content: await generateCommonPanel(origin, [
             heading('Hedera Account Status'),
@@ -336,7 +336,7 @@ async function connectHederaAccount(
             divider(),
           ]),
         };
-        await snapDialog(dialogParamsForHederaAccountId);
+        await snapDialog(dialogParamsForHederaAccountId); */
 
         console.error(
           `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Public Key: ${publicKey}`,
@@ -473,7 +473,7 @@ export async function importMetaMaskAccount(
     }
 
     if (_.isEmpty(hederaAccountId)) {
-      const dialogParamsForHederaAccountId: SnapDialogParams = {
+      /*       const dialogParamsForHederaAccountId: SnapDialogParams = {
         type: 'alert',
         content: await generateCommonPanel(origin, [
           heading('Hedera Account Status'),
@@ -485,7 +485,7 @@ export async function importMetaMaskAccount(
           divider(),
         ]),
       };
-      await snapDialog(dialogParamsForHederaAccountId);
+      await snapDialog(dialogParamsForHederaAccountId); */
 
       // TODO: Maybe offer the user an "Activate" option that will charge them "x" amount of ETH
       console.error(
