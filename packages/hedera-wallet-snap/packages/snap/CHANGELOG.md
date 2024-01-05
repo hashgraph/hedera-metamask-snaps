@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.3](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.3...v0.1.3) (2024-01-05)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+- Fixed an issue whereby sometimes, hbars couldn't be sent on mainnet due to a network issue
+
 ## [0.1.2](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.2...v0.1.2) (2023-12-01)
 
 ### :page_with_curl: Documentation

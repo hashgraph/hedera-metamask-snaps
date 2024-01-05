@@ -18,16 +18,7 @@
  *
  */
 
-import {
-  AccountId,
-  Client,
-  Hbar,
-  HbarUnit,
-  PrivateKey,
-  Status,
-  StatusError,
-  TransferTransaction,
-} from '@hashgraph/sdk';
+import { AccountId, Client, Hbar, HbarUnit, PrivateKey } from '@hashgraph/sdk';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
@@ -79,24 +70,25 @@ export class HederaServiceImpl implements HederaService {
     keyIndex: number;
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null> {
-    let client;
+    let client: Client;
 
     if (this.network === 'testnet') {
       client = Client.forTestnet();
-      /* client = Client.forNetwork({
+      /*       client = Client.forNetwork({
         'https://testnet-node00-00-grpc.hedera.com:443': new AccountId(3),
       }); */
     } else if (this.network === 'previewnet') {
       client = Client.forPreviewnet();
     } else {
       client = Client.forMainnet();
-      /* client = Client.forNetwork({
+      /*       client = Client.forNetwork({
         'https://node01-00-grpc.swirlds.com:443': new AccountId(4),
       }); */
     }
 
-    // NOTE: important, ensure that we pre-compute the health state of all nodes
-    await client.pingAll();
+    // client.setLogger(this.debugLogger);
+
+    client.setNetworkUpdatePeriod(2000);
 
     const transactionSigner = await options.wallet.getTransactionSigner(
       options.keyIndex,
@@ -115,10 +107,6 @@ export class HederaServiceImpl implements HederaService {
       publicKey ?? '',
       transactionSigner,
     );
-
-    if (!(await testClientOperatorMatch(client))) {
-      return null;
-    }
 
     // this sets the fee paid by the client for the transaction
     client.setDefaultMaxTransactionFee(Hbar.from(500000, HbarUnit.Tinybar));
@@ -261,44 +249,6 @@ export class HederaServiceImpl implements HederaService {
     }
     return result;
   }
-}
-
-/**
- * Does the operator key belong to the operator account.
- *
- * @param client - Hedera Client.
- */
-async function testClientOperatorMatch(client: Client) {
-  const tx = new TransferTransaction()
-    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-    .addHbarTransfer(client.operatorAccountId!, Hbar.fromTinybars(0))
-    .setMaxTransactionFee(Hbar.fromTinybars(1));
-
-  try {
-    await tx.execute(client);
-  } catch (error: any) {
-    if (error instanceof StatusError) {
-      if (
-        error.status === Status.InsufficientTxFee ||
-        error.status === Status.InsufficientPayerBalance
-      ) {
-        // If the transaction fails with Insufficient Tx Fee, this means
-        // that the account ID verification succeeded before this point
-        // Same for Insufficient Payer Balance
-
-        return true;
-      }
-
-      return false;
-    }
-
-    throw error;
-  }
-
-  // under *no* cirumstances should this transaction succeed
-  throw new Error(
-    'unexpected success of intentionally-erroneous transaction to confirm account ID',
-  );
 }
 
 /**
