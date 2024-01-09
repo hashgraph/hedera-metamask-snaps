@@ -14,15 +14,14 @@ on:
         description: "Dry Run Enabled"
         type: boolean
         required: false
-        default: false
+        default: true
 
 defaults:
   run:
     shell: bash
-    working-directory: ./packages/${{ github.event.inputs.snap-package-dir }}
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-release:
@@ -97,34 +96,33 @@ jobs:
   run-safety-checks:
     name: Safety Checks
     runs-on: [self-hosted, Linux, medium, ephemeral]
+    defaults:
+      run:
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
     steps:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           ref: ${{ github.event.inputs.tag || '' }}
 
-      - name: Install Task
-        uses: arduino/setup-task@e26d8975574116b0097a1161e0fe16ba75d84c1c # v1.0.3
-        with:
-          version: 3.7.0
-
-      - name: Install PNPM
-        uses: pnpm/action-setup@d882d12c64e032187b2edb46d3a0d003b7a43598 # v2.4.0
-        with:
-          version: 8.10.0
-
       - name: Setup Node
         uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
         with:
           node-version: 18
 
-      - name: Compile Code
-        run: task build
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      - name: Yarn install
+        run: yarn install
+
+      - name: Build Code
+        run: yarn run build
 
   publish-release:
     if: github.actor == 'NanaEC' || github.actor == 'nathanklick' || github.actor == 'kpachhai'
     name: Publish Release
-    runs-on: [self-hosted, Linux, large, ephemeral]
+    runs-on: [self-hosted, Linux, medium, ephemeral]
     needs:
       - validate-release
       - run-safety-checks
@@ -134,11 +132,6 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag || '' }}
 
-      - name: Install Task
-        uses: arduino/setup-task@e26d8975574116b0097a1161e0fe16ba75d84c1c # v1.0.3
-        with:
-          version: 3.7.0
-
       - name: Install PNPM
         uses: pnpm/action-setup@d882d12c64e032187b2edb46d3a0d003b7a43598 # v2.4.0
         with:
@@ -149,27 +142,39 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Yarn
+        run: pnpm install -g yarn
+
+      - name: Yarn Build
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}"
+        run: |
+          yarn install
+          yarn run build
+
       - name: Calculate Publish Arguments
         id: publish
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
         run: |
-          PUBLISH_ARGS="--access public"
+          PUBLISH_ARGS="--access public --no-git-checks"
           [[ "${{ github.event.inputs.dry-run-enabled }}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
           echo "args=${PUBLISH_ARGS}" >>"${GITHUB_OUTPUT}"
           # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >>".npmrc"
+          echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
+          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
 
       - name: Publish Release
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: task publish -- ${{ steps.publish.outputs.args }}
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
+        run: pnpm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
         uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1.13.0
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         with:
-          tag: ${{ steps.validate-release.outputs.tag }}
-          prerelease: ${{ steps.validate-release.outputs.prerelease == 'true' }}
+          tag: ${{ needs.validate-release.outputs.tag }}
+          prerelease: ${{ needs.validate-release.outputs.prerelease == 'true' }}
           draft: false
           generateReleaseNotes: true
           skipIfReleaseExists: true

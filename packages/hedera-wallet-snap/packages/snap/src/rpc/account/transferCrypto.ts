@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import _ from 'lodash';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -80,13 +79,14 @@ export async function transferCrypto(
     return acc;
   }, {});
 
+  const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : 'N/A';
   const panelToShow = [
     text(`Origin: ${origin}`),
     divider(),
     heading('Transfer Crypto'),
     text('Are you sure you want to execute the following transaction(s)?'),
     divider(),
-    text(`Memo: ${memo === null || _.isEmpty(memo) ? 'N/A' : memo}`),
+    text(`Memo: ${strippedMemo}`),
     text(`Max Transaction Fee: ${maxFee ?? 1} Hbar`),
   ];
 

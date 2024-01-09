@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -330,7 +330,7 @@ async function connectHederaAccount(
       const publicKey =
         PrivateKey.fromString(privateKey).publicKey.toStringRaw();
       if (_.isEmpty(accountInfo)) {
-        const dialogParamsForHederaAccountId: SnapDialogParams = {
+        /* const dialogParamsForHederaAccountId: SnapDialogParams = {
           type: 'alert',
           content: await generateCommonPanel(origin, [
             heading('Hedera Account Status'),
@@ -342,7 +342,7 @@ async function connectHederaAccount(
             divider(),
           ]),
         };
-        await snapDialog(dialogParamsForHederaAccountId);
+        await snapDialog(dialogParamsForHederaAccountId); */
 
         console.error(
           `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Public Key: ${publicKey}`,
@@ -424,7 +424,7 @@ async function connectHederaAccount(
 /**
  * Veramo Import metamask account.
  *
- * @param origin - Source.
+ * @param _origin - Source.
  * @param state - IdentitySnapState.
  * @param network - Hedera network.
  * @param mirrorNode - Hedera mirror node URL.
@@ -432,7 +432,7 @@ async function connectHederaAccount(
  * @param keyStore - Keystore for private, public keys and EVM address.
  */
 export async function importMetaMaskAccount(
-  origin: string,
+  _origin: string,
   state: WalletSnapState,
   network: string,
   mirrorNode: string,
@@ -487,7 +487,7 @@ export async function importMetaMaskAccount(
     }
 
     if (_.isEmpty(hederaAccountId)) {
-      const dialogParamsForHederaAccountId: SnapDialogParams = {
+      /*       const dialogParamsForHederaAccountId: SnapDialogParams = {
         type: 'alert',
         content: await generateCommonPanel(origin, [
           heading('Hedera Account Status'),
@@ -499,7 +499,7 @@ export async function importMetaMaskAccount(
           divider(),
         ]),
       };
-      await snapDialog(dialogParamsForHederaAccountId);
+      await snapDialog(dialogParamsForHederaAccountId); */
 
       console.error(
         `This Hedera account is not yet active. Please activate it by sending some HBAR to this account. EVM Address: ${address}`,
