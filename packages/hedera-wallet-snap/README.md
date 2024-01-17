@@ -1,4 +1,4 @@
-# @hashgraph/hedera-wallet-snap
+# Hedera Wallet Snap for MetaMask
 
 This repository contains code for Hedera Wallet Snap and an example website that integrates the snap to offer various features such as sending HBAR to another HBAR account id and EVM address, retrieving account info from either the Hedera Ledger node or Hedera Mirror node. Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
 
