@@ -32,6 +32,7 @@ import {
   calculateHederaQueryFees,
   deductServiceFee,
 } from '../../utils/tuumService';
+import { providerErrors } from '@metamask/rpc-errors';
 
 /**
  * Hedera Ledger Node:
@@ -139,7 +140,7 @@ export async function getAccountInfo(
       const confirmed = await snapDialog(dialogParamsForHederaAccountId);
       if (!confirmed) {
         console.error(`User rejected the transaction`);
-        throw new Error(`User rejected the transaction`);
+        throw providerErrors.userRejectedRequest();
       }
 
       hederaClient.setMaxQueryPayment(maxCost.toFixed(8));
@@ -187,7 +188,9 @@ export async function getAccountInfo(
     }
   } catch (error: any) {
     console.error(`Error while trying to get account info: ${String(error)}`);
-    throw new Error(`Error while trying to get account info: ${String(error)}`);
+    throw providerErrors.unsupportedMethod(
+      `Error while trying to get account info: ${String(error)}`,
+    );
   }
 
   return accountInfo;

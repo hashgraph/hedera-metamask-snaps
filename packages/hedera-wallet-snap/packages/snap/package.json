@@ -52,6 +52,7 @@
     "@hashgraph/sdk": "^2.38.0",
     "@metamask/key-tree": "^9.0.0",
     "@metamask/providers": "10.2.1",
+    "@metamask/rpc-errors": "^6.1.0",
     "@metamask/snaps-types": "^1.0.1",
     "@metamask/snaps-ui": "^1.0.1",
     "bignumber.js": "^9.1.1",
