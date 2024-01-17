@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
   GetAccountInfoRequestParams,
+  SignMessageRequestParams,
   TransferCryptoRequestParams,
 } from '../types/snap';
 
@@ -119,6 +120,30 @@ export const sendHello = async (network: string, mirrorNodeUrl: string) => {
 };
 
 /**
+ * Invoke the "getCurrentAccount" method from the snap.
+ */
+export const getCurrentAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'getCurrentAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "getAccountInfo" method from the snap.
  */
 
@@ -189,6 +214,32 @@ export const transferCrypto = async (
           memo: transferCryptoParams.memo,
           maxFee: transferCryptoParams.maxFee,
           serviceFee: transferCryptoParams.serviceFee,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "signMessage" method from the snap.
+ */
+export const signMessage = async (
+  network: string,
+  mirrorNodeUrl: string,
+  signMessageRequestParams: SignMessageRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'signMessage',
+        params: {
+          network,
+          mirrorNodeUrl,
+          message: signMessageRequestParams.message,
           ...externalAccountparams,
         },
       },

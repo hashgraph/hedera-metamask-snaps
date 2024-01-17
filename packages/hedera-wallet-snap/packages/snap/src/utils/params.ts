@@ -19,6 +19,7 @@
  */
 
 import { AccountId } from '@hashgraph/sdk';
+import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
 import { ExternalAccount } from '../types/account';
@@ -26,6 +27,7 @@ import {
   GetAccountInfoRequestParams,
   MirrorNodeParams,
   ServiceFee,
+  SignMessageRequestParams,
   TransferCryptoRequestParams,
 } from '../types/params';
 
@@ -51,7 +53,7 @@ export function getMirrorNodeFlagIfExists(params: unknown): string {
       console.error(
         'Invalid MirrorNode Params passed. "mirrorNodeUrl" must be a string',
       );
-      throw new Error(
+      throw providerErrors.unsupportedMethod(
         'Invalid MirrorNode Params passed. "mirrorNodeUrl" must be a string',
       );
     }
@@ -89,7 +91,7 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
           console.error(
             'Invalid externalAccount Params passed. "accountIdOrEvmAddress" must not be empty',
           );
-          throw new Error(
+          throw providerErrors.unsupportedMethod(
             'Invalid externalAccount Params passed. "accountIdOrEvmAddress" must not be empty',
           );
         }
@@ -105,7 +107,7 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
             console.error(
               'Invalid externalAccount Params passed. "curve" must be a string and must be either "ECDSA_SECP256K1" or "ED25519"',
             );
-            throw new Error(
+            throw providerErrors.unsupportedMethod(
               'Invalid externalAccount Params passed. "curve" must be a string and must be either "ECDSA_SECP256K1" or "ED25519"',
             );
           }
@@ -133,7 +135,7 @@ function isValidServiceFee(params: unknown): asserts params is ServiceFee {
     console.error(
       'Invalid Params passed. "serviceFee.percentageCut" must be a number',
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       'Invalid Params passed. "serviceFee.percentageCut" must be a number',
     );
   }
@@ -146,8 +148,56 @@ function isValidServiceFee(params: unknown): asserts params is ServiceFee {
     console.error(
       'Invalid Params passed. "serviceFee.toAddress" must be a string and must not be empty',
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       'Invalid Params passed. "serviceFee.toAddress" must be a string and must not be empty',
+    );
+  }
+}
+
+/**
+ * Check Validation of signMessage request.
+ *
+ * @param params - Request params.
+ */
+export function isValidSignMessageRequest(
+  params: unknown,
+): asserts params is SignMessageRequestParams {
+  if (params === null || _.isEmpty(params) || !('message' in params)) {
+    console.error(
+      'Invalid signMessage Params passed. "message" must be passed as a parameter',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid signMessage Params passed. "message" must be passed as a parameter',
+    );
+  }
+
+  const parameter = params as SignMessageRequestParams;
+
+  // Check if message is valid
+  if (
+    'header' in parameter &&
+    (_.isNull(parameter.header) || typeof parameter.header !== 'string')
+  ) {
+    console.error(
+      'Invalid signMessage Params passed. "header" is not a string',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid signMessage Params passed. "header" is not a string',
+    );
+  }
+
+  // Check if message is valid
+  if (
+    'message' in parameter &&
+    (_.isNull(parameter.message) ||
+      typeof parameter.message !== 'string' ||
+      _.isEmpty(parameter.message))
+  ) {
+    console.error(
+      'Invalid signMessage Params passed. "message" is not a string or is empty',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid signMessage Params passed. "message" is not a string or is empty',
     );
   }
 }
@@ -173,7 +223,7 @@ export function isValidGetAccountInfoRequest(
     console.error(
       'Invalid getAccountInfo Params passed. "accountId" must be a string and be a valid Hedera Account Id',
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       'Invalid getAccountInfo Params passed. "accountId" must be a string and be a valid Hedera Account Id',
     );
   }
@@ -200,7 +250,7 @@ export function isValidTransferCryptoParams(
     console.error(
       'Invalid transferCrypto Params passed. "transfers" must be passed as a parameter',
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       'Invalid transferCrypto Params passed. "transfers" must be passed as a parameter',
     );
   }
@@ -217,7 +267,7 @@ export function isValidTransferCryptoParams(
         console.error(
           `Invalid transferCrypto Params passed. "transfers[].asset" is not a string or is empty`,
         );
-        throw new Error(
+        throw providerErrors.unsupportedMethod(
           `Invalid transferCrypto Params passed. "transfers[].asset" is not a string or is empty`,
         );
       }
@@ -229,7 +279,7 @@ export function isValidTransferCryptoParams(
         console.error(
           `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
         );
-        throw new Error(
+        throw providerErrors.unsupportedMethod(
           `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
         );
       }
@@ -237,7 +287,7 @@ export function isValidTransferCryptoParams(
         console.error(
           `Invalid transferCrypto Params passed. "transfers[].amount" is not a number`,
         );
-        throw new Error(
+        throw providerErrors.unsupportedMethod(
           `Invalid transferCrypto Params passed. "transfers[].to" is not a number`,
         );
       }
@@ -252,7 +302,7 @@ export function isValidTransferCryptoParams(
     console.error(
       `Invalid transferCrypto Params passed. "memo" is not a string`,
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       `Invalid transferCrypto Params passed. "memo" is not a string`,
     );
   }
@@ -265,7 +315,7 @@ export function isValidTransferCryptoParams(
     console.error(
       `Invalid transferCrypto Params passed. "maxFee" is not a number`,
     );
-    throw new Error(
+    throw providerErrors.unsupportedMethod(
       `Invalid transferCrypto Params passed. "maxFee" is not a number`,
     );
   }

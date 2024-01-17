@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
 import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
+import { SignMessage } from '../components/cards/SignMessage';
 import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
@@ -156,6 +157,12 @@ const Index = () => {
         />
 
         <TransferCrypto
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <SignMessage
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
