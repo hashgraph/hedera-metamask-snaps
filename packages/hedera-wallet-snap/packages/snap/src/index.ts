@@ -218,16 +218,6 @@ export const onUpdate: OnUpdateHandler = async () => {
         text('New features added in this version:'),
         text('🚀 Added a new API to let users sign arbitrary messages'),
         text('🚀 Added a new API to let users view their transaction history'),
-        text('🚀 Added a new API to let users approve and delete an allowance'),
-        text(
-          '🚀 Added a new API to let users transfer both fungible and non-fungible tokens',
-        ),
-        text(
-          '🚀 Added a new API to let users delete their account from the ledger',
-        ),
-        text(
-          '🚀 Added a new API to let users stake and unstake HBAR to and from Hedera Network Nodes',
-        ),
       ]),
     },
   });
