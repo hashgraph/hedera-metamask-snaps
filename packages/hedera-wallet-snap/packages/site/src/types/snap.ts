@@ -71,6 +71,10 @@ export type GetAccountInfoRequestParams = {
   serviceFee?: ServiceFee;
 };
 
+export type GetTransactionsRequestParams = {
+  transactionId?: string;
+};
+
 export type TransferCryptoRequestParams = {
   transfers: SimpleTransfer[];
   memo?: string;

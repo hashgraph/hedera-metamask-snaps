@@ -24,6 +24,7 @@ import Select from 'react-select';
 import { Card, InstallFlaskButton } from '../components/base';
 import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
 import { GetAccountInfo } from '../components/cards/GetAccountInfo';
+import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
 import { SignMessage } from '../components/cards/SignMessage';
@@ -163,6 +164,12 @@ const Index = () => {
         />
 
         <SignMessage
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTransactions
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
