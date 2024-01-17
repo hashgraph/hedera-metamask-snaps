@@ -1,5 +1,6 @@
 # hedera-metamask-snaps
-[MetaMask Snaps](https://metamask.io/snaps/)s are 3rd party npm packages that users can install directly in their Metamask wallet to extend the functionality of MetaMask.
+
+[MetaMask Snaps](https://support.metamask.io/hc/en-us/articles/18377120661019-Getting-started-with-MetaMask-Snaps) are 3rd party npm packages that users can install directly in their Metamask wallet to extend the functionality of MetaMask.
 
 This repo will host a combination of separate Metamask Snaps to benefit the Hedera community.
 Each directory inside the `./packages` directory will be an independent snap.
@@ -14,7 +15,6 @@ All features should see a feature branch created and a PR taking the changes fro
 Periodically, release branches e.g. `release/0.1` will be created. From this branch sub packages are able to release versioned npm packages or images.
 Code owners of individual snaps are responsible for maintaining the desired versioning of their snaps in readiness for the next repo release.
 At the time of release bump of the main repo the current version of updated snaps may be taken and npm publishing of new versions of multiple snaps carried out.
-
 
 ## Support
 
