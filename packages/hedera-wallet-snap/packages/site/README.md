@@ -1,4 +1,4 @@
-# TypeScript Example Snap Front-end
+# Example website that integrates the snap
 
 This project was bootstrapped with [Gatsby](https://www.gatsbyjs.com/).
 
