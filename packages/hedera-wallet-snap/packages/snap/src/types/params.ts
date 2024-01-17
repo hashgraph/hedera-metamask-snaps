@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,10 @@ export type SignMessageRequestParams = {
 export type GetAccountInfoRequestParams = {
   accountId?: string;
   serviceFee?: ServiceFee;
+};
+
+export type GetTransactionsRequestParams = {
+  transactionId?: string;
 };
 
 export type TransferCryptoRequestParams = {

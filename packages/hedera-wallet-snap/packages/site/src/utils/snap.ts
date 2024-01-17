@@ -23,6 +23,7 @@ import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
   GetAccountInfoRequestParams,
+  GetTransactionsRequestParams,
   SignMessageRequestParams,
   TransferCryptoRequestParams,
 } from '../types/snap';
@@ -186,6 +187,33 @@ export const getAccountBalance = async (
       request: {
         method: 'getAccountBalance',
         params: { network, ...externalAccountparams },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getTransactions" method from the snap.
+ */
+
+export const getTransactions = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getTransactionsParams: GetTransactionsRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'getTransactions',
+        params: {
+          network,
+          mirrorNodeUrl,
+          transactionId: getTransactionsParams.transactionId,
+          ...externalAccountparams,
+        },
       },
     },
   });

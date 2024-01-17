@@ -25,6 +25,7 @@ import normalizeUrl from 'normalize-url';
 import { ExternalAccount } from '../types/account';
 import {
   GetAccountInfoRequestParams,
+  GetTransactionsRequestParams,
   MirrorNodeParams,
   ServiceFee,
   SignMessageRequestParams,
@@ -235,6 +236,32 @@ export function isValidGetAccountInfoRequest(
     parameter.serviceFee !== undefined
   ) {
     isValidServiceFee(parameter.serviceFee);
+  }
+}
+
+/**
+ * Check Validation of getTransactions request.
+ *
+ * @param params - Request params.
+ */
+export function isValidGetTransactionsParams(
+  params: unknown,
+): asserts params is GetTransactionsRequestParams {
+  const parameter = params as GetTransactionsRequestParams;
+
+  // Check if accountId is valid
+  if (
+    'transactionId' in parameter &&
+    (_.isNull(parameter.transactionId) ||
+      typeof parameter.transactionId !== 'string' ||
+      _.isEmpty(parameter.transactionId))
+  ) {
+    console.error(
+      'Invalid getTransactions Params passed. "transactionId" must be a string',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid getTransactions Params passed. "transactionId" must be a string',
+    );
   }
 }
 

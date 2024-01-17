@@ -18,23 +18,25 @@
  *
  */
 
-import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { copyable, heading, panel, text } from '@metamask/snaps-ui';
-
 import { providerErrors } from '@metamask/rpc-errors';
+import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
+import { OnRpcRequestHandler } from '@metamask/snaps-types';
+import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { getAccountBalance } from './rpc/account/getAccountBalance';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { transferCrypto } from './rpc/account/transferCrypto';
 import { setCurrentAccount } from './snap/account';
-import { getSnapStateUnchecked } from './snap/state';
+import { getSnapStateUnchecked, initSnapState } from './snap/state';
 import { WalletSnapParams } from './types/state';
-import { init } from './utils/init';
+
+import { getTransactions } from './rpc/transactions/getTransactions';
 import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
   isValidGetAccountInfoRequest,
+  isValidGetTransactionsParams,
   isValidSignMessageRequest,
   isValidTransferCryptoParams,
 } from './utils/params';
@@ -63,7 +65,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   let state = await getSnapStateUnchecked();
   if (state === null || _.isEmpty(state)) {
-    state = await init(origin);
+    state = await initSnapState();
   }
 
   let isExternalAccount = false;
@@ -157,6 +159,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         accountBalance: await getAccountBalance(walletSnapParams),
       };
     }
+    case 'getTransactions':
+      isValidGetTransactionsParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        transactions: await getTransactions(walletSnapParams, request.params),
+      };
     case 'transferCrypto': {
       isValidTransferCryptoParams(request.params);
       return {
@@ -167,4 +175,60 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     default:
       throw providerErrors.unsupportedMethod();
   }
+};
+
+export const onInstall: OnInstallHandler = async () => {
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([
+        heading('Thank you for installing Hedera Wallet Snap'),
+        text(
+          'To learn about the Snap, refer to [Hedera Wallet Snap Documentation](https://docs.tuum.tech/hedera-wallet-snap/basics/introduction).',
+        ),
+        divider(),
+        text(
+          '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Hedera Wallet inside Metamask',
+        ),
+        divider(),
+        text(
+          '💰 Hedera Wallet is a beta version and is not recommended for use with large amounts of funds. Use at your own risk.',
+        ),
+        divider(),
+        text(
+          '⦿ Note that Hedera Wallet Snap does not have direct access to the private key of the Metamask accounts so it generates a new snap account that is associated with the currently connected Metamask account so the account created by the snap will have a different address compared to your Metamask account address.',
+        ),
+        divider(),
+        text(
+          '😭 If you add a new account in Metamask, you will need to reinstall the snap and reconnect to the new account. This is only temporary and in the future, you will not need to do the reinstall once Metamask Snaps support account change events.',
+        ),
+      ]),
+    },
+  });
+};
+
+export const onUpdate: OnUpdateHandler = async () => {
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([
+        heading('Thank you for updating Hedera Wallet Snap'),
+        text('New features added in this version:'),
+        text('🚀 Added a new API to let users sign arbitrary messages'),
+        text('🚀 Added a new API to let users view their transaction history'),
+        text('🚀 Added a new API to let users approve and delete an allowance'),
+        text(
+          '🚀 Added a new API to let users transfer both fungible and non-fungible tokens',
+        ),
+        text(
+          '🚀 Added a new API to let users delete their account from the ledger',
+        ),
+        text(
+          '🚀 Added a new API to let users stake and unstake HBAR to and from Hedera Network Nodes',
+        ),
+      ]),
+    },
+  });
 };

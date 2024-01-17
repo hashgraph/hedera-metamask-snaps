@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@
 import SnapsWebpackPlugin from '@metamask/snaps-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import { resolve } from 'path';
 import { Configuration, ProvidePlugin } from 'webpack';
 import { merge } from 'webpack-merge';
 import WebpackBarPlugin from 'webpackbar';
+// eslint-disable-next-line import/no-nodejs-modules
+import * as path from 'path';
+
 // Configuration that is shared between the two bundles
 const common: Configuration = {
   // For simplicity, we don't do any optimisations here. Ideally, this would be
@@ -33,7 +35,8 @@ const common: Configuration = {
   devtool: 'source-map',
   stats: 'errors-only',
   output: {
-    path: resolve(__dirname, 'dist'),
+    // eslint-disable-next-line no-restricted-globals
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     publicPath: './dist',
   },
@@ -41,29 +44,7 @@ const common: Configuration = {
     extensions: ['.ts', '.js'],
     fallback: {
       stream: false,
-      assert: require.resolve('assert'),
-      buffer: require.resolve('buffer'),
-      console: require.resolve('console-browserify'),
-      constants: require.resolve('constants-browserify'),
-      crypto: require.resolve('crypto-browserify'),
-      domain: require.resolve('domain-browser'),
-      events: require.resolve('events'),
-      http: require.resolve('stream-http'),
-      https: require.resolve('https-browserify'),
-      os: require.resolve('os-browserify/browser'),
-      path: require.resolve('path-browserify'),
-      punycode: require.resolve('punycode'),
-      process: require.resolve('process/browser'),
-      querystring: require.resolve('querystring-es3'),
       // stream: require.resolve('stream-browserify'),
-      string_decoder: require.resolve('string_decoder'),
-      sys: require.resolve('util'),
-      timers: require.resolve('timers-browserify'),
-      tty: require.resolve('tty-browserify'),
-      url: require.resolve('url'),
-      util: require.resolve('util'),
-      vm: require.resolve('vm-browserify'),
-      zlib: require.resolve('browserify-zlib'),
     },
   },
   module: {

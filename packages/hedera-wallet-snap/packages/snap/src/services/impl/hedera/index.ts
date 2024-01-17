@@ -33,6 +33,7 @@ import {
   MirrorAccountInfo,
   MirrorStakingInfo,
   MirrorTokenInfo,
+  MirrorTransactionInfo,
   SimpleHederaClient,
   Token,
   TokenBalance,
@@ -247,6 +248,47 @@ export class HederaServiceImpl implements HederaService {
     if (response.success) {
       result = response.data;
     }
+    return result;
+  }
+
+  async getMirrorTransactions(
+    accountId: string,
+    transactionId: string,
+  ): Promise<MirrorTransactionInfo[]> {
+    let result = [] as MirrorTransactionInfo[];
+    let url = `${this.mirrorNodeUrl}/api/v1/transactions/`;
+    if (_.isEmpty(transactionId)) {
+      url = `${url}?account.id=${accountId}&limit=50&order=desc`;
+    } else {
+      url = `${url}${transactionId}`;
+    }
+
+    const response: FetchResponse = await fetchDataFromUrl(url);
+    if (!response.success) {
+      return result;
+    }
+
+    result = response.data.transactions as MirrorTransactionInfo[];
+
+    const timestampToString = (data: string | null | undefined) => {
+      if (!data) {
+        return '';
+      }
+      return new Date(parseFloat(data) * 1000).toISOString();
+    };
+
+    result.forEach((transaction) => {
+      transaction.consensus_timestamp = timestampToString(
+        transaction.consensus_timestamp,
+      );
+      transaction.parent_consensus_timestamp = timestampToString(
+        transaction.parent_consensus_timestamp,
+      );
+      transaction.valid_start_timestamp = timestampToString(
+        transaction.valid_start_timestamp,
+      );
+    });
+
     return result;
   }
 }

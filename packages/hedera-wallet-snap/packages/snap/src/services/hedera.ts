@@ -138,6 +138,11 @@ export type HederaService = {
   getMirrorAccountInfo(idOrAliasOrEvmAddress: string): Promise<AccountInfo>;
 
   getTokenById(tokenId: string): Promise<MirrorTokenInfo>;
+
+  getMirrorTransactions(
+    accountId: string,
+    transactionId: string,
+  ): Promise<MirrorTransactionInfo[]>;
 };
 
 export type SimpleHederaClient = {
@@ -246,4 +251,42 @@ export type MirrorTokenInfo = {
   total_supply: string;
   type: string;
   wipe_key: Key;
+};
+
+export type MirrorTransactionInfoTransfer = {
+  account: string;
+  amount: number;
+  is_approval: boolean;
+};
+
+export type MirrorTransactionInfoStakingRewardTransfer = {
+  account: string;
+  amount: number;
+};
+
+export type MirrorTransactionInfo = {
+  bytes: any;
+  consensus_timestamp: string;
+  parent_consensus_timestamp: string;
+  transaction_hash: string;
+  valid_start_timestamp: string;
+  charged_tx_fee: number;
+  transaction_id: string;
+  memo_base64: string;
+  result: string;
+  entity_id: string;
+  name: string;
+  max_fee: string;
+  valid_duration_seconds: number;
+  node: string;
+  transfers: MirrorTransactionInfoTransfer[];
+  token_transfers: [];
+  staking_reward_transfers: MirrorTransactionInfoStakingRewardTransfer[];
+  nft_transfers: [];
+  assessed_custom_fees: [];
+  nonce: number;
+  scheduled: boolean;
+  links: {
+    next: string;
+  };
 };
