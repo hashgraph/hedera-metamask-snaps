@@ -18,11 +18,21 @@
  *
  */
 
-import { AccountId, Client, Hbar, HbarUnit, PrivateKey } from '@hashgraph/sdk';
+import {
+  AccountId,
+  Client,
+  Hbar,
+  HbarUnit,
+  PrivateKey,
+  Status,
+  StatusError,
+  TransferTransaction,
+} from '@hashgraph/sdk';
 import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
 import { StakingInfoJson } from '@hashgraph/sdk/lib/account/AccountInfo';
+import { providerErrors } from '@metamask/rpc-errors';
 import { AccountInfo } from 'src/types/account';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
@@ -108,6 +118,10 @@ export class HederaServiceImpl implements HederaService {
       publicKey ?? '',
       transactionSigner,
     );
+
+    if (!(await testClientOperatorMatch(client))) {
+      return null;
+    }
 
     // this sets the fee paid by the client for the transaction
     client.setDefaultMaxTransactionFee(Hbar.from(500000, HbarUnit.Tinybar));
@@ -291,6 +305,48 @@ export class HederaServiceImpl implements HederaService {
 
     return result;
   }
+}
+
+/**
+ * Does the operator key belong to the operator account.
+ *
+ * @param client - Hedera Client.
+ */
+async function testClientOperatorMatch(client: Client) {
+  const tx = new TransferTransaction()
+    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
+    .addHbarTransfer(client.operatorAccountId!, Hbar.fromTinybars(0))
+    .setMaxTransactionFee(Hbar.fromTinybars(1));
+
+  try {
+    await tx.execute(client);
+  } catch (error: any) {
+    if (error instanceof StatusError) {
+      if (
+        error.status === Status.InsufficientTxFee ||
+        error.status === Status.InsufficientPayerBalance
+      ) {
+        // If the transaction fails with Insufficient Tx Fee, this means
+        // that the account ID verification succeeded before this point
+        // Same for Insufficient Payer Balance
+
+        return true;
+      }
+
+      return false;
+    }
+
+    throw providerErrors.unauthorized(
+      `The account id does not belong to the associated private key: ${String(
+        error,
+      )}`,
+    );
+  }
+
+  // under *no* cirumstances should this transaction succeed
+  throw providerErrors.unauthorized(
+    'Unexpected success of intentionally-erroneous transaction to confirm account ID',
+  );
 }
 
 /**

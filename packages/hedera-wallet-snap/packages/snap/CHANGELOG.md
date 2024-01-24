@@ -1,6 +1,18 @@
 # Changelog
 
-## [0.1.4](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.4...v0.1.4) (2024-01-17)
+## [0.1.5](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.5...v0.1.5) (2024-01-24)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- Added a helper method to check whether the account id is associated with the given private key on hedera ledger
+
+### :bug: Bug Fixes
+
+## [0.1.4](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.4...v0.1.4) (2024-01-17)
 
 ### :page_with_curl: Documentation
 
@@ -21,7 +33,7 @@
 
 - Fixed an issue whereby sometimes, hbars couldn't be sent on mainnet due to a network issue
 
-## [0.1.3](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.3...v0.1.3) (2024-01-05)
+## [0.1.3](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.3...v0.1.3) (2024-01-05)
 
 ### :page_with_curl: Documentation
 
@@ -33,7 +45,7 @@
 
 - Fixed an issue whereby sometimes, hbars couldn't be sent on mainnet due to a network issue
 
-## [0.1.2](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.2...v0.1.2) (2023-12-01)
+## [0.1.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.2...v0.1.2) (2023-12-01)
 
 ### :page_with_curl: Documentation
 
@@ -47,7 +59,7 @@
 
 - None
 
-## [0.1.1](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.1...v0.1.1) (2023-11-30)
+## [0.1.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.1...v0.1.1) (2023-11-30)
 
 ### :page_with_curl: Documentation
 
@@ -61,7 +73,7 @@
 
 - None
 
-## [0.1.0](https://github.com/tuum-tech/hedera-pulse/compare/v0.1.0...v0.1.0) (2023-12-28)
+## [0.1.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.0...v0.1.0) (2023-12-28)
 
 ### :page_with_curl: Documentation
 
