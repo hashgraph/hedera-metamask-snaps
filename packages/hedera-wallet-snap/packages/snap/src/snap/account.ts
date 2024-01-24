@@ -318,7 +318,7 @@ async function connectHederaAccount(
         divider(),
         text(`Account Id: ${accountId}`),
       ]),
-      placeholder: '2386d1d21644dc65d...', // You can use '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c' for testing purposes
+      placeholder: '2386d1d21644dc65d...',
     };
     const privateKey = (await snapDialog(dialogParamsForPrivateKey)) as string;
 
@@ -327,23 +327,14 @@ async function connectHederaAccount(
       const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
         accountId,
       );
-      const publicKey =
-        PrivateKey.fromString(privateKey).publicKey.toStringRaw();
-      if (_.isEmpty(accountInfo)) {
-        /* const dialogParamsForHederaAccountId: SnapDialogParams = {
-          type: 'alert',
-          content: await generateCommonPanel(origin, [
-            heading('Hedera Account Status'),
-            text(
-              `This Hedera account is not yet active on ${network}. Please activate it by sending some HBAR to this account on '${network}'.`,
-            ),
-            divider(),
-            text(`Public Key: ${publicKey}`),
-            divider(),
-          ]),
-        };
-        await snapDialog(dialogParamsForHederaAccountId); */
 
+      let publicKey =
+        PrivateKey.fromStringECDSA(privateKey).publicKey.toStringRaw();
+      if (curve === 'ED25519') {
+        publicKey =
+          PrivateKey.fromStringED25519(privateKey).publicKey.toStringRaw();
+      }
+      if (_.isEmpty(accountInfo)) {
         console.error(
           `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Public Key: ${publicKey}`,
         );
