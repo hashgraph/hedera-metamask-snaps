@@ -22,7 +22,6 @@ import { providerErrors } from '@metamask/rpc-errors';
 import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
-import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { getAccountBalance } from './rpc/account/getAccountBalance';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
@@ -31,7 +30,12 @@ import { setCurrentAccount } from './snap/account';
 import { getSnapStateUnchecked, initSnapState } from './snap/state';
 import { WalletSnapParams } from './types/state';
 
+import { PrivateKey } from '@hashgraph/sdk';
+import { Wallet, ethers } from 'ethers';
+import { Wallet as HederaWallet } from './domain/wallet/abstract';
+import { PrivateKeySoftwareWallet } from './domain/wallet/software-private-key';
 import { getTransactions } from './rpc/transactions/getTransactions';
+import { stringToUint8Array, uint8ArrayToHex } from './utils/crypto';
 import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
@@ -137,13 +141,29 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       }
 
       const { hederaEvmAddress, network } = state.currentAccount;
-      const { privateKey } =
+      const { privateKey: pk, curve } =
         state.accountState[hederaEvmAddress][network].keyStore;
-      const wallet: Wallet = new ethers.Wallet(privateKey);
+
+      let signature = '';
+      if (curve === 'ECDSA_SECP256K1') {
+        const wallet: Wallet = new ethers.Wallet(pk);
+        signature = await wallet.signMessage(request.params.message);
+      } else if (curve === 'ED25519') {
+        const privateKey = PrivateKey.fromStringED25519(pk);
+        const wallet: HederaWallet = new PrivateKeySoftwareWallet(privateKey);
+        const signer = await wallet.getTransactionSigner(0);
+
+        signature = uint8ArrayToHex(
+          await signer(stringToUint8Array(request.params.message)),
+        );
+      }
+      if (!signature.startsWith('0x')) {
+        signature = `0x${signature}`;
+      }
 
       return {
         currentAccount: state.currentAccount,
-        signature: await wallet.signMessage(request.params.message),
+        signature,
       };
     }
     case 'getAccountInfo': {

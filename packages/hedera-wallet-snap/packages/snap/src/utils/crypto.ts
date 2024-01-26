@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,4 +57,62 @@ export const isValidEthereumPublicKey = (key: string): boolean => {
     (publicKey.length === 68 || publicKey.length === 130) &&
     ethers.isHexString(publicKey)
   );
+};
+
+/**
+ * Converts string to a uint8 array.
+ *
+ * @param data - Message to convert.
+ * @returns Converted value.
+ */
+export const stringToUint8Array = (data: string): Uint8Array => {
+  // Use TextEncoder to convert the string to UTF-8 encoding
+  const encoder = new TextEncoder(); // The TextEncoder encodes into UTF-8 by default
+  const uint8Array = encoder.encode(data);
+  return uint8Array;
+};
+
+/**
+ * Converts uint8 array to a hex string.
+ *
+ * @param data - Data to convert.
+ * @returns Converted value.
+ */
+export const uint8ArrayToHex = (
+  data: Uint8Array | null | undefined,
+): string => {
+  if (!data) {
+    return '';
+  }
+  return data.reduce(
+    (str, byte) => str + byte.toString(16).padStart(2, '0'),
+    '',
+  );
+};
+
+/**
+ * Converts hex string to an uint8 array.
+ *
+ * @param data - Data to convert.
+ * @returns Converted value.
+ */
+export const hexToUInt8Array = (data: string): Uint8Array => {
+  let hexString = data;
+  // Remove the '0x' prefix if it exists
+  if (hexString.startsWith('0x')) {
+    hexString = hexString.slice(2);
+  }
+
+  // Ensure the hex string has an even length
+  if (hexString.length % 2 !== 0) {
+    throw new Error('Invalid hex string');
+  }
+
+  // Convert the hex string to a byte array
+  const byteArray = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < byteArray.length; i++) {
+    byteArray[i] = parseInt(hexString.substr(i * 2, 2), 16);
+  }
+
+  return byteArray;
 };

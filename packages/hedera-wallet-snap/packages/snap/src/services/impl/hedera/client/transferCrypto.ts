@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,15 @@
  *
  */
 
-import { Hbar, TransferTransaction, type Client } from '@hashgraph/sdk';
+import {
+  Hbar,
+  HbarUnit,
+  TransferTransaction,
+  type Client,
+} from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
+import { uint8ArrayToHex } from '../../../../utils/crypto';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -55,7 +61,7 @@ export async function transferCrypto(
 ): Promise<TxReceipt> {
   const maxFee = options.maxFee
     ? new Hbar(options.maxFee.toFixed(8))
-    : new Hbar(1);
+    : Hbar.from(500000, HbarUnit.Tinybar);
 
   const serviceFeeToAddr: string = options.serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
@@ -82,8 +88,7 @@ export async function transferCrypto(
         outgoingHbarAmount += -options.serviceFeesToPay[transfer.asset];
       }
     } else {
-      // TODO: Currently not implemented
-      /*       const multiplier = Math.pow(
+      const multiplier = Math.pow(
         10,
         options.currentBalance.tokens[transfer.asset].decimals,
       );
@@ -112,7 +117,7 @@ export async function transferCrypto(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         client.operatorAccountId!,
         -outgoingTokenAmount,
-      ); */
+      );
     }
   }
 
@@ -131,16 +136,6 @@ export async function transferCrypto(
   options.onBeforeConfirm?.();
 
   const receipt = await txResponse.getReceipt(client);
-
-  const uint8ArrayToHex = (data: Uint8Array | null | undefined) => {
-    if (!data) {
-      return '';
-    }
-    return data.reduce(
-      (str, byte) => str + byte.toString(16).padStart(2, '0'),
-      '',
-    );
-  };
 
   return {
     status: receipt.status.toString(),

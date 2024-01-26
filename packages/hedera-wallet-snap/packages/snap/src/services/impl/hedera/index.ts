@@ -365,9 +365,14 @@ export async function getHederaClient(
 ): Promise<SimpleHederaClient | null> {
   const accountId = AccountId.fromString(_accountId);
 
-  let privateKey = PrivateKey.fromStringECDSA(_privateKey);
-  if (_curve === 'ED25519') {
+  let privateKey: PrivateKey;
+  if (_curve === 'ECDSA_SECP256K1') {
+    privateKey = PrivateKey.fromStringECDSA(_privateKey);
+  } else if (_curve === 'ED25519') {
     privateKey = PrivateKey.fromStringED25519(_privateKey);
+  } else {
+    console.error('Invalid curve type');
+    return null;
   }
 
   const wallet: Wallet = new PrivateKeySoftwareWallet(privateKey);

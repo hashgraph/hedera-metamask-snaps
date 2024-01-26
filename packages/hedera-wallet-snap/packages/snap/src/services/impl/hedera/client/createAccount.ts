@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,17 @@
 import {
   AccountCreateTransaction,
   Hbar,
+  HbarUnit,
   PublicKey,
   TransactionReceipt,
   TransferTransaction,
   type Client,
 } from '@hashgraph/sdk';
 
-import { isValidEthereumPublicKey } from '../../../../utils/keyPair';
+import {
+  isValidEthereumPublicKey,
+  uint8ArrayToHex,
+} from '../../../../utils/crypto';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -58,7 +62,7 @@ export async function createAccount(
 ): Promise<TxReceipt> {
   const maxFee = options.maxFee
     ? new Hbar(options.maxFee.toFixed(8))
-    : new Hbar(1);
+    : Hbar.from(500000, HbarUnit.Tinybar);
 
   const transaction = new TransferTransaction()
     .setTransactionMemo(options.memo ?? '')
@@ -131,16 +135,6 @@ export async function createAccount(
 
     receipt = await txResponse.getReceipt(client);
   }
-
-  const uint8ArrayToHex = (data: Uint8Array | null | undefined) => {
-    if (!data) {
-      return '';
-    }
-    return data.reduce(
-      (str, byte) => str + byte.toString(16).padStart(2, '0'),
-      '',
-    );
-  };
 
   return {
     status: receipt.status.toString(),

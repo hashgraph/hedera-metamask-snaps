@@ -33,7 +33,7 @@ import {
 } from '../types/account';
 import { hederaNetworks } from '../types/constants';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
-import { generateWallet } from '../utils/keyPair';
+import { generateWallet } from '../utils/crypto';
 import { generateCommonPanel, snapDialog } from './dialog';
 import { validHederaNetwork } from './network';
 import {

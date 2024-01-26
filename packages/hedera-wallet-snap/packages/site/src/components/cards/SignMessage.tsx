@@ -17,7 +17,6 @@
  * limitations under the License.
  *
  */
-import { verifyMessage } from 'ethers';
 import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
@@ -66,21 +65,9 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       setAccountInfo(currentAccount);
       console.log('signature: ', signature);
 
-      // Let's try to verify whether this signature is valid
-      // Recover address from signature
-      const addressInSignature = verifyMessage(
-        message,
-        signature,
-      ).toLowerCase();
-      console.log('addressInSignature: ', addressInSignature);
-
       showModal({
         title: 'Signed Message',
-        content: JSON.stringify(
-          { message, signature, addressInSignature },
-          null,
-          4,
-        ),
+        content: JSON.stringify({ message, signature }, null, 4),
       });
     } catch (e) {
       console.error(e);
