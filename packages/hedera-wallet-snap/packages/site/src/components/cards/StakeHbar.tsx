@@ -41,7 +41,7 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [nodeId, setNodeId] = useState<number | null>(null);
+  const [nodeId, setNodeId] = useState<number>();
   const [accountId, setAccountId] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
@@ -55,6 +55,7 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       const stakeHbarParams = {
         accountId: accountId || undefined,
       } as StakeHbarRequestParams;
+      console.log('nodeId: ', nodeId);
       if (!_.isNull(nodeId)) {
         stakeHbarParams.nodeId = nodeId;
       }
