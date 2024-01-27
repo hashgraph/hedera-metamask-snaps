@@ -25,6 +25,7 @@ import {
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   SignMessageRequestParams,
+  StakeHbarRequestParams,
   TransferCryptoRequestParams,
 } from '../types/snap';
 
@@ -268,6 +269,33 @@ export const signMessage = async (
           network,
           mirrorNodeUrl,
           message: signMessageRequestParams.message,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "stakeHbar" method from the snap.
+ */
+export const stakeHbar = async (
+  network: string,
+  mirrorNodeUrl: string,
+  stakeHbarParams: StakeHbarRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'stakeHbar',
+        params: {
+          network,
+          mirrorNodeUrl,
+          nodeId: stakeHbarParams.nodeId,
+          accountId: stakeHbarParams.accountId,
           ...externalAccountparams,
         },
       },

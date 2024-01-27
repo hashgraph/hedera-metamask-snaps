@@ -28,7 +28,6 @@ import {
   StatusError,
   TransferTransaction,
 } from '@hashgraph/sdk';
-import BigNumber from 'bignumber.js';
 import _ from 'lodash';
 
 import { StakingInfoJson } from '@hashgraph/sdk/lib/account/AccountInfo';
@@ -37,6 +36,7 @@ import { AccountInfo } from 'src/types/account';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
 import { FetchResponse, fetchDataFromUrl } from '../../../utils/fetch';
+import { timestampToString } from '../../../utils/helper';
 import {
   AccountBalance,
   HederaService,
@@ -129,25 +129,21 @@ export class HederaServiceImpl implements HederaService {
     return new SimpleHederaClientImpl(client, privateKey);
   }
 
-  async getNodeStakingInfo(): Promise<MirrorStakingInfo[]> {
+  async getNodeStakingInfo(nodeId?: number): Promise<MirrorStakingInfo[]> {
     const result: MirrorStakingInfo[] = [];
 
-    const url = `${this.mirrorNodeUrl}/api/v1/network/nodes?order=asc&limit=25`;
+    let url = `${this.mirrorNodeUrl}/api/v1/network/nodes`;
+
+    if (_.isNull(nodeId)) {
+      url = `${url}?order=desc&limit=50`;
+    } else {
+      url = `${url}?node.id=${nodeId as number}`;
+    }
+
     const response: FetchResponse = await fetchDataFromUrl(url);
     if (response.success) {
       for (const node of response.data.nodes) {
-        result.push({
-          description: node.description,
-          node_id: node.node_id,
-          node_account_id: node.node_account_id,
-          min_stake: new BigNumber(node.min_stake),
-          max_stake: new BigNumber(node.max_stake),
-          stake: new BigNumber(node.stake),
-          stake_rewarded: new BigNumber(node.stake_rewarded),
-          stake_not_rewarded: new BigNumber(node.stake_not_rewarded),
-          reward_rate_start: new BigNumber(node.reward_rate_start),
-          staking_period: node.staking_period,
-        });
+        result.push(node);
       }
 
       if (response.data.links.next) {
@@ -157,18 +153,7 @@ export class HederaServiceImpl implements HederaService {
         const secondResponse: FetchResponse = await fetchDataFromUrl(secondUrl);
         if (secondResponse.success) {
           for (const node of secondResponse.data.nodes) {
-            result.push({
-              description: node.description,
-              node_id: node.node_id,
-              node_account_id: node.node_account_id,
-              min_stake: new BigNumber(node.min_stake),
-              max_stake: new BigNumber(node.max_stake),
-              stake: new BigNumber(node.stake),
-              stake_rewarded: new BigNumber(node.stake_rewarded),
-              stake_not_rewarded: new BigNumber(node.stake_not_rewarded),
-              reward_rate_start: new BigNumber(node.reward_rate_start),
-              staking_period: node.staking_period,
-            });
+            result.push(node);
           }
         }
       }
@@ -220,12 +205,8 @@ export class HederaServiceImpl implements HederaService {
     return {
       accountId: result.account,
       alias: result.alias,
-      createdTime: new Date(
-        parseFloat(result.created_timestamp) * 1000,
-      ).toISOString(),
-      expirationTime: new Date(
-        parseFloat(result.expiry_timestamp) * 1000,
-      ).toISOString(),
+      createdTime: timestampToString(result.created_timestamp),
+      expirationTime: timestampToString(result.expiry_timestamp),
       memo: result.memo,
       evmAddress: result.evm_address,
       key: {
@@ -234,9 +215,7 @@ export class HederaServiceImpl implements HederaService {
       },
       balance: {
         hbars,
-        timestamp: new Date(
-          parseFloat(result.balance.timestamp) * 1000,
-        ).toISOString(),
+        timestamp: timestampToString(result.balance.timestamp),
         tokens,
       } as AccountBalance,
       autoRenewPeriod: String(result.auto_renew_period),
@@ -244,9 +223,7 @@ export class HederaServiceImpl implements HederaService {
       isDeleted: result.deleted,
       stakingInfo: {
         declineStakingReward: result.decline_reward,
-        stakePeriodStart: result.stake_period_start
-          ? new Date(parseFloat(result.stake_period_start) * 1000).toISOString()
-          : '',
+        stakePeriodStart: timestampToString(result.stake_period_start),
         pendingReward: String(result.pending_reward),
         stakedToMe: '0', // TODO
         stakedAccountId: result.staked_account_id ?? '',
@@ -283,13 +260,6 @@ export class HederaServiceImpl implements HederaService {
     }
 
     result = response.data.transactions as MirrorTransactionInfo[];
-
-    const timestampToString = (data: string | null | undefined) => {
-      if (!data) {
-        return '';
-      }
-      return new Date(parseFloat(data) * 1000).toISOString();
-    };
 
     result.forEach((transaction) => {
       transaction.consensus_timestamp = timestampToString(

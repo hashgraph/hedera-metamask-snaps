@@ -47,3 +47,8 @@ export type TransferCryptoRequestParams = {
   maxFee?: number; // hbars
   serviceFee?: ServiceFee;
 };
+
+export type StakeHbarRequestParams = {
+  nodeId?: number;
+  accountId?: string;
+};

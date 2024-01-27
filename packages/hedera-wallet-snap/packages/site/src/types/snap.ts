@@ -87,6 +87,11 @@ export type SignMessageRequestParams = {
   message: string;
 };
 
+export type StakeHbarRequestParams = {
+  nodeId?: number;
+  accountId?: string;
+};
+
 export type ExternalAccountParams = {
   externalAccount: {
     accountIdOrEvmAddress: string;

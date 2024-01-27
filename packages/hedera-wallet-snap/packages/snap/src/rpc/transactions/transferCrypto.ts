@@ -35,7 +35,7 @@ import { SnapDialogParams, WalletSnapParams } from '../../types/state';
  *
  * @param walletSnapParams - Wallet snap params.
  * @param transferCryptoParams - Parameters for transferring crypto.
- * @returns Account Info.
+ * @returns Receipt of the transaction.
  */
 export async function transferCrypto(
   walletSnapParams: WalletSnapParams,

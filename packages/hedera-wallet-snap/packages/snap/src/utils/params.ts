@@ -29,6 +29,7 @@ import {
   MirrorNodeParams,
   ServiceFee,
   SignMessageRequestParams,
+  StakeHbarRequestParams,
   TransferCryptoRequestParams,
 } from '../types/params';
 
@@ -354,5 +355,52 @@ export function isValidTransferCryptoParams(
     parameter.serviceFee !== undefined
   ) {
     isValidServiceFee(parameter.serviceFee);
+  }
+}
+
+/**
+ * Check Validation of stakeHbar request.
+ *
+ * @param params - Request params.
+ */
+export function isValidStakeHbarParams(
+  params: unknown,
+): asserts params is StakeHbarRequestParams {
+  if (
+    params === null ||
+    _.isEmpty(params) ||
+    !('nodeId' in params || 'accountId' in params) ||
+    ('nodeId' in params && 'accountId' in params)
+  ) {
+    const errMessage =
+      'Invalid stakeHbar Params passed. Pass either "nodeId" or "accountId" as a parameter';
+    console.error(errMessage);
+    throw providerErrors.unsupportedMethod(errMessage);
+  }
+
+  const parameter = params as StakeHbarRequestParams;
+
+  // Check if nodeId is valid
+  if (
+    'nodeId' in parameter &&
+    (_.isNull(parameter.nodeId) || typeof parameter.nodeId !== 'number')
+  ) {
+    const errMessage =
+      'Invalid stakeHbar Params passed. "nodeId" is not a valid Node ID';
+    console.error(errMessage);
+    throw providerErrors.unsupportedMethod(errMessage);
+  }
+
+  // Check if accountId is valid
+  if (
+    'accountId' in parameter &&
+    (typeof parameter.accountId !== 'string' ||
+      _.isEmpty(parameter.accountId) ||
+      !AccountId.fromString(parameter.accountId))
+  ) {
+    const errMessage =
+      'Invalid stakeHbar Params passed. "accountId" is not a valid Hedera Account Id';
+    console.error(errMessage);
+    throw providerErrors.unsupportedMethod(errMessage);
   }
 }

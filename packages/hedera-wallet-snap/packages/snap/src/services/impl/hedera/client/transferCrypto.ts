@@ -27,12 +27,8 @@ import {
 
 import { ethers } from 'ethers';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
-import {
-  AccountBalance,
-  SimpleTransfer,
-  TxReceipt,
-  TxReceiptExchangeRate,
-} from '../../../hedera';
+import { timestampToString } from '../../../../utils/helper';
+import { AccountBalance, SimpleTransfer, TxReceipt } from '../../../hedera';
 
 /**
  * Transfer crypto(hbar or other tokens).
@@ -87,6 +83,11 @@ export async function transferCrypto(
         );
         outgoingHbarAmount += -options.serviceFeesToPay[transfer.asset];
       }
+      transaction.addHbarTransfer(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        client.operatorAccountId!,
+        new Hbar(outgoingHbarAmount),
+      );
     } else {
       const multiplier = Math.pow(
         10,
@@ -120,15 +121,6 @@ export async function transferCrypto(
       );
     }
   }
-
-  if (outgoingHbarAmount !== 0) {
-    transaction.addHbarTransfer(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
-      new Hbar(outgoingHbarAmount),
-    );
-  }
-
   transaction.freezeWith(client);
 
   const txResponse = await transaction.execute(client);
@@ -136,6 +128,14 @@ export async function transferCrypto(
   options.onBeforeConfirm?.();
 
   const receipt = await txResponse.getReceipt(client);
+
+  let newExchangeRate;
+  if (receipt.exchangeRate) {
+    newExchangeRate = {
+      ...receipt.exchangeRate,
+      expirationTime: timestampToString(receipt.exchangeRate.expirationTime),
+    };
+  }
 
   return {
     status: receipt.status.toString(),
@@ -145,11 +145,7 @@ export async function transferCrypto(
     topicId: receipt.topicId ? receipt.topicId : '',
     tokenId: receipt.tokenId ? receipt.tokenId : '',
     scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-    exchangeRate: receipt.exchangeRate
-      ? (JSON.parse(
-          JSON.stringify(receipt.exchangeRate),
-        ) as TxReceiptExchangeRate)
-      : ({} as TxReceiptExchangeRate),
+    exchangeRate: newExchangeRate,
     topicSequenceNumber: receipt.topicSequenceNumber
       ? String(receipt.topicSequenceNumber)
       : '',

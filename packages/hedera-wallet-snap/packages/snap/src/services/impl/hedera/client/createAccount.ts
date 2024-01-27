@@ -92,6 +92,11 @@ export async function createAccount(
         transaction.addHbarTransfer(transfer.to, transfer.amount);
         outgoingHbarAmount += -transfer.amount;
       }
+      transaction.addHbarTransfer(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        client.operatorAccountId!,
+        new Hbar(outgoingHbarAmount),
+      );
     } else {
       const multiplier = Math.pow(
         10,
@@ -113,14 +118,6 @@ export async function createAccount(
         amountToReduce,
       );
     }
-  }
-
-  if (outgoingHbarAmount !== 0) {
-    transaction.addHbarTransfer(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
-      new Hbar(outgoingHbarAmount),
-    );
   }
 
   let receipt: TransactionReceipt;

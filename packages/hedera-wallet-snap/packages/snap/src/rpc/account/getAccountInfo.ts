@@ -69,6 +69,9 @@ export async function getAccountInfo(
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
+  const { privateKey, curve } =
+    state.accountState[hederaEvmAddress][network].keyStore;
+
   let accountIdToQuery = hederaAccountId;
   let selfAccountId = true;
   if (!_.isEmpty(accountId)) {
@@ -84,8 +87,8 @@ export async function getAccountInfo(
     if (_.isEmpty(mirrorNodeUrl)) {
       console.log('Retrieving account info using Hedera Ledger Node');
       const hederaClient = await createHederaClient(
-        state.accountState[hederaEvmAddress][network].keyStore.curve,
-        state.accountState[hederaEvmAddress][network].keyStore.privateKey,
+        curve,
+        privateKey,
         hederaAccountId,
         network,
       );

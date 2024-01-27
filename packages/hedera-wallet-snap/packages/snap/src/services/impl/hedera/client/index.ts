@@ -35,6 +35,7 @@ import {
 } from '../../../hedera';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
+import { stakeHbar } from './stakeHbar';
 import { transferCrypto } from './transferCrypto';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
@@ -91,5 +92,12 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     onBeforeConfirm?: () => void;
   }): Promise<TxReceipt> {
     return transferCrypto(this._client, options);
+  }
+
+  async stakeHbar(options: {
+    nodeId: number | null;
+    accountId: string | null;
+  }): Promise<TxReceipt> {
+    return stakeHbar(this._client, options);
   }
 }
