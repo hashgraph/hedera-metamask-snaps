@@ -32,6 +32,7 @@ import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
+import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -177,6 +178,12 @@ const Index = () => {
         />
 
         <StakeHbar
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnstakeHbar
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

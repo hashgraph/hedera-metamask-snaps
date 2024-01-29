@@ -49,6 +49,6 @@ export type TransferCryptoRequestParams = {
 };
 
 export type StakeHbarRequestParams = {
-  nodeId?: number;
-  accountId?: string;
+  nodeId?: number | null;
+  accountId?: string | null;
 };

@@ -45,11 +45,18 @@ export async function stakeHbar(
     client.operatorAccountId!,
   );
 
-  if (!_.isNull(options.nodeId)) {
-    transaction.setStakedNodeId(options.nodeId);
-  } else if (!_.isEmpty(options.accountId)) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    transaction.setStakedAccountId(options.accountId!);
+  if (_.isNull(options.nodeId) && _.isNull(options.accountId)) {
+    transaction.setDeclineStakingReward(true);
+  } else {
+    if (Number.isFinite(options.nodeId)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      transaction.setStakedNodeId(options.nodeId!);
+    }
+    if (!_.isEmpty(options.accountId)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      transaction.setStakedAccountId(options.accountId!);
+    }
+    transaction.setDeclineStakingReward(false);
   }
 
   transaction.freezeWith(client);

@@ -369,8 +369,7 @@ export function isValidStakeHbarParams(
   if (
     params === null ||
     _.isEmpty(params) ||
-    !('nodeId' in params || 'accountId' in params) ||
-    ('nodeId' in params && 'accountId' in params)
+    !('nodeId' in params || 'accountId' in params)
   ) {
     const errMessage =
       'Invalid stakeHbar Params passed. Pass either "nodeId" or "accountId" as a parameter';
@@ -383,7 +382,8 @@ export function isValidStakeHbarParams(
   // Check if nodeId is valid
   if (
     'nodeId' in parameter &&
-    (_.isNull(parameter.nodeId) || typeof parameter.nodeId !== 'number')
+    !_.isNull(parameter.nodeId) &&
+    (typeof parameter.nodeId !== 'number' || !Number.isFinite(parameter.nodeId))
   ) {
     const errMessage =
       'Invalid stakeHbar Params passed. "nodeId" is not a valid Node ID';
@@ -394,6 +394,7 @@ export function isValidStakeHbarParams(
   // Check if accountId is valid
   if (
     'accountId' in parameter &&
+    !_.isNull(parameter.accountId) &&
     (typeof parameter.accountId !== 'string' ||
       _.isEmpty(parameter.accountId) ||
       !AccountId.fromString(parameter.accountId))

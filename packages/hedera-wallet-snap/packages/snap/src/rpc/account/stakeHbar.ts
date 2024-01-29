@@ -26,6 +26,7 @@ import { TxReceipt } from '../../services/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
+import { updateSnapState } from '../../snap/state';
 import { StakeHbarRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { timestampToString } from '../../utils/helper';
@@ -41,7 +42,7 @@ export async function stakeHbar(
   walletSnapParams: WalletSnapParams,
   stakeHbarRequestParams: StakeHbarRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state } = walletSnapParams;
+  const { origin, state, mirrorNodeUrl } = walletSnapParams;
 
   const { nodeId = null, accountId = null } = stakeHbarRequestParams;
 
@@ -50,53 +51,88 @@ export async function stakeHbar(
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
 
+  let { stakedAccountId, stakedNodeId, declineStakingReward } =
+    state.accountState[hederaEvmAddress][network].accountInfo.stakingInfo;
+
+  let mirrorNodeUrlToUse = mirrorNodeUrl;
+  if (_.isEmpty(mirrorNodeUrlToUse)) {
+    mirrorNodeUrlToUse =
+      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
+  }
+
   let txReceipt = {} as TxReceipt;
 
   try {
     const panelToShow = [
-      heading('Stake HBAR'),
+      heading('Stake/Unstake HBAR'),
       text(
         'Refer to this [guide](https://docs.hedera.com/hedera/core-concepts/staking) for more information on staking HBAR',
       ),
       divider(),
-      text('You are about to stake your HBAR to the following:'),
-      divider(),
     ];
 
-    if (!_.isNull(nodeId)) {
-      const hederaService = new HederaServiceImpl(
-        network,
-        state.accountState[hederaEvmAddress][network].mirrorNodeUrl,
+    // Handle unstaking Hbar
+    if (_.isNull(nodeId) && _.isNull(accountId)) {
+      panelToShow.push(
+        text(
+          'You are about to unstake your HBAR so you will not be receiving any staking rewards from here on out.',
+        ),
       );
-      const stakingInfo = await hederaService.getNodeStakingInfo(nodeId);
-      if (stakingInfo.length === 0) {
+      declineStakingReward = true;
+    } else {
+      if (!_.isNull(nodeId) && !_.isNull(accountId)) {
         throw providerErrors.unsupportedMethod(
-          `Node ID ${nodeId} does not exist`,
+          'Cannot stake to both a node and an account',
         );
       }
-      panelToShow.push(text(`Node Description: ${stakingInfo[0].description}`));
-      panelToShow.push(text(`Node ID: ${stakingInfo[0].node_id}`));
+      // Handle staking Hbar
       panelToShow.push(
-        text(`Node Account ID: ${stakingInfo[0].node_account_id}`),
+        text('You are about to stake your HBAR to the following:'),
       );
-      const totalStake = Hbar.from(stakingInfo[0].stake, HbarUnit.Tinybar);
-      panelToShow.push(text(`Total Stake: ${totalStake.toString()}`));
-      panelToShow.push(
-        text(
-          `Staking Start: ${timestampToString(
-            stakingInfo[0].staking_period.from,
-          )}`,
-        ),
-      );
-      panelToShow.push(
-        text(
-          `Staking End: ${timestampToString(stakingInfo[0].staking_period.to)}`,
-        ),
-      );
-    } else if (!_.isEmpty(accountId)) {
-      panelToShow.push(text(`Account ID: ${String(accountId)}`));
+      panelToShow.push(divider());
+      if (!_.isNull(nodeId)) {
+        const hederaService = new HederaServiceImpl(
+          network,
+          mirrorNodeUrlToUse,
+        );
+        const stakingInfo = await hederaService.getNodeStakingInfo(nodeId);
+        if (stakingInfo.length === 0) {
+          throw providerErrors.unsupportedMethod(
+            `Node ID ${nodeId} does not exist`,
+          );
+        }
+        panelToShow.push(
+          text(`Node Description: ${stakingInfo[0].description}`),
+        );
+        panelToShow.push(text(`Node ID: ${stakingInfo[0].node_id}`));
+        panelToShow.push(
+          text(`Node Account ID: ${stakingInfo[0].node_account_id}`),
+        );
+        const totalStake = Hbar.from(stakingInfo[0].stake, HbarUnit.Tinybar);
+        panelToShow.push(text(`Total Stake: ${totalStake.toString()}`));
+        panelToShow.push(
+          text(
+            `Staking Start: ${timestampToString(
+              stakingInfo[0].staking_period.from,
+            )}`,
+          ),
+        );
+        panelToShow.push(
+          text(
+            `Staking End: ${timestampToString(
+              stakingInfo[0].staking_period.to,
+            )}`,
+          ),
+        );
+        stakedNodeId = String(nodeId);
+      }
+      if (!_.isEmpty(accountId)) {
+        panelToShow.push(text(`Account ID: ${String(accountId)}`));
+        stakedAccountId = accountId;
+      }
+      panelToShow.push(divider());
+      declineStakingReward = false;
     }
-    panelToShow.push(divider());
 
     const dialogParamsForStakeHbar: SnapDialogParams = {
       type: 'confirmation',
@@ -119,6 +155,19 @@ export async function stakeHbar(
       nodeId,
       accountId,
     });
+
+    state.accountState[hederaEvmAddress][
+      network
+    ].accountInfo.stakingInfo.stakedAccountId = stakedAccountId;
+    state.accountState[hederaEvmAddress][
+      network
+    ].accountInfo.stakingInfo.stakedNodeId = stakedNodeId;
+    state.accountState[hederaEvmAddress][
+      network
+    ].accountInfo.stakingInfo.declineStakingReward = declineStakingReward;
+    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
+      mirrorNodeUrlToUse;
+    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to stake Hbar: ${String(error)}`;
     console.error(errMessage);

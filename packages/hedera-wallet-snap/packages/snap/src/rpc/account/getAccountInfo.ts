@@ -19,6 +19,7 @@
  */
 
 import { AccountInfoQuery } from '@hashgraph/sdk';
+import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
@@ -32,7 +33,6 @@ import {
   calculateHederaQueryFees,
   deductServiceFee,
 } from '../../utils/tuumService';
-import { providerErrors } from '@metamask/rpc-errors';
 
 /**
  * Hedera Ledger Node:
@@ -187,6 +187,8 @@ export async function getAccountInfo(
     if (selfAccountId) {
       state.accountState[hederaEvmAddress][network].accountInfo = accountInfo;
       state.currentAccount.balance = accountInfo.balance;
+      state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
+        mirrorNodeUrl;
       await updateSnapState(state);
     }
   } catch (error: any) {

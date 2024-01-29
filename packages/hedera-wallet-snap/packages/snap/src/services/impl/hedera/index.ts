@@ -141,20 +141,22 @@ export class HederaServiceImpl implements HederaService {
     }
 
     const response: FetchResponse = await fetchDataFromUrl(url);
-    if (response.success) {
-      for (const node of response.data.nodes) {
-        result.push(node);
-      }
+    if (!response.success) {
+      return [] as MirrorStakingInfo[];
+    }
 
-      if (response.data.links.next) {
-        const secondUrl = `${this.mirrorNodeUrl}${
-          response.data.links.next as string
-        }`;
-        const secondResponse: FetchResponse = await fetchDataFromUrl(secondUrl);
-        if (secondResponse.success) {
-          for (const node of secondResponse.data.nodes) {
-            result.push(node);
-          }
+    for (const node of response.data.nodes) {
+      result.push(node);
+    }
+
+    if (response.data.links.next) {
+      const secondUrl = `${this.mirrorNodeUrl}${
+        response.data.links.next as string
+      }`;
+      const secondResponse: FetchResponse = await fetchDataFromUrl(secondUrl);
+      if (secondResponse.success) {
+        for (const node of secondResponse.data.nodes) {
+          result.push(node);
         }
       }
     }

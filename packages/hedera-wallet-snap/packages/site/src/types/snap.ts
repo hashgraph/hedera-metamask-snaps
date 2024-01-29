@@ -88,8 +88,8 @@ export type SignMessageRequestParams = {
 };
 
 export type StakeHbarRequestParams = {
-  nodeId?: number;
-  accountId?: string;
+  nodeId?: number | null;
+  accountId?: string | null;
 };
 
 export type ExternalAccountParams = {
