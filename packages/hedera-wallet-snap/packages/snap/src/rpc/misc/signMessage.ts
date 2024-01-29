@@ -35,7 +35,7 @@ import { stringToUint8Array, uint8ArrayToHex } from '../../utils/crypto';
  *
  * @param walletSnapParams - Wallet snap params.
  * @param signMessageRequestParams - Parameters for signing message.
- * @returns Account Balance.
+ * @returns Receipt of the transaction.
  */
 export async function signMessage(
   walletSnapParams: WalletSnapParams,

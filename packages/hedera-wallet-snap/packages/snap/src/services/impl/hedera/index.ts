@@ -22,7 +22,6 @@ import {
   AccountId,
   Client,
   Hbar,
-  HbarUnit,
   PrivateKey,
   Status,
   StatusError,
@@ -124,7 +123,7 @@ export class HederaServiceImpl implements HederaService {
     }
 
     // this sets the fee paid by the client for the transaction
-    client.setDefaultMaxTransactionFee(Hbar.from(500000, HbarUnit.Tinybar));
+    // client.setDefaultMaxTransactionFee(new Hbar(1));
 
     return new SimpleHederaClientImpl(client, privateKey);
   }

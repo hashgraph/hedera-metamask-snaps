@@ -19,7 +19,6 @@
  */
 
 import {
-  Hbar,
   type AccountId,
   type Client,
   type PrivateKey,
@@ -33,6 +32,7 @@ import {
   SimpleTransfer,
   TxReceipt,
 } from '../../../hedera';
+import { deleteAccount } from './deleteAccount';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
 import { stakeHbar } from './stakeHbar';
@@ -48,12 +48,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   constructor(client: Client, privateKey: PrivateKey | null) {
     this._client = client;
     this._privateKey = privateKey;
-  }
-
-  setMaxQueryPayment(cost: any): void {
-    const costInHbar = new Hbar(cost);
-    // this sets the fee paid by the client for the query
-    this._client.setMaxQueryPayment(costInHbar);
   }
 
   getClient(): Client {
@@ -99,5 +93,11 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     accountId: string | null;
   }): Promise<TxReceipt> {
     return stakeHbar(this._client, options);
+  }
+
+  async deleteAccount(options: {
+    transferAccountId: string;
+  }): Promise<TxReceipt> {
+    return deleteAccount(this._client, options);
   }
 }

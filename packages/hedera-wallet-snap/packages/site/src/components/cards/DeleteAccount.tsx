@@ -23,8 +23,8 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, StakeHbarRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, stakeHbar } from '../../utils';
+import { Account, DeleteAccountRequestParams } from '../../types/snap';
+import { deleteAccount, shouldDisplayReconnectButton } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -36,27 +36,31 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const UnstakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const DeleteAccount: FC<Props> = ({
+  network,
+  mirrorNodeUrl,
+  setAccountInfo,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
+  const [transferAccountId, setTransferAccountId] = useState<string>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleUnstakeHbarClick = async () => {
+  const handleDeleteAccountClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const stakeHbarParams = {
-        nodeId: null,
-        accountId: null,
-      } as StakeHbarRequestParams;
-      const response: any = await stakeHbar(
+      const deleteAccountParams = {
+        transferAccountId,
+      } as DeleteAccountRequestParams;
+      const response: any = await deleteAccount(
         network,
         mirrorNodeUrl,
-        stakeHbarParams,
+        deleteAccountParams,
         externalAccountParams,
       );
 
@@ -79,18 +83,28 @@ const UnstakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'Unstake HBAR',
-        description: 'Use your Hedera snap account to unstake your HBAR.',
+        title: 'Delete your Account',
+        description: 'Delete your account from the ledger.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
+            <label>
+              Enter the account ID to transfer existing Hbar to
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={transferAccountId}
+                placeholder="Account Id"
+                onChange={(e) => setTransferAccountId(e.target.value)}
+              />
+            </label>
             <br />
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Unstake"
-            onClick={handleUnstakeHbarClick}
+            buttonText="Delete"
+            onClick={handleDeleteAccountClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -106,4 +120,4 @@ const UnstakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { UnstakeHbar };
+export { DeleteAccount };

@@ -92,6 +92,10 @@ export type StakeHbarRequestParams = {
   accountId?: string | null;
 };
 
+export type DeleteAccountRequestParams = {
+  transferAccountId: string;
+};
+
 export type ExternalAccountParams = {
   externalAccount: {
     accountIdOrEvmAddress: string;

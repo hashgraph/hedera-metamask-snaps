@@ -24,6 +24,7 @@ import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
 import { ExternalAccount } from '../types/account';
 import {
+  DeleteAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MirrorNodeParams,
@@ -403,5 +404,44 @@ export function isValidStakeHbarParams(
       'Invalid stakeHbar Params passed. "accountId" is not a valid Hedera Account Id';
     console.error(errMessage);
     throw providerErrors.unsupportedMethod(errMessage);
+  }
+}
+
+/**
+ * Check Validation of deleteAccount request.
+ *
+ * @param params - Request params.
+ */
+export function isValidDeleteAccountParams(
+  params: unknown,
+): asserts params is DeleteAccountRequestParams {
+  if (
+    params === null ||
+    _.isEmpty(params) ||
+    !('transferAccountId' in params)
+  ) {
+    console.error(
+      'Invalid deleteAccount Params passed. "transferAccountId" must be passed as a parameter',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid deleteAccount Params passed. "transferAccountId" must be passed as a parameter',
+    );
+  }
+
+  const parameter = params as DeleteAccountRequestParams;
+
+  // Check if transferAccountId is valid
+  if (
+    'transferAccountId' in parameter &&
+    (_.isEmpty(parameter.transferAccountId) ||
+      typeof parameter.transferAccountId !== 'string' ||
+      !AccountId.fromString(parameter.transferAccountId))
+  ) {
+    console.error(
+      'Invalid deleteAccount Params passed. "transferAccountId" is not a valid Account ID',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid deleteAccount Params passed. "transferAccountId" is not a valid Account ID',
+    );
   }
 }

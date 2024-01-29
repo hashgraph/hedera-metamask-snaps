@@ -18,12 +18,7 @@
  *
  */
 
-import {
-  Hbar,
-  HbarUnit,
-  TransferTransaction,
-  type Client,
-} from '@hashgraph/sdk';
+import { Hbar, TransferTransaction, type Client } from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
@@ -55,15 +50,15 @@ export async function transferCrypto(
     onBeforeConfirm?: () => void;
   },
 ): Promise<TxReceipt> {
-  const maxFee = options.maxFee
-    ? new Hbar(options.maxFee.toFixed(8))
-    : Hbar.from(500000, HbarUnit.Tinybar);
-
   const serviceFeeToAddr: string = options.serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
-  const transaction = new TransferTransaction()
-    .setTransactionMemo(options.memo ?? '')
-    .setMaxTransactionFee(maxFee);
+  const transaction = new TransferTransaction().setTransactionMemo(
+    options.memo ?? '',
+  );
+
+  if (options.maxFee) {
+    transaction.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
+  }
 
   let outgoingHbarAmount = 0;
   for (const transfer of options.transfers) {

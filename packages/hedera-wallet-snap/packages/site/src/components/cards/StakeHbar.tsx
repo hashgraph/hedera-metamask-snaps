@@ -115,7 +115,7 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Stake HBAR"
+            buttonText="Stake"
             onClick={handleStakeHbarClick}
             disabled={!state.installedSnap}
             loading={loading}

@@ -146,8 +146,6 @@ export async function getAccountInfo(
         throw providerErrors.userRejectedRequest();
       }
 
-      hederaClient.setMaxQueryPayment(maxCost.toFixed(8));
-
       accountInfo = await hederaClient.getAccountInfo(accountIdToQuery);
 
       if (selfAccountId) {

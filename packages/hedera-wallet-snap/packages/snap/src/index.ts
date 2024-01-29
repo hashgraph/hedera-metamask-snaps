@@ -30,12 +30,14 @@ import { setCurrentAccount } from './snap/account';
 import { getSnapStateUnchecked, initSnapState } from './snap/state';
 import { WalletSnapParams } from './types/state';
 
+import { deleteAccount } from './rpc/account/deleteAccount';
 import { stakeHbar } from './rpc/account/stakeHbar';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
+  isValidDeleteAccountParams,
   isValidGetAccountInfoRequest,
   isValidGetTransactionsParams,
   isValidSignMessageRequest,
@@ -153,6 +155,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await stakeHbar(walletSnapParams, request.params),
+      };
+    }
+    case 'deleteAccount': {
+      isValidDeleteAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await deleteAccount(walletSnapParams, request.params),
       };
     }
     default:

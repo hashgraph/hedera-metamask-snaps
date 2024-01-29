@@ -505,7 +505,6 @@ export async function importMetaMaskAccount(
 
   // eslint-disable-next-line require-atomic-updates
   state.currentAccount = {
-    metamaskAddress: connectedAddress,
     hederaAccountId,
     hederaEvmAddress: address,
     balance,

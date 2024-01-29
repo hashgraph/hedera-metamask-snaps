@@ -22,6 +22,7 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
+  DeleteAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   SignMessageRequestParams,
@@ -296,6 +297,32 @@ export const stakeHbar = async (
           mirrorNodeUrl,
           nodeId: stakeHbarParams.nodeId,
           accountId: stakeHbarParams.accountId,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteAccount" method from the snap.
+ */
+export const deleteAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteAccountParams: DeleteAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'deleteAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          transferAccountId: deleteAccountParams.transferAccountId,
           ...externalAccountparams,
         },
       },

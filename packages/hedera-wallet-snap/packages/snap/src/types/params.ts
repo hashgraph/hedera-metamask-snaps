@@ -52,3 +52,7 @@ export type StakeHbarRequestParams = {
   nodeId?: number | null;
   accountId?: string | null;
 };
+
+export type DeleteAccountRequestParams = {
+  transferAccountId: string;
+};

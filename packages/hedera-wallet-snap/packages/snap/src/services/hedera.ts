@@ -146,9 +146,6 @@ export type HederaService = {
 };
 
 export type SimpleHederaClient = {
-  // set max fee queries
-  setMaxQueryPayment(cost: any): void;
-
   // get the associated client
   getClient(): Client;
 
@@ -180,6 +177,8 @@ export type SimpleHederaClient = {
     nodeId: number | null;
     accountId: string | null;
   }): Promise<TxReceipt>;
+
+  deleteAccount(options: { transferAccountId: string }): Promise<TxReceipt>;
 };
 
 export type MirrorStakingInfoServiceEndpoint = {
