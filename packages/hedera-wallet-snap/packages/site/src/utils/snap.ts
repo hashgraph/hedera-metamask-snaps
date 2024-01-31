@@ -22,7 +22,9 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
+  ApproveAllowanceRequestParams,
   DeleteAccountRequestParams,
+  DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   SignMessageRequestParams,
@@ -297,6 +299,63 @@ export const stakeHbar = async (
           mirrorNodeUrl,
           nodeId: stakeHbarParams.nodeId,
           accountId: stakeHbarParams.accountId,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "approveAllowance" method from the snap.
+ */
+export const approveAllowance = async (
+  network: string,
+  mirrorNodeUrl: string,
+  approveAllowanceParams: ApproveAllowanceRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'approveAllowance',
+        params: {
+          network,
+          mirrorNodeUrl,
+          spenderAccountId: approveAllowanceParams.spenderAccountId,
+          amount: approveAllowanceParams.amount,
+          assetType: approveAllowanceParams.assetType,
+          assetDetail: approveAllowanceParams.assetDetail,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteAllowance" method from the snap.
+ */
+export const deleteAllowance = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteAllowanceParams: DeleteAllowanceRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'deleteAllowance',
+        params: {
+          network,
+          mirrorNodeUrl,
+          assetType: deleteAllowanceParams.assetType,
+          assetId: deleteAllowanceParams.assetId,
+          spenderAccountId: deleteAllowanceParams.spenderAccountId,
           ...externalAccountparams,
         },
       },

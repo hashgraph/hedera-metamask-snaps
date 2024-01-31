@@ -26,13 +26,16 @@ import {
 } from '@hashgraph/sdk';
 
 import { AccountInfo } from '../../../../types/account';
+import { ApproveAllowanceAssetDetail } from '../../../../types/params';
 import {
   AccountBalance,
   SimpleHederaClient,
   SimpleTransfer,
   TxReceipt,
 } from '../../../hedera';
+import { approveAllowance } from './approveAllowance';
 import { deleteAccount } from './deleteAccount';
+import { deleteAllowance } from './deleteAllowance';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
 import { stakeHbar } from './stakeHbar';
@@ -93,6 +96,23 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     accountId: string | null;
   }): Promise<TxReceipt> {
     return stakeHbar(this._client, options);
+  }
+
+  async approveAllowance(options: {
+    spenderAccountId: string;
+    amount: number;
+    assetType: string;
+    assetDetail?: ApproveAllowanceAssetDetail;
+  }): Promise<TxReceipt> {
+    return approveAllowance(this._client, options);
+  }
+
+  async deleteAllowance(options: {
+    assetType: string;
+    assetId: string;
+    spenderAccountId?: string;
+  }): Promise<TxReceipt> {
+    return deleteAllowance(this._client, options);
   }
 
   async deleteAccount(options: {

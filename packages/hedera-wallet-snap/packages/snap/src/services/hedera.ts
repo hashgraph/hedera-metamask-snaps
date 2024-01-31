@@ -32,6 +32,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from '../types/account';
+import { ApproveAllowanceAssetDetail } from '../types/params';
 
 export type SimpleTransfer = {
   // HBAR or Token ID (as string)
@@ -176,6 +177,19 @@ export type SimpleHederaClient = {
   stakeHbar(options: {
     nodeId: number | null;
     accountId: string | null;
+  }): Promise<TxReceipt>;
+
+  approveAllowance(options: {
+    spenderAccountId: string;
+    amount: number;
+    assetType: string;
+    assetDetail?: ApproveAllowanceAssetDetail;
+  }): Promise<TxReceipt>;
+
+  deleteAllowance(options: {
+    assetType: string;
+    assetId: string;
+    spenderAccountId?: string;
   }): Promise<TxReceipt>;
 
   deleteAccount(options: { transferAccountId: string }): Promise<TxReceipt>;

@@ -22,8 +22,10 @@ import { useContext, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { Card, InstallFlaskButton } from '../components/base';
+import { ApproveAllowance } from '../components/cards/ApproveAllowance';
 import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
 import { DeleteAccount } from '../components/cards/DeleteAccount';
+import { DeleteAllowance } from '../components/cards/DeleteAllowance';
 import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
@@ -185,6 +187,18 @@ const Index = () => {
         />
 
         <UnstakeHbar
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <ApproveAllowance
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteAllowance
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

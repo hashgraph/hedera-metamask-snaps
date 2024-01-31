@@ -30,14 +30,18 @@ import { setCurrentAccount } from './snap/account';
 import { getSnapStateUnchecked, initSnapState } from './snap/state';
 import { WalletSnapParams } from './types/state';
 
+import { approveAllowance } from './rpc/account/approveAllowance';
 import { deleteAccount } from './rpc/account/deleteAccount';
+import { deleteAllowance } from './rpc/account/deleteAllowance';
 import { stakeHbar } from './rpc/account/stakeHbar';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
+  isValidApproveAllowanceParams,
   isValidDeleteAccountParams,
+  isValidDeleteAllowanceParams,
   isValidGetAccountInfoRequest,
   isValidGetTransactionsParams,
   isValidSignMessageRequest,
@@ -155,6 +159,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await stakeHbar(walletSnapParams, request.params),
+      };
+    }
+    case 'approveAllowance': {
+      isValidApproveAllowanceParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await approveAllowance(walletSnapParams, request.params),
+      };
+    }
+    case 'deleteAllowance': {
+      isValidDeleteAllowanceParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await deleteAllowance(walletSnapParams, request.params),
       };
     }
     case 'deleteAccount': {

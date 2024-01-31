@@ -56,3 +56,21 @@ export type StakeHbarRequestParams = {
 export type DeleteAccountRequestParams = {
   transferAccountId: string;
 };
+
+export type ApproveAllowanceAssetDetail = {
+  assetId: string;
+  all?: boolean;
+};
+
+export type ApproveAllowanceRequestParams = {
+  spenderAccountId: string;
+  amount: number;
+  assetType: 'HBAR' | 'TOKEN' | 'NFT';
+  assetDetail?: ApproveAllowanceAssetDetail;
+};
+
+export type DeleteAllowanceRequestParams = {
+  assetType: 'HBAR' | 'TOKEN' | 'NFT';
+  assetId: string;
+  spenderAccountId?: string;
+};
