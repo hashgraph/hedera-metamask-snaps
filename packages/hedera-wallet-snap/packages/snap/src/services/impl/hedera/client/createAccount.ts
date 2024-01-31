@@ -20,8 +20,8 @@
 
 import {
   AccountCreateTransaction,
+  AccountId,
   Hbar,
-  HbarUnit,
   PublicKey,
   TransactionReceipt,
   TransferTransaction,
@@ -60,25 +60,28 @@ export async function createAccount(
     onBeforeConfirm?: () => void;
   },
 ): Promise<TxReceipt> {
-  const maxFee = options.maxFee
-    ? new Hbar(options.maxFee.toFixed(8))
-    : Hbar.from(500000, HbarUnit.Tinybar);
+  const transaction = new TransferTransaction().setTransactionMemo(
+    options.memo ?? '',
+  );
 
-  const transaction = new TransferTransaction()
-    .setTransactionMemo(options.memo ?? '')
-    .setMaxTransactionFee(maxFee);
+  if (options.maxFee) {
+    transaction.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
+  }
 
   let newAccountCreated = false;
   const receipts: TransactionReceipt[] = [];
   let outgoingHbarAmount = 0;
   for (const transfer of options.transfers) {
-    if (transfer.asset === 'HBAR') {
+    if (transfer.assetType === 'HBAR') {
       if (isValidEthereumPublicKey(transfer.to)) {
         const tx = new AccountCreateTransaction()
           .setInitialBalance(Hbar.fromTinybars(transfer.amount))
-          .setMaxTransactionFee(maxFee)
-          .setKey(PublicKey.fromString(transfer.to))
-          .freezeWith(client);
+          .setKey(PublicKey.fromString(transfer.to));
+
+        if (options.maxFee) {
+          tx.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
+        }
+        tx.freezeWith(client);
 
         const txResponse = await tx.execute(client);
 
@@ -97,25 +100,26 @@ export async function createAccount(
         client.operatorAccountId!,
         new Hbar(outgoingHbarAmount),
       );
-    } else {
-      const multiplier = Math.pow(
-        10,
-        options.currentBalance.tokens[transfer.asset].decimals,
-      );
-
-      transaction.addTokenTransfer(
-        transfer.asset,
+    } else if (transfer.assetType === 'TOKEN') {
+      const assetid = transfer.assetId as string;
+      transaction.addTokenTransferWithDecimals(
+        assetid,
         transfer.to,
-        transfer.amount * multiplier,
+        transfer.amount,
+        options.currentBalance.tokens[assetid].decimals,
       );
-
-      const amountToReduce = -(transfer.amount * multiplier);
-
-      transaction.addTokenTransfer(
-        transfer.asset,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
-        amountToReduce,
+      transaction.addTokenTransferWithDecimals(
+        assetid,
+        client.operatorAccountId as AccountId,
+        transfer.amount,
+        options.currentBalance.tokens[assetid].decimals,
+      );
+    } else if (transfer.assetType === 'NFT') {
+      const assetid = transfer.assetId as string;
+      transaction.addNftTransfer(
+        assetid,
+        client.operatorAccountId as AccountId,
+        transfer.to,
       );
     }
   }

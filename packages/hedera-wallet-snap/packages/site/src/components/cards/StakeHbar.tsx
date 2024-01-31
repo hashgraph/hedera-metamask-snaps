@@ -83,7 +83,7 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'Stake HBAR',
+        title: 'stakeHbar',
         description:
           'Use your Hedera snap account to stake your HBAR to a Node ID or Account ID.',
         form: (

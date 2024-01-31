@@ -99,7 +99,7 @@ const ApproveAllowance: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'Approve an Allowance',
+        title: 'approveAllowance',
         description:
           'Use your Hedera snap account to approve an allowance to another Account.',
         form: (

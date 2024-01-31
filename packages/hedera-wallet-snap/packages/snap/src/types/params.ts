@@ -71,6 +71,6 @@ export type ApproveAllowanceRequestParams = {
 
 export type DeleteAllowanceRequestParams = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
-  assetId: string;
+  assetId?: string;
   spenderAccountId?: string;
 };

@@ -32,6 +32,8 @@ const TransferCrypto: FC<Props> = ({
   const { showModal } = useModal();
   const [sendToAddress, setSendToAddress] = useState('');
   const [memo, setMemo] = useState('');
+  const [assetType, setAssetType] = useState<'HBAR' | 'TOKEN' | 'NFT'>('HBAR');
+  const [assetId, setAssetId] = useState('');
   const [sendAmount, setSendAmount] = useState(0);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
@@ -44,12 +46,15 @@ const TransferCrypto: FC<Props> = ({
 
       const transfers: SimpleTransfer[] = [
         {
-          asset: 'HBAR',
+          assetType,
           to: sendToAddress,
           amount: sendAmount,
         } as SimpleTransfer,
       ];
-      // const maxFee = 1; // Note that if you don't pass this, default is 1 HBAR
+      if (assetType === 'TOKEN' || assetType === 'NFT') {
+        transfers[0].assetId = assetId;
+      }
+      // const maxFee = 1; // Note that if you don't pass this, default is whatever the snap has set
 
       const TUUMESERVICEADDRESS = '0.0.98'; // Hedera Fee collection account
       const serviceFee = {
@@ -88,7 +93,7 @@ const TransferCrypto: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'sendHbar',
+        title: 'transferCrypto',
         description:
           'Send HBAR to another account(can pass in Account Id or EVM address but not both)',
         form: (
@@ -117,7 +122,35 @@ const TransferCrypto: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter an amount of HBARs to send(in HBARs)
+              Asset Type
+              <select
+                style={{ width: '100%' }}
+                value={assetType}
+                onChange={(e) =>
+                  setAssetType(e.target.value as 'HBAR' | 'TOKEN' | 'NFT')
+                }
+              >
+                <option value="HBAR">HBAR</option>
+                <option value="TOKEN">TOKEN</option>
+                <option value="NFT">NFT</option>
+              </select>
+            </label>
+
+            {(assetType === 'TOKEN' || assetType === 'NFT') && (
+              <label>
+                Enter Asset Id (eg. Token Id, NFT Id)
+                <input
+                  type="text"
+                  style={{ width: '100%' }}
+                  value={assetId}
+                  placeholder="Enter Asset Id"
+                  onChange={(e) => setAssetId(e.target.value)}
+                />
+              </label>
+            )}
+            <br />
+            <label>
+              Enter an amount to send
               <input
                 type="number"
                 style={{ width: '100%' }}
@@ -131,7 +164,7 @@ const TransferCrypto: FC<Props> = ({
         ),
         button: (
           <SendHelloButton
-            buttonText="Send HBAR"
+            buttonText="Transfer"
             onClick={handleTransferCryptoClick}
             disabled={!state.installedSnap}
             loading={loading}

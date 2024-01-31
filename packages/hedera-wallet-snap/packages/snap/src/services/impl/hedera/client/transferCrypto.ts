@@ -18,7 +18,12 @@
  *
  */
 
-import { Hbar, TransferTransaction, type Client } from '@hashgraph/sdk';
+import {
+  AccountId,
+  Hbar,
+  TransferTransaction,
+  type Client,
+} from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
@@ -60,62 +65,72 @@ export async function transferCrypto(
     transaction.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
   }
 
-  let outgoingHbarAmount = 0;
   for (const transfer of options.transfers) {
-    if (transfer.asset === 'HBAR') {
+    if (transfer.assetType === 'HBAR') {
       if (ethers.isAddress(transfer.to)) {
         transfer.to = `0.0.${transfer.to.slice(2)}`;
       }
 
       transaction.addHbarTransfer(transfer.to, transfer.amount);
-      outgoingHbarAmount += -transfer.amount;
+      transaction.addHbarTransfer(
+        client.operatorAccountId as AccountId,
+        -transfer.amount,
+      );
 
       // Service Fee
-      if (options.serviceFeesToPay[transfer.asset] > 0) {
+      if (options.serviceFeesToPay[transfer.assetType] > 0) {
         transaction.addHbarTransfer(
           serviceFeeToAddr,
-          options.serviceFeesToPay[transfer.asset],
+          options.serviceFeesToPay[transfer.assetType],
         );
-        outgoingHbarAmount += -options.serviceFeesToPay[transfer.asset];
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -options.serviceFeesToPay[transfer.assetType],
+        );
       }
-      transaction.addHbarTransfer(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
-        new Hbar(outgoingHbarAmount),
-      );
-    } else {
-      const multiplier = Math.pow(
-        10,
-        options.currentBalance.tokens[transfer.asset].decimals,
-      );
-
-      let outgoingTokenAmount = transfer.amount * multiplier;
-
-      transaction.addTokenTransfer(
-        transfer.asset,
+    } else if (transfer.assetType === 'TOKEN') {
+      const assetid = transfer.assetId as string;
+      const decimals = options.currentBalance.tokens[assetid]
+        ? options.currentBalance.tokens[assetid].decimals
+        : 0;
+      transaction.addTokenTransferWithDecimals(
+        assetid,
         transfer.to,
-        outgoingTokenAmount,
+        transfer.amount,
+        decimals,
+      );
+      transaction.addTokenTransferWithDecimals(
+        assetid,
+        client.operatorAccountId as AccountId,
+        -transfer.amount,
+        decimals,
       );
 
       // Service Fee
-      if (options.serviceFeesToPay[transfer.asset] > 0) {
-        transaction.addTokenTransfer(
-          transfer.asset,
+      if (options.serviceFeesToPay[assetid] > 0) {
+        transaction.addTokenTransferWithDecimals(
+          assetid,
           serviceFeeToAddr,
-          options.serviceFeesToPay[transfer.asset] * multiplier,
+          options.serviceFeesToPay[assetid],
+          decimals,
         );
-        outgoingTokenAmount +=
-          options.serviceFeesToPay[transfer.asset] * multiplier;
+        transaction.addTokenTransferWithDecimals(
+          assetid,
+          client.operatorAccountId as AccountId,
+          -options.serviceFeesToPay[assetid],
+          decimals,
+        );
       }
-
-      transaction.addTokenTransfer(
-        transfer.asset,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
-        -outgoingTokenAmount,
+    } else if (transfer.assetType === 'NFT') {
+      const assetid = transfer.assetId as string;
+      transaction.addNftTransfer(
+        assetid,
+        client.operatorAccountId as AccountId,
+        transfer.to,
       );
     }
   }
+
   transaction.freezeWith(client);
 
   const txResponse = await transaction.execute(client);

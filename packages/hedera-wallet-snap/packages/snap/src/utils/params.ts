@@ -289,47 +289,6 @@ export function isValidTransferCryptoParams(
 
   const parameter = params as TransferCryptoRequestParams;
 
-  if (parameter.transfers) {
-    parameter.transfers.forEach((transfer: object) => {
-      if (
-        !('asset' in transfer) ||
-        typeof transfer.asset !== 'string' ||
-        _.isEmpty(transfer.asset)
-      ) {
-        console.error(
-          `Invalid transferCrypto Params passed. "transfers[].asset" is not a string or is empty`,
-        );
-        throw providerErrors.unsupportedMethod(
-          `Invalid transferCrypto Params passed. "transfers[].asset" is not a string or is empty`,
-        );
-      }
-      if (
-        !('to' in transfer) ||
-        typeof transfer.to !== 'string' ||
-        _.isEmpty(transfer.to)
-      ) {
-        console.error(
-          `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
-        );
-        throw providerErrors.unsupportedMethod(
-          `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
-        );
-      }
-      if (
-        !('amount' in transfer) ||
-        typeof transfer.amount !== 'number' ||
-        !Number.isFinite(transfer.amount)
-      ) {
-        console.error(
-          `Invalid transferCrypto Params passed. "transfers[].amount" is not a number`,
-        );
-        throw providerErrors.unsupportedMethod(
-          `Invalid transferCrypto Params passed. "transfers[].to" is not a number`,
-        );
-      }
-    });
-  }
-
   // Check if memo is valid
   if (
     'memo' in parameter &&
@@ -365,6 +324,88 @@ export function isValidTransferCryptoParams(
     parameter.serviceFee !== undefined
   ) {
     isValidServiceFee(parameter.serviceFee);
+  }
+
+  // Check if transfers is valid
+  if (parameter.transfers) {
+    parameter.transfers.forEach((transfer: object) => {
+      // Check if assetType is valid
+      if (
+        !('assetType' in transfer) ||
+        typeof transfer.assetType !== 'string' ||
+        !(
+          transfer.assetType === 'HBAR' ||
+          transfer.assetType === 'TOKEN' ||
+          transfer.assetType === 'NFT'
+        )
+      ) {
+        console.error(
+          'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+        );
+      }
+      if (transfer.assetType === 'HBAR' && 'assetId' in transfer) {
+        console.error(
+          'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
+        );
+      } else if (
+        (transfer.assetType === 'TOKEN' || transfer.assetType === 'NFT') &&
+        !('assetId' in transfer)
+      ) {
+        console.error(
+          'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
+        );
+      }
+
+      // Check if assetId is valid
+      if (
+        transfer.assetType !== 'HBAR' &&
+        'assetId' in transfer &&
+        (_.isEmpty(transfer.assetId) || typeof transfer.assetId !== 'string')
+      ) {
+        console.error(
+          `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
+        );
+        throw providerErrors.unsupportedMethod(
+          `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
+        );
+      }
+
+      // Check if to is valid
+      if (
+        !('to' in transfer) ||
+        typeof transfer.to !== 'string' ||
+        _.isEmpty(transfer.to)
+      ) {
+        console.error(
+          `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
+        );
+        throw providerErrors.unsupportedMethod(
+          `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
+        );
+      }
+      // Check if amount is valid
+      if (
+        !('amount' in transfer) ||
+        typeof transfer.amount !== 'number' ||
+        !Number.isFinite(transfer.amount)
+      ) {
+        console.error(
+          `Invalid transferCrypto Params passed. "transfers[].amount" is not a number`,
+        );
+        throw providerErrors.unsupportedMethod(
+          `Invalid transferCrypto Params passed. "transfers[].to" is not a number`,
+        );
+      }
+    });
   }
 }
 

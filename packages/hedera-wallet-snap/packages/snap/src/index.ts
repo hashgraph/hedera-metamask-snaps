@@ -168,6 +168,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         receipt: await approveAllowance(walletSnapParams, request.params),
       };
     }
+    case 'transferApprovedCrypto': {
+      isValidTransferCryptoParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await transferCrypto(walletSnapParams, request.params),
+        // receipt: await transferApprovedCrypto(walletSnapParams, request.params),
+      };
+    }
     case 'deleteAllowance': {
       isValidDeleteAllowanceParams(request.params);
       return {
@@ -211,7 +219,7 @@ export const onInstall: OnInstallHandler = async () => {
         ),
         divider(),
         text(
-          '😭 If you add a new account in MetaMask, you will need to reinstall the snap and reconnect to the new account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
+          '😭 If you add a new account in MetaMask after you have already approved existing accounts, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
         ),
       ]),
     },
@@ -226,8 +234,15 @@ export const onUpdate: OnUpdateHandler = async () => {
       content: panel([
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
-        text('🚀 Added a new API to let users sign arbitrary messages'),
-        text('🚀 Added a new API to let users view their transaction history'),
+        text(
+          '🚀 Added a new API to stake/unstake Hbar to and from Hedera Network nodes',
+        ),
+        text(
+          '🚀 Added a new API to approve/delete an allowance for Hbar, tokens and NFTs',
+        ),
+        text(
+          '🚀 Added a new API to delete a Hedera account from the ledger permanently. This action is irreversible!',
+        ),
       ]),
     },
   });

@@ -79,7 +79,7 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'Sign arbitary message',
+        title: 'signMessage',
         description:
           'Use your Hedera snap account to sign an arbitary message.',
         form: (

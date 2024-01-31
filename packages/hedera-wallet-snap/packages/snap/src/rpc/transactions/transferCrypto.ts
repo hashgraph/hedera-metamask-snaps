@@ -20,15 +20,23 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import _ from 'lodash';
 import {
   AccountBalance,
   SimpleTransfer,
   TxReceipt,
 } from '../../services/hedera';
+import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { snapDialog } from '../../snap/dialog';
-import { ServiceFee, TransferCryptoRequestParams } from '../../types/params';
+import { updateSnapState } from '../../snap/state';
+import {
+  GetAccountInfoRequestParams,
+  ServiceFee,
+  TransferCryptoRequestParams,
+} from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { getAccountInfo } from '../account/getAccountInfo';
 
 /**
  * Transfer crypto(hbar or other tokens).
@@ -41,7 +49,7 @@ export async function transferCrypto(
   walletSnapParams: WalletSnapParams,
   transferCryptoParams: TransferCryptoRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state } = walletSnapParams;
+  const { origin, state, mirrorNodeUrl } = walletSnapParams;
 
   const {
     transfers = [] as SimpleTransfer[],
@@ -55,12 +63,21 @@ export async function transferCrypto(
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
-  let shouldExecuteTransfer = false;
+  let mirrorNodeUrlToUse = mirrorNodeUrl;
+  if (_.isEmpty(mirrorNodeUrlToUse)) {
+    mirrorNodeUrlToUse =
+      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
+  }
+
   const serviceFeesToPay: Record<string, number> = transfers.reduce<
     Record<string, number>
   >((acc, transfer) => {
-    if (!acc[transfer.asset]) {
-      acc[transfer.asset] = 0;
+    if (!acc[transfer.assetType]) {
+      if (transfer.assetType === 'HBAR') {
+        acc[transfer.assetType] = 0;
+      } else {
+        acc[transfer.assetId as string] = 0;
+      }
     }
     // Calculate the service fee based on the total amount
     const fee = Number(
@@ -71,104 +88,163 @@ export async function transferCrypto(
     transfer.amount -= fee;
 
     // Record the service fee
-    acc[transfer.asset] += fee;
-
-    if (transfer.asset === 'HBAR') {
-      shouldExecuteTransfer = true;
+    if (transfer.assetType === 'HBAR') {
+      acc[transfer.assetType] += fee;
+    } else {
+      acc[transfer.assetId as string] += fee;
     }
+
     return acc;
   }, {});
 
-  const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : 'N/A';
-  const panelToShow = [
-    text(`Origin: ${origin}`),
-    divider(),
-    heading('Transfer Crypto'),
-    text('Are you sure you want to execute the following transaction(s)?'),
-    divider(),
-    text(`Memo: ${strippedMemo}`),
-    text(`Max Transaction Fee: ${maxFee ?? 1} Hbar`),
-  ];
+  let txReceipt = {} as TxReceipt;
 
-  transfers.forEach((transfer, index) => {
-    panelToShow.push(divider());
+  try {
+    await getAccountInfo(
+      { origin, state, mirrorNodeUrl: mirrorNodeUrlToUse } as WalletSnapParams,
+      {} as GetAccountInfoRequestParams,
+    );
+    let currentBalance =
+      state.accountState[hederaEvmAddress][network].accountInfo.balance;
+    if (!currentBalance) {
+      currentBalance = {} as AccountBalance;
+    }
 
-    const txNumber = (index + 1).toString();
-    panelToShow.push(text(`Transaction #${txNumber}`));
-    panelToShow.push(divider());
+    const panelToShow = [
+      text(`Origin: ${origin}`),
+      divider(),
+      heading('Transfer Crypto'),
+      text('Are you sure you want to execute the following transaction(s)?'),
+      divider(),
+    ];
+    const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
+    if (strippedMemo) {
+      panelToShow.push(text(`Memo: ${strippedMemo}`));
+    }
+    if (maxFee) {
+      panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
+    }
 
-    if (transfer.asset === 'HBAR') {
-      panelToShow.push(text(`Asset: ${transfer.asset}`));
+    const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+    for (const transfer of transfers) {
+      const txNumber = transfers.indexOf(transfer) + 1;
+      panelToShow.push(text(`Transaction #${txNumber}`));
+      panelToShow.push(divider());
+      panelToShow.push(divider());
+
+      panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
+      panelToShow.push(divider());
+      let asset = '';
+      let feeToDisplay = 0;
+      if (transfer.assetType === 'HBAR') {
+        if (currentBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
+          const errMessage = `You do not have enough Hbar in your balance to transfer the requested amount`;
+          console.error(errMessage);
+          throw providerErrors.unauthorized(errMessage);
+        }
+        asset = 'HBAR';
+      } else {
+        if (
+          !currentBalance.tokens[transfer.assetId as string] ||
+          currentBalance.tokens[transfer.assetId as string].balance <
+            transfer.amount
+        ) {
+          const errMessage = `You either do not own ${
+            transfer.assetId as string
+          } or do not have enough in your balance to transfer the requested amount`;
+          console.error(errMessage);
+          throw providerErrors.unauthorized(errMessage);
+        }
+        panelToShow.push(text(`Asset Id: ${transfer.assetId as string}`));
+        const tokenInfo = await hederaService.getTokenById(
+          transfer.assetId as string,
+        );
+        if (_.isEmpty(tokenInfo)) {
+          const errMessage = `Error while trying to get token info for ${
+            transfer.assetId as string
+          } from Hedera Mirror Nodes at this time`;
+          console.error(errMessage);
+          panelToShow.push(text(errMessage));
+          panelToShow.push(
+            text(
+              `Proceed only if you are sure about the asset ID being transferred`,
+            ),
+          );
+        } else {
+          asset = tokenInfo.symbol;
+          panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
+          panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
+          panelToShow.push(text(`Symbol: ${asset}`));
+        }
+
+        if (serviceFeesToPay[transfer.assetType] > 0) {
+          feeToDisplay = serviceFeesToPay[transfer.assetType];
+        } else {
+          feeToDisplay = serviceFeesToPay[transfer.assetId as string];
+        }
+        panelToShow.push(divider());
+      }
       panelToShow.push(text(`To: ${transfer.to}`));
-      panelToShow.push(text(`Amount: ${transfer.amount} HBAR`));
-      if (serviceFeesToPay[transfer.asset] > 0) {
+      panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
+      if (feeToDisplay > 0) {
         panelToShow.push(
           text(
-            `Service Fee: ${serviceFeesToPay[transfer.asset]
+            `Service Fee: ${feeToDisplay
               .toFixed(8)
               .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
-              transfer.asset === 'HBAR' ? 'HBAR' : ''
+              transfer.assetType === 'HBAR'
+                ? 'HBAR'
+                : (transfer.assetId as string)
             }`,
           ),
           text(
-            `Total Amount: ${(
-              transfer.amount + serviceFeesToPay[transfer.asset]
-            )
+            `Total Amount: ${(transfer.amount + feeToDisplay)
               .toFixed(8)
               .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
-              transfer.asset === 'HBAR' ? 'HBAR' : ''
+              transfer.assetType === 'HBAR'
+                ? 'HBAR'
+                : (transfer.assetId as string)
             }`,
           ),
         );
       }
-    } else {
-      panelToShow.push(
-        text(`The transfer of '${transfer.asset}' is currently not supported`),
-      );
+      panelToShow.push(divider());
     }
-  });
 
-  const dialogParams: SnapDialogParams = {
-    type: 'confirmation',
-    content: panel(panelToShow),
-  };
-
-  if (await snapDialog(dialogParams)) {
-    try {
-      if (!shouldExecuteTransfer) {
-        console.error('There are no transactions to execute. Please try again');
-        throw providerErrors.unsupportedMethod(
-          'There are no transactions to execute. Please try again',
-        );
-      }
-
-      let currentBalance =
-        state.accountState[hederaEvmAddress][network].accountInfo.balance;
-      if (!currentBalance) {
-        currentBalance = {} as AccountBalance;
-      }
-
-      const hederaClient = await createHederaClient(
-        state.accountState[hederaEvmAddress][network].keyStore.curve,
-        state.accountState[hederaEvmAddress][network].keyStore.privateKey,
-        hederaAccountId,
-        network,
-      );
-
-      return await hederaClient.transferCrypto({
-        currentBalance,
-        transfers,
-        memo,
-        maxFee,
-        serviceFeesToPay,
-        serviceFeeToAddress: serviceFee.toAddress,
-      });
-    } catch (error: any) {
-      console.error(`Error while trying to transfer crypto: ${String(error)}`);
-      throw providerErrors.unsupportedMethod(
-        `Error while trying to transfer crypto: ${String(error)}`,
-      );
+    const dialogParams: SnapDialogParams = {
+      type: 'confirmation',
+      content: panel(panelToShow),
+    };
+    const confirmed = await snapDialog(dialogParams);
+    if (!confirmed) {
+      console.error(`User rejected the transaction`);
+      throw providerErrors.userRejectedRequest();
     }
+
+    const hederaClient = await createHederaClient(
+      state.accountState[hederaEvmAddress][network].keyStore.curve,
+      state.accountState[hederaEvmAddress][network].keyStore.privateKey,
+      hederaAccountId,
+      network,
+    );
+
+    txReceipt = await hederaClient.transferCrypto({
+      currentBalance,
+      transfers,
+      memo,
+      maxFee,
+      serviceFeesToPay,
+      serviceFeeToAddress: serviceFee.toAddress,
+    });
+    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
+      mirrorNodeUrlToUse;
+    await updateSnapState(state);
+  } catch (error: any) {
+    console.error(`Error while trying to transfer crypto: ${String(error)}`);
+    throw providerErrors.unsupportedMethod(
+      `Error while trying to transfer crypto: ${String(error)}`,
+    );
   }
-  throw providerErrors.userRejectedRequest();
+
+  return txReceipt;
 }

@@ -65,7 +65,7 @@ export const deductServiceFee = async (
 
     const transfers: SimpleTransfer[] = [
       {
-        asset: 'HBAR',
+        assetType: 'HBAR',
         to: toAddress,
         amount: serviceFeeToPay,
       } as SimpleTransfer,

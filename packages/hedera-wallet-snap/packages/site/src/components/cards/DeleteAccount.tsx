@@ -83,8 +83,9 @@ const DeleteAccount: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'Delete your Account',
-        description: 'Delete your account from the ledger.',
+        title: 'deleteAccount',
+        description:
+          'Delete your account from the ledger. This action is irreversible!!',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />

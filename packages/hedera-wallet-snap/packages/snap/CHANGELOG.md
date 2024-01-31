@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.5...v0.1.5) (2024-01-24)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- [Added a new API to stake/unstake Hbar to and from Hedera Network nodes](https://github.com/hashgraph/hedera-metamask-snaps/issues/54)
+- [Added a new API to approve/delete an allowance for Hbar, tokens and NFTs](https://github.com/hashgraph/hedera-metamask-snaps/issues/52)
+- [Added a new API to delete a Hedera account from the ledger permanently. This action is irreversible!](https://github.com/hashgraph/hedera-metamask-snaps/issues/53)
+
+### :bug: Bug Fixes
+
 ## [0.1.5](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.1.5...v0.1.5) (2024-01-24)
 
 ### :page_with_curl: Documentation

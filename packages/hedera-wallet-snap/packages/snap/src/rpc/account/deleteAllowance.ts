@@ -78,12 +78,12 @@ export async function deleteAllowance(
     } else {
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
       const tokenInfo: MirrorTokenInfo = await hederaService.getTokenById(
-        assetId,
+        assetId as string,
       );
 
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-      panelToShow.push(text(`Id: ${assetId}`));
+      panelToShow.push(text(`Id: ${assetId as string}`));
       panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
       panelToShow.push(
         text(
@@ -121,7 +121,7 @@ export async function deleteAllowance(
     );
     txReceipt = await hederaClient.deleteAllowance({
       assetType,
-      assetId,
+      assetId: assetId as string,
       spenderAccountId,
     });
 

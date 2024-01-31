@@ -91,7 +91,7 @@ const DeleteAllowance: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'Delete an Allowance',
+        title: 'deleteAllowance',
         description:
           'Use your Hedera snap account to delete an allowance from another Account.',
         form: (
