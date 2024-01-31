@@ -36,6 +36,7 @@ import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
+import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -157,6 +158,12 @@ const Index = () => {
         />
 
         <GetAccountInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <AssociateTokens
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

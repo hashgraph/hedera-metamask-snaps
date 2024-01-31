@@ -34,12 +34,14 @@ import { approveAllowance } from './rpc/account/approveAllowance';
 import { deleteAccount } from './rpc/account/deleteAccount';
 import { deleteAllowance } from './rpc/account/deleteAllowance';
 import { stakeHbar } from './rpc/account/stakeHbar';
+import { associateTokens } from './rpc/hts/associateTokens';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
   isValidApproveAllowanceParams,
+  isValidAssociateTokensParams,
   isValidDeleteAccountParams,
   isValidDeleteAllowanceParams,
   isValidGetAccountInfoRequest,
@@ -141,12 +143,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         accountBalance: await getAccountBalance(walletSnapParams),
       };
     }
-    case 'getTransactions':
+    case 'getTransactions': {
       isValidGetTransactionsParams(request.params);
       return {
         currentAccount: state.currentAccount,
         transactions: await getTransactions(walletSnapParams, request.params),
       };
+    }
+    case 'associateTokens': {
+      isValidAssociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await associateTokens(walletSnapParams, request.params),
+      };
+    }
     case 'transferCrypto': {
       isValidTransferCryptoParams(request.params);
       return {

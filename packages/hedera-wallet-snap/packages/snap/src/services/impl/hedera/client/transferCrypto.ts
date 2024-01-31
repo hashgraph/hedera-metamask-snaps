@@ -90,35 +90,33 @@ export async function transferCrypto(
       }
     } else if (transfer.assetType === 'TOKEN') {
       const assetid = transfer.assetId as string;
-      const decimals = options.currentBalance.tokens[assetid]
-        ? options.currentBalance.tokens[assetid].decimals
-        : 0;
-      transaction.addTokenTransferWithDecimals(
+      const multiplier = Math.pow(
+        10,
+        options.currentBalance.tokens[assetid].decimals,
+      );
+
+      transaction.addTokenTransfer(
         assetid,
         transfer.to,
-        transfer.amount,
-        decimals,
+        transfer.amount * multiplier,
       );
-      transaction.addTokenTransferWithDecimals(
+      transaction.addTokenTransfer(
         assetid,
         client.operatorAccountId as AccountId,
-        -transfer.amount,
-        decimals,
+        -(transfer.amount * multiplier),
       );
 
       // Service Fee
       if (options.serviceFeesToPay[assetid] > 0) {
-        transaction.addTokenTransferWithDecimals(
+        transaction.addTokenTransfer(
           assetid,
           serviceFeeToAddr,
-          options.serviceFeesToPay[assetid],
-          decimals,
+          options.serviceFeesToPay[assetid] * multiplier,
         );
-        transaction.addTokenTransferWithDecimals(
+        transaction.addTokenTransfer(
           assetid,
           client.operatorAccountId as AccountId,
-          -options.serviceFeesToPay[assetid],
-          decimals,
+          -(options.serviceFeesToPay[assetid] * multiplier),
         );
       }
     } else if (transfer.assetType === 'NFT') {

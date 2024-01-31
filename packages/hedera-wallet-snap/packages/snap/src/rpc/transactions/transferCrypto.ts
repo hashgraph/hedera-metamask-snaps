@@ -19,7 +19,7 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import {
   AccountBalance,
@@ -28,7 +28,7 @@ import {
 } from '../../services/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { snapDialog } from '../../snap/dialog';
+import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
 import {
   GetAccountInfoRequestParams,
@@ -111,8 +111,6 @@ export async function transferCrypto(
     }
 
     const panelToShow = [
-      text(`Origin: ${origin}`),
-      divider(),
       heading('Transfer Crypto'),
       text('Are you sure you want to execute the following transaction(s)?'),
       divider(),
@@ -213,7 +211,7 @@ export async function transferCrypto(
 
     const dialogParams: SnapDialogParams = {
       type: 'confirmation',
-      content: panel(panelToShow),
+      content: await generateCommonPanel(origin, panelToShow),
     };
     const confirmed = await snapDialog(dialogParams);
     if (!confirmed) {

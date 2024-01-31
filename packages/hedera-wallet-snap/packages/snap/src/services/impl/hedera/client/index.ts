@@ -38,6 +38,7 @@ import { deleteAccount } from './deleteAccount';
 import { deleteAllowance } from './deleteAllowance';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
+import { associateTokens } from './hts/associateTokens';
 import { stakeHbar } from './stakeHbar';
 import { transferCrypto } from './transferCrypto';
 
@@ -77,6 +78,10 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
 
   async getAccountBalance(): Promise<number> {
     return getAccountBalance(this._client);
+  }
+
+  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
+    return associateTokens(this._client, options);
   }
 
   async transferCrypto(options: {

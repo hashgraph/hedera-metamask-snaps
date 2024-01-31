@@ -23,6 +23,7 @@ import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
   ApproveAllowanceRequestParams,
+  AssociateTokensRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
@@ -216,6 +217,32 @@ export const getTransactions = async (
           network,
           mirrorNodeUrl,
           transactionId: getTransactionsParams.transactionId,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "associateTokens" method from the snap.
+ */
+export const associateTokens = async (
+  network: string,
+  mirrorNodeUrl: string,
+  associateTokensRequestParams: AssociateTokensRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'associateTokens',
+        params: {
+          network,
+          mirrorNodeUrl,
+          tokenIds: associateTokensRequestParams.tokenIds,
           ...externalAccountparams,
         },
       },

@@ -165,6 +165,8 @@ export type SimpleHederaClient = {
   // returns the account balance in HBARs
   getAccountBalance(): Promise<number>;
 
+  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
+
   transferCrypto(options: {
     currentBalance: AccountBalance;
     transfers: SimpleTransfer[];

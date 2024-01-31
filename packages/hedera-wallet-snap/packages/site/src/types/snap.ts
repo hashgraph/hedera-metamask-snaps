@@ -76,6 +76,10 @@ export type GetTransactionsRequestParams = {
   transactionId?: string;
 };
 
+export type AssociateTokensRequestParams = {
+  tokenIds: string[];
+};
+
 export type TransferCryptoRequestParams = {
   transfers: SimpleTransfer[];
   memo?: string;

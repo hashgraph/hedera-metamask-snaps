@@ -25,6 +25,7 @@ import normalizeUrl from 'normalize-url';
 import { ExternalAccount } from '../types/account';
 import {
   ApproveAllowanceRequestParams,
+  AssociateTokensRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
@@ -268,6 +269,49 @@ export function isValidGetTransactionsParams(
       'Invalid getTransactions Params passed. "transactionId" must be a string',
     );
   }
+}
+
+/**
+ * Check Validation of associateTokens request.
+ *
+ * @param params - Request params.
+ */
+export function isValidAssociateTokensParams(
+  params: unknown,
+): asserts params is AssociateTokensRequestParams {
+  if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
+    console.error(
+      'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
+    );
+  }
+
+  const parameter = params as AssociateTokensRequestParams;
+
+  // Check if tokenIds is valid
+  if (
+    'tokenIds' in parameter &&
+    (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds))
+  ) {
+    console.error(
+      'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+    );
+    throw providerErrors.unsupportedMethod(
+      'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+    );
+  }
+  parameter.tokenIds.forEach((tokenId: string) => {
+    if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+      console.error(
+        'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+      );
+    }
+  });
 }
 
 /**
