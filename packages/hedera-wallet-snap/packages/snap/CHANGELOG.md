@@ -8,6 +8,8 @@
 
 ### :rocket: Features
 
+- Added a new API to associate fungible/non-fungible tokens to an account
+- Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens
 - [Added a new API to stake/unstake Hbar to and from Hedera Network nodes](https://github.com/hashgraph/hedera-metamask-snaps/issues/54)
 - [Added a new API to approve/delete an allowance for Hbar, tokens and NFTs](https://github.com/hashgraph/hedera-metamask-snaps/issues/52)
 - [Added a new API to delete a Hedera account from the ledger permanently. This action is irreversible!](https://github.com/hashgraph/hedera-metamask-snaps/issues/53)

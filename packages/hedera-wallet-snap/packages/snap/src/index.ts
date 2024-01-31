@@ -245,6 +245,12 @@ export const onUpdate: OnUpdateHandler = async () => {
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
         text(
+          '🚀 Added a new API to associate fungible/non-fungible tokens to an account',
+        ),
+        text(
+          '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
+        ),
+        text(
           '🚀 Added a new API to stake/unstake Hbar to and from Hedera Network nodes',
         ),
         text(
