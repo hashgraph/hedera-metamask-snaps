@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.1...v0.2.1) (2024-02-01)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- Updated `transferCrypto` API to support the transfer of approved hbar and other tokens after `approveAllowance` is called
+
+### :bug: Bug Fixes
+
+- Fixed a bug whereby `approveAllowance` was not approving the correct amount of tokens
+
 ## [0.2.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.0...v0.2.0) (2024-01-31)
 
 ### :page_with_curl: Documentation
