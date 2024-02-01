@@ -453,31 +453,13 @@ export async function importMetaMaskAccount(
     console.log('Retrieving account info from Hedera Mirror node');
     const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
     mirrorNodeUrl = hederaService.mirrorNodeUrl;
-    const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
+    let accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
       idOrAliasOrEvmAddress,
     );
-    if (!_.isEmpty(accountInfo)) {
-      hederaAccountId = accountInfo.accountId;
-
-      // Make sure that the EVM address of this accountId matches the one on Hedera
-      if (accountInfo.evmAddress !== address) {
-        console.error(
-          `The Hedera account '${hederaAccountId}' is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
-        );
-        throw providerErrors.custom({
-          code: 4200,
-          message: `This Hedera account is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
-          data: hederaAccountId,
-        });
-      }
-
-      balance = accountInfo.balance;
-
-      // eslint-disable-next-line require-atomic-updates
-      state.accountState[connectedAddress][network].accountInfo = accountInfo;
+    if (_.isEmpty(accountInfo)) {
+      accountInfo = await hederaService.getMirrorAccountInfo(address);
     }
-
-    if (_.isEmpty(hederaAccountId)) {
+    if (_.isEmpty(accountInfo)) {
       /*       const dialogParamsForHederaAccountId: SnapDialogParams = {
         type: 'alert',
         content: await generateCommonPanel(origin, [
@@ -491,7 +473,6 @@ export async function importMetaMaskAccount(
         ]),
       };
       await snapDialog(dialogParamsForHederaAccountId); */
-
       console.error(
         `This Hedera account is not yet active. Please activate it by sending some HBAR to this account. EVM Address: ${address}`,
       );
@@ -501,6 +482,24 @@ export async function importMetaMaskAccount(
         data: address,
       });
     }
+    hederaAccountId = accountInfo.accountId;
+
+    // Make sure that the EVM address of this accountId matches the one on Hedera
+    if (accountInfo.evmAddress !== address) {
+      console.error(
+        `The Hedera account '${hederaAccountId}' is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
+      );
+      throw providerErrors.custom({
+        code: 4200,
+        message: `This Hedera account is associated with the EVM address '${accountInfo.evmAddress}' but you tried to associate it with the address '${address}.`,
+        data: hederaAccountId,
+      });
+    }
+
+    balance = accountInfo.balance;
+
+    // eslint-disable-next-line require-atomic-updates
+    state.accountState[connectedAddress][network].accountInfo = accountInfo;
   }
 
   // eslint-disable-next-line require-atomic-updates
