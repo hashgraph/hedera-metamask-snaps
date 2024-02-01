@@ -41,9 +41,40 @@ export type GetTransactionsRequestParams = {
   transactionId?: string;
 };
 
+export type AssociateTokensRequestParams = {
+  tokenIds: string[];
+};
+
 export type TransferCryptoRequestParams = {
   transfers: SimpleTransfer[];
   memo?: string;
   maxFee?: number; // hbars
   serviceFee?: ServiceFee;
+};
+
+export type StakeHbarRequestParams = {
+  nodeId?: number | null;
+  accountId?: string | null;
+};
+
+export type DeleteAccountRequestParams = {
+  transferAccountId: string;
+};
+
+export type ApproveAllowanceAssetDetail = {
+  assetId: string;
+  all?: boolean;
+};
+
+export type ApproveAllowanceRequestParams = {
+  spenderAccountId: string;
+  amount: number;
+  assetType: 'HBAR' | 'TOKEN' | 'NFT';
+  assetDetail?: ApproveAllowanceAssetDetail;
+};
+
+export type DeleteAllowanceRequestParams = {
+  assetType: 'HBAR' | 'TOKEN' | 'NFT';
+  assetId?: string;
+  spenderAccountId?: string;
 };

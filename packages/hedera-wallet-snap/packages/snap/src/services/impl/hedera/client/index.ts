@@ -19,7 +19,6 @@
  */
 
 import {
-  Hbar,
   type AccountId,
   type Client,
   type PrivateKey,
@@ -27,14 +26,20 @@ import {
 } from '@hashgraph/sdk';
 
 import { AccountInfo } from '../../../../types/account';
+import { ApproveAllowanceAssetDetail } from '../../../../types/params';
 import {
   AccountBalance,
   SimpleHederaClient,
   SimpleTransfer,
   TxReceipt,
 } from '../../../hedera';
+import { approveAllowance } from './approveAllowance';
+import { deleteAccount } from './deleteAccount';
+import { deleteAllowance } from './deleteAllowance';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
+import { associateTokens } from './hts/associateTokens';
+import { stakeHbar } from './stakeHbar';
 import { transferCrypto } from './transferCrypto';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
@@ -47,12 +52,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   constructor(client: Client, privateKey: PrivateKey | null) {
     this._client = client;
     this._privateKey = privateKey;
-  }
-
-  setMaxQueryPayment(cost: any): void {
-    const costInHbar = new Hbar(cost);
-    // this sets the fee paid by the client for the query
-    this._client.setMaxQueryPayment(costInHbar);
   }
 
   getClient(): Client {
@@ -81,6 +80,10 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return getAccountBalance(this._client);
   }
 
+  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
+    return associateTokens(this._client, options);
+  }
+
   async transferCrypto(options: {
     currentBalance: AccountBalance;
     transfers: SimpleTransfer[];
@@ -91,5 +94,35 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     onBeforeConfirm?: () => void;
   }): Promise<TxReceipt> {
     return transferCrypto(this._client, options);
+  }
+
+  async stakeHbar(options: {
+    nodeId: number | null;
+    accountId: string | null;
+  }): Promise<TxReceipt> {
+    return stakeHbar(this._client, options);
+  }
+
+  async approveAllowance(options: {
+    spenderAccountId: string;
+    amount: number;
+    assetType: string;
+    assetDetail?: ApproveAllowanceAssetDetail;
+  }): Promise<TxReceipt> {
+    return approveAllowance(this._client, options);
+  }
+
+  async deleteAllowance(options: {
+    assetType: string;
+    assetId: string;
+    spenderAccountId?: string;
+  }): Promise<TxReceipt> {
+    return deleteAllowance(this._client, options);
+  }
+
+  async deleteAccount(options: {
+    transferAccountId: string;
+  }): Promise<TxReceipt> {
+    return deleteAccount(this._client, options);
   }
 }

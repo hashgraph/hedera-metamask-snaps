@@ -22,15 +22,21 @@ import { useContext, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { Card, InstallFlaskButton } from '../components/base';
+import { ApproveAllowance } from '../components/cards/ApproveAllowance';
 import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
+import { DeleteAccount } from '../components/cards/DeleteAccount';
+import { DeleteAllowance } from '../components/cards/DeleteAllowance';
 import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
 import { SignMessage } from '../components/cards/SignMessage';
+import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
+import { UnstakeHbar } from '../components/cards/UnstakeHbar';
+import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -157,6 +163,12 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
+        <AssociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
         <TransferCrypto
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
@@ -170,6 +182,36 @@ const Index = () => {
         />
 
         <GetTransactions
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <StakeHbar
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnstakeHbar
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <ApproveAllowance
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteAllowance
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteAccount
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,17 @@
  *
  */
 
-import { Hbar, TransferTransaction, type Client } from '@hashgraph/sdk';
+import {
+  AccountId,
+  Hbar,
+  TransferTransaction,
+  type Client,
+} from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
-import {
-  AccountBalance,
-  SimpleTransfer,
-  TxReceipt,
-  TxReceiptExchangeRate,
-} from '../../../hedera';
+import { uint8ArrayToHex } from '../../../../utils/crypto';
+import { timestampToString } from '../../../../utils/helper';
+import { AccountBalance, SimpleTransfer, TxReceipt } from '../../../hedera';
 
 /**
  * Transfer crypto(hbar or other tokens).
@@ -53,75 +55,78 @@ export async function transferCrypto(
     onBeforeConfirm?: () => void;
   },
 ): Promise<TxReceipt> {
-  const maxFee = options.maxFee
-    ? new Hbar(options.maxFee.toFixed(8))
-    : new Hbar(1);
-
   const serviceFeeToAddr: string = options.serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
-  const transaction = new TransferTransaction()
-    .setTransactionMemo(options.memo ?? '')
-    .setMaxTransactionFee(maxFee);
+  const transaction = new TransferTransaction().setTransactionMemo(
+    options.memo ?? '',
+  );
 
-  let outgoingHbarAmount = 0;
+  if (options.maxFee) {
+    transaction.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
+  }
+
   for (const transfer of options.transfers) {
-    if (transfer.asset === 'HBAR') {
+    if (transfer.assetType === 'HBAR') {
       if (ethers.isAddress(transfer.to)) {
         transfer.to = `0.0.${transfer.to.slice(2)}`;
       }
 
       transaction.addHbarTransfer(transfer.to, transfer.amount);
-      outgoingHbarAmount += -transfer.amount;
+      transaction.addHbarTransfer(
+        client.operatorAccountId as AccountId,
+        -transfer.amount,
+      );
 
       // Service Fee
-      if (options.serviceFeesToPay[transfer.asset] > 0) {
+      if (options.serviceFeesToPay[transfer.assetType] > 0) {
         transaction.addHbarTransfer(
           serviceFeeToAddr,
-          options.serviceFeesToPay[transfer.asset],
+          options.serviceFeesToPay[transfer.assetType],
         );
-        outgoingHbarAmount += -options.serviceFeesToPay[transfer.asset];
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -options.serviceFeesToPay[transfer.assetType],
+        );
       }
-    } else {
-      // TODO: Currently not implemented
-      /*       const multiplier = Math.pow(
+    } else if (transfer.assetType === 'TOKEN') {
+      const assetid = transfer.assetId as string;
+      const multiplier = Math.pow(
         10,
-        options.currentBalance.tokens[transfer.asset].decimals,
+        options.currentBalance.tokens[assetid].decimals,
       );
 
-      let outgoingTokenAmount = transfer.amount * multiplier;
-
       transaction.addTokenTransfer(
-        transfer.asset,
+        assetid,
         transfer.to,
-        outgoingTokenAmount,
+        transfer.amount * multiplier,
+      );
+      transaction.addTokenTransfer(
+        assetid,
+        client.operatorAccountId as AccountId,
+        -(transfer.amount * multiplier),
       );
 
       // Service Fee
-      if (options.serviceFeesToPay[transfer.asset] > 0) {
+      if (options.serviceFeesToPay[assetid] > 0) {
         transaction.addTokenTransfer(
-          transfer.asset,
+          assetid,
           serviceFeeToAddr,
-          options.serviceFeesToPay[transfer.asset] * multiplier,
+          options.serviceFeesToPay[assetid] * multiplier,
         );
-        outgoingTokenAmount +=
-          options.serviceFeesToPay[transfer.asset] * multiplier;
+        transaction.addTokenTransfer(
+          assetid,
+          client.operatorAccountId as AccountId,
+          -(options.serviceFeesToPay[assetid] * multiplier),
+        );
       }
-
-      transaction.addTokenTransfer(
-        transfer.asset,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
-        -outgoingTokenAmount,
-      ); */
+    } else if (transfer.assetType === 'NFT') {
+      const assetid = transfer.assetId as string;
+      transaction.addNftTransfer(
+        assetid,
+        client.operatorAccountId as AccountId,
+        transfer.to,
+      );
     }
-  }
-
-  if (outgoingHbarAmount !== 0) {
-    transaction.addHbarTransfer(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
-      new Hbar(outgoingHbarAmount),
-    );
   }
 
   transaction.freezeWith(client);
@@ -132,15 +137,13 @@ export async function transferCrypto(
 
   const receipt = await txResponse.getReceipt(client);
 
-  const uint8ArrayToHex = (data: Uint8Array | null | undefined) => {
-    if (!data) {
-      return '';
-    }
-    return data.reduce(
-      (str, byte) => str + byte.toString(16).padStart(2, '0'),
-      '',
-    );
-  };
+  let newExchangeRate;
+  if (receipt.exchangeRate) {
+    newExchangeRate = {
+      ...receipt.exchangeRate,
+      expirationTime: timestampToString(receipt.exchangeRate.expirationTime),
+    };
+  }
 
   return {
     status: receipt.status.toString(),
@@ -150,11 +153,7 @@ export async function transferCrypto(
     topicId: receipt.topicId ? receipt.topicId : '',
     tokenId: receipt.tokenId ? receipt.tokenId : '',
     scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-    exchangeRate: receipt.exchangeRate
-      ? (JSON.parse(
-          JSON.stringify(receipt.exchangeRate),
-        ) as TxReceiptExchangeRate)
-      : ({} as TxReceiptExchangeRate),
+    exchangeRate: newExchangeRate,
     topicSequenceNumber: receipt.topicSequenceNumber
       ? String(receipt.topicSequenceNumber)
       : '',

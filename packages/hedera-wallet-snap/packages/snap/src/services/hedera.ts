@@ -32,13 +32,15 @@ import { BigNumber } from 'bignumber.js';
 
 import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from '../types/account';
+import { ApproveAllowanceAssetDetail } from '../types/params';
 
 export type SimpleTransfer = {
-  // HBAR or Token ID (as string)
-  asset: string;
+  assetType: 'HBAR' | 'TOKEN' | 'NFT';
   to: string;
   // amount must be in low denom
   amount: number;
+  // Token or NFT ID (as string)
+  assetId?: string;
 };
 
 export type Token = {
@@ -146,9 +148,6 @@ export type HederaService = {
 };
 
 export type SimpleHederaClient = {
-  // set max fee queries
-  setMaxQueryPayment(cost: any): void;
-
   // get the associated client
   getClient(): Client;
 
@@ -166,6 +165,8 @@ export type SimpleHederaClient = {
   // returns the account balance in HBARs
   getAccountBalance(): Promise<number>;
 
+  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
+
   transferCrypto(options: {
     currentBalance: AccountBalance;
     transfers: SimpleTransfer[];
@@ -175,20 +176,54 @@ export type SimpleHederaClient = {
     serviceFeeToAddress: string | null;
     onBeforeConfirm?: () => void;
   }): Promise<TxReceipt>;
+
+  stakeHbar(options: {
+    nodeId: number | null;
+    accountId: string | null;
+  }): Promise<TxReceipt>;
+
+  approveAllowance(options: {
+    spenderAccountId: string;
+    amount: number;
+    assetType: string;
+    assetDetail?: ApproveAllowanceAssetDetail;
+  }): Promise<TxReceipt>;
+
+  deleteAllowance(options: {
+    assetType: string;
+    assetId: string;
+    spenderAccountId?: string;
+  }): Promise<TxReceipt>;
+
+  deleteAccount(options: { transferAccountId: string }): Promise<TxReceipt>;
+};
+
+export type MirrorStakingInfoServiceEndpoint = {
+  ip_address_v4: string;
+  port: number;
 };
 
 export type MirrorStakingInfo = {
   description: string;
+  file_id: string;
+  max_stake: BigNumber;
+  memo: string;
+  min_stake: BigNumber;
   node_id: number;
   node_account_id: string;
+  node_cert_hash: string;
+  public_key: string;
+  reward_rate_start: BigNumber;
+  service_endpoints: MirrorStakingInfoServiceEndpoint[];
   stake: BigNumber;
-  min_stake: BigNumber;
-  max_stake: BigNumber;
   stake_rewarded: BigNumber;
   stake_not_rewarded: BigNumber;
-  reward_rate_start: BigNumber;
   // staking period uses strings representing seconds.nanos since the epoch
   staking_period: {
+    from: string;
+    to: string;
+  };
+  timestamp: {
     from: string;
     to: string;
   };

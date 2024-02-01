@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Tuum Tech
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 import {
   AccountCreateTransaction,
+  AccountId,
   Hbar,
   PublicKey,
   TransactionReceipt,
@@ -27,7 +28,10 @@ import {
   type Client,
 } from '@hashgraph/sdk';
 
-import { isValidEthereumPublicKey } from '../../../../utils/keyPair';
+import {
+  isValidEthereumPublicKey,
+  uint8ArrayToHex,
+} from '../../../../utils/crypto';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -56,25 +60,28 @@ export async function createAccount(
     onBeforeConfirm?: () => void;
   },
 ): Promise<TxReceipt> {
-  const maxFee = options.maxFee
-    ? new Hbar(options.maxFee.toFixed(8))
-    : new Hbar(1);
+  const transaction = new TransferTransaction().setTransactionMemo(
+    options.memo ?? '',
+  );
 
-  const transaction = new TransferTransaction()
-    .setTransactionMemo(options.memo ?? '')
-    .setMaxTransactionFee(maxFee);
+  if (options.maxFee) {
+    transaction.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
+  }
 
   let newAccountCreated = false;
   const receipts: TransactionReceipt[] = [];
   let outgoingHbarAmount = 0;
   for (const transfer of options.transfers) {
-    if (transfer.asset === 'HBAR') {
+    if (transfer.assetType === 'HBAR') {
       if (isValidEthereumPublicKey(transfer.to)) {
         const tx = new AccountCreateTransaction()
           .setInitialBalance(Hbar.fromTinybars(transfer.amount))
-          .setMaxTransactionFee(maxFee)
-          .setKey(PublicKey.fromString(transfer.to))
-          .freezeWith(client);
+          .setKey(PublicKey.fromString(transfer.to));
+
+        if (options.maxFee) {
+          tx.setMaxTransactionFee(new Hbar(options.maxFee.toFixed(8)));
+        }
+        tx.freezeWith(client);
 
         const txResponse = await tx.execute(client);
 
@@ -88,35 +95,33 @@ export async function createAccount(
         transaction.addHbarTransfer(transfer.to, transfer.amount);
         outgoingHbarAmount += -transfer.amount;
       }
-    } else {
-      const multiplier = Math.pow(
-        10,
-        options.currentBalance.tokens[transfer.asset].decimals,
-      );
-
-      transaction.addTokenTransfer(
-        transfer.asset,
-        transfer.to,
-        transfer.amount * multiplier,
-      );
-
-      const amountToReduce = -(transfer.amount * multiplier);
-
-      transaction.addTokenTransfer(
-        transfer.asset,
+      transaction.addHbarTransfer(
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         client.operatorAccountId!,
-        amountToReduce,
+        new Hbar(outgoingHbarAmount),
+      );
+    } else if (transfer.assetType === 'TOKEN') {
+      const assetid = transfer.assetId as string;
+      transaction.addTokenTransferWithDecimals(
+        assetid,
+        transfer.to,
+        transfer.amount,
+        options.currentBalance.tokens[assetid].decimals,
+      );
+      transaction.addTokenTransferWithDecimals(
+        assetid,
+        client.operatorAccountId as AccountId,
+        transfer.amount,
+        options.currentBalance.tokens[assetid].decimals,
+      );
+    } else if (transfer.assetType === 'NFT') {
+      const assetid = transfer.assetId as string;
+      transaction.addNftTransfer(
+        assetid,
+        client.operatorAccountId as AccountId,
+        transfer.to,
       );
     }
-  }
-
-  if (outgoingHbarAmount !== 0) {
-    transaction.addHbarTransfer(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
-      new Hbar(outgoingHbarAmount),
-    );
   }
 
   let receipt: TransactionReceipt;
@@ -131,16 +136,6 @@ export async function createAccount(
 
     receipt = await txResponse.getReceipt(client);
   }
-
-  const uint8ArrayToHex = (data: Uint8Array | null | undefined) => {
-    if (!data) {
-      return '';
-    }
-    return data.reduce(
-      (str, byte) => str + byte.toString(16).padStart(2, '0'),
-      '',
-    );
-  };
 
   return {
     status: receipt.status.toString(),

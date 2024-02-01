@@ -21,14 +21,14 @@ import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
-} from '../../contexts/MetamaskContext';
-import useModal from '../../hooks/useModal';
-import { Account, SignMessageRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, signMessage } from '../../utils';
-import { Card, SendHelloButton } from '../base';
+} from '../../../contexts/MetamaskContext';
+import useModal from '../../../hooks/useModal';
+import { Account, AssociateTokensRequestParams } from '../../../types/snap';
+import { associateTokens, shouldDisplayReconnectButton } from '../../../utils';
+import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
-} from '../sections/ExternalAccount';
+} from '../../sections/ExternalAccount';
 
 type Props = {
   network: string;
@@ -36,38 +36,42 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const AssociateTokens: FC<Props> = ({
+  network,
+  mirrorNodeUrl,
+  setAccountInfo,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [message, setMessage] = useState('Hello, Hedera!');
+  const [tokenId, setTokenId] = useState<string>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSignMessageClick = async () => {
+  const handleAssociateTokensClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const signMessageParams = {
-        message,
-      } as SignMessageRequestParams;
-      const response: any = await signMessage(
+      const associateTokensParams = {
+        tokenIds: [tokenId],
+      } as AssociateTokensRequestParams;
+      const response: any = await associateTokens(
         network,
         mirrorNodeUrl,
-        signMessageParams,
+        associateTokensParams,
         externalAccountParams,
       );
 
-      const { signature, currentAccount } = response;
+      const { receipt, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('signature: ', signature);
+      console.log('receipt: ', receipt);
 
       showModal({
-        title: 'Signed Message',
-        content: JSON.stringify({ message, signature }, null, 4),
+        title: 'Transaction Receipt',
+        content: JSON.stringify({ receipt }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -79,20 +83,20 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'signMessage',
+        title: 'associateTokens',
         description:
-          'Use your Hedera snap account to sign an arbitary message.',
+          'Associate tokens to your Hedera account. This will allow you to manage your fungible and non-fungible tokens from your Hedera account.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter an arbitary message to sign
+              Enter the token ID to associate to
               <input
                 type="text"
                 style={{ width: '100%' }}
-                value={message}
-                placeholder="Hello, Hedera!"
-                onChange={(e) => setMessage(e.target.value)}
+                value={tokenId}
+                placeholder="Token Id"
+                onChange={(e) => setTokenId(e.target.value)}
               />
             </label>
             <br />
@@ -100,8 +104,8 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Sign"
-            onClick={handleSignMessageClick}
+            buttonText="Associate"
+            onClick={handleAssociateTokensClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -117,4 +121,4 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { SignMessage };
+export { AssociateTokens };

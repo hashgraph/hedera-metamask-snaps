@@ -30,6 +30,7 @@ import {
   StakingInfoJson,
 } from '@hashgraph/sdk/lib/account/AccountInfo';
 import { AccountInfo } from '../../../../types/account';
+import { timestampToString } from '../../../../utils/helper';
 
 /**
  * Retrieve the account info.
@@ -54,11 +55,9 @@ export async function getAccountInfo(
     stakingInfo.declineStakingReward =
       accountInfoJson.stakingInfo.declineStakingReward;
 
-    stakingInfo.stakePeriodStart = accountInfoJson.stakingInfo.stakePeriodStart
-      ? new Date(
-          parseFloat(accountInfoJson.stakingInfo.stakePeriodStart) * 1000,
-        ).toISOString()
-      : '';
+    stakingInfo.stakePeriodStart = timestampToString(
+      accountInfoJson.stakingInfo.stakePeriodStart,
+    );
 
     stakingInfo.pendingReward = Hbar.fromString(
       accountInfoJson.stakingInfo.pendingReward ?? '0',
@@ -78,9 +77,7 @@ export async function getAccountInfo(
   return {
     accountId: accountInfoJson.accountId,
     alias: accountInfoJson.aliasKey ?? '',
-    expirationTime: new Date(
-      parseFloat(accountInfoJson.expirationTime) * 1000,
-    ).toISOString(),
+    expirationTime: timestampToString(accountInfoJson.expirationTime),
     memo: accountInfoJson.accountMemo,
     evmAddress: accountInfoJson.contractAccountId
       ? `0x${accountInfoJson.contractAccountId}`
@@ -92,7 +89,7 @@ export async function getAccountInfo(
     },
     balance: {
       hbars: hbarBalance,
-      timestamp: new Date().toISOString(),
+      timestamp: timestampToString(new Date()),
     },
     autoRenewPeriod: accountInfo.autoRenewPeriod.seconds.toString(),
     ethereumNonce: accountInfoJson.ethereumNonce ?? '',

@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2024 Tuum Tech
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
@@ -6,11 +25,10 @@ import {
 import useModal from '../../hooks/useModal';
 import {
   Account,
-  ServiceFee,
-  SimpleTransfer,
-  TransferCryptoRequestParams,
+  ApproveAllowanceAssetDetail,
+  ApproveAllowanceRequestParams,
 } from '../../types/snap';
-import { shouldDisplayReconnectButton, transferCrypto } from '../../utils';
+import { approveAllowance, shouldDisplayReconnectButton } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -22,7 +40,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const TransferCrypto: FC<Props> = ({
+const ApproveAllowance: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -30,62 +48,50 @@ const TransferCrypto: FC<Props> = ({
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [sendToAddress, setSendToAddress] = useState('');
-  const [memo, setMemo] = useState('');
+  const [spenderAccountId, setSpenderAccountId] = useState('');
+  const [amount, setAmount] = useState<number>();
   const [assetType, setAssetType] = useState<'HBAR' | 'TOKEN' | 'NFT'>('HBAR');
   const [assetId, setAssetId] = useState('');
-  const [sendAmount, setSendAmount] = useState(0);
+  const [approveAll, setApproveAll] = useState<boolean>(false);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleTransferCryptoClick = async () => {
+  const handleApproveAllowanceClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const transfers: SimpleTransfer[] = [
-        {
-          assetType,
-          to: sendToAddress,
-          amount: sendAmount,
-        } as SimpleTransfer,
-      ];
+      const approveAllowanceParams = {
+        spenderAccountId,
+        amount,
+        assetType,
+      } as ApproveAllowanceRequestParams;
       if (assetType === 'TOKEN' || assetType === 'NFT') {
-        transfers[0].assetId = assetId;
+        approveAllowanceParams.assetDetail = {
+          assetId,
+          approveAll,
+        } as ApproveAllowanceAssetDetail;
       }
-      // const maxFee = 1; // Note that if you don't pass this, default is whatever the snap has set
-
-      const TUUMESERVICEADDRESS = '0.0.98'; // Hedera Fee collection account
-      const serviceFee = {
-        percentageCut: 0, // Change this if you want to charge a service fee
-        toAddress: TUUMESERVICEADDRESS,
-      } as ServiceFee;
-
-      const transferCryptoParams = {
-        transfers,
-        memo,
-        undefined,
-        serviceFee,
-      } as TransferCryptoRequestParams;
-
-      const response: any = await transferCrypto(
+      const response: any = await approveAllowance(
         network,
         mirrorNodeUrl,
-        transferCryptoParams,
+        approveAllowanceParams,
         externalAccountParams,
       );
 
-      const { currentAccount, receipt } = response;
+      const { receipt, currentAccount } = response;
+
       setAccountInfo(currentAccount);
-      console.log('Receipt: ', JSON.stringify(receipt, null, 4));
+      console.log('receipt: ', receipt);
+
       showModal({
-        title: 'Your transaction receipt',
-        content: JSON.stringify(receipt),
+        title: 'Transaction Receipt',
+        content: JSON.stringify({ receipt }, null, 4),
       });
-    } catch (error: any) {
-      console.error(error);
-      dispatch({ type: MetamaskActions.SetError, payload: error });
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
     }
     setLoading(false);
   };
@@ -93,31 +99,31 @@ const TransferCrypto: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'transferCrypto',
+        title: 'approveAllowance',
         description:
-          'Send HBAR to another account(can pass in Account Id or EVM address but not both)',
+          'Use your Hedera snap account to approve an allowance to another Account.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter an account Id or an EVM address to send Hbar to
+              Enter the spender Account ID.
               <input
                 type="text"
                 style={{ width: '100%' }}
-                value={sendToAddress}
-                placeholder="Account Id or EVM address"
-                onChange={(e) => setSendToAddress(e.target.value)}
+                value={spenderAccountId}
+                placeholder="Enter Account Id(0.0.x)"
+                onChange={(e) => setSpenderAccountId(e.target.value)}
               />
             </label>
             <br />
             <label>
-              Enter memo to include(needed for exchange addresses)
+              Enter the amount to be allowed to be spent
               <input
-                type="text"
+                type="number"
                 style={{ width: '100%' }}
-                value={memo}
-                placeholder="Memo"
-                onChange={(e) => setMemo(e.target.value)}
+                value={amount || ''}
+                placeholder="Enter the amount"
+                onChange={(e) => setAmount(parseFloat(e.target.value))}
               />
             </label>
             <br />
@@ -135,7 +141,7 @@ const TransferCrypto: FC<Props> = ({
                 <option value="NFT">NFT</option>
               </select>
             </label>
-
+            <br />
             {(assetType === 'TOKEN' || assetType === 'NFT') && (
               <label>
                 Enter Asset Id (eg. Token Id, NFT Id)
@@ -148,24 +154,23 @@ const TransferCrypto: FC<Props> = ({
                 />
               </label>
             )}
-            <br />
-            <label>
-              Enter an amount to send
-              <input
-                type="number"
-                style={{ width: '100%' }}
-                value={sendAmount}
-                placeholder="0.01"
-                onChange={(e) => setSendAmount(parseFloat(e.target.value))}
-              />
-            </label>
+            {assetType === 'NFT' && (
+              <label>
+                Approve All NFTs in this collection{' '}
+                <input
+                  type="checkbox"
+                  checked={approveAll}
+                  onChange={(e) => setApproveAll(e.target.checked)}
+                />
+              </label>
+            )}
             <br />
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Transfer"
-            onClick={handleTransferCryptoClick}
+            buttonText="Approve an Allowance"
+            onClick={handleApproveAllowanceClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -181,4 +186,4 @@ const TransferCrypto: FC<Props> = ({
   );
 };
 
-export { TransferCrypto };
+export { ApproveAllowance };

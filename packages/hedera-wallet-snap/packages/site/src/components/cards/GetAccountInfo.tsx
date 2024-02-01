@@ -80,7 +80,8 @@ const GetAccountInfo: FC<Props> = ({
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter an account Id
+              Enter an account Id to look up the account info. By default, it
+              will look up the account info of the account you are connected to.
               <input
                 type="text"
                 style={{ width: '100%' }}

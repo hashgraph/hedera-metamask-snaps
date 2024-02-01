@@ -23,8 +23,8 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, SignMessageRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, signMessage } from '../../utils';
+import { Account, StakeHbarRequestParams } from '../../types/snap';
+import { shouldDisplayReconnectButton, stakeHbar } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -36,38 +36,38 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const UnstakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [message, setMessage] = useState('Hello, Hedera!');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSignMessageClick = async () => {
+  const handleUnstakeHbarClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const signMessageParams = {
-        message,
-      } as SignMessageRequestParams;
-      const response: any = await signMessage(
+      const stakeHbarParams = {
+        nodeId: null,
+        accountId: null,
+      } as StakeHbarRequestParams;
+      const response: any = await stakeHbar(
         network,
         mirrorNodeUrl,
-        signMessageParams,
+        stakeHbarParams,
         externalAccountParams,
       );
 
-      const { signature, currentAccount } = response;
+      const { receipt, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('signature: ', signature);
+      console.log('receipt: ', receipt);
 
       showModal({
-        title: 'Signed Message',
-        content: JSON.stringify({ message, signature }, null, 4),
+        title: 'Transaction Receipt',
+        content: JSON.stringify({ receipt }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -79,29 +79,18 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'signMessage',
-        description:
-          'Use your Hedera snap account to sign an arbitary message.',
+        title: 'Unstake HBAR',
+        description: 'Use your Hedera snap account to unstake your HBAR.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
-            <label>
-              Enter an arbitary message to sign
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={message}
-                placeholder="Hello, Hedera!"
-                onChange={(e) => setMessage(e.target.value)}
-              />
-            </label>
             <br />
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Sign"
-            onClick={handleSignMessageClick}
+            buttonText="Unstake"
+            onClick={handleUnstakeHbarClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -117,4 +106,4 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { SignMessage };
+export { UnstakeHbar };

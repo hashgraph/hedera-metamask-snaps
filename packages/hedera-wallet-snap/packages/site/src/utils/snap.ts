@@ -22,9 +22,14 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
+  ApproveAllowanceRequestParams,
+  AssociateTokensRequestParams,
+  DeleteAccountRequestParams,
+  DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   SignMessageRequestParams,
+  StakeHbarRequestParams,
   TransferCryptoRequestParams,
 } from '../types/snap';
 
@@ -220,6 +225,32 @@ export const getTransactions = async (
 };
 
 /**
+ * Invoke the "associateTokens" method from the snap.
+ */
+export const associateTokens = async (
+  network: string,
+  mirrorNodeUrl: string,
+  associateTokensRequestParams: AssociateTokensRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'associateTokens',
+        params: {
+          network,
+          mirrorNodeUrl,
+          tokenIds: associateTokensRequestParams.tokenIds,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "transferCrypto" method from the snap.
  */
 
@@ -268,6 +299,116 @@ export const signMessage = async (
           network,
           mirrorNodeUrl,
           message: signMessageRequestParams.message,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "stakeHbar" method from the snap.
+ */
+export const stakeHbar = async (
+  network: string,
+  mirrorNodeUrl: string,
+  stakeHbarParams: StakeHbarRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'stakeHbar',
+        params: {
+          network,
+          mirrorNodeUrl,
+          nodeId: stakeHbarParams.nodeId,
+          accountId: stakeHbarParams.accountId,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "approveAllowance" method from the snap.
+ */
+export const approveAllowance = async (
+  network: string,
+  mirrorNodeUrl: string,
+  approveAllowanceParams: ApproveAllowanceRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'approveAllowance',
+        params: {
+          network,
+          mirrorNodeUrl,
+          spenderAccountId: approveAllowanceParams.spenderAccountId,
+          amount: approveAllowanceParams.amount,
+          assetType: approveAllowanceParams.assetType,
+          assetDetail: approveAllowanceParams.assetDetail,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteAllowance" method from the snap.
+ */
+export const deleteAllowance = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteAllowanceParams: DeleteAllowanceRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'deleteAllowance',
+        params: {
+          network,
+          mirrorNodeUrl,
+          assetType: deleteAllowanceParams.assetType,
+          assetId: deleteAllowanceParams.assetId,
+          spenderAccountId: deleteAllowanceParams.spenderAccountId,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteAccount" method from the snap.
+ */
+export const deleteAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteAccountParams: DeleteAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'deleteAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          transferAccountId: deleteAccountParams.transferAccountId,
           ...externalAccountparams,
         },
       },

@@ -21,23 +21,33 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
-import { Wallet, ethers } from 'ethers';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { getAccountBalance } from './rpc/account/getAccountBalance';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
-import { transferCrypto } from './rpc/account/transferCrypto';
+import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { setCurrentAccount } from './snap/account';
 import { getSnapStateUnchecked, initSnapState } from './snap/state';
 import { WalletSnapParams } from './types/state';
 
+import { approveAllowance } from './rpc/account/approveAllowance';
+import { deleteAccount } from './rpc/account/deleteAccount';
+import { deleteAllowance } from './rpc/account/deleteAllowance';
+import { stakeHbar } from './rpc/account/stakeHbar';
+import { associateTokens } from './rpc/hts/associateTokens';
+import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import {
   getMirrorNodeFlagIfExists,
   isExternalAccountFlagSet,
+  isValidApproveAllowanceParams,
+  isValidAssociateTokensParams,
+  isValidDeleteAccountParams,
+  isValidDeleteAllowanceParams,
   isValidGetAccountInfoRequest,
   isValidGetTransactionsParams,
   isValidSignMessageRequest,
+  isValidStakeHbarParams,
   isValidTransferCryptoParams,
 } from './utils/params';
 
@@ -115,35 +125,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     case 'signMessage': {
       isValidSignMessageRequest(request.params);
-
-      const result = await snap.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'confirmation',
-          content: panel([
-            heading('Signature request'),
-            text(
-              _.isEmpty(request.params.header)
-                ? 'Do you want to sign this message?'
-                : request.params.header,
-            ),
-            copyable(request.params.message),
-          ]),
-        },
-      });
-
-      if (!result) {
-        throw providerErrors.userRejectedRequest();
-      }
-
-      const { hederaEvmAddress, network } = state.currentAccount;
-      const { privateKey } =
-        state.accountState[hederaEvmAddress][network].keyStore;
-      const wallet: Wallet = new ethers.Wallet(privateKey);
-
       return {
         currentAccount: state.currentAccount,
-        signature: await wallet.signMessage(request.params.message),
+        signature: await signMessage(walletSnapParams, request.params),
       };
     }
     case 'getAccountInfo': {
@@ -159,17 +143,61 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         accountBalance: await getAccountBalance(walletSnapParams),
       };
     }
-    case 'getTransactions':
+    case 'getTransactions': {
       isValidGetTransactionsParams(request.params);
       return {
         currentAccount: state.currentAccount,
         transactions: await getTransactions(walletSnapParams, request.params),
       };
+    }
+    case 'associateTokens': {
+      isValidAssociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await associateTokens(walletSnapParams, request.params),
+      };
+    }
     case 'transferCrypto': {
       isValidTransferCryptoParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await transferCrypto(walletSnapParams, request.params),
+      };
+    }
+    case 'stakeHbar': {
+      isValidStakeHbarParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await stakeHbar(walletSnapParams, request.params),
+      };
+    }
+    case 'approveAllowance': {
+      isValidApproveAllowanceParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await approveAllowance(walletSnapParams, request.params),
+      };
+    }
+    case 'transferApprovedCrypto': {
+      isValidTransferCryptoParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await transferCrypto(walletSnapParams, request.params),
+        // receipt: await transferApprovedCrypto(walletSnapParams, request.params),
+      };
+    }
+    case 'deleteAllowance': {
+      isValidDeleteAllowanceParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await deleteAllowance(walletSnapParams, request.params),
+      };
+    }
+    case 'deleteAccount': {
+      isValidDeleteAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await deleteAccount(walletSnapParams, request.params),
       };
     }
     default:
@@ -201,7 +229,7 @@ export const onInstall: OnInstallHandler = async () => {
         ),
         divider(),
         text(
-          '😭 If you add a new account in MetaMask, you will need to reinstall the snap and reconnect to the new account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
+          '😭 If you add a new account in MetaMask after you have already approved existing accounts, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
         ),
       ]),
     },
@@ -216,8 +244,21 @@ export const onUpdate: OnUpdateHandler = async () => {
       content: panel([
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
-        text('🚀 Added a new API to let users sign arbitrary messages'),
-        text('🚀 Added a new API to let users view their transaction history'),
+        text(
+          '🚀 Added a new API to associate fungible/non-fungible tokens to an account',
+        ),
+        text(
+          '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
+        ),
+        text(
+          '🚀 Added a new API to stake/unstake Hbar to and from Hedera Network nodes',
+        ),
+        text(
+          '🚀 Added a new API to approve/delete an allowance for Hbar, tokens and NFTs',
+        ),
+        text(
+          '🚀 Added a new API to delete a Hedera account from the ledger permanently. This action is irreversible!',
+        ),
       ]),
     },
   });

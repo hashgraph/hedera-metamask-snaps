@@ -23,8 +23,8 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, SignMessageRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, signMessage } from '../../utils';
+import { Account, StakeHbarRequestParams } from '../../types/snap';
+import { shouldDisplayReconnectButton, stakeHbar } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -36,38 +36,42 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [message, setMessage] = useState('Hello, Hedera!');
+  const [nodeId, setNodeId] = useState<number>();
+  const [accountId, setAccountId] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSignMessageClick = async () => {
+  const handleStakeHbarClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const signMessageParams = {
-        message,
-      } as SignMessageRequestParams;
-      const response: any = await signMessage(
+      const stakeHbarParams = {
+        accountId: accountId || undefined,
+      } as StakeHbarRequestParams;
+      if (Number.isFinite(nodeId)) {
+        stakeHbarParams.nodeId = nodeId;
+      }
+      const response: any = await stakeHbar(
         network,
         mirrorNodeUrl,
-        signMessageParams,
+        stakeHbarParams,
         externalAccountParams,
       );
 
-      const { signature, currentAccount } = response;
+      const { receipt, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('signature: ', signature);
+      console.log('receipt: ', receipt);
 
       showModal({
-        title: 'Signed Message',
-        content: JSON.stringify({ message, signature }, null, 4),
+        title: 'Transaction Receipt',
+        content: JSON.stringify({ receipt }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -79,20 +83,35 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'signMessage',
+        title: 'stakeHbar',
         description:
-          'Use your Hedera snap account to sign an arbitary message.',
+          'Use your Hedera snap account to stake your HBAR to a Node ID or Account ID.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter an arbitary message to sign
+              Enter the node ID to stake to. Visit{' '}
+              <a href="https://docs.hedera.com/hedera/networks/mainnet/mainnet-nodes">
+                here
+              </a>{' '}
+              to find the node ID for the node you would like to stake to.
               <input
-                type="text"
+                type="number"
                 style={{ width: '100%' }}
-                value={message}
-                placeholder="Hello, Hedera!"
-                onChange={(e) => setMessage(e.target.value)}
+                value={nodeId}
+                placeholder="Enter the number of the Node ID(eg. 0, 1, 2, etc.)"
+                onChange={(e) => setNodeId(parseInt(e.target.value))}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the account ID to stake to
+              <input
+                type="string"
+                style={{ width: '100%' }}
+                value={accountId}
+                placeholder="Enter Account Id(0.0.x)"
+                onChange={(e) => setAccountId(e.target.value)}
               />
             </label>
             <br />
@@ -100,8 +119,8 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Sign"
-            onClick={handleSignMessageClick}
+            buttonText="Stake"
+            onClick={handleStakeHbarClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -117,4 +136,4 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { SignMessage };
+export { StakeHbar };

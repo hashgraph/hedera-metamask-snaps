@@ -33,7 +33,7 @@ import {
 } from '../types/account';
 import { hederaNetworks } from '../types/constants';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
-import { generateWallet } from '../utils/keyPair';
+import { generateWallet } from '../utils/crypto';
 import { generateCommonPanel, snapDialog } from './dialog';
 import { validHederaNetwork } from './network';
 import {
@@ -505,7 +505,6 @@ export async function importMetaMaskAccount(
 
   // eslint-disable-next-line require-atomic-updates
   state.currentAccount = {
-    metamaskAddress: connectedAddress,
     hederaAccountId,
     hederaEvmAddress: address,
     balance,

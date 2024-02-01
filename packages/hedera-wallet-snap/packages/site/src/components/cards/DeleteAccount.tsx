@@ -23,8 +23,8 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, SignMessageRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, signMessage } from '../../utils';
+import { Account, DeleteAccountRequestParams } from '../../types/snap';
+import { deleteAccount, shouldDisplayReconnectButton } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -36,38 +36,42 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const DeleteAccount: FC<Props> = ({
+  network,
+  mirrorNodeUrl,
+  setAccountInfo,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [message, setMessage] = useState('Hello, Hedera!');
+  const [transferAccountId, setTransferAccountId] = useState<string>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSignMessageClick = async () => {
+  const handleDeleteAccountClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const signMessageParams = {
-        message,
-      } as SignMessageRequestParams;
-      const response: any = await signMessage(
+      const deleteAccountParams = {
+        transferAccountId,
+      } as DeleteAccountRequestParams;
+      const response: any = await deleteAccount(
         network,
         mirrorNodeUrl,
-        signMessageParams,
+        deleteAccountParams,
         externalAccountParams,
       );
 
-      const { signature, currentAccount } = response;
+      const { receipt, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('signature: ', signature);
+      console.log('receipt: ', receipt);
 
       showModal({
-        title: 'Signed Message',
-        content: JSON.stringify({ message, signature }, null, 4),
+        title: 'Transaction Receipt',
+        content: JSON.stringify({ receipt }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -79,20 +83,20 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'signMessage',
+        title: 'deleteAccount',
         description:
-          'Use your Hedera snap account to sign an arbitary message.',
+          'Delete your account from the ledger. This action is irreversible!!',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter an arbitary message to sign
+              Enter the account ID to transfer existing Hbar to
               <input
                 type="text"
                 style={{ width: '100%' }}
-                value={message}
-                placeholder="Hello, Hedera!"
-                onChange={(e) => setMessage(e.target.value)}
+                value={transferAccountId}
+                placeholder="Account Id"
+                onChange={(e) => setTransferAccountId(e.target.value)}
               />
             </label>
             <br />
@@ -100,8 +104,8 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Sign"
-            onClick={handleSignMessageClick}
+            buttonText="Delete"
+            onClick={handleDeleteAccountClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -117,4 +121,4 @@ const SignMessage: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { SignMessage };
+export { DeleteAccount };

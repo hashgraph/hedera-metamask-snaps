@@ -19,6 +19,7 @@
  */
 
 import { AccountInfoQuery } from '@hashgraph/sdk';
+import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
@@ -32,7 +33,6 @@ import {
   calculateHederaQueryFees,
   deductServiceFee,
 } from '../../utils/tuumService';
-import { providerErrors } from '@metamask/rpc-errors';
 
 /**
  * Hedera Ledger Node:
@@ -69,6 +69,9 @@ export async function getAccountInfo(
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
+  const { privateKey, curve } =
+    state.accountState[hederaEvmAddress][network].keyStore;
+
   let accountIdToQuery = hederaAccountId;
   let selfAccountId = true;
   if (!_.isEmpty(accountId)) {
@@ -84,8 +87,8 @@ export async function getAccountInfo(
     if (_.isEmpty(mirrorNodeUrl)) {
       console.log('Retrieving account info using Hedera Ledger Node');
       const hederaClient = await createHederaClient(
-        state.accountState[hederaEvmAddress][network].keyStore.curve,
-        state.accountState[hederaEvmAddress][network].keyStore.privateKey,
+        curve,
+        privateKey,
         hederaAccountId,
         network,
       );
@@ -143,8 +146,6 @@ export async function getAccountInfo(
         throw providerErrors.userRejectedRequest();
       }
 
-      hederaClient.setMaxQueryPayment(maxCost.toFixed(8));
-
       accountInfo = await hederaClient.getAccountInfo(accountIdToQuery);
 
       if (selfAccountId) {
@@ -184,6 +185,8 @@ export async function getAccountInfo(
     if (selfAccountId) {
       state.accountState[hederaEvmAddress][network].accountInfo = accountInfo;
       state.currentAccount.balance = accountInfo.balance;
+      state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
+        mirrorNodeUrl;
       await updateSnapState(state);
     }
   } catch (error: any) {
