@@ -409,20 +409,6 @@ export function isValidTransferCryptoParams(
         );
       }
 
-      // Check if assetId is valid
-      if (
-        transfer.assetType !== 'HBAR' &&
-        'assetId' in transfer &&
-        (_.isEmpty(transfer.assetId) || typeof transfer.assetId !== 'string')
-      ) {
-        console.error(
-          `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
-        );
-        throw providerErrors.unsupportedMethod(
-          `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
-        );
-      }
-
       // Check if to is valid
       if (
         !('to' in transfer) ||
@@ -447,6 +433,35 @@ export function isValidTransferCryptoParams(
         );
         throw providerErrors.unsupportedMethod(
           `Invalid transferCrypto Params passed. "transfers[].to" is not a number`,
+        );
+      }
+
+      // Check if assetId is valid
+      if (
+        transfer.assetType !== 'HBAR' &&
+        'assetId' in transfer &&
+        (_.isEmpty(transfer.assetId) || typeof transfer.assetId !== 'string')
+      ) {
+        console.error(
+          `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
+        );
+        throw providerErrors.unsupportedMethod(
+          `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
+        );
+      }
+
+      // Check if from is valid
+      if (
+        'from' in transfer &&
+        (_.isEmpty(transfer.from) ||
+          typeof transfer.from !== 'string' ||
+          !AccountId.fromString(transfer.from))
+      ) {
+        console.error(
+          `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
+        );
+        throw providerErrors.unsupportedMethod(
+          `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
         );
       }
     });

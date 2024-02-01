@@ -20,6 +20,7 @@
 
 import {
   AccountAllowanceApproveTransaction,
+  AccountId,
   Hbar,
   type Client,
 } from '@hashgraph/sdk';
@@ -52,32 +53,32 @@ export async function approveAllowance(
 
   if (options.assetType === 'HBAR') {
     transaction.approveHbarAllowance(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
+      client.operatorAccountId as AccountId,
       options.spenderAccountId,
       new Hbar(options.amount),
     );
   } else if (options.assetType === 'TOKEN') {
+    const multiplier = Math.pow(
+      10,
+      options.assetDetail?.assetDecimals as number,
+    );
     transaction.approveTokenAllowance(
       options.assetDetail?.assetId as string,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
+      client.operatorAccountId as AccountId,
       options.spenderAccountId,
-      options.amount,
+      options.amount * multiplier,
     );
   } else if (options.assetType === 'NFT') {
     if (options.assetDetail?.all) {
       transaction.approveTokenNftAllowanceAllSerials(
         options.assetDetail?.assetId,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
+        client.operatorAccountId as AccountId,
         options.spenderAccountId,
       );
     } else {
       transaction.approveTokenNftAllowance(
         options.assetDetail?.assetId as string,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
+        client.operatorAccountId as AccountId,
         options.spenderAccountId,
       );
     }

@@ -37,10 +37,10 @@ import { ApproveAllowanceAssetDetail } from '../types/params';
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
   to: string;
-  // amount must be in low denom
-  amount: number;
-  // Token or NFT ID (as string)
-  assetId?: string;
+  amount: number; // amount must be in low denom
+  assetId?: string; // Token or NFT ID (as string)
+  from?: string; // Only for approved allowances
+  decimals?: number; // Only for Token/NFT transfers
 };
 
 export type Token = {
@@ -168,7 +168,6 @@ export type SimpleHederaClient = {
   associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
 
   transferCrypto(options: {
-    currentBalance: AccountBalance;
     transfers: SimpleTransfer[];
     memo: string | null;
     maxFee: number | null; // hbars

@@ -63,6 +63,7 @@ export type DeleteAccountRequestParams = {
 
 export type ApproveAllowanceAssetDetail = {
   assetId: string;
+  assetDecimals?: number;
   all?: boolean;
 };
 

@@ -168,7 +168,6 @@ export async function getAccountInfo(
       // Deduct service Fee if set
       if (serviceFee.percentageCut > 0) {
         await deductServiceFee(
-          state.accountState[hederaEvmAddress][network].accountInfo.balance,
           serviceFeeToPay,
           serviceFee.toAddress,
           hederaClient,

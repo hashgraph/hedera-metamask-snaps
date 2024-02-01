@@ -178,14 +178,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         receipt: await approveAllowance(walletSnapParams, request.params),
       };
     }
-    case 'transferApprovedCrypto': {
-      isValidTransferCryptoParams(request.params);
-      return {
-        currentAccount: state.currentAccount,
-        receipt: await transferCrypto(walletSnapParams, request.params),
-        // receipt: await transferApprovedCrypto(walletSnapParams, request.params),
-      };
-    }
     case 'deleteAllowance': {
       isValidDeleteAllowanceParams(request.params);
       return {

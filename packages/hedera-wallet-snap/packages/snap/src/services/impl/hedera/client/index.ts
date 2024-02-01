@@ -27,12 +27,7 @@ import {
 
 import { AccountInfo } from '../../../../types/account';
 import { ApproveAllowanceAssetDetail } from '../../../../types/params';
-import {
-  AccountBalance,
-  SimpleHederaClient,
-  SimpleTransfer,
-  TxReceipt,
-} from '../../../hedera';
+import { SimpleHederaClient, SimpleTransfer, TxReceipt } from '../../../hedera';
 import { approveAllowance } from './approveAllowance';
 import { deleteAccount } from './deleteAccount';
 import { deleteAllowance } from './deleteAllowance';
@@ -85,7 +80,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   }
 
   async transferCrypto(options: {
-    currentBalance: AccountBalance;
     transfers: SimpleTransfer[];
     memo: string | null;
     maxFee: number | null;
