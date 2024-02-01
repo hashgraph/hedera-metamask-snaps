@@ -21,11 +21,8 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import {
-  AccountBalance,
-  SimpleTransfer,
-  TxReceipt,
-} from '../../services/hedera';
+import { AccountInfo } from 'src/types/account';
+import { SimpleTransfer, TxReceipt } from '../../services/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
@@ -104,11 +101,6 @@ export async function transferCrypto(
       { origin, state, mirrorNodeUrl: mirrorNodeUrlToUse } as WalletSnapParams,
       {} as GetAccountInfoRequestParams,
     );
-    let currentBalance =
-      state.accountState[hederaEvmAddress][network].accountInfo.balance;
-    if (!currentBalance) {
-      currentBalance = {} as AccountBalance;
-    }
 
     const panelToShow = [
       heading('Transfer Crypto'),
@@ -130,28 +122,56 @@ export async function transferCrypto(
       panelToShow.push(divider());
       panelToShow.push(divider());
 
-      panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
-      panelToShow.push(divider());
       let asset = '';
       let feeToDisplay = 0;
+      let walletBalance =
+        state.accountState[hederaEvmAddress][network].accountInfo.balance;
+      if (!_.isEmpty(transfer.from)) {
+        const ownerAccountInfo: AccountInfo = await getAccountInfo(
+          {
+            origin,
+            state,
+            mirrorNodeUrl: mirrorNodeUrlToUse,
+          } as WalletSnapParams,
+          { accountId: transfer.from } as GetAccountInfoRequestParams,
+        );
+        walletBalance = ownerAccountInfo.balance;
+        panelToShow.push(text(`Transaction Type: Delegated Transfer`));
+        panelToShow.push(text(`Owner Account Id: ${transfer.from as string}`));
+      }
+      panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
+      panelToShow.push(divider());
       if (transfer.assetType === 'HBAR') {
-        if (currentBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
-          const errMessage = `You do not have enough Hbar in your balance to transfer the requested amount`;
+        if (walletBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
+          const errMessage = `There is not enough Hbar in the wallet to transfer the requested amount`;
           console.error(errMessage);
-          throw providerErrors.unauthorized(errMessage);
+          panelToShow.push(text(errMessage));
+          panelToShow.push(
+            text(
+              `Proceed only if you are sure about the amount being transferred`,
+            ),
+          );
         }
         asset = 'HBAR';
       } else {
+        transfer.decimals = walletBalance.tokens[transfer.assetId as string]
+          ? walletBalance.tokens[transfer.assetId as string].decimals
+          : NaN;
         if (
-          !currentBalance.tokens[transfer.assetId as string] ||
-          currentBalance.tokens[transfer.assetId as string].balance <
+          !walletBalance.tokens[transfer.assetId as string] ||
+          walletBalance.tokens[transfer.assetId as string].balance <
             transfer.amount
         ) {
-          const errMessage = `You either do not own ${
+          const errMessage = `This wallet either does not own  ${
             transfer.assetId as string
-          } or do not have enough in your balance to transfer the requested amount`;
+          } or there is not enough balance to transfer the requested amount`;
           console.error(errMessage);
-          throw providerErrors.unauthorized(errMessage);
+          panelToShow.push(text(errMessage));
+          panelToShow.push(
+            text(
+              `Proceed only if you are sure about the amount being transferred`,
+            ),
+          );
         }
         panelToShow.push(text(`Asset Id: ${transfer.assetId as string}`));
         const tokenInfo = await hederaService.getTokenById(
@@ -173,6 +193,14 @@ export async function transferCrypto(
           panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
           panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
           panelToShow.push(text(`Symbol: ${asset}`));
+          transfer.decimals = Number(tokenInfo.decimals);
+        }
+        if (!Number.isFinite(transfer.decimals)) {
+          const errMessage = `Error while trying to get token info for ${
+            transfer.assetId as string
+          } from Hedera Mirror Nodes at this time`;
+          console.error(errMessage);
+          throw providerErrors.unsupportedMethod(errMessage);
         }
 
         if (serviceFeesToPay[transfer.assetType] > 0) {
@@ -227,7 +255,6 @@ export async function transferCrypto(
     );
 
     txReceipt = await hederaClient.transferCrypto({
-      currentBalance,
       transfers,
       memo,
       maxFee,

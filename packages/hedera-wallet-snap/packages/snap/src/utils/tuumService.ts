@@ -20,11 +20,7 @@
 
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-import {
-  AccountBalance,
-  SimpleHederaClient,
-  SimpleTransfer,
-} from 'src/services/hedera';
+import { SimpleHederaClient, SimpleTransfer } from 'src/services/hedera';
 
 export type QueryCost = {
   serviceFeeToPay: number;
@@ -52,7 +48,6 @@ export const calculateHederaQueryFees = (
 };
 
 export const deductServiceFee = async (
-  currentBalance: AccountBalance,
   serviceFeeToPay: number,
   serviceFeeToAddr: string,
   hederaClient: SimpleHederaClient,
@@ -71,7 +66,6 @@ export const deductServiceFee = async (
       } as SimpleTransfer,
     ];
     await hederaClient.transferCrypto({
-      currentBalance,
       transfers,
       memo: null,
       maxFee: null,

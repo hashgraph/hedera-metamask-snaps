@@ -61,8 +61,12 @@ export async function approveAllowance(
 ): Promise<TxReceipt> {
   const { origin, state, mirrorNodeUrl } = walletSnapParams;
 
-  const { spenderAccountId, amount, assetType, assetDetail } =
-    approveAllowanceRequestParams;
+  const {
+    spenderAccountId,
+    amount,
+    assetType,
+    assetDetail = {} as ApproveAllowanceAssetDetail,
+  } = approveAllowanceRequestParams;
 
   const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
 
@@ -88,10 +92,15 @@ export async function approveAllowance(
     if (assetType === 'HBAR') {
       panelToShow.push(text(`Asset: ${assetType}`));
     } else {
+      const walletBalance =
+        state.accountState[hederaEvmAddress][network].accountInfo.balance;
+      assetDetail.assetDecimals = walletBalance.tokens[assetDetail.assetId]
+        ? walletBalance.tokens[assetDetail.assetId].decimals
+        : NaN;
+
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
-      const assetProp = assetDetail as ApproveAllowanceAssetDetail;
       const tokenInfo: MirrorTokenInfo = await hederaService.getTokenById(
-        assetProp.assetId,
+        assetDetail.assetId,
       );
       if (assetType === 'NFT' && assetDetail?.all) {
         panelToShow.push(
@@ -100,11 +109,26 @@ export async function approveAllowance(
           ),
         );
       }
+      if (_.isEmpty(tokenInfo)) {
+        const errMessage = `Error while trying to get token info for ${assetDetail.assetId} from Hedera Mirror Nodes at this time`;
+        console.error(errMessage);
+        panelToShow.push(text(errMessage));
+        panelToShow.push(
+          text(`Proceed only if you are sure about the asset ID being correct`),
+        );
+      } else {
+        panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
+        panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
+        panelToShow.push(text(`Id: ${assetDetail.assetId}`));
+        panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
+        assetDetail.assetDecimals = Number(tokenInfo.decimals);
+      }
+      if (!Number.isFinite(assetDetail.assetDecimals)) {
+        const errMessage = `Error while trying to get token info for ${assetDetail.assetId} from Hedera Mirror Nodes at this time`;
+        console.error(errMessage);
+        throw providerErrors.unsupportedMethod(errMessage);
+      }
 
-      panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
-      panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-      panelToShow.push(text(`Id: ${assetProp.assetId}`));
-      panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
       panelToShow.push(
         text(
           `Total Supply: ${(

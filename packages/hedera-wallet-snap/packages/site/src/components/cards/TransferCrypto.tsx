@@ -1,4 +1,6 @@
+import _ from 'lodash';
 import { FC, useContext, useRef, useState } from 'react';
+import { Form } from 'react-bootstrap';
 import {
   MetaMaskContext,
   MetamaskActions,
@@ -35,6 +37,8 @@ const TransferCrypto: FC<Props> = ({
   const [assetType, setAssetType] = useState<'HBAR' | 'TOKEN' | 'NFT'>('HBAR');
   const [assetId, setAssetId] = useState('');
   const [sendAmount, setSendAmount] = useState(0);
+  const [isDelegatedTransfer, setIsDelegatedTransfer] = useState(false); // New state for Delegated Transfer checkbox
+  const [sendFromAddress, setSendFromAddress] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
@@ -53,6 +57,9 @@ const TransferCrypto: FC<Props> = ({
       ];
       if (assetType === 'TOKEN' || assetType === 'NFT') {
         transfers[0].assetId = assetId;
+      }
+      if (isDelegatedTransfer && !_.isEmpty(sendFromAddress)) {
+        transfers[0].from = sendFromAddress;
       }
       // const maxFee = 1; // Note that if you don't pass this, default is whatever the snap has set
 
@@ -99,6 +106,31 @@ const TransferCrypto: FC<Props> = ({
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
+            <Form>
+              <Form.Check
+                type="checkbox"
+                id="delegated-transfer-checkbox"
+                label="Delegated Transfer"
+                onChange={(e) => {
+                  setIsDelegatedTransfer(e.target.checked);
+                }}
+              />
+              {isDelegatedTransfer && (
+                <>
+                  <Form.Label>
+                    Enter an account Id to send Hbar from (Only needed for
+                    delegated transfer)
+                  </Form.Label>
+                  <Form.Control
+                    size="lg"
+                    type="text"
+                    placeholder="Owner Account Id to send from"
+                    style={{ marginBottom: 8 }}
+                    onChange={(e) => setSendFromAddress(e.target.value)}
+                  />
+                </>
+              )}
+            </Form>
             <label>
               Enter an account Id or an EVM address to send Hbar to
               <input

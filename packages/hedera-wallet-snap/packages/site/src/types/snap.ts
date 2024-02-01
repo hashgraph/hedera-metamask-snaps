@@ -56,10 +56,9 @@ export type Account = {
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
   to: string;
-  // amount must be in low denom
-  amount: number;
-  // Token or NFT ID (as string)
-  assetId?: string;
+  amount: number; // amount must be in low denom
+  assetId?: string; // Token or NFT ID (as string)
+  from?: string; // Only for approved allowances
 };
 
 export type ServiceFee = {

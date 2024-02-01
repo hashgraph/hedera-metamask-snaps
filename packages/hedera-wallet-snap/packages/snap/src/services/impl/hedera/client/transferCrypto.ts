@@ -26,16 +26,16 @@ import {
 } from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
+import _ from 'lodash';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
 import { timestampToString } from '../../../../utils/helper';
-import { AccountBalance, SimpleTransfer, TxReceipt } from '../../../hedera';
+import { SimpleTransfer, TxReceipt } from '../../../hedera';
 
 /**
  * Transfer crypto(hbar or other tokens).
  *
  * @param client - Hedera Client.
  * @param options - Transfer crypto options.
- * @param options.currentBalance - Current Balance to use to retrieve from snap state.
  * @param options.transfers - The list of transfers to take place.
  * @param options.memo - Memo to include in the transfer.
  * @param options.maxFee - Max fee to use in the transfer.
@@ -46,7 +46,6 @@ import { AccountBalance, SimpleTransfer, TxReceipt } from '../../../hedera';
 export async function transferCrypto(
   client: Client,
   options: {
-    currentBalance: AccountBalance;
     transfers: SimpleTransfer[];
     memo: string | null;
     maxFee: number | null; // hbar
@@ -72,10 +71,17 @@ export async function transferCrypto(
       }
 
       transaction.addHbarTransfer(transfer.to, transfer.amount);
-      transaction.addHbarTransfer(
-        client.operatorAccountId as AccountId,
-        -transfer.amount,
-      );
+      if (_.isEmpty(transfer.from)) {
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -transfer.amount,
+        );
+      } else {
+        transaction.addApprovedHbarTransfer(
+          transfer.from as string,
+          -transfer.amount,
+        );
+      }
 
       // Service Fee
       if (options.serviceFeesToPay[transfer.assetType] > 0) {
@@ -90,21 +96,26 @@ export async function transferCrypto(
       }
     } else if (transfer.assetType === 'TOKEN') {
       const assetid = transfer.assetId as string;
-      const multiplier = Math.pow(
-        10,
-        options.currentBalance.tokens[assetid].decimals,
-      );
+      const multiplier = Math.pow(10, transfer.decimals as number);
 
       transaction.addTokenTransfer(
         assetid,
         transfer.to,
         transfer.amount * multiplier,
       );
-      transaction.addTokenTransfer(
-        assetid,
-        client.operatorAccountId as AccountId,
-        -(transfer.amount * multiplier),
-      );
+      if (_.isEmpty(transfer.from)) {
+        transaction.addTokenTransfer(
+          assetid,
+          client.operatorAccountId as AccountId,
+          -(transfer.amount * multiplier),
+        );
+      } else {
+        transaction.addApprovedTokenTransfer(
+          assetid,
+          transfer.from as string,
+          -(transfer.amount * multiplier),
+        );
+      }
 
       // Service Fee
       if (options.serviceFeesToPay[assetid] > 0) {
@@ -121,11 +132,19 @@ export async function transferCrypto(
       }
     } else if (transfer.assetType === 'NFT') {
       const assetid = transfer.assetId as string;
-      transaction.addNftTransfer(
-        assetid,
-        client.operatorAccountId as AccountId,
-        transfer.to,
-      );
+      if (_.isEmpty(transfer.from)) {
+        transaction.addNftTransfer(
+          assetid,
+          client.operatorAccountId as AccountId,
+          transfer.to,
+        );
+      } else {
+        transaction.addApprovedNftTransfer(
+          assetid,
+          transfer.from as string,
+          transfer.to,
+        );
+      }
     }
   }
 
