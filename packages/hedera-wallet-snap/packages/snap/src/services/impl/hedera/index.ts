@@ -29,7 +29,7 @@ import {
 } from '@hashgraph/sdk';
 import _ from 'lodash';
 
-import { StakingInfoJson } from '@hashgraph/sdk/lib/account/AccountInfo';
+import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 import { providerErrors } from '@metamask/rpc-errors';
 import { AccountInfo } from 'src/types/account';
 import { Wallet } from '../../../domain/wallet/abstract';
@@ -141,23 +141,27 @@ export class HederaServiceImpl implements HederaService {
 
     const response: FetchResponse = await fetchDataFromUrl(url);
     if (!response.success) {
-      return [] as MirrorStakingInfo[];
+      return result;
     }
 
-    for (const node of response.data.nodes) {
-      result.push(node);
-    }
+    try {
+      for (const node of response.data.nodes) {
+        result.push(node);
+      }
 
-    if (response.data.links.next) {
-      const secondUrl = `${this.mirrorNodeUrl}${
-        response.data.links.next as string
-      }`;
-      const secondResponse: FetchResponse = await fetchDataFromUrl(secondUrl);
-      if (secondResponse.success) {
-        for (const node of secondResponse.data.nodes) {
-          result.push(node);
+      if (response.data.links.next) {
+        const secondUrl = `${this.mirrorNodeUrl}${
+          response.data.links.next as string
+        }`;
+        const secondResponse: FetchResponse = await fetchDataFromUrl(secondUrl);
+        if (secondResponse.success) {
+          for (const node of secondResponse.data.nodes) {
+            result.push(node);
+          }
         }
       }
+    } catch (error: any) {
+      console.error('Error in getNodeStakingInfo:', String(error));
     }
 
     return result;
@@ -166,71 +170,80 @@ export class HederaServiceImpl implements HederaService {
   async getMirrorAccountInfo(
     idOrAliasOrEvmAddress: string,
   ): Promise<AccountInfo> {
-    let result = {} as MirrorAccountInfo;
+    const result = {} as AccountInfo;
     const url = `${this.mirrorNodeUrl}/api/v1/accounts/${idOrAliasOrEvmAddress}`;
     const response: FetchResponse = await fetchDataFromUrl(url);
     if (!response.success) {
-      return {} as AccountInfo;
+      return result;
     }
 
-    result = response.data as MirrorAccountInfo;
+    const mirrorNodeData = response.data as MirrorAccountInfo;
 
-    const hbars = result.balance.balance / 1e8;
-    const tokens: Record<string, TokenBalance> = {};
-    // Use map to create an array of promises
-    const tokenPromises = result.balance.tokens.map(async (token: Token) => {
-      const tokenId = token.token_id;
-      const tokenInfo: MirrorTokenInfo = await this.getTokenById(tokenId);
-      tokens[tokenId] = {
-        balance: token.balance / Math.pow(10, Number(tokenInfo.decimals)),
-        decimals: Number(tokenInfo.decimals),
-        tokenId,
-        name: tokenInfo.name,
-        symbol: tokenInfo.symbol,
-        tokenType: tokenInfo.type,
-        supplyType: tokenInfo.supply_type,
-        totalSupply: (
-          Number(tokenInfo.total_supply) /
-          Math.pow(10, Number(tokenInfo.decimals))
-        ).toString(),
-        maxSupply: (
-          Number(tokenInfo.max_supply) /
-          Math.pow(10, Number(tokenInfo.decimals))
-        ).toString(),
-      } as TokenBalance;
-    });
+    try {
+      result.accountId = mirrorNodeData.account;
+      result.alias = mirrorNodeData.alias;
+      result.createdTime = timestampToString(mirrorNodeData.created_timestamp);
+      result.expirationTime = timestampToString(
+        mirrorNodeData.expiry_timestamp,
+      );
+      result.memo = mirrorNodeData.memo;
+      result.evmAddress = mirrorNodeData.evm_address;
+      result.key = {
+        type: mirrorNodeData.key._type,
+        key: mirrorNodeData.key.key,
+      };
+      result.autoRenewPeriod = String(mirrorNodeData.auto_renew_period);
+      result.ethereumNonce = String(mirrorNodeData.ethereum_nonce);
+      result.isDeleted = mirrorNodeData.deleted;
+      result.stakingInfo = {
+        declineStakingReward: mirrorNodeData.decline_reward,
+        stakePeriodStart: timestampToString(mirrorNodeData.stake_period_start),
+        pendingReward: String(mirrorNodeData.pending_reward),
+        stakedToMe: '0', // TODO
+        stakedAccountId: mirrorNodeData.staked_account_id ?? '',
+        stakedNodeId: mirrorNodeData.staked_node_id ?? '',
+      } as StakingInfoJson;
 
-    // Wait for all promises to resolve
-    await Promise.all(tokenPromises);
+      const hbars = mirrorNodeData.balance.balance / 1e8;
+      const tokens: Record<string, TokenBalance> = {};
+      // Use map to create an array of promises
+      const tokenPromises = mirrorNodeData.balance.tokens.map(
+        async (token: Token) => {
+          const tokenId = token.token_id;
+          const tokenInfo: MirrorTokenInfo = await this.getTokenById(tokenId);
+          tokens[tokenId] = {
+            balance: token.balance / Math.pow(10, Number(tokenInfo.decimals)),
+            decimals: Number(tokenInfo.decimals),
+            tokenId,
+            name: tokenInfo.name,
+            symbol: tokenInfo.symbol,
+            tokenType: tokenInfo.type,
+            supplyType: tokenInfo.supply_type,
+            totalSupply: (
+              Number(tokenInfo.total_supply) /
+              Math.pow(10, Number(tokenInfo.decimals))
+            ).toString(),
+            maxSupply: (
+              Number(tokenInfo.max_supply) /
+              Math.pow(10, Number(tokenInfo.decimals))
+            ).toString(),
+          } as TokenBalance;
+        },
+      );
 
-    return {
-      accountId: result.account,
-      alias: result.alias,
-      createdTime: timestampToString(result.created_timestamp),
-      expirationTime: timestampToString(result.expiry_timestamp),
-      memo: result.memo,
-      evmAddress: result.evm_address,
-      key: {
-        type: result.key._type,
-        key: result.key.key,
-      },
-      balance: {
+      // Wait for all promises to resolve
+      await Promise.all(tokenPromises);
+
+      result.balance = {
         hbars,
         timestamp: timestampToString(result.balance.timestamp),
         tokens,
-      } as AccountBalance,
-      autoRenewPeriod: String(result.auto_renew_period),
-      ethereumNonce: String(result.ethereum_nonce),
-      isDeleted: result.deleted,
-      stakingInfo: {
-        declineStakingReward: result.decline_reward,
-        stakePeriodStart: timestampToString(result.stake_period_start),
-        pendingReward: String(result.pending_reward),
-        stakedToMe: '0', // TODO
-        stakedAccountId: result.staked_account_id ?? '',
-        stakedNodeId: result.staked_node_id ?? '',
-      } as StakingInfoJson,
-    } as AccountInfo;
+      } as AccountBalance;
+    } catch (error: any) {
+      console.error('Error in getMirrorAccountInfo:', String(error));
+    }
+
+    return result;
   }
 
   async getTokenById(tokenId: string): Promise<MirrorTokenInfo> {
@@ -260,19 +273,23 @@ export class HederaServiceImpl implements HederaService {
       return result;
     }
 
-    result = response.data.transactions as MirrorTransactionInfo[];
+    try {
+      result = response.data.transactions as MirrorTransactionInfo[];
 
-    result.forEach((transaction) => {
-      transaction.consensus_timestamp = timestampToString(
-        transaction.consensus_timestamp,
-      );
-      transaction.parent_consensus_timestamp = timestampToString(
-        transaction.parent_consensus_timestamp,
-      );
-      transaction.valid_start_timestamp = timestampToString(
-        transaction.valid_start_timestamp,
-      );
-    });
+      result.forEach((transaction) => {
+        transaction.consensus_timestamp = timestampToString(
+          transaction.consensus_timestamp,
+        );
+        transaction.parent_consensus_timestamp = timestampToString(
+          transaction.parent_consensus_timestamp,
+        );
+        transaction.valid_start_timestamp = timestampToString(
+          transaction.valid_start_timestamp,
+        );
+      });
+    } catch (error: any) {
+      console.error('Error in getMirrorTransactions:', String(error));
+    }
 
     return result;
   }
