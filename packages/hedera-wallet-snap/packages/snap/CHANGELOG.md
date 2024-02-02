@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.3](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.3...v0.2.3) (2024-02-02)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- Added support of external accounts import that are of type `ProtobufEncoded` in addition to `ECDSA` and `ED25519`
+
+### :bug: Bug Fixes
+
+- Fixed a bug whereby snap could not fetch info after testnet reset as account IDs would also be reset with that
+
 ## [0.2.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.1...v0.2.1) (2024-02-01)
 
 ### :page_with_curl: Documentation
