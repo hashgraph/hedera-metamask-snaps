@@ -67,6 +67,10 @@ export async function stakeHbar(
 
   let newExchangeRate;
   if (receipt.exchangeRate) {
+    console.log(
+      'receipt.exchangeRate',
+      JSON.stringify(receipt.exchangeRate, null, 4),
+    );
     newExchangeRate = {
       ...receipt.exchangeRate,
       expirationTime: timestampToString(receipt.exchangeRate.expirationTime),
