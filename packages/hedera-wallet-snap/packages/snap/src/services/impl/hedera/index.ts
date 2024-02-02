@@ -236,7 +236,7 @@ export class HederaServiceImpl implements HederaService {
 
       result.balance = {
         hbars,
-        timestamp: timestampToString(result.balance.timestamp),
+        timestamp: timestampToString(mirrorNodeData.balance.timestamp),
         tokens,
       } as AccountBalance;
     } catch (error: any) {

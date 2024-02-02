@@ -77,6 +77,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   if (state === null || _.isEmpty(state)) {
     state = await initSnapState();
   }
+  console.log('State:', JSON.stringify(state, null, 4));
 
   let isExternalAccount = false;
   if (isExternalAccountFlagSet(request.params)) {
