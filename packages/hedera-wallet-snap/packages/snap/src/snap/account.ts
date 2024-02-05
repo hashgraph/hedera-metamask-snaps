@@ -104,15 +104,6 @@ export async function setCurrentAccount(
       const { accountIdOrEvmAddress, curve = 'ECDSA_SECP256K1' } =
         nonMetamaskAccount.externalAccount;
       if (ethers.isAddress(accountIdOrEvmAddress)) {
-        if (curve !== 'ECDSA_SECP256K1') {
-          console.error(
-            `You must use 'ECDSA_SECP256K1' as the curve if you want to import an EVM address. Please make sure to pass in the correct value for "curve".`,
-          );
-          throw providerErrors.unsupportedMethod(
-            `You must use 'ECDSA_SECP256K1' as the curve if you want to import an EVM address. Please make sure to pass in the correct value for "curve".`,
-          );
-        }
-
         const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
           await connectEVMAccount(
             origin,
@@ -229,6 +220,16 @@ async function connectEVMAccount(
       const { keyStore } = state.accountState[addr][network];
 
       if (evmAddress === keyStore.address) {
+        if (keyStore.curve !== curve) {
+          console.error(
+            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          );
+          throw providerErrors.custom({
+            code: 4200,
+            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
+            data: { network, curve, evmAddress },
+          });
+        }
         connectedAddress = addr;
         result = keyStore;
         break;
@@ -390,6 +391,16 @@ async function connectHederaAccount(
     if (state.accountState[addr][network]) {
       const { keyStore } = state.accountState[addr][network];
       if (keyStore.hederaAccountId === accountId) {
+        if (keyStore.curve !== curve) {
+          console.error(
+            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          );
+          throw providerErrors.custom({
+            code: 4200,
+            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
+            data: { network, curve, accountId },
+          });
+        }
         connectedAddress = addr;
         result = keyStore;
         break;
