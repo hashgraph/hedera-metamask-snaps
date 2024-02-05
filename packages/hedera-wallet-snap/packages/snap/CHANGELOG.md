@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.4](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.4...v0.2.4) (2024-02-05)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+- Fixed some import issues
+
 ## [0.2.3](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.3...v0.2.3) (2024-02-02)
 
 ### :page_with_curl: Documentation

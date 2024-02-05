@@ -31,9 +31,9 @@ import _ from 'lodash';
 
 import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 import { providerErrors } from '@metamask/rpc-errors';
-import { AccountInfo } from 'src/types/account';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
+import { AccountInfo } from '../../../types/account';
 import { FetchResponse, fetchDataFromUrl } from '../../../utils/fetch';
 import { timestampToString } from '../../../utils/helper';
 import {
