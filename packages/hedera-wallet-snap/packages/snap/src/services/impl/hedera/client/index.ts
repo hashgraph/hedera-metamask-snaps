@@ -49,6 +49,10 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     this._privateKey = privateKey;
   }
 
+  close() {
+    this._client.close();
+  }
+
   getClient(): Client {
     return this._client;
   }

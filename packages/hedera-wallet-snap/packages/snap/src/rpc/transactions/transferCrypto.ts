@@ -21,12 +21,12 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { AccountInfo } from 'src/types/account';
 import { SimpleTransfer, TxReceipt } from '../../services/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
+import { AccountInfo } from '../../types/account';
 import {
   GetAccountInfoRequestParams,
   ServiceFee,

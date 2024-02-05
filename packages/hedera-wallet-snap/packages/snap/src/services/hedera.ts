@@ -148,6 +148,9 @@ export type HederaService = {
 };
 
 export type SimpleHederaClient = {
+  // close the client
+  close(): void;
+
   // get the associated client
   getClient(): Client;
 
