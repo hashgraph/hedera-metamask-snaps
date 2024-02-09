@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
-import { MirrorTransactionInfo } from '../../services/hedera';
+import { MirrorTransactionInfo } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { updateSnapState } from '../../snap/state';
 import { GetTransactionsRequestParams } from '../../types/params';
