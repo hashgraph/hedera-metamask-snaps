@@ -29,7 +29,7 @@ import { ethers } from 'ethers';
 import _ from 'lodash';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
 import { timestampToString } from '../../../../utils/helper';
-import { SimpleTransfer, TxReceipt } from '../../../hedera';
+import { SimpleTransfer, TxReceipt } from '../../../../types/hedera';
 
 /**
  * Transfer crypto(hbar or other tokens).

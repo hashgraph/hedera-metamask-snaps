@@ -27,7 +27,7 @@ import {
 
 import { uint8ArrayToHex } from '../../../../utils/crypto';
 import { timestampToString } from '../../../../utils/helper';
-import { TxReceipt } from '../../../hedera';
+import { TxReceipt } from '../../../../types/hedera';
 
 /**
  * Approve an allowance.

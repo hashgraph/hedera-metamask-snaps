@@ -37,7 +37,7 @@ import {
   SimpleTransfer,
   TxReceipt,
   TxReceiptExchangeRate,
-} from '../../../hedera';
+} from '../../../../types/hedera';
 
 /**
  * Create a new account for someone else by transferring HBAR or any other token.
