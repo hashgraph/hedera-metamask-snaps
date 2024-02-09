@@ -372,7 +372,7 @@ export async function getHederaClient(
     accountId,
   });
 
-  if (client === null || _.isEmpty(client)) {
+  if (_.isEmpty(client)) {
     console.error('Invalid private key or account Id of the operator');
     return null;
   }
