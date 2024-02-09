@@ -18,7 +18,7 @@
  *
  */
 
-import { SimpleTransfer } from '../services/hedera';
+import { SimpleTransfer } from './hedera';
 
 export type MirrorNodeParams = { mirrorNodeUrl?: string };
 

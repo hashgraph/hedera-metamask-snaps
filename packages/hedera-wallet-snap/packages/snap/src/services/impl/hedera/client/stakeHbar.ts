@@ -23,7 +23,7 @@ import { AccountUpdateTransaction, type Client } from '@hashgraph/sdk';
 import _ from 'lodash';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
 import { timestampToString } from '../../../../utils/helper';
-import { TxReceipt } from '../../../hedera';
+import { TxReceipt } from '../../../../types/hedera';
 
 /**
  * Stake Hbar to a Node or another Acocunt ID.

@@ -27,7 +27,11 @@ import {
 
 import { AccountInfo } from '../../../../types/account';
 import { ApproveAllowanceAssetDetail } from '../../../../types/params';
-import { SimpleHederaClient, SimpleTransfer, TxReceipt } from '../../../hedera';
+import {
+  SimpleHederaClient,
+  SimpleTransfer,
+  TxReceipt,
+} from '../../../../types/hedera';
 import { approveAllowance } from './approveAllowance';
 import { deleteAccount } from './deleteAccount';
 import { deleteAllowance } from './deleteAllowance';

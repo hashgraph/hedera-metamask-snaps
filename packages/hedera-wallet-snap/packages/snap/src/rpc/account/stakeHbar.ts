@@ -22,7 +22,7 @@ import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { TxReceipt } from '../../services/hedera';
+import { TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';

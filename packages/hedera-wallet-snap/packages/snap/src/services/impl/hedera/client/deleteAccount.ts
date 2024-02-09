@@ -22,7 +22,7 @@ import { AccountDeleteTransaction, type Client } from '@hashgraph/sdk';
 
 import { uint8ArrayToHex } from '../../../../utils/crypto';
 import { timestampToString } from '../../../../utils/helper';
-import { TxReceipt } from '../../../hedera';
+import { TxReceipt } from '../../../../types/hedera';
 
 /**
  * Delete an account.

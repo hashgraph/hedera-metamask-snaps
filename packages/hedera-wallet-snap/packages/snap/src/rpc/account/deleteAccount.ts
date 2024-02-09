@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { heading, text } from '@metamask/snaps-ui';
-import { AccountBalance, TxReceipt } from '../../services/hedera';
+import { AccountBalance, TxReceipt } from '../../types/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
