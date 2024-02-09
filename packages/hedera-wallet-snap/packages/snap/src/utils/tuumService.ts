@@ -20,7 +20,7 @@
 
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-import { SimpleHederaClient, SimpleTransfer } from '../services/hedera';
+import { SimpleHederaClient, SimpleTransfer } from '../types/hedera';
 
 export type QueryCost = {
   serviceFeeToPay: number;

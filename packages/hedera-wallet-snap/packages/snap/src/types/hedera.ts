@@ -31,8 +31,8 @@ import { Long } from '@hashgraph/sdk/lib/long';
 import { BigNumber } from 'bignumber.js';
 
 import { Wallet } from '../domain/wallet/abstract';
-import { AccountInfo } from '../types/account';
-import { ApproveAllowanceAssetDetail } from '../types/params';
+import { AccountInfo } from './account';
+import { ApproveAllowanceAssetDetail } from './params';
 
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';

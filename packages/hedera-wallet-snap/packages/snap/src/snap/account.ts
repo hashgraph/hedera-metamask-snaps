@@ -23,7 +23,7 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import { SimpleHederaClient } from '../services/hedera';
+import { SimpleHederaClient } from '../types/hedera';
 import { HederaServiceImpl, getHederaClient } from '../services/impl/hedera';
 import {
   Account,
