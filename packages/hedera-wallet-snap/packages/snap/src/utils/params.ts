@@ -196,9 +196,7 @@ export function isValidSignMessageRequest(
   // Check if message is valid
   if (
     'message' in parameter &&
-    (_.isNull(parameter.message) ||
-      typeof parameter.message !== 'string' ||
-      _.isEmpty(parameter.message))
+    (typeof parameter.message !== 'string' || _.isEmpty(parameter.message))
   ) {
     console.error(
       'Invalid signMessage Params passed. "message" is not a string or is empty',
@@ -222,8 +220,7 @@ export function isValidGetAccountInfoRequest(
   // Check if accountId is valid
   if (
     'accountId' in parameter &&
-    (_.isNull(parameter.accountId) ||
-      typeof parameter.accountId !== 'string' ||
+    (typeof parameter.accountId !== 'string' ||
       _.isEmpty(parameter.accountId) ||
       !AccountId.fromString(parameter.accountId))
   ) {
@@ -258,8 +255,7 @@ export function isValidGetTransactionsParams(
   // Check if accountId is valid
   if (
     'transactionId' in parameter &&
-    (_.isNull(parameter.transactionId) ||
-      typeof parameter.transactionId !== 'string' ||
+    (typeof parameter.transactionId !== 'string' ||
       _.isEmpty(parameter.transactionId))
   ) {
     console.error(
@@ -303,7 +299,7 @@ export function isValidAssociateTokensParams(
     );
   }
   parameter.tokenIds.forEach((tokenId: string) => {
-    if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+    if (_.isEmpty(tokenId)) {
       console.error(
         'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
       );
