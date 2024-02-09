@@ -46,7 +46,7 @@ import {
   SimpleHederaClient,
   Token,
   TokenBalance,
-} from '../../hedera';
+} from '../../../types/hedera';
 import { SimpleHederaClientImpl } from './client';
 
 export class HederaServiceImpl implements HederaService {
