@@ -136,7 +136,6 @@ function isValidServiceFee(params: unknown): asserts params is ServiceFee {
   // Check if serviceFee.percentageCut is valid
   if (
     _.isNull(parameter.percentageCut) ||
-    typeof parameter.percentageCut !== 'number' ||
     !Number.isFinite(parameter.percentageCut)
   ) {
     console.error(
@@ -147,11 +146,7 @@ function isValidServiceFee(params: unknown): asserts params is ServiceFee {
     );
   }
   // Check if serviceFee.toAddress is valid
-  if (
-    _.isNull(parameter.toAddress) ||
-    typeof parameter.toAddress !== 'string' ||
-    _.isEmpty(parameter.toAddress)
-  ) {
+  if (_.isEmpty(parameter.toAddress)) {
     console.error(
       'Invalid Params passed. "serviceFee.toAddress" must be a string and must not be empty',
     );
