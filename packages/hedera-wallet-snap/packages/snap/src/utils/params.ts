@@ -294,7 +294,7 @@ export function isValidAssociateTokensParams(
     );
   }
   parameter.tokenIds.forEach((tokenId: string) => {
-    if (_.isEmpty(tokenId)) {
+    if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
       console.error(
         'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
       );
