@@ -51,7 +51,7 @@ export async function getSnapState(): Promise<WalletSnapState> {
     params: { operation: 'get' },
   })) as WalletSnapState | null;
 
-  if (state === null || _.isEmpty(state)) {
+  if (_.isEmpty(state)) {
     throw Error('WalletSnapState is not initialized!');
   }
 

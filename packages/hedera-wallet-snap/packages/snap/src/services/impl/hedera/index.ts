@@ -310,18 +310,13 @@ async function testClientOperatorMatch(client: Client) {
     await tx.execute(client);
   } catch (error: any) {
     if (error instanceof StatusError) {
-      if (
+      // If the transaction fails with Insufficient Tx Fee, this means
+      // that the account ID verification succeeded before this point
+      // Same for Insufficient Payer Balance
+      return (
         error.status === Status.InsufficientTxFee ||
         error.status === Status.InsufficientPayerBalance
-      ) {
-        // If the transaction fails with Insufficient Tx Fee, this means
-        // that the account ID verification succeeded before this point
-        // Same for Insufficient Payer Balance
-
-        return true;
-      }
-
-      return false;
+      );
     }
 
     throw providerErrors.unauthorized(
@@ -372,7 +367,7 @@ export async function getHederaClient(
     accountId,
   });
 
-  if (client === null || _.isEmpty(client)) {
+  if (_.isEmpty(client)) {
     console.error('Invalid private key or account Id of the operator');
     return null;
   }

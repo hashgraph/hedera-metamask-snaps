@@ -136,7 +136,6 @@ function isValidServiceFee(params: unknown): asserts params is ServiceFee {
   // Check if serviceFee.percentageCut is valid
   if (
     _.isNull(parameter.percentageCut) ||
-    typeof parameter.percentageCut !== 'number' ||
     !Number.isFinite(parameter.percentageCut)
   ) {
     console.error(
@@ -147,11 +146,7 @@ function isValidServiceFee(params: unknown): asserts params is ServiceFee {
     );
   }
   // Check if serviceFee.toAddress is valid
-  if (
-    _.isNull(parameter.toAddress) ||
-    typeof parameter.toAddress !== 'string' ||
-    _.isEmpty(parameter.toAddress)
-  ) {
+  if (_.isEmpty(parameter.toAddress)) {
     console.error(
       'Invalid Params passed. "serviceFee.toAddress" must be a string and must not be empty',
     );
@@ -196,9 +191,7 @@ export function isValidSignMessageRequest(
   // Check if message is valid
   if (
     'message' in parameter &&
-    (_.isNull(parameter.message) ||
-      typeof parameter.message !== 'string' ||
-      _.isEmpty(parameter.message))
+    (typeof parameter.message !== 'string' || _.isEmpty(parameter.message))
   ) {
     console.error(
       'Invalid signMessage Params passed. "message" is not a string or is empty',
@@ -222,8 +215,7 @@ export function isValidGetAccountInfoRequest(
   // Check if accountId is valid
   if (
     'accountId' in parameter &&
-    (_.isNull(parameter.accountId) ||
-      typeof parameter.accountId !== 'string' ||
+    (typeof parameter.accountId !== 'string' ||
       _.isEmpty(parameter.accountId) ||
       !AccountId.fromString(parameter.accountId))
   ) {
@@ -258,8 +250,7 @@ export function isValidGetTransactionsParams(
   // Check if accountId is valid
   if (
     'transactionId' in parameter &&
-    (_.isNull(parameter.transactionId) ||
-      typeof parameter.transactionId !== 'string' ||
+    (typeof parameter.transactionId !== 'string' ||
       _.isEmpty(parameter.transactionId))
   ) {
     console.error(

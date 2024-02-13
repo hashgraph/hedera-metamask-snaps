@@ -74,7 +74,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   );
 
   let state = await getSnapStateUnchecked();
-  if (state === null || _.isEmpty(state)) {
+  if (_.isEmpty(state)) {
     state = await initSnapState();
   }
 
