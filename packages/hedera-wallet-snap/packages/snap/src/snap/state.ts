@@ -21,7 +21,7 @@
 import _ from 'lodash';
 import { Account } from '../types/account';
 import { WalletSnapState } from '../types/state';
-import { getEmptyAccountState, getInitialSnapState } from '../utils/config';
+import { StateUtils } from '../utils/ConfigUtils';
 
 /**
  * Function for updating WalletSnapState object in the MetaMask state.
@@ -80,7 +80,7 @@ export async function getSnapStateUnchecked(): Promise<WalletSnapState | null> {
  * @returns Object.
  */
 export async function initSnapState(): Promise<WalletSnapState> {
-  const state = getInitialSnapState();
+  const state:WalletSnapState = StateUtils.getInitialSnapState();
   await updateSnapState(state);
   return state;
 }
@@ -101,7 +101,7 @@ export async function initAccountState(
   if (_.isEmpty(state.accountState[evmAddress])) {
     state.accountState[evmAddress] = {};
   }
-  state.accountState[evmAddress][network] = getEmptyAccountState();
+  state.accountState[evmAddress][network] = StateUtils.getEmptyAccountState();
 
   await updateSnapState(state);
 }
