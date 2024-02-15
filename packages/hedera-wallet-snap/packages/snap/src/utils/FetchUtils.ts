@@ -40,27 +40,18 @@ export class FetchUtils {
     let data;
     let error;
 
-    try {
-      const response = await fetch(url);
+    const response = await fetch(url);
 
-      if (response.ok) {
-        data = await response.json();
-      } else {
-        error = `Network response was not ok. Status: ${response.status} ${response.statusText}`;
-      }
-
-      return {
-        success: response.ok,
-        data,
-        error,
-      };
-    } catch (err) {
-      console.error("Error fetching data:", err);
-      return {
-        success: false,
-        data: null,
-        error: "An error occurred while fetching data.",
-      };
+    if (response.ok) {
+      data = await response.json();
+    } else {
+      error = `Network response was not ok. Status: ${response.status} ${response.statusText}`;
     }
+
+    return {
+      success: response.ok,
+      data,
+      error,
+    };
   }
 }
