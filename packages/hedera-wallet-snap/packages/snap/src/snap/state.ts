@@ -80,7 +80,7 @@ export async function getSnapStateUnchecked(): Promise<WalletSnapState | null> {
  * @returns Object.
  */
 export async function initSnapState(): Promise<WalletSnapState> {
-  const state:WalletSnapState = StateUtils.getInitialSnapState();
+  const state = StateUtils.getInitialSnapState();
   await updateSnapState(state);
   return state;
 }
