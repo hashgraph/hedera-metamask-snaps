@@ -153,7 +153,9 @@ export class HederaServiceImpl implements HederaService {
         const secondUrl = `${this.mirrorNodeUrl}${
           response.data.links.next as string
         }`;
-        const secondResponse: FetchResponse = await FetchUtils.fetchDataFromUrl(secondUrl);
+        const secondResponse: FetchResponse = await FetchUtils.fetchDataFromUrl(
+          secondUrl,
+        );
         if (secondResponse.success) {
           for (const node of secondResponse.data.nodes) {
             result.push(node);
