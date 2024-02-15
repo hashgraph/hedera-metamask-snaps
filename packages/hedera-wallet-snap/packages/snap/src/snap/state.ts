@@ -21,7 +21,7 @@
 import _ from 'lodash';
 import { Account } from '../types/account';
 import { WalletSnapState } from '../types/state';
-import { StateUtils } from '../utils/ConfigUtils';
+import { StateUtils } from '../utils/StateUtils';
 
 /**
  * Function for updating WalletSnapState object in the MetaMask state.
