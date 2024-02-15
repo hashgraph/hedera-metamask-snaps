@@ -34,7 +34,7 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
 import { AccountInfo } from '../../../types/account';
-import { FetchResponse, fetchDataFromUrl } from '../../../utils/fetch';
+import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
 import { timestampToString } from '../../../utils/helper';
 import {
   AccountBalance,
@@ -139,7 +139,7 @@ export class HederaServiceImpl implements HederaService {
       url = `${url}?node.id=${nodeId as number}`;
     }
 
-    const response: FetchResponse = await fetchDataFromUrl(url);
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (!response.success) {
       return result;
     }
@@ -153,7 +153,7 @@ export class HederaServiceImpl implements HederaService {
         const secondUrl = `${this.mirrorNodeUrl}${
           response.data.links.next as string
         }`;
-        const secondResponse: FetchResponse = await fetchDataFromUrl(secondUrl);
+        const secondResponse: FetchResponse = await FetchUtils.fetchDataFromUrl(secondUrl);
         if (secondResponse.success) {
           for (const node of secondResponse.data.nodes) {
             result.push(node);
@@ -172,7 +172,7 @@ export class HederaServiceImpl implements HederaService {
   ): Promise<AccountInfo> {
     const result = {} as AccountInfo;
     const url = `${this.mirrorNodeUrl}/api/v1/accounts/${idOrAliasOrEvmAddress}`;
-    const response: FetchResponse = await fetchDataFromUrl(url);
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (!response.success) {
       return result;
     }
@@ -249,7 +249,7 @@ export class HederaServiceImpl implements HederaService {
   async getTokenById(tokenId: string): Promise<MirrorTokenInfo> {
     let result = {} as MirrorTokenInfo;
     const url = `${this.mirrorNodeUrl}/api/v1/tokens/${tokenId}`;
-    const response: FetchResponse = await fetchDataFromUrl(url);
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (response.success) {
       result = response.data;
     }
@@ -268,7 +268,7 @@ export class HederaServiceImpl implements HederaService {
       url = `${url}${transactionId}`;
     }
 
-    const response: FetchResponse = await fetchDataFromUrl(url);
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (!response.success) {
       return result;
     }
