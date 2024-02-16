@@ -35,7 +35,7 @@ import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
 import { AccountInfo } from '../../../types/account';
 import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
-import { timestampToString } from '../../../utils/helper';
+import { Utils } from '../../../utils/Utils';
 import {
   AccountBalance,
   HederaService,
@@ -184,8 +184,10 @@ export class HederaServiceImpl implements HederaService {
     try {
       result.accountId = mirrorNodeData.account;
       result.alias = mirrorNodeData.alias;
-      result.createdTime = timestampToString(mirrorNodeData.created_timestamp);
-      result.expirationTime = timestampToString(
+      result.createdTime = Utils.timestampToString(
+        mirrorNodeData.created_timestamp,
+      );
+      result.expirationTime = Utils.timestampToString(
         mirrorNodeData.expiry_timestamp,
       );
       result.memo = mirrorNodeData.memo;
@@ -199,7 +201,9 @@ export class HederaServiceImpl implements HederaService {
       result.isDeleted = mirrorNodeData.deleted;
       result.stakingInfo = {
         declineStakingReward: mirrorNodeData.decline_reward,
-        stakePeriodStart: timestampToString(mirrorNodeData.stake_period_start),
+        stakePeriodStart: Utils.timestampToString(
+          mirrorNodeData.stake_period_start,
+        ),
         pendingReward: String(mirrorNodeData.pending_reward),
         stakedToMe: '0', // TODO
         stakedAccountId: mirrorNodeData.staked_account_id ?? '',
@@ -238,7 +242,7 @@ export class HederaServiceImpl implements HederaService {
 
       result.balance = {
         hbars,
-        timestamp: timestampToString(mirrorNodeData.balance.timestamp),
+        timestamp: Utils.timestampToString(mirrorNodeData.balance.timestamp),
         tokens,
       } as AccountBalance;
     } catch (error: any) {
@@ -279,13 +283,13 @@ export class HederaServiceImpl implements HederaService {
       result = response.data.transactions as MirrorTransactionInfo[];
 
       result.forEach((transaction) => {
-        transaction.consensus_timestamp = timestampToString(
+        transaction.consensus_timestamp = Utils.timestampToString(
           transaction.consensus_timestamp,
         );
-        transaction.parent_consensus_timestamp = timestampToString(
+        transaction.parent_consensus_timestamp = Utils.timestampToString(
           transaction.parent_consensus_timestamp,
         );
-        transaction.valid_start_timestamp = timestampToString(
+        transaction.valid_start_timestamp = Utils.timestampToString(
           transaction.valid_start_timestamp,
         );
       });

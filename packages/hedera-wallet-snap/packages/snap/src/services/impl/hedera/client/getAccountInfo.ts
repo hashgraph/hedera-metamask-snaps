@@ -30,7 +30,7 @@ import {
   StakingInfoJson,
 } from '@hashgraph/sdk/lib/account/AccountInfo';
 import { AccountInfo } from '../../../../types/account';
-import { timestampToString } from '../../../../utils/helper';
+import { Utils } from '../../../../utils/Utils';
 
 /**
  * Retrieve the account info.
@@ -55,7 +55,7 @@ export async function getAccountInfo(
     stakingInfo.declineStakingReward =
       accountInfoJson.stakingInfo.declineStakingReward;
 
-    stakingInfo.stakePeriodStart = timestampToString(
+    stakingInfo.stakePeriodStart = Utils.timestampToString(
       accountInfoJson.stakingInfo.stakePeriodStart,
     );
 
@@ -77,7 +77,7 @@ export async function getAccountInfo(
   return {
     accountId: accountInfoJson.accountId,
     alias: accountInfoJson.aliasKey ?? '',
-    expirationTime: timestampToString(accountInfoJson.expirationTime),
+    expirationTime: Utils.timestampToString(accountInfoJson.expirationTime),
     memo: accountInfoJson.accountMemo,
     evmAddress: accountInfoJson.contractAccountId
       ? `0x${accountInfoJson.contractAccountId}`
@@ -89,7 +89,7 @@ export async function getAccountInfo(
     },
     balance: {
       hbars: hbarBalance,
-      timestamp: timestampToString(new Date()),
+      timestamp: Utils.timestampToString(new Date()),
     },
     autoRenewPeriod: accountInfo.autoRenewPeriod.seconds.toString(),
     ethereumNonce: accountInfoJson.ethereumNonce ?? '',
