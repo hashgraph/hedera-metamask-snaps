@@ -28,7 +28,7 @@ import {
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { uint8ArrayToHex } from '../../../../utils/crypto';
-import { timestampToString } from '../../../../utils/helper';
+import { Utils } from '../../../../utils/Utils';
 import { SimpleTransfer, TxReceipt } from '../../../../types/hedera';
 
 /**
@@ -160,7 +160,9 @@ export async function transferCrypto(
   if (receipt.exchangeRate) {
     newExchangeRate = {
       ...receipt.exchangeRate,
-      expirationTime: timestampToString(receipt.exchangeRate.expirationTime),
+      expirationTime: Utils.timestampToString(
+        receipt.exchangeRate.expirationTime,
+      ),
     };
   }
 
