@@ -26,7 +26,7 @@ import {
 } from '@hashgraph/sdk';
 
 import { uint8ArrayToHex } from '../../../../utils/crypto';
-import { timestampToString } from '../../../../utils/helper';
+import { Utils } from '../../../../utils/Utils';
 import { TxReceipt } from '../../../../types/hedera';
 
 /**
@@ -84,7 +84,9 @@ export async function deleteAllowance(
   if (receipt.exchangeRate) {
     newExchangeRate = {
       ...receipt.exchangeRate,
-      expirationTime: timestampToString(receipt.exchangeRate.expirationTime),
+      expirationTime: Utils.timestampToString(
+        receipt.exchangeRate.expirationTime,
+      ),
     };
   }
 
