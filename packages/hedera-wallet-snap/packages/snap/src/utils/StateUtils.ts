@@ -17,6 +17,7 @@
  * limitations under the License.
  *
  */
+import cloneDeep from 'lodash.clonedeep';
 
 import { Account, AccountInfo } from '../types/account';
 import { KeyStore, WalletAccountState, WalletSnapState } from '../types/state';
@@ -34,7 +35,7 @@ export class StateUtils {
   } as WalletAccountState;
 
   public static getEmptyAccountState(): WalletAccountState {
-    return structuredClone(this.#emptyAccountState);
+    return cloneDeep(this.#emptyAccountState);
   }
 
   static readonly #initialSnapState: WalletSnapState = {
@@ -52,6 +53,6 @@ export class StateUtils {
   };
 
   public static getInitialSnapState(): WalletSnapState {
-    return structuredClone(this.#initialSnapState);
+    return cloneDeep(this.#initialSnapState);
   }
 }
