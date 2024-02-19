@@ -29,10 +29,7 @@ import { updateSnapState } from '../../snap/state';
 import { AccountInfo } from '../../types/account';
 import { GetAccountInfoRequestParams, ServiceFee } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import {
-  calculateHederaQueryFees,
-  deductServiceFee,
-} from '../../utils/tuumService';
+import { TuumUtils } from '../../utils/TuumUtils';
 
 /**
  * Hedera Ledger Node:
@@ -97,7 +94,7 @@ export async function getAccountInfo(
       const queryCost = (
         await query.getCost(hederaClient.getClient())
       ).toBigNumber();
-      const { serviceFeeToPay, maxCost } = calculateHederaQueryFees(
+      const { serviceFeeToPay, maxCost } = TuumUtils.calculateHederaQueryFees(
         queryCost,
         serviceFee.percentageCut,
       );
@@ -162,7 +159,7 @@ export async function getAccountInfo(
 
       // Deduct service Fee if set
       if (serviceFee.percentageCut > 0) {
-        await deductServiceFee(
+        await TuumUtils.deductServiceFee(
           serviceFeeToPay,
           serviceFee.toAddress,
           hederaClient,
