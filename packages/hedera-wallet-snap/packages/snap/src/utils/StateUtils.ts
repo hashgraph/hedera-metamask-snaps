@@ -17,6 +17,7 @@
  * limitations under the License.
  *
  */
+
 import cloneDeep from 'lodash.clonedeep';
 
 import { Account, AccountInfo } from '../types/account';
