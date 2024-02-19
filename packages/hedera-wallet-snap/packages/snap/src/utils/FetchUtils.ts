@@ -23,28 +23,35 @@ export type FetchResponse = {
   data: any;
   error: string | undefined;
 };
+
 /**
- * Retrieve results using hedera mirror node.
- *
- * @param url - The URL to use to query.
+ * Provides utilities for interacting with Hedera Wallet Snap functionalities.
  */
-export async function fetchDataFromUrl(
-  url: RequestInfo | URL,
-): Promise<FetchResponse> {
-  let data;
-  let error;
+export class FetchUtils {
+  /**
+   * Retrieve results using hedera mirror node.
+   *
+   * @param url - The URL to use to query.
+   * @returns A promise that resolves to the fetch response.
+   */
+  public static async fetchDataFromUrl(
+    url: RequestInfo | URL,
+  ): Promise<FetchResponse> {
+    let data;
+    let error;
 
-  const response = await fetch(url);
+    const response = await fetch(url);
 
-  if (response.ok) {
-    data = await response.json();
-  } else {
-    error = `Network response was not ok. Status: ${response.status} ${response.statusText}`;
+    if (response.ok) {
+      data = await response.json();
+    } else {
+      error = `Network response was not ok. Status: ${response.status} ${response.statusText}`;
+    }
+
+    return {
+      success: response.ok,
+      data,
+      error,
+    };
   }
-
-  return {
-    success: response.ok,
-    data,
-    error,
-  } as FetchResponse;
 }
