@@ -28,8 +28,7 @@ import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
 import { SignMessageRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { stringToUint8Array, uint8ArrayToHex } from '../../utils/crypto';
-
+import { CryptoUtils } from '../../utils/CryptoUtils';
 /**
  * Sign an arbitary message.
  *
@@ -76,7 +75,9 @@ export async function signMessage(
       const wallet: HederaWallet = new PrivateKeySoftwareWallet(privateKey);
       const signer = await wallet.getTransactionSigner(0);
 
-      signature = uint8ArrayToHex(await signer(stringToUint8Array(message)));
+      signature = CryptoUtils.uint8ArrayToHex(
+        await signer(CryptoUtils.stringToUint8Array(message)),
+      );
     }
     if (!signature.startsWith('0x')) {
       signature = `0x${signature}`;

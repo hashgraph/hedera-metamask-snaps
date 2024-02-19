@@ -28,10 +28,7 @@ import {
   type Client,
 } from '@hashgraph/sdk';
 
-import {
-  isValidEthereumPublicKey,
-  uint8ArrayToHex,
-} from '../../../../utils/crypto';
+import { CryptoUtils } from '../../../../utils/CryptoUtils';
 import {
   AccountBalance,
   SimpleTransfer,
@@ -73,7 +70,7 @@ export async function createAccount(
   let outgoingHbarAmount = 0;
   for (const transfer of options.transfers) {
     if (transfer.assetType === 'HBAR') {
-      if (isValidEthereumPublicKey(transfer.to)) {
+      if (CryptoUtils.isValidEthereumPublicKey(transfer.to)) {
         const tx = new AccountCreateTransaction()
           .setInitialBalance(Hbar.fromTinybars(transfer.amount))
           .setKey(PublicKey.fromString(transfer.to));
@@ -153,7 +150,7 @@ export async function createAccount(
     topicSequenceNumber: receipt.topicSequenceNumber
       ? String(receipt.topicSequenceNumber)
       : '',
-    topicRunningHash: uint8ArrayToHex(receipt.topicRunningHash),
+    topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
     totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
     scheduledTransactionId: receipt.scheduledTransactionId
       ? receipt.scheduledTransactionId.toString()

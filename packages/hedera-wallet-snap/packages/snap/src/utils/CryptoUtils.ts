@@ -28,7 +28,9 @@ export class CryptoUtils {
    * @param evmAddress - The EVM address used as salt for entropy.
    * @returns A promise that resolves to an HDNodeWallet.
    */
-  public static async generateWallet(evmAddress: string): Promise<HDNodeWallet> {
+  public static async generateWallet(
+    evmAddress: string,
+  ): Promise<HDNodeWallet> {
     const entropy = await snap.request({
       method: 'snap_getEntropy',
       params: {

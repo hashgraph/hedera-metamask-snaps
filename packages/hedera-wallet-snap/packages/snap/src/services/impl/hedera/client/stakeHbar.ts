@@ -21,7 +21,7 @@
 import { AccountUpdateTransaction, type Client } from '@hashgraph/sdk';
 
 import _ from 'lodash';
-import { uint8ArrayToHex } from '../../../../utils/crypto';
+import { CryptoUtils } from '../../../../utils/CryptoUtils';
 import { timestampToString } from '../../../../utils/helper';
 import { TxReceipt } from '../../../../types/hedera';
 
@@ -85,7 +85,7 @@ export async function stakeHbar(
     topicSequenceNumber: receipt.topicSequenceNumber
       ? String(receipt.topicSequenceNumber)
       : '',
-    topicRunningHash: uint8ArrayToHex(receipt.topicRunningHash),
+    topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
     totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
     scheduledTransactionId: receipt.scheduledTransactionId
       ? receipt.scheduledTransactionId.toString()

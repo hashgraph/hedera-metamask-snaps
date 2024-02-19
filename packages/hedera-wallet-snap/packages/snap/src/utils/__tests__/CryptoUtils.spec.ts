@@ -2,37 +2,10 @@ import { CryptoUtils } from '../CryptoUtils';
 import { ethers } from 'ethers';
 import { mocked } from 'jest-mock';
 
-// Mocking external dependencies
 jest.mock('ethers');
 const mockedIsHexString = mocked(ethers.isHexString);
 
 describe('CryptoUtils', () => {
-
-  /*describe('generateWallet', () => {
-    it('should generate a wallet from an EVM address', async () => {
-      const mockEntropy = 'someEntropy';
-      const mockWallet = {}; // Simplified mock wallet object
-
-      snap.request.mockResolvedValue(mockEntropy);
-      HDNodeWallet.fromMnemonic = jest.fn().mockReturnValue({
-        derivePath: jest.fn().mockReturnValue(mockWallet),
-      });
-
-      const evmAddress = '0x123';
-      const wallet = await CryptoUtils.generateWallet(evmAddress);
-
-      expect(snap.request).toHaveBeenCalledWith({
-        method: 'snap_getEntropy',
-        params: {
-          version: 1,
-          salt: evmAddress,
-        },
-      });
-      expect(wallet).toEqual(mockWallet);
-    });
-  });
-*/
-
   describe('isValidEthereumPublicKey', () => {
     beforeEach(() => {
       mockedIsHexString.mockClear();
