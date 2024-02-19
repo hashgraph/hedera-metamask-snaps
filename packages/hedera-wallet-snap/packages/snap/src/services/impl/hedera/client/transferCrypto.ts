@@ -27,7 +27,7 @@ import {
 
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import { uint8ArrayToHex } from '../../../../utils/crypto';
+import { CryptoUtils } from '../../../../utils/CryptoUtils';
 import { Utils } from '../../../../utils/Utils';
 import { SimpleTransfer, TxReceipt } from '../../../../types/hedera';
 
@@ -178,7 +178,7 @@ export async function transferCrypto(
     topicSequenceNumber: receipt.topicSequenceNumber
       ? String(receipt.topicSequenceNumber)
       : '',
-    topicRunningHash: uint8ArrayToHex(receipt.topicRunningHash),
+    topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
     totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
     scheduledTransactionId: receipt.scheduledTransactionId
       ? receipt.scheduledTransactionId.toString()

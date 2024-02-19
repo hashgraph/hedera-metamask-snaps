@@ -33,7 +33,7 @@ import {
 } from '../types/account';
 import { hederaNetworks } from '../types/constants';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
-import { generateWallet } from '../utils/crypto';
+import { CryptoUtils } from '../utils/CryptoUtils';
 import { generateCommonPanel, snapDialog } from './dialog';
 import { validHederaNetwork } from './network';
 import {
@@ -148,7 +148,7 @@ export async function setCurrentAccount(
       // Handle metamask connected account
       connectedAddress = await getCurrentMetamaskAccount();
       // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
-      const res = await generateWallet(connectedAddress);
+      const res = await CryptoUtils.generateWallet(connectedAddress);
       if (!res) {
         console.log('Failed to generate snap wallet for DID operations');
         throw providerErrors.unsupportedMethod(
