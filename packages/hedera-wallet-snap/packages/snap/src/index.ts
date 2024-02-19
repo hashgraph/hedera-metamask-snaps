@@ -37,19 +37,7 @@ import { stakeHbar } from './rpc/account/stakeHbar';
 import { associateTokens } from './rpc/hts/associateTokens';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
-import {
-  getMirrorNodeFlagIfExists,
-  isExternalAccountFlagSet,
-  isValidApproveAllowanceParams,
-  isValidAssociateTokensParams,
-  isValidDeleteAccountParams,
-  isValidDeleteAllowanceParams,
-  isValidGetAccountInfoRequest,
-  isValidGetTransactionsParams,
-  isValidSignMessageRequest,
-  isValidStakeHbarParams,
-  isValidTransferCryptoParams,
-} from './utils/params';
+import { HederaUtils } from './utils/HederaUtils';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -79,11 +67,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   let isExternalAccount = false;
-  if (isExternalAccountFlagSet(request.params)) {
+  if (HederaUtils.isExternalAccountFlagSet(request.params)) {
     isExternalAccount = true;
   }
 
-  const mirrorNodeUrl = getMirrorNodeFlagIfExists(request.params);
+  const mirrorNodeUrl = HederaUtils.getMirrorNodeFlagIfExists(request.params);
 
   await setCurrentAccount(
     origin,
@@ -124,14 +112,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         currentAccount: state.currentAccount,
       };
     case 'signMessage': {
-      isValidSignMessageRequest(request.params);
+      HederaUtils.isValidSignMessageRequest(request.params);
       return {
         currentAccount: state.currentAccount,
         signature: await signMessage(walletSnapParams, request.params),
       };
     }
     case 'getAccountInfo': {
-      isValidGetAccountInfoRequest(request.params);
+      HederaUtils.isValidGetAccountInfoRequest(request.params);
       return {
         currentAccount: state.currentAccount,
         accountInfo: await getAccountInfo(walletSnapParams, request.params),
@@ -144,49 +132,49 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
     case 'getTransactions': {
-      isValidGetTransactionsParams(request.params);
+      HederaUtils.isValidGetTransactionsParams(request.params);
       return {
         currentAccount: state.currentAccount,
         transactions: await getTransactions(walletSnapParams, request.params),
       };
     }
     case 'associateTokens': {
-      isValidAssociateTokensParams(request.params);
+      HederaUtils.isValidAssociateTokensParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await associateTokens(walletSnapParams, request.params),
       };
     }
     case 'transferCrypto': {
-      isValidTransferCryptoParams(request.params);
+      HederaUtils.isValidTransferCryptoParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await transferCrypto(walletSnapParams, request.params),
       };
     }
     case 'stakeHbar': {
-      isValidStakeHbarParams(request.params);
+      HederaUtils.isValidStakeHbarParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await stakeHbar(walletSnapParams, request.params),
       };
     }
     case 'approveAllowance': {
-      isValidApproveAllowanceParams(request.params);
+      HederaUtils.isValidApproveAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await approveAllowance(walletSnapParams, request.params),
       };
     }
     case 'deleteAllowance': {
-      isValidDeleteAllowanceParams(request.params);
+      HederaUtils.isValidDeleteAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await deleteAllowance(walletSnapParams, request.params),
       };
     }
     case 'deleteAccount': {
-      isValidDeleteAccountParams(request.params);
+      HederaUtils.isValidDeleteAccountParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await deleteAccount(walletSnapParams, request.params),

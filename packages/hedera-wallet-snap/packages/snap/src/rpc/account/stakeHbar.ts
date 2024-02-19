@@ -29,7 +29,7 @@ import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
 import { StakeHbarRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { timestampToString } from '../../utils/helper';
+import { Utils } from '../../utils/Utils';
 
 /**
  * Stake Hbar to either a nodeid or accountId.
@@ -112,14 +112,14 @@ export async function stakeHbar(
         panelToShow.push(text(`Total Stake: ${totalStake.toString()}`));
         panelToShow.push(
           text(
-            `Staking Start: ${timestampToString(
+            `Staking Start: ${Utils.timestampToString(
               stakingInfo[0].staking_period.from,
             )}`,
           ),
         );
         panelToShow.push(
           text(
-            `Staking End: ${timestampToString(
+            `Staking End: ${Utils.timestampToString(
               stakingInfo[0].staking_period.to,
             )}`,
           ),
