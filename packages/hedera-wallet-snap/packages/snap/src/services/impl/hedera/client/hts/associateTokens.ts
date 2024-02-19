@@ -25,7 +25,7 @@ import {
 } from '@hashgraph/sdk';
 
 import { CryptoUtils } from '../../../../../utils/CryptoUtils';
-import { timestampToString } from '../../../../../utils/helper';
+import { Utils } from '../../../../../utils/Utils';
 import { TxReceipt } from '../../../../../types/hedera';
 
 /**
@@ -54,7 +54,9 @@ export async function associateTokens(
   if (receipt.exchangeRate) {
     newExchangeRate = {
       ...receipt.exchangeRate,
-      expirationTime: timestampToString(receipt.exchangeRate.expirationTime),
+      expirationTime: Utils.timestampToString(
+        receipt.exchangeRate.expirationTime,
+      ),
     };
   }
 

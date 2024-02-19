@@ -5,6 +5,10 @@ module.exports = {
     sourceType: 'module',
   },
 
+  "rules": {
+    "linebreak-style": "off"
+  },
+
   extends: ['@metamask/eslint-config'],
 
   overrides: [
