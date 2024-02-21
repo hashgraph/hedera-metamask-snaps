@@ -1,0 +1,26 @@
+name: Lint Snap Code
+
+on: [push, pull_request]
+
+jobs:
+  eslint:
+    name: Run ESLint For Snap
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Check out source code
+
+      - uses: actions/setup-node@v2
+        name: Set up Node.js
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install Dependencies in Subdirectory
+        run: yarn install
+        working-directory: ./packages/hedera-wallet-snap/packages/snap
+
+      - name: Run ESLint in Subdirectory
+        run: yarn eslint . --cache --ext .js,.ts
+        working-directory: ./packages/hedera-wallet-snap/packages/snap
