@@ -23,5 +23,5 @@ jobs:
         working-directory: ./packages/hedera-wallet-snap/packages/snap
 
       - name: Run ESLint in Subdirectory
-        run: yarn eslint . --cache --ext .js,.ts
+        run: yarn lint
         working-directory: ./packages/hedera-wallet-snap/packages/snap
