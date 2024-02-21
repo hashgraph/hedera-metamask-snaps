@@ -138,13 +138,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         transactions: await getTransactions(walletSnapParams, request.params),
       };
     }
-    case 'associateTokens': {
-      HederaUtils.isValidAssociateTokensParams(request.params);
-      return {
-        currentAccount: state.currentAccount,
-        receipt: await associateTokens(walletSnapParams, request.params),
-      };
-    }
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
@@ -178,6 +171,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await deleteAccount(walletSnapParams, request.params),
+      };
+    }
+    case 'hts/associateTokens': {
+      HederaUtils.isValidAssociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await associateTokens(walletSnapParams, request.params),
+      };
+    }
+    case 'hts/createToken': {
+      HederaUtils.isValidCreateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await createToken(walletSnapParams, request.params),
       };
     }
     default:

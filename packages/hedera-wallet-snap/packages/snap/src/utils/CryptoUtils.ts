@@ -18,6 +18,7 @@
  *
  */
 
+import { PublicKey } from '@hashgraph/sdk';
 import { HDNodeWallet, Mnemonic, ethers } from 'ethers';
 import { DEFAULTCOINTYPE } from '../types/constants';
 
@@ -64,6 +65,21 @@ export class CryptoUtils {
       (publicKey.length === 68 || publicKey.length === 130) &&
       ethers.isHexString(publicKey)
     );
+  }
+
+  /**
+   * Checks whether the provided key is a valid Hedera public key.
+   *
+   * @param key - The public key to check.
+   * @returns True if the key is valid, false otherwise.
+   */
+  public static isValidHederaPublicKey(key: string): boolean {
+    try {
+      PublicKey.fromString(key);
+    } catch (error: any) {
+      return false;
+    }
+    return true;
   }
 
   /**

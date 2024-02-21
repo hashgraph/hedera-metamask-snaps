@@ -238,7 +238,7 @@ export const associateTokens = async (
     params: {
       snapId: defaultSnapOrigin,
       request: {
-        method: 'associateTokens',
+        method: 'hts/associateTokens',
         params: {
           network,
           mirrorNodeUrl,

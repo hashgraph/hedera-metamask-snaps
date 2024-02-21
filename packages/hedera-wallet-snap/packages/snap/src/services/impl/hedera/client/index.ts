@@ -19,6 +19,10 @@
  */
 
 import {
+  CustomFee,
+  Key,
+  Timestamp,
+  TokenSupplyType,
   type AccountId,
   type Client,
   type PrivateKey,
@@ -26,18 +30,19 @@ import {
 } from '@hashgraph/sdk';
 
 import { AccountInfo } from '../../../../types/account';
-import { ApproveAllowanceAssetDetail } from '../../../../types/params';
 import {
   SimpleHederaClient,
   SimpleTransfer,
   TxReceipt,
 } from '../../../../types/hedera';
+import { ApproveAllowanceAssetDetail } from '../../../../types/params';
 import { approveAllowance } from './approveAllowance';
 import { deleteAccount } from './deleteAccount';
 import { deleteAllowance } from './deleteAllowance';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
 import { associateTokens } from './hts/associateTokens';
+import { createToken } from './hts/createToken';
 import { stakeHbar } from './stakeHbar';
 import { transferCrypto } from './transferCrypto';
 
@@ -83,10 +88,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return getAccountBalance(this._client);
   }
 
-  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
-    return associateTokens(this._client, options);
-  }
-
   async transferCrypto(options: {
     transfers: SimpleTransfer[];
     memo: string | null;
@@ -126,5 +127,31 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     transferAccountId: string;
   }): Promise<TxReceipt> {
     return deleteAccount(this._client, options);
+  }
+
+  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
+    return associateTokens(this._client, options);
+  }
+
+  async createToken(options: {
+    name: string;
+    symbol: string;
+    decimals: number;
+    initialSupply: number;
+    kycPublicKey: Key;
+    freezePublicKey: Key;
+    pausePublicKey: Key;
+    wipePublicKey: Key;
+    supplyPublicKey: Key;
+    feeSchedulePublicKey: Key;
+    freezeDefault: boolean;
+    expirationTime: Timestamp | Date;
+    autoRenewAccountId: string;
+    tokenMemo: string;
+    customFees: CustomFee[];
+    supplyType: TokenSupplyType;
+    maxSupply: number;
+  }): Promise<TxReceipt> {
+    return createToken(this._client, this._privateKey as PrivateKey, options);
   }
 }
