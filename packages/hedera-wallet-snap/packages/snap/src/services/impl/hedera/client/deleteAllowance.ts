@@ -25,7 +25,6 @@ import {
   type Client,
 } from '@hashgraph/sdk';
 
-
 import { CryptoUtils } from '../../../../utils/CryptoUtils';
 import { Utils } from '../../../../utils/Utils';
 import { TxReceipt } from '../../../../types/hedera';

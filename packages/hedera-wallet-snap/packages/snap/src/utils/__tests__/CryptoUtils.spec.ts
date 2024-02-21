@@ -12,7 +12,8 @@ describe('CryptoUtils', () => {
     });
 
     it('should validate an Ethereum public key', () => {
-      const publicKey = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+      const publicKey =
+        '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
       mockedIsHexString.mockReturnValue(true);
 
       const result = CryptoUtils.isValidEthereumPublicKey(publicKey);
@@ -62,7 +63,9 @@ describe('CryptoUtils', () => {
 
     it('should throw an error for invalid hex strings', () => {
       const hexString = 'abc';
-      expect(() => CryptoUtils.hexToUInt8Array(hexString)).toThrow('Invalid hex string');
+      expect(() => CryptoUtils.hexToUInt8Array(hexString)).toThrow(
+        'Invalid hex string',
+      );
     });
   });
 });

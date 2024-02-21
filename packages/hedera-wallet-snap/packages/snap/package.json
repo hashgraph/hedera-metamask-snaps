@@ -58,6 +58,7 @@
     "@metamask/snaps-ui": "^1.0.1",
     "bignumber.js": "^9.1.1",
     "ethers": "^6.3.0",
+    "jest-mock": "^29.7.0",
     "lodash": "^4.17.21",
     "normalize-url": "^8.0.0"
   },
