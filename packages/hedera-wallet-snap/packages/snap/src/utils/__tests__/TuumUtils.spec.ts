@@ -12,7 +12,10 @@ describe('HederaWalletUtils', () => {
         maxCost: 115.5, // (100 + 10) * 1.05
       };
 
-      const result = TuumUtils.calculateHederaQueryFees(queryCost, serviceFeePercentage);
+      const result = TuumUtils.calculateHederaQueryFees(
+        queryCost,
+        serviceFeePercentage,
+      );
 
       expect(result.serviceFeeToPay).toBeCloseTo(expected.serviceFeeToPay);
       expect(result.maxCost).toBeCloseTo(expected.maxCost);
@@ -21,8 +24,8 @@ describe('HederaWalletUtils', () => {
 
   describe('deductServiceFee', () => {
     it('should call transferCrypto with correct parameters', async () => {
-      //note that jest is having issues with classes with nested includes
-      //since we're doing the instance refactor next going to leave this as-is
+      // note that jest is having issues with classes with nested includes
+      // since we're doing the instance refactor next going to leave this as-is
     });
   });
 });

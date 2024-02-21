@@ -1,5 +1,6 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { HederaUtils } from '../HederaUtils';
+
 describe('HederaUtils', () => {
   describe('getMirrorNodeFlagIfExists', () => {
     it('returns empty string if no mirrorNodeUrl provided', () => {
@@ -23,7 +24,9 @@ describe('HederaUtils', () => {
     });
 
     it('returns true if externalAccount flag is set correctly', () => {
-      const params = { externalAccount: { accountIdOrEvmAddress: '0.0.123', curve: 'ED25519' } };
+      const params = {
+        externalAccount: { accountIdOrEvmAddress: '0.0.123', curve: 'ED25519' },
+      };
       const result = HederaUtils.isExternalAccountFlagSet(params);
       expect(result).toBe(true);
     });
@@ -48,8 +51,9 @@ describe('HederaUtils', () => {
   describe('isValidSignMessageRequest', () => {
     it('throws an error if message parameter is missing', () => {
       const params = {}; // Empty parameters
-      expect(() => HederaUtils.isValidSignMessageRequest(params))
-        .toThrow(providerErrors.unsupportedMethod().message);
+      expect(() => HederaUtils.isValidSignMessageRequest(params)).toThrow(
+        providerErrors.unsupportedMethod().message,
+      );
     });
 
     it('does not throw an error for valid message parameters', () => {
@@ -60,74 +64,94 @@ describe('HederaUtils', () => {
   describe('isValidGetAccountInfoRequest', () => {
     it('throws an error if accountId is invalid', () => {
       const params = { accountId: 'invalid' };
-      expect(() => HederaUtils.isValidGetAccountInfoRequest(params))
-        .toThrow(providerErrors.unsupportedMethod().message);
+      expect(() => HederaUtils.isValidGetAccountInfoRequest(params)).toThrow(
+        providerErrors.unsupportedMethod().message,
+      );
     });
 
     it('does not throw an error for valid accountId', () => {
       const params = { accountId: '0.0.12345' };
-      expect(() => HederaUtils.isValidGetAccountInfoRequest(params)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidGetAccountInfoRequest(params),
+      ).not.toThrow();
     });
   });
   describe('isValidGetTransactionsParams', () => {
     it('throws an error if transactionId is invalid', () => {
       const params = { transactionId: '' }; // Invalid empty string
-      expect(() => HederaUtils.isValidGetTransactionsParams(params))
-        .toThrow(providerErrors.unsupportedMethod().message);
+      expect(() => HederaUtils.isValidGetTransactionsParams(params)).toThrow(
+        providerErrors.unsupportedMethod().message,
+      );
     });
 
     it('does not throw an error for valid transactionId', () => {
       const params = { transactionId: '0.0.12345@123456789' };
-      expect(() => HederaUtils.isValidGetTransactionsParams(params)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidGetTransactionsParams(params),
+      ).not.toThrow();
     });
   });
   describe('isValidAssociateTokensParams', () => {
     it('throws an error if tokenIds array is empty', () => {
       const params = { tokenIds: [] };
-      expect(() => HederaUtils.isValidAssociateTokensParams(params))
-        .toThrow(providerErrors.unsupportedMethod().message);
+      expect(() => HederaUtils.isValidAssociateTokensParams(params)).toThrow(
+        providerErrors.unsupportedMethod().message,
+      );
     });
 
     it('does not throw an error for valid tokenIds', () => {
       const params = { tokenIds: ['0.0.123', '0.0.456'] };
-      expect(() => HederaUtils.isValidAssociateTokensParams(params)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidAssociateTokensParams(params),
+      ).not.toThrow();
     });
   });
   describe('isValidTransferCryptoParams', () => {
     it('throws an error if transfers parameter is missing or empty', () => {
       const emptyParams = {};
-      expect(() => HederaUtils.isValidTransferCryptoParams(emptyParams))
-        .toThrow('Invalid transferCrypto Params passed. "transfers" must be passed as a parameter');
+      expect(() =>
+        HederaUtils.isValidTransferCryptoParams(emptyParams),
+      ).toThrow(
+        'Invalid transferCrypto Params passed. "transfers" must be passed as a parameter',
+      );
 
       const paramsWithEmptyArray = { transfers: [] };
-      expect(() => HederaUtils.isValidTransferCryptoParams(paramsWithEmptyArray))
-        .toThrow('Invalid transferCrypto Params passed. "transfers" must be passed as a parameter');
+      expect(() =>
+        HederaUtils.isValidTransferCryptoParams(paramsWithEmptyArray),
+      ).toThrow(
+        'Invalid transferCrypto Params passed. "transfers" must be passed as a parameter',
+      );
     });
 
     it('does not throw an error for valid transfers parameters', () => {
       const validParams = {
-        transfers: [
-          { to: '0.0.123', amount: 100, assetType: 'HBAR' }
-        ]
+        transfers: [{ to: '0.0.123', amount: 100, assetType: 'HBAR' }],
       };
-      expect(() => HederaUtils.isValidTransferCryptoParams(validParams)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidTransferCryptoParams(validParams),
+      ).not.toThrow();
     });
- });
+  });
   describe('isValidStakeHbarParams', () => {
     it('throws an error if neither nodeId nor accountId are provided', () => {
       const invalidParams = {};
-      expect(() => HederaUtils.isValidStakeHbarParams(invalidParams))
-        .toThrow('Invalid stakeHbar Params passed. Pass either "nodeId" or "accountId" as a parameter');
+      expect(() => HederaUtils.isValidStakeHbarParams(invalidParams)).toThrow(
+        'Invalid stakeHbar Params passed. Pass either "nodeId" or "accountId" as a parameter',
+      );
     });
 
     it('does not throw an error when valid nodeId is provided', () => {
       const paramsWithNodeId = { nodeId: 0 };
-      expect(() => HederaUtils.isValidStakeHbarParams(paramsWithNodeId)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidStakeHbarParams(paramsWithNodeId),
+      ).not.toThrow();
     });
 
     it('does not throw an error when valid accountId is provided', () => {
       const paramsWithAccountId = { accountId: '0.0.12345' };
-      expect(() => HederaUtils.isValidStakeHbarParams(paramsWithAccountId)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidStakeHbarParams(paramsWithAccountId),
+      ).not.toThrow();
     });
 
     // Test for invalid nodeId and accountId formats
@@ -135,17 +159,25 @@ describe('HederaUtils', () => {
   describe('isValidDeleteAccountParams', () => {
     it('throws an error if transferAccountId is missing or invalid', () => {
       const invalidParams = {};
-      expect(() => HederaUtils.isValidDeleteAccountParams(invalidParams))
-        .toThrow('Invalid deleteAccount Params passed. "transferAccountId" must be passed as a parameter');
+      expect(() =>
+        HederaUtils.isValidDeleteAccountParams(invalidParams),
+      ).toThrow(
+        'Invalid deleteAccount Params passed. "transferAccountId" must be passed as a parameter',
+      );
 
       const invalidParams2 = { transferAccountId: '' };
-      expect(() => HederaUtils.isValidDeleteAccountParams(invalidParams2))
-        .toThrow('Invalid deleteAccount Params passed. "transferAccountId" is not a valid Account ID');
+      expect(() =>
+        HederaUtils.isValidDeleteAccountParams(invalidParams2),
+      ).toThrow(
+        'Invalid deleteAccount Params passed. "transferAccountId" is not a valid Account ID',
+      );
     });
 
     it('does not throw an error for valid transferAccountId', () => {
       const validParams = { transferAccountId: '0.0.12345' };
-      expect(() => HederaUtils.isValidDeleteAccountParams(validParams)).not.toThrow();
+      expect(() =>
+        HederaUtils.isValidDeleteAccountParams(validParams),
+      ).not.toThrow();
     });
   });
 });

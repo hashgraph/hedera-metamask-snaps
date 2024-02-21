@@ -16,5 +16,5 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: '.*\\.spec\\.ts$',
   transformIgnorePatterns: [],
-  testTimeout: 120000
+  testTimeout: 120000,
 };
