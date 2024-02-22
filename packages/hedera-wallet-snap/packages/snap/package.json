@@ -44,7 +44,7 @@
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "serve": "mm-snap serve",
     "start": "mm-snap --version && concurrently \"yarn build && yarn serve\" \"yarn watch\"",
-    "test": "jest --forceExit",
+    "test": "jest --forceExit --verbose",
     "test:ci": "yarn test --silent",
     "watch": "chokidar 'src/' -c 'yarn build'"
   },
