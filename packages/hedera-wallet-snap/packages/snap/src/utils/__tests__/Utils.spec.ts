@@ -24,7 +24,7 @@ describe('HederaWalletSnap', () => {
 
     test('should convert a string representation of a timestamp to a UTC string', () => {
       const timestamp = '1672444800'; // Equivalent to 2023-01-01T00:00:00Z
-      const expected = new Date(parseInt(timestamp) * 1000).toUTCString();
+      const expected = new Date(parseInt(timestamp, 10) * 1000).toUTCString();
       expect(Utils.timestampToString(timestamp)).toBe(expected);
     });
 

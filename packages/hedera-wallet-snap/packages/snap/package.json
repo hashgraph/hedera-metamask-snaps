@@ -44,7 +44,7 @@
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "serve": "mm-snap serve",
     "start": "mm-snap --version && concurrently \"yarn build && yarn serve\" \"yarn watch\"",
-    "test": "jest --forceExit",
+    "test": "jest --forceExit --verbose",
     "test:ci": "yarn test --silent",
     "watch": "chokidar 'src/' -c 'yarn build'"
   },
@@ -58,6 +58,7 @@
     "@metamask/snaps-ui": "^1.0.1",
     "bignumber.js": "^9.1.1",
     "ethers": "^6.3.0",
+    "jest-mock": "^29.7.0",
     "lodash": "^4.17.21",
     "normalize-url": "^8.0.0"
   },

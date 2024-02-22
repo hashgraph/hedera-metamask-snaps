@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { FetchUtils, FetchResponse } from '../FetchUtils';
 
 global.fetch = jest.fn();

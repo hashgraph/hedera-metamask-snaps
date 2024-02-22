@@ -10,5 +10,6 @@
     "removeComments": true
   },
   "files": ["./json-typings.d.ts"],
+  "exclude": ["./jest.config.js"],
   "include": ["src/**/*"]
 }
