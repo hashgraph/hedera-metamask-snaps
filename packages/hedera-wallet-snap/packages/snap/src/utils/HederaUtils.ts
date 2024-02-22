@@ -254,6 +254,7 @@ export class HederaUtils {
     );
     // Check if the property exists and is a valid public key
     if (
+      propertyName in parameter &&
       !(
         CryptoUtils.isValidEthereumPublicKey(parameter[propertyName]) ||
         CryptoUtils.isValidHederaPublicKey(parameter[propertyName])
@@ -283,9 +284,7 @@ export class HederaUtils {
     ) {
       const parameter = params as MirrorNodeParams;
 
-      // Check if mirrorNodeUrl is valid
-      HederaUtils.checkValidString(parameter, 'params', 'mirrorNodeUrl', false);
-
+      // Check if mirrorNodeUrl was passed
       if (!_.isEmpty(parameter.mirrorNodeUrl)) {
         mirrorNodeUrl = normalizeUrl(parameter.mirrorNodeUrl as string);
       }
@@ -481,89 +480,96 @@ export class HederaUtils {
     }
 
     // Check if transfers is valid
-    if (
-      'transfers' in parameter &&
-      (_.isEmpty(parameter.transfers) || !Array.isArray(parameter.transfers))
-    ) {
-      console.error(
-        'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
-      );
-    }
-    parameter.transfers.forEach((transfer: SimpleTransfer) => {
-      // Check if assetType is valid
-      HederaUtils.checkValidString(transfer, 'createToken', 'assetType', true);
+    if ('transfers' in parameter) {
       if (
-        !(
-          transfer.assetType === 'HBAR' ||
-          transfer.assetType === 'TOKEN' ||
-          transfer.assetType === 'NFT'
-        )
+        _.isEmpty(parameter.transfers) ||
+        !Array.isArray(parameter.transfers)
       ) {
         console.error(
-          'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+          'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
         );
         throw providerErrors.unsupportedMethod(
-          'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+          'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
         );
       }
-      if (transfer.assetType === 'HBAR' && 'assetId' in transfer) {
-        console.error(
-          'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
-        );
-        throw providerErrors.unsupportedMethod(
-          'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
-        );
-      } else if (
-        (transfer.assetType === 'TOKEN' || transfer.assetType === 'NFT') &&
-        !('assetId' in transfer)
-      ) {
-        console.error(
-          'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
-        );
-        throw providerErrors.unsupportedMethod(
-          'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
-        );
-      }
-
-      // Check if to is valid
-      HederaUtils.checkValidString(transfer, 'transfers[].to', 'to', true);
-
-      // Check if amount is valid
-      HederaUtils.checkValidNumber(
-        transfer,
-        'transfers[].amount',
-        'amount',
-        true,
-      );
-
-      // Check if assetId is valid
-      if (transfer.assetType !== 'HBAR') {
+      parameter.transfers.forEach((transfer: SimpleTransfer) => {
+        // Check if assetType is valid
         HederaUtils.checkValidString(
           transfer,
-          'transfers[].to',
-          'assetId',
+          'createToken',
+          'assetType',
           true,
         );
-      }
+        if (
+          !(
+            transfer.assetType === 'HBAR' ||
+            transfer.assetType === 'TOKEN' ||
+            transfer.assetType === 'NFT'
+          )
+        ) {
+          console.error(
+            'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+          );
+        }
+        if (transfer.assetType === 'HBAR' && 'assetId' in transfer) {
+          console.error(
+            'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
+          );
+        } else if (
+          (transfer.assetType === 'TOKEN' || transfer.assetType === 'NFT') &&
+          !('assetId' in transfer)
+        ) {
+          console.error(
+            'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
+          );
+        }
 
-      // Check if from is valid
-      if (
-        'from' in transfer &&
-        (_.isEmpty(transfer.from) ||
-          typeof transfer.from !== 'string' ||
-          !AccountId.fromString(transfer.from))
-      ) {
-        console.error(
-          `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
+        // Check if to is valid
+        HederaUtils.checkValidString(transfer, 'transfers[].to', 'to', true);
+
+        // Check if amount is valid
+        HederaUtils.checkValidNumber(
+          transfer,
+          'transfers[].amount',
+          'amount',
+          true,
         );
-        throw providerErrors.unsupportedMethod(
-          `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
-        );
-      }
-    });
+
+        // Check if assetId is valid
+        if (transfer.assetType !== 'HBAR') {
+          HederaUtils.checkValidString(
+            transfer,
+            'transfers[].to',
+            'assetId',
+            true,
+          );
+        }
+
+        // Check if from is valid
+        if (
+          'from' in transfer &&
+          (_.isEmpty(transfer.from) ||
+            typeof transfer.from !== 'string' ||
+            !AccountId.fromString(transfer.from))
+        ) {
+          console.error(
+            `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
+          );
+          throw providerErrors.unsupportedMethod(
+            `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
+          );
+        }
+      });
+    }
   }
 
   /**
@@ -866,19 +872,8 @@ export class HederaUtils {
     const parameter = params as AssociateTokensRequestParams;
 
     // Check if tokenIds is valid
-    if (
-      'tokenIds' in parameter &&
-      (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds))
-    ) {
-      console.error(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-      );
-    }
-    parameter.tokenIds.forEach((tokenId: string) => {
-      if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+    if ('tokenIds' in parameter) {
+      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
         console.error(
           'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
         );
@@ -886,7 +881,17 @@ export class HederaUtils {
           'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
         );
       }
-    });
+      parameter.tokenIds.forEach((tokenId: string) => {
+        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+          console.error(
+            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+        }
+      });
+    }
   }
 
   /**
@@ -951,6 +956,14 @@ export class HederaUtils {
 
     // Check if decimals is valid
     HederaUtils.checkValidNumber(parameter, 'createToken', 'decimals', true);
+    if (parameter.assetType === 'NFT' && parameter.decimals !== 0) {
+      console.error(
+        'Invalid createToken Params passed. "decimals" must be 0 for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "decimals" must be 0 for "NFT" assetType',
+      );
+    }
 
     // Check if initialSupply is valid
     HederaUtils.checkValidNumber(
@@ -1007,6 +1020,14 @@ export class HederaUtils {
       'supplyPublicKey',
       false,
     );
+    if (parameter.assetType === 'NFT' && _.isEmpty(parameter.supplyPublicKey)) {
+      console.error(
+        'Invalid createToken Params passed. "supplyPublicKey" must be passed for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "supplyPublicKey" must be passed for "NFT" assetType',
+      );
+    }
 
     // Check if feeSchedulePublicKey is valid
     HederaUtils.checkValidPublicKey(
@@ -1044,19 +1065,19 @@ export class HederaUtils {
     HederaUtils.checkValidString(parameter, 'createToken', 'tokenMemo', false);
 
     // Check if customFees is valid
-    if (
-      'customFees' in parameter &&
-      (_.isEmpty(parameter.customFees) || !Array.isArray(parameter.customFees))
-    ) {
-      console.error(
-        'Invalid createToken Params passed. "customFees" must be passed as an array',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid createToken Params passed. "customFees" must be passed as an array',
-      );
-    }
-    (parameter.customFees as TokenCustomFee[]).forEach(
-      (customFee: TokenCustomFee) => {
+    if ('customFees' in parameter) {
+      if (
+        _.isEmpty(parameter.customFees) ||
+        !Array.isArray(parameter.customFees)
+      ) {
+        console.error(
+          'Invalid createToken Params passed. "customFees" must be passed as an array',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid createToken Params passed. "customFees" must be passed as an array',
+        );
+      }
+      parameter.customFees.forEach((customFee: TokenCustomFee) => {
         // Check if feeCollectorAccountId is valid
         HederaUtils.checkValidString(
           customFee,
@@ -1092,8 +1113,8 @@ export class HederaUtils {
           'allCollectorsAreExempt',
           false,
         );
-      },
-    );
+      });
+    }
 
     // Check if supplyType is valid
     HederaUtils.checkValidString(parameter, 'createToken', 'supplyType', true);

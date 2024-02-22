@@ -24,6 +24,7 @@ import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
+  CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
@@ -225,32 +226,6 @@ export const getTransactions = async (
 };
 
 /**
- * Invoke the "associateTokens" method from the snap.
- */
-export const associateTokens = async (
-  network: string,
-  mirrorNodeUrl: string,
-  associateTokensRequestParams: AssociateTokensRequestParams,
-  externalAccountparams?: ExternalAccountParams,
-) => {
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: {
-        method: 'hts/associateTokens',
-        params: {
-          network,
-          mirrorNodeUrl,
-          tokenIds: associateTokensRequestParams.tokenIds,
-          ...externalAccountparams,
-        },
-      },
-    },
-  });
-};
-
-/**
  * Invoke the "transferCrypto" method from the snap.
  */
 
@@ -409,6 +384,58 @@ export const deleteAccount = async (
           network,
           mirrorNodeUrl,
           transferAccountId: deleteAccountParams.transferAccountId,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "associateTokens" method from the snap.
+ */
+export const associateTokens = async (
+  network: string,
+  mirrorNodeUrl: string,
+  associateTokensRequestParams: AssociateTokensRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/associateTokens',
+        params: {
+          network,
+          mirrorNodeUrl,
+          tokenIds: associateTokensRequestParams.tokenIds,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "createToken" method from the snap.
+ */
+export const createToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  createTokenRequestParams: CreateTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/createToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...createTokenRequestParams,
           ...externalAccountparams,
         },
       },

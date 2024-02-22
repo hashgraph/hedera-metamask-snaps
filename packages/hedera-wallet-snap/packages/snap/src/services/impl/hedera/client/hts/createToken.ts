@@ -71,7 +71,7 @@ export async function createToken(
     supplyType: 'FINITE' | 'INFINITE';
     initialSupply: number;
     maxSupply: number;
-    expirationTime: string;
+    expirationTime: string | undefined;
     autoRenewAccountId: string;
     tokenMemo: string;
     freezeDefault: boolean;
@@ -102,28 +102,32 @@ export async function createToken(
     )
     .setInitialSupply(options.initialSupply * Math.pow(10, options.decimals))
     .setMaxSupply(options.maxSupply * Math.pow(10, options.decimals))
-    .setExpirationTime(new Date(options.expirationTime))
     .setAutoRenewAccountId(options.autoRenewAccountId)
     .setTokenMemo(options.tokenMemo)
     .setFreezeDefault(options.freezeDefault);
 
+  if (options.expirationTime) {
+    transaction.setExpirationTime(new Date(options.expirationTime));
+  }
   if (options.kycPublicKey) {
     transaction.setKycKey(PublicKey.fromString(options.kycPublicKey));
   }
   if (options.freezePublicKey) {
-    transaction.setKycKey(PublicKey.fromString(options.freezePublicKey));
+    transaction.setFreezeKey(PublicKey.fromString(options.freezePublicKey));
   }
   if (options.pausePublicKey) {
-    transaction.setKycKey(PublicKey.fromString(options.pausePublicKey));
+    transaction.setPauseKey(PublicKey.fromString(options.pausePublicKey));
   }
   if (options.wipePublicKey) {
-    transaction.setKycKey(PublicKey.fromString(options.wipePublicKey));
+    transaction.setWipeKey(PublicKey.fromString(options.wipePublicKey));
   }
   if (options.supplyPublicKey) {
-    transaction.setKycKey(PublicKey.fromString(options.supplyPublicKey));
+    transaction.setSupplyKey(PublicKey.fromString(options.supplyPublicKey));
   }
   if (options.feeSchedulePublicKey) {
-    transaction.setKycKey(PublicKey.fromString(options.feeSchedulePublicKey));
+    transaction.setFeeScheduleKey(
+      PublicKey.fromString(options.feeSchedulePublicKey),
+    );
   }
 
   if (options.customFees) {
@@ -178,11 +182,11 @@ export async function createToken(
   return {
     status: receipt.status.toString(),
     accountId: receipt.accountId ? receipt.accountId.toString() : '',
-    fileId: receipt.fileId ? receipt.fileId : '',
-    contractId: receipt.contractId ? receipt.contractId : '',
-    topicId: receipt.topicId ? receipt.topicId : '',
-    tokenId: receipt.tokenId ? receipt.tokenId : '',
-    scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
+    fileId: receipt.fileId ? receipt.fileId.toString() : '',
+    contractId: receipt.contractId ? receipt.contractId.toString() : '',
+    topicId: receipt.topicId ? receipt.topicId.toString() : '',
+    tokenId: receipt.tokenId ? receipt.tokenId.toString() : '',
+    scheduleId: receipt.scheduleId ? receipt.scheduleId.toString() : '',
     exchangeRate: newExchangeRate,
     topicSequenceNumber: receipt.topicSequenceNumber
       ? String(receipt.topicSequenceNumber)

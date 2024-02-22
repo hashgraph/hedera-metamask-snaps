@@ -193,7 +193,7 @@ export async function setCurrentAccount(
     console.error(`Error while trying to get the account: ${String(error)}`);
     throw providerErrors.custom({
       code: 4200,
-      message: `Error while trying to get the account}`,
+      message: `Error while trying to get the account`,
       data: { error: String(error) },
     });
   }

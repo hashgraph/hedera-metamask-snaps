@@ -49,9 +49,6 @@ export async function createToken(
 
   const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
 
-  const currentDate = new Date();
-  currentDate.setDate(currentDate.getDate() + 90);
-
   const {
     assetType,
     name,
@@ -65,7 +62,7 @@ export async function createToken(
     supplyPublicKey,
     feeSchedulePublicKey,
     freezeDefault = false,
-    expirationTime = currentDate.toUTCString(),
+    expirationTime,
     autoRenewAccountId = hederaAccountId,
     tokenMemo = 'Created via Hedera Wallet Snap',
     customFees,
@@ -91,15 +88,24 @@ export async function createToken(
       divider(),
       text(`Name: ${name}`),
       text(`Symbol: ${symbol}`),
-      text(`Decimals: ${decimals}`),
       text(`Supply Type: ${supplyType}`),
-      text(`Initial Supply: ${initialSupply}`),
-      text(`Max Supply: ${maxSupply}`),
-      text(`Expiration Time: ${expirationTime}`),
+    ];
+    if (assetType === 'TOKEN') {
+      panelToShow.push(
+        text(`Initial Supply: ${initialSupply}`),
+        text(`Decimals: ${decimals}`),
+      );
+    }
+    panelToShow.push(
+      text(`Max Supply: ${supplyType === 'INFINITE' ? 'Infinite' : maxSupply}`),
       text(`Auto Renew Account ID: ${autoRenewAccountId}`),
       text(`Token Memo: ${tokenMemo}`),
       text(`Freeze Default: ${freezeDefault}`),
-      text(`Admin Key: ${publicKey}`),
+      text(
+        `Admin Key: ${
+          publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey
+        }`,
+      ),
       text(`Treasury Account: ${hederaAccountId}`),
       text(
         `KYC Public Key: ${
@@ -136,7 +142,10 @@ export async function createToken(
       text(
         `Custom Fees: ${_.isEmpty(customFees) ? 'Not set' : 'Set as follows'}`,
       ),
-    ];
+    );
+    if (expirationTime) {
+      panelToShow.push(text(`Expiration Time: ${expirationTime}`));
+    }
     if (customFees) {
       panelToShow.push(divider());
       for (const customFee of customFees) {

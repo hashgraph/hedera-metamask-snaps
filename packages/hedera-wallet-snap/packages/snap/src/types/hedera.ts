@@ -207,7 +207,7 @@ export type SimpleHederaClient = {
     supplyType: 'FINITE' | 'INFINITE';
     initialSupply: number;
     maxSupply: number;
-    expirationTime: string;
+    expirationTime: string | undefined;
     autoRenewAccountId: string;
     tokenMemo: string;
     freezeDefault: boolean;

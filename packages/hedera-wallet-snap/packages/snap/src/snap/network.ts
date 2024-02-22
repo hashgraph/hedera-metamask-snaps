@@ -20,7 +20,6 @@
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
 
-import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import { hederaNetworks, isIn } from '../types/constants';
 import { WalletSnapState } from '../types/state';
@@ -56,25 +55,21 @@ export async function getMirrorNodeUrl(
   state: WalletSnapState,
   params: unknown,
 ): Promise<string> {
-  const mirrorNodeUrl = HederaUtils.getMirrorNodeFlagIfExists(params);
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
+  let mirrorNodeUrl = HederaUtils.getMirrorNodeFlagIfExists(params);
   try {
-    if (_.isEmpty(mirrorNodeUrlToUse)) {
-      mirrorNodeUrlToUse =
+    if (_.isEmpty(mirrorNodeUrl)) {
+      mirrorNodeUrl =
         state.accountState[state.currentAccount.hederaEvmAddress][
           state.currentAccount.network
         ].mirrorNodeUrl;
+    } else {
+      state.accountState[state.currentAccount.hederaEvmAddress][
+        state.currentAccount.network
+      ].mirrorNodeUrl = mirrorNodeUrl;
+      await updateSnapState(state);
     }
-    state.accountState[state.currentAccount.hederaEvmAddress][
-      state.currentAccount.network
-    ].mirrorNodeUrl = mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
-    throw providerErrors.custom({
-      code: 4200,
-      message: `Error while trying to set mirror node url}`,
-      data: { error: String(error) },
-    });
+    console.log('Mirror Node Url could not be set at this time. Continuing...');
   }
-  return mirrorNodeUrlToUse;
+  return mirrorNodeUrl;
 }
