@@ -21,11 +21,10 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
@@ -73,12 +72,6 @@ export async function approveAllowance(
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
 
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
-
   let txReceipt = {} as TxReceipt;
   try {
     const panelToShow = [
@@ -98,7 +91,7 @@ export async function approveAllowance(
         ? walletBalance.tokens[assetDetail.assetId].decimals
         : NaN;
 
-      const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const tokenInfo: MirrorTokenInfo = await hederaService.getTokenById(
         assetDetail.assetId,
       );
@@ -174,10 +167,6 @@ export async function approveAllowance(
       assetType,
       assetDetail,
     });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to approve an alloance: ${String(
       error,

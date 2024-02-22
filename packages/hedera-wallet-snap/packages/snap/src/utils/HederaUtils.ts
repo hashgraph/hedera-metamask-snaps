@@ -22,10 +22,12 @@ import { AccountId } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
+import { SimpleTransfer } from 'src/types/hedera';
 import { ExternalAccount } from '../types/account';
 import {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
+  CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
@@ -34,10 +36,239 @@ import {
   ServiceFee,
   SignMessageRequestParams,
   StakeHbarRequestParams,
+  TokenCustomFee,
   TransferCryptoRequestParams,
 } from '../types/params';
+import { CryptoUtils } from './CryptoUtils';
 
 export class HederaUtils {
+  /**
+   * Checks if the specified property in the given object is passed.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkRequiredProperty(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    if (isRequired && !(propertyName in parameter)) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be passed`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be passed`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid string.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidString(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid string
+    if (
+      propertyName in parameter &&
+      (typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid boolean.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidBoolean(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid boolean
+    if (
+      propertyName in parameter &&
+      typeof parameter[propertyName] !== 'boolean'
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a boolean`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a boolean`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid number.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidNumber(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid number
+    if (
+      propertyName in parameter &&
+      (typeof parameter[propertyName] !== 'number' ||
+        !Number.isFinite(parameter[propertyName]) ||
+        parameter[propertyName] < 0)
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a number`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a number`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid timestamp.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidTimestamp(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid timestamp
+
+    // Regular expression for validating date in YYYY-MM-DD format
+    // and date-time in YYYY-MM-DDTHH:mm:ss format
+    const dateTimeRegex =
+      /^\d{4}-[01]\d-[0-3]\d(?:T([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])?$/u;
+
+    if (
+      propertyName in parameter &&
+      (!dateTimeRegex.test(parameter[propertyName]) ||
+        typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid public key.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidPublicKey(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid string first
+    HederaUtils.checkValidString(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid public key
+    if (
+      propertyName in parameter &&
+      !(
+        CryptoUtils.isValidEthereumPublicKey(parameter[propertyName]) ||
+        CryptoUtils.isValidHederaPublicKey(parameter[propertyName])
+      )
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid public key`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a public key`,
+      );
+    }
+  }
+
   /**
    * Check Validation of MirrorNode flag.
    *
@@ -53,20 +284,9 @@ export class HederaUtils {
     ) {
       const parameter = params as MirrorNodeParams;
 
-      if (
-        parameter.mirrorNodeUrl === null ||
-        typeof parameter.mirrorNodeUrl !== 'string'
-      ) {
-        console.error(
-          'Invalid MirrorNode Params passed. "mirrorNodeUrl" must be a string',
-        );
-        throw providerErrors.unsupportedMethod(
-          'Invalid MirrorNode Params passed. "mirrorNodeUrl" must be a string',
-        );
-      }
-
+      // Check if mirrorNodeUrl was passed
       if (!_.isEmpty(parameter.mirrorNodeUrl)) {
-        mirrorNodeUrl = normalizeUrl(parameter.mirrorNodeUrl);
+        mirrorNodeUrl = normalizeUrl(parameter.mirrorNodeUrl as string);
       }
     }
 
@@ -138,26 +358,10 @@ export class HederaUtils {
     const parameter = params as ServiceFee;
 
     // Check if serviceFee.percentageCut is valid
-    if (
-      _.isNull(parameter.percentageCut) ||
-      !Number.isFinite(parameter.percentageCut)
-    ) {
-      console.error(
-        'Invalid Params passed. "serviceFee.percentageCut" must be a number',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid Params passed. "serviceFee.percentageCut" must be a number',
-      );
-    }
+    HederaUtils.checkValidNumber(parameter, 'params', 'percentageCut', true);
+
     // Check if serviceFee.toAddress is valid
-    if (_.isEmpty(parameter.toAddress)) {
-      console.error(
-        'Invalid Params passed. "serviceFee.toAddress" must be a string and must not be empty',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid Params passed. "serviceFee.toAddress" must be a string and must not be empty',
-      );
-    }
+    HederaUtils.checkValidString(parameter, 'params', 'toAddress', false);
   }
 
   /**
@@ -180,30 +384,10 @@ export class HederaUtils {
     const parameter = params as SignMessageRequestParams;
 
     // Check if message is valid
-    if (
-      'header' in parameter &&
-      (_.isNull(parameter.header) || typeof parameter.header !== 'string')
-    ) {
-      console.error(
-        'Invalid signMessage Params passed. "header" is not a string',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid signMessage Params passed. "header" is not a string',
-      );
-    }
+    HederaUtils.checkValidString(parameter, 'signMessage', 'header', false);
 
     // Check if message is valid
-    if (
-      'message' in parameter &&
-      (typeof parameter.message !== 'string' || _.isEmpty(parameter.message))
-    ) {
-      console.error(
-        'Invalid signMessage Params passed. "message" is not a string or is empty',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid signMessage Params passed. "message" is not a string or is empty',
-      );
-    }
+    HederaUtils.checkValidString(parameter, 'signMessage', 'message', false);
   }
 
   /**
@@ -252,62 +436,13 @@ export class HederaUtils {
   ): asserts params is GetTransactionsRequestParams {
     const parameter = params as GetTransactionsRequestParams;
 
-    // Check if accountId is valid
-    if (
-      'transactionId' in parameter &&
-      (typeof parameter.transactionId !== 'string' ||
-        _.isEmpty(parameter.transactionId))
-    ) {
-      console.error(
-        'Invalid getTransactions Params passed. "transactionId" must be a string',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid getTransactions Params passed. "transactionId" must be a string',
-      );
-    }
-  }
-
-  /**
-   * Check Validation of associateTokens request.
-   *
-   * @param params - Request params.
-   */
-  public static isValidAssociateTokensParams(
-    params: unknown,
-  ): asserts params is AssociateTokensRequestParams {
-    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
-      console.error(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
-      );
-    }
-
-    const parameter = params as AssociateTokensRequestParams;
-
-    // Check if tokenIds is valid
-    if (
-      'tokenIds' in parameter &&
-      (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds))
-    ) {
-      console.error(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-      );
-    }
-    parameter.tokenIds.forEach((tokenId: string) => {
-      if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
-        console.error(
-          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-        );
-        throw providerErrors.unsupportedMethod(
-          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-        );
-      }
-    });
+    // Check if transactionId is valid
+    HederaUtils.checkValidString(
+      parameter,
+      'getTransactions',
+      'transactionId',
+      false,
+    );
   }
 
   /**
@@ -330,32 +465,10 @@ export class HederaUtils {
     const parameter = params as TransferCryptoRequestParams;
 
     // Check if memo is valid
-    if (
-      'memo' in parameter &&
-      (_.isNull(parameter.memo) || typeof parameter.memo !== 'string')
-    ) {
-      console.error(
-        `Invalid transferCrypto Params passed. "memo" is not a string`,
-      );
-      throw providerErrors.unsupportedMethod(
-        `Invalid transferCrypto Params passed. "memo" is not a string`,
-      );
-    }
+    HederaUtils.checkValidString(parameter, 'transferCrypto', 'memo', false);
 
     // Check if maxFee is valid
-    if (
-      'maxFee' in parameter &&
-      (_.isNull(parameter.maxFee) ||
-        typeof parameter.maxFee !== 'number' ||
-        !Number.isFinite(parameter.maxFee))
-    ) {
-      console.error(
-        `Invalid transferCrypto Params passed. "maxFee" is not a number`,
-      );
-      throw providerErrors.unsupportedMethod(
-        `Invalid transferCrypto Params passed. "maxFee" is not a number`,
-      );
-    }
+    HederaUtils.checkValidNumber(parameter, 'transferCrypto', 'maxFee', false);
 
     // Check if serviceFee is valid
     if (
@@ -367,12 +480,27 @@ export class HederaUtils {
     }
 
     // Check if transfers is valid
-    if (parameter.transfers) {
-      parameter.transfers.forEach((transfer: object) => {
+    if ('transfers' in parameter) {
+      if (
+        _.isEmpty(parameter.transfers) ||
+        !Array.isArray(parameter.transfers)
+      ) {
+        console.error(
+          'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
+        );
+      }
+      parameter.transfers.forEach((transfer: SimpleTransfer) => {
         // Check if assetType is valid
+        HederaUtils.checkValidString(
+          transfer,
+          'createToken',
+          'assetType',
+          true,
+        );
         if (
-          !('assetType' in transfer) ||
-          typeof transfer.assetType !== 'string' ||
           !(
             transfer.assetType === 'HBAR' ||
             transfer.assetType === 'TOKEN' ||
@@ -406,43 +534,23 @@ export class HederaUtils {
         }
 
         // Check if to is valid
-        if (
-          !('to' in transfer) ||
-          typeof transfer.to !== 'string' ||
-          _.isEmpty(transfer.to)
-        ) {
-          console.error(
-            `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
-          );
-          throw providerErrors.unsupportedMethod(
-            `Invalid transferCrypto Params passed. "transfers[].to" is not a string or is empty`,
-          );
-        }
+        HederaUtils.checkValidString(transfer, 'transfers[].to', 'to', true);
+
         // Check if amount is valid
-        if (
-          !('amount' in transfer) ||
-          typeof transfer.amount !== 'number' ||
-          !Number.isFinite(transfer.amount)
-        ) {
-          console.error(
-            `Invalid transferCrypto Params passed. "transfers[].amount" is not a number`,
-          );
-          throw providerErrors.unsupportedMethod(
-            `Invalid transferCrypto Params passed. "transfers[].to" is not a number`,
-          );
-        }
+        HederaUtils.checkValidNumber(
+          transfer,
+          'transfers[].amount',
+          'amount',
+          true,
+        );
 
         // Check if assetId is valid
-        if (
-          transfer.assetType !== 'HBAR' &&
-          'assetId' in transfer &&
-          (_.isEmpty(transfer.assetId) || typeof transfer.assetId !== 'string')
-        ) {
-          console.error(
-            `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
-          );
-          throw providerErrors.unsupportedMethod(
-            `Invalid transferCrypto Params passed. "transfers[].assetId" is not a string or is empty`,
+        if (transfer.assetType !== 'HBAR') {
+          HederaUtils.checkValidString(
+            transfer,
+            'transfers[].to',
+            'assetId',
+            true,
           );
         }
 
@@ -486,17 +594,7 @@ export class HederaUtils {
     const parameter = params as StakeHbarRequestParams;
 
     // Check if nodeId is valid
-    if (
-      'nodeId' in parameter &&
-      !_.isNull(parameter.nodeId) &&
-      (typeof parameter.nodeId !== 'number' ||
-        !Number.isFinite(parameter.nodeId))
-    ) {
-      const errMessage =
-        'Invalid stakeHbar Params passed. "nodeId" is not a valid Node ID';
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
-    }
+    HederaUtils.checkValidNumber(parameter, 'stakeHbar', 'nodeId', false);
 
     // Check if accountId is valid
     if (
@@ -593,34 +691,27 @@ export class HederaUtils {
     }
 
     // Check if amount is valid
-    if (
-      'amount' in parameter &&
-      (typeof parameter.amount !== 'number' || parameter.amount <= 0)
-    ) {
-      console.error(
-        'Invalid approveAllowance Params passed. "amount" is not a valid number',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid approveAllowance Params passed. "amount" is not a valid number',
-      );
-    }
+    HederaUtils.checkValidNumber(parameter, 'approveAllowance', 'amount', true);
 
     // Check if assetType is valid
+    HederaUtils.checkValidString(
+      parameter,
+      'approveAllowance',
+      'assetType',
+      true,
+    );
     if (
-      'assetType' in parameter &&
-      (_.isEmpty(parameter.assetType) ||
-        typeof parameter.assetType !== 'string' ||
-        !(
-          parameter.assetType === 'HBAR' ||
-          parameter.assetType === 'TOKEN' ||
-          parameter.assetType === 'NFT'
-        ))
+      !(
+        parameter.assetType === 'HBAR' ||
+        parameter.assetType === 'TOKEN' ||
+        parameter.assetType === 'NFT'
+      )
     ) {
       console.error(
-        'Invalid approveAllowance Params passed. "assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+        'Invalid approveAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid approveAllowance Params passed. "assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+        'Invalid approveAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
     }
     if (parameter.assetType === 'HBAR' && !_.isEmpty(parameter.assetDetail)) {
@@ -650,6 +741,39 @@ export class HederaUtils {
         'Invalid approveAllowance Params passed. "assetDetail" must be passed for "TOKEN/NFT" assetType',
       );
     }
+
+    // Check if assetDetail is valid
+    if ('assetDetail' in parameter) {
+      if (_.isEmpty(parameter.assetDetail)) {
+        console.error(
+          'Invalid approveAllowance Params passed. "assetDetail" is not valid',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid approveAllowance Params passed. "assetDetail" is not valid',
+        );
+      }
+      // Check if assetId is valid
+      HederaUtils.checkValidString(
+        parameter.assetDetail,
+        'approveAllowance',
+        'assetId',
+        true,
+      );
+      // Check if assetDecimals is valid
+      HederaUtils.checkValidNumber(
+        parameter,
+        'approveAllowance',
+        'assetDecimals',
+        false,
+      );
+      // Check if all is valid
+      HederaUtils.checkValidBoolean(
+        parameter.assetDetail,
+        'approveAllowance',
+        'all',
+        false,
+      );
+    }
   }
 
   /**
@@ -672,23 +796,27 @@ export class HederaUtils {
     const parameter = params as DeleteAllowanceRequestParams;
 
     // Check if assetType is valid
+    HederaUtils.checkValidString(
+      parameter,
+      'deleteAllowance',
+      'assetType',
+      true,
+    );
     if (
-      'assetType' in parameter &&
-      (_.isEmpty(parameter.assetType) ||
-        typeof parameter.assetType !== 'string' ||
-        !(
-          parameter.assetType === 'HBAR' ||
-          parameter.assetType === 'TOKEN' ||
-          parameter.assetType === 'NFT'
-        ))
+      !(
+        parameter.assetType === 'HBAR' ||
+        parameter.assetType === 'TOKEN' ||
+        parameter.assetType === 'NFT'
+      )
     ) {
       console.error(
-        'Invalid deleteAllowance Params passed. "assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+        'Invalid deleteAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid deleteAllowance Params passed. "assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+        'Invalid deleteAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
     }
+
     if (parameter.assetType === 'HBAR' && !_.isEmpty(parameter.assetId)) {
       console.error(
         'Invalid approveAllowance Params passed. "assetId" cannot be passed for "HBAR" assetType',
@@ -714,15 +842,303 @@ export class HederaUtils {
     }
 
     // Check if assetId is valid
-    if (
-      (parameter.assetType === 'TOKEN' || parameter.assetType === 'NFT') &&
-      (_.isEmpty(parameter.assetId) || typeof parameter.assetId !== 'string')
-    ) {
+    if (parameter.assetType === 'TOKEN' || parameter.assetType === 'NFT') {
+      HederaUtils.checkValidString(
+        parameter,
+        'deleteAllowance',
+        'assetId',
+        true,
+      );
+    }
+  }
+
+  /**
+   * Check Validation of associateTokens request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidAssociateTokensParams(
+    params: unknown,
+  ): asserts params is AssociateTokensRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
       console.error(
-        'Invalid deleteAllowance Params passed. "assetId" must be passed for "TOKEN/NFT" assetType and must be a valid string',
+        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid deleteAllowance Params passed. "assetId" must be passed for "TOKEN/NFT" assetType and must be a valid string',
+        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as AssociateTokensRequestParams;
+
+    // Check if tokenIds is valid
+    if ('tokenIds' in parameter) {
+      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
+        console.error(
+          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+      }
+      parameter.tokenIds.forEach((tokenId: string) => {
+        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+          console.error(
+            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+        }
+      });
+    }
+  }
+
+  /**
+   * Check Validation of createToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidCreateTokenParams(
+    params: unknown,
+  ): asserts params is CreateTokenRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('assetType' in params) ||
+      !('name' in params) ||
+      !('symbol' in params) ||
+      !('decimals' in params) ||
+      !('supplyType' in params)
+    ) {
+      console.error(
+        'Invalid createToken Params passed. "assetType", "name", "symbol", "decimals" and "supplyType" must be passed as parameters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "assetType", "name", "symbol", "decimals" and "supplyType" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as CreateTokenRequestParams;
+
+    // Check if assetType is valid
+    HederaUtils.checkValidString(parameter, 'createToken', 'assetType', true);
+    if (!(parameter.assetType === 'TOKEN' || parameter.assetType === 'NFT')) {
+      console.error(
+        'Invalid createToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+    }
+
+    // Check if name is valid
+    HederaUtils.checkValidString(parameter, 'createToken', 'name', true);
+    if (parameter.name.length > 100) {
+      console.error(
+        'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+      );
+    }
+
+    // Check if symbol is valid
+    HederaUtils.checkValidString(parameter, 'createToken', 'symbol', true);
+    if (parameter.symbol.length > 100) {
+      console.error(
+        'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+      );
+    }
+
+    // Check if decimals is valid
+    HederaUtils.checkValidNumber(parameter, 'createToken', 'decimals', true);
+    if (parameter.assetType === 'NFT' && parameter.decimals !== 0) {
+      console.error(
+        'Invalid createToken Params passed. "decimals" must be 0 for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "decimals" must be 0 for "NFT" assetType',
+      );
+    }
+
+    // Check if initialSupply is valid
+    HederaUtils.checkValidNumber(
+      parameter,
+      'createToken',
+      'initialSupply',
+      false,
+    );
+    if (parameter.assetType === 'NFT' && parameter.initialSupply !== 0) {
+      console.error(
+        'Invalid createToken Params passed. "initialSupply" must be 0 for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "initialSupply" must be 0 for "NFT" assetType',
+      );
+    }
+
+    // Check if kycPublicKey is valid
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'createToken',
+      'kycPublicKey',
+      false,
+    );
+
+    // Check if freezePublicKey is valid
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'createToken',
+      'freezePublicKey',
+      false,
+    );
+
+    // Check if pausePublicKey is valid
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'createToken',
+      'pausePublicKey',
+      false,
+    );
+
+    // Check if wipePublicKey is valid
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'createToken',
+      'wipePublicKey',
+      false,
+    );
+
+    // Check if supplyPublicKey is valid
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'createToken',
+      'supplyPublicKey',
+      false,
+    );
+    if (parameter.assetType === 'NFT' && _.isEmpty(parameter.supplyPublicKey)) {
+      console.error(
+        'Invalid createToken Params passed. "supplyPublicKey" must be passed for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "supplyPublicKey" must be passed for "NFT" assetType',
+      );
+    }
+
+    // Check if feeSchedulePublicKey is valid
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'createToken',
+      'feeSchedulePublicKey',
+      false,
+    );
+
+    // Check if freezeDefault is valid
+    HederaUtils.checkValidBoolean(
+      parameter,
+      'createToken',
+      'freezeDefault',
+      false,
+    );
+
+    // Check if expirationTime is valid
+    HederaUtils.checkValidTimestamp(
+      parameter,
+      'createToken',
+      'expirationTime',
+      false,
+    );
+
+    // Check if autoRenewAccountId is valid
+    HederaUtils.checkValidString(
+      parameter,
+      'createToken',
+      'autoRenewAccountId',
+      false,
+    );
+
+    // Check if tokenMemo is valid
+    HederaUtils.checkValidString(parameter, 'createToken', 'tokenMemo', false);
+
+    // Check if customFees is valid
+    if ('customFees' in parameter) {
+      if (
+        _.isEmpty(parameter.customFees) ||
+        !Array.isArray(parameter.customFees)
+      ) {
+        console.error(
+          'Invalid createToken Params passed. "customFees" must be passed as an array',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid createToken Params passed. "customFees" must be passed as an array',
+        );
+      }
+      parameter.customFees.forEach((customFee: TokenCustomFee) => {
+        // Check if feeCollectorAccountId is valid
+        HederaUtils.checkValidString(
+          customFee,
+          'createToken',
+          'feeCollectorAccountId',
+          true,
+        );
+        // Check if hbarAmount is valid
+        HederaUtils.checkValidNumber(
+          customFee,
+          'createToken',
+          'hbarAmount',
+          false,
+        );
+        // Check if tokenAmount is valid
+        HederaUtils.checkValidNumber(
+          customFee,
+          'createToken',
+          'tokenAmount',
+          false,
+        );
+        // Check if denominatingTokenId is valid
+        HederaUtils.checkValidString(
+          customFee,
+          'createToken',
+          'denominatingTokenId',
+          false,
+        );
+        // Check if allCollectorsAreExempt is valid
+        HederaUtils.checkValidBoolean(
+          customFee,
+          'createToken',
+          'allCollectorsAreExempt',
+          false,
+        );
+      });
+    }
+
+    // Check if supplyType is valid
+    HederaUtils.checkValidString(parameter, 'createToken', 'supplyType', true);
+    if (
+      !(
+        parameter.supplyType === 'FINITE' || parameter.supplyType === 'INFINITE'
+      )
+    ) {
+      console.error(
+        'Invalid createToken Params passed. "supplyType" must be of the following: "FINITE", "INFINITE"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "supplyType" must be of the following: "FINITE", "INFINITE"',
+      );
+    }
+
+    // Check if maxSupply is valid
+    HederaUtils.checkValidNumber(parameter, 'createToken', 'maxSupply', false);
+    if (parameter.maxSupply && parameter.supplyType === 'INFINITE') {
+      console.error(
+        'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
     }
   }

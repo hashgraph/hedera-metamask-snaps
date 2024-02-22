@@ -21,12 +21,11 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { SimpleTransfer, TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
 import { AccountInfo } from '../../types/account';
+import { SimpleTransfer, TxReceipt } from '../../types/hedera';
 import {
   GetAccountInfoRequestParams,
   ServiceFee,
@@ -60,12 +59,6 @@ export async function transferCrypto(
 
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
-
   const serviceFeesToPay: Record<string, number> = transfers.reduce<
     Record<string, number>
   >((acc, transfer) => {
@@ -98,8 +91,9 @@ export async function transferCrypto(
 
   try {
     await getAccountInfo(
-      { origin, state, mirrorNodeUrl: mirrorNodeUrlToUse } as WalletSnapParams,
+      { origin, state, mirrorNodeUrl } as WalletSnapParams,
       {} as GetAccountInfoRequestParams,
+      true,
     );
 
     const panelToShow = [
@@ -115,7 +109,7 @@ export async function transferCrypto(
       panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
     }
 
-    const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+    const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
     for (const transfer of transfers) {
       const txNumber = transfers.indexOf(transfer) + 1;
       panelToShow.push(text(`Transaction #${txNumber}`));
@@ -131,9 +125,10 @@ export async function transferCrypto(
           {
             origin,
             state,
-            mirrorNodeUrl: mirrorNodeUrlToUse,
+            mirrorNodeUrl,
           } as WalletSnapParams,
           { accountId: transfer.from } as GetAccountInfoRequestParams,
+          true,
         );
         walletBalance = ownerAccountInfo.balance;
         panelToShow.push(text(`Transaction Type: Delegated Transfer`));
@@ -259,11 +254,8 @@ export async function transferCrypto(
       memo,
       maxFee,
       serviceFeesToPay,
-      serviceFeeToAddress: serviceFee.toAddress,
+      serviceFeeToAddress: serviceFee.toAddress as string,
     });
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     console.error(`Error while trying to transfer crypto: ${String(error)}`);
     throw providerErrors.unsupportedMethod(

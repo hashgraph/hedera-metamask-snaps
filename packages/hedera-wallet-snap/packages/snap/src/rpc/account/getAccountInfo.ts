@@ -48,11 +48,13 @@ import { TuumUtils } from '../../utils/TuumUtils';
  *
  * @param walletSnapParams - Wallet snap params.
  * @param getAccountInfoParams - Parameters for getting acocunt info.
+ * @param fetchUsingMirrorNode - Whether to fetch using Mirror Node.
  * @returns Account Info.
  */
 export async function getAccountInfo(
   walletSnapParams: WalletSnapParams,
   getAccountInfoParams: GetAccountInfoRequestParams,
+  fetchUsingMirrorNode: boolean,
 ): Promise<AccountInfo> {
   const { origin, state, mirrorNodeUrl } = walletSnapParams;
 
@@ -81,7 +83,11 @@ export async function getAccountInfo(
   let accountInfo = {} as AccountInfo;
 
   try {
-    if (_.isEmpty(mirrorNodeUrl)) {
+    if (fetchUsingMirrorNode) {
+      console.log('Retrieving account info using Hedera Mirror node');
+      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
+      accountInfo = await hederaService.getMirrorAccountInfo(accountIdToQuery);
+    } else {
       const hederaClient = await createHederaClient(
         curve,
         privateKey,
@@ -161,14 +167,10 @@ export async function getAccountInfo(
       if (serviceFee.percentageCut > 0) {
         await TuumUtils.deductServiceFee(
           serviceFeeToPay,
-          serviceFee.toAddress,
+          serviceFee.toAddress as string,
           hederaClient,
         );
       }
-    } else {
-      console.log('Retrieving account info using Hedera Mirror node');
-      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-      accountInfo = await hederaService.getMirrorAccountInfo(accountIdToQuery);
     }
 
     // Only change the state if we are retrieving account Id of the currently logged in user

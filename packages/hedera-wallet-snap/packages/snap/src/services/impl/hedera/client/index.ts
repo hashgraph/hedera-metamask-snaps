@@ -26,18 +26,22 @@ import {
 } from '@hashgraph/sdk';
 
 import { AccountInfo } from '../../../../types/account';
-import { ApproveAllowanceAssetDetail } from '../../../../types/params';
 import {
   SimpleHederaClient,
   SimpleTransfer,
   TxReceipt,
 } from '../../../../types/hedera';
+import {
+  ApproveAllowanceAssetDetail,
+  TokenCustomFee,
+} from '../../../../types/params';
 import { approveAllowance } from './approveAllowance';
 import { deleteAccount } from './deleteAccount';
 import { deleteAllowance } from './deleteAllowance';
 import { getAccountBalance } from './getAccountBalance';
 import { getAccountInfo } from './getAccountInfo';
 import { associateTokens } from './hts/associateTokens';
+import { createToken } from './hts/createToken';
 import { stakeHbar } from './stakeHbar';
 import { transferCrypto } from './transferCrypto';
 
@@ -83,10 +87,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return getAccountBalance(this._client);
   }
 
-  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
-    return associateTokens(this._client, options);
-  }
-
   async transferCrypto(options: {
     transfers: SimpleTransfer[];
     memo: string | null;
@@ -126,5 +126,32 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     transferAccountId: string;
   }): Promise<TxReceipt> {
     return deleteAccount(this._client, options);
+  }
+
+  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
+    return associateTokens(this._client, options);
+  }
+
+  async createToken(options: {
+    assetType: 'TOKEN' | 'NFT';
+    name: string;
+    symbol: string;
+    decimals: number;
+    supplyType: 'FINITE' | 'INFINITE';
+    initialSupply: number;
+    maxSupply: number;
+    expirationTime: string | undefined;
+    autoRenewAccountId: string;
+    tokenMemo: string;
+    freezeDefault: boolean;
+    kycPublicKey: string | undefined;
+    freezePublicKey: string | undefined;
+    pausePublicKey: string | undefined;
+    wipePublicKey: string | undefined;
+    supplyPublicKey: string | undefined;
+    feeSchedulePublicKey: string | undefined;
+    customFees: TokenCustomFee[] | undefined;
+  }): Promise<TxReceipt> {
+    return createToken(this._client, this._privateKey as PrivateKey, options);
   }
 }

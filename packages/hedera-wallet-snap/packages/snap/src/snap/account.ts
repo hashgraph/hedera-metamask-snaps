@@ -23,7 +23,6 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import { SimpleHederaClient } from '../types/hedera';
 import { HederaServiceImpl, getHederaClient } from '../services/impl/hedera';
 import {
   Account,
@@ -32,6 +31,7 @@ import {
   NetworkParams,
 } from '../types/account';
 import { hederaNetworks } from '../types/constants';
+import { SimpleHederaClient } from '../types/hedera';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { generateCommonPanel, snapDialog } from './dialog';
@@ -71,7 +71,7 @@ function ensure0xPrefix(address: string): string {
  * @param params - Parameters that were passed by the user.
  * @param mirrorNodeUrl - Hedera mirror node URL.
  * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
- * @returns MetaMask Hedera client.
+ * @returns Nothing.
  */
 export async function setCurrentAccount(
   origin: string,
@@ -191,7 +191,11 @@ export async function setCurrentAccount(
     );
   } catch (error: any) {
     console.error(`Error while trying to get the account: ${String(error)}`);
-    throw error;
+    throw providerErrors.custom({
+      code: 4200,
+      message: `Error while trying to get the account`,
+      data: { error: String(error) },
+    });
   }
 }
 

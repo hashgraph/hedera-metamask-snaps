@@ -20,7 +20,11 @@
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
 
+import _ from 'lodash';
 import { hederaNetworks, isIn } from '../types/constants';
+import { WalletSnapState } from '../types/state';
+import { HederaUtils } from '../utils/HederaUtils';
+import { updateSnapState } from './state';
 
 /**
  * Get current network.
@@ -38,3 +42,34 @@ export async function getCurrentNetwork(
 export const validHederaNetwork = (network: string) => {
   return isIn(hederaNetworks, network);
 };
+
+/**
+ * Function that gets  the mirror node url from snap state or whatever was passed in
+ * by the user.
+ *
+ * @param state - WalletSnapState.
+ * @param params - Parameters that were passed by the user.
+ * @returns Mirror Node Url.
+ */
+export async function getMirrorNodeUrl(
+  state: WalletSnapState,
+  params: unknown,
+): Promise<string> {
+  let mirrorNodeUrl = HederaUtils.getMirrorNodeFlagIfExists(params);
+  try {
+    if (_.isEmpty(mirrorNodeUrl)) {
+      mirrorNodeUrl =
+        state.accountState[state.currentAccount.hederaEvmAddress][
+          state.currentAccount.network
+        ].mirrorNodeUrl;
+    } else {
+      state.accountState[state.currentAccount.hederaEvmAddress][
+        state.currentAccount.network
+      ].mirrorNodeUrl = mirrorNodeUrl;
+      await updateSnapState(state);
+    }
+  } catch (error: any) {
+    console.log('Mirror Node Url could not be set at this time. Continuing...');
+  }
+  return mirrorNodeUrl;
+}

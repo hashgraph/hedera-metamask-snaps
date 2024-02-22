@@ -20,12 +20,10 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import _ from 'lodash';
-import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { DeleteAllowanceRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 
@@ -51,12 +49,6 @@ export async function deleteAllowance(
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
 
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
-
   let txReceipt = {} as TxReceipt;
   try {
     const panelToShow = [
@@ -76,7 +68,7 @@ export async function deleteAllowance(
     if (assetType === 'HBAR') {
       panelToShow.push(text(`Asset: ${assetType}`));
     } else {
-      const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const tokenInfo: MirrorTokenInfo = await hederaService.getTokenById(
         assetId as string,
       );
@@ -124,10 +116,6 @@ export async function deleteAllowance(
       assetId: assetId as string,
       spenderAccountId,
     });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to delete an allowance: ${String(
       error,
