@@ -22,11 +22,11 @@ import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
+import { TxReceipt } from '../../types/hedera';
 import { StakeHbarRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { Utils } from '../../utils/Utils';
@@ -53,12 +53,6 @@ export async function stakeHbar(
 
   let { stakedAccountId, stakedNodeId, declineStakingReward } =
     state.accountState[hederaEvmAddress][network].accountInfo.stakingInfo;
-
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
 
   let txReceipt = {} as TxReceipt;
 
@@ -91,10 +85,7 @@ export async function stakeHbar(
       );
       panelToShow.push(divider());
       if (!_.isNull(nodeId)) {
-        const hederaService = new HederaServiceImpl(
-          network,
-          mirrorNodeUrlToUse,
-        );
+        const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
         const stakingInfo = await hederaService.getNodeStakingInfo(nodeId);
         if (stakingInfo.length === 0) {
           throw providerErrors.unsupportedMethod(
@@ -165,8 +156,6 @@ export async function stakeHbar(
     state.accountState[hederaEvmAddress][
       network
     ].accountInfo.stakingInfo.declineStakingReward = declineStakingReward;
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
     await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to stake Hbar: ${String(error)}`;

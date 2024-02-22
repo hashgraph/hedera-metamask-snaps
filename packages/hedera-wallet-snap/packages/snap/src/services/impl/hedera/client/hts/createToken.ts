@@ -20,17 +20,18 @@
 
 import {
   AccountId,
-  CustomFee,
-  Key,
+  CustomFixedFee,
+  Hbar,
   PrivateKey,
   PublicKey,
-  Timestamp,
   TokenCreateTransaction,
   TokenSupplyType,
+  TokenType,
   type Client,
 } from '@hashgraph/sdk';
 
 import { TxReceipt } from '../../../../../types/hedera';
+import { TokenCustomFee } from '../../../../../types/params';
 import { CryptoUtils } from '../../../../../utils/CryptoUtils';
 import { Utils } from '../../../../../utils/Utils';
 
@@ -40,68 +41,121 @@ import { Utils } from '../../../../../utils/Utils';
  * @param client - Hedera Client.
  * @param privateKey - Private key of the token creator.
  * @param options - Create Token options.
+ * @param options.assetType - Token assetType.
  * @param options.name - Token name.
  * @param options.symbol - Token symbol.
  * @param options.decimals - Token decimals.
+ * @param options.supplyType - Token supplyType.
  * @param options.initialSupply - Token initialSupply.
+ * @param options.maxSupply - Token maxSupply.
+ * @param options.expirationTime - Token expirationTime.
+ * @param options.autoRenewAccountId - Token autoRenewAccountId.
+ * @param options.tokenMemo - Token tokenMemo.
+ * @param options.freezeDefault - Token freezeDefault.
  * @param options.kycPublicKey - Token kycPublicKey.
  * @param options.freezePublicKey - Token freezePublicKey.
  * @param options.pausePublicKey - Token pausePublicKey.
  * @param options.wipePublicKey - Token wipePublicKey.
  * @param options.supplyPublicKey - Token supplyPublicKey.
  * @param options.feeSchedulePublicKey - Token feeSchedulePublicKey.
- * @param options.freezeDefault - Token freezeDefault.
- * @param options.expirationTime - Token expirationTime.
- * @param options.autoRenewAccountId - Token autoRenewAccountId.
- * @param options.tokenMemo - Token tokenMemo.
  * @param options.customFees - Token customFees.
- * @param options.supplyType - Token supplyType.
- * @param options.maxSupply - Token maxSupply.
  */
 export async function createToken(
   client: Client,
   privateKey: PrivateKey,
   options: {
+    assetType: 'TOKEN' | 'NFT';
     name: string;
     symbol: string;
     decimals: number;
+    supplyType: 'FINITE' | 'INFINITE';
     initialSupply: number;
-    kycPublicKey: Key;
-    freezePublicKey: Key;
-    pausePublicKey: Key;
-    wipePublicKey: Key;
-    supplyPublicKey: Key;
-    feeSchedulePublicKey: Key;
-    freezeDefault: boolean;
-    expirationTime: Timestamp | Date;
+    maxSupply: number;
+    expirationTime: string;
     autoRenewAccountId: string;
     tokenMemo: string;
-    customFees: CustomFee[];
-    supplyType: TokenSupplyType;
-    maxSupply: number;
+    freezeDefault: boolean;
+    kycPublicKey: string | undefined;
+    freezePublicKey: string | undefined;
+    pausePublicKey: string | undefined;
+    wipePublicKey: string | undefined;
+    supplyPublicKey: string | undefined;
+    feeSchedulePublicKey: string | undefined;
+    customFees: TokenCustomFee[] | undefined;
   },
 ): Promise<TxReceipt> {
   const transaction = new TokenCreateTransaction()
     .setAdminKey(client.operatorPublicKey as PublicKey)
     .setTreasuryAccountId(client.operatorAccountId as AccountId)
+    .setTokenType(
+      options.assetType === 'TOKEN'
+        ? TokenType.FungibleCommon
+        : TokenType.NonFungibleUnique,
+    )
     .setTokenName(options.name)
     .setTokenSymbol(options.symbol)
     .setDecimals(options.decimals)
-    .setInitialSupply(options.initialSupply)
-    .setKycKey(options.kycPublicKey)
-    .setFreezeKey(options.freezePublicKey)
-    .setPauseKey(options.pausePublicKey)
-    .setWipeKey(options.wipePublicKey)
-    .setSupplyKey(options.supplyPublicKey)
-    .setFeeScheduleKey(options.feeSchedulePublicKey)
-    .setFreezeDefault(options.freezeDefault)
-    .setExpirationTime(options.expirationTime)
+    .setSupplyType(
+      options.supplyType === 'FINITE'
+        ? TokenSupplyType.Finite
+        : TokenSupplyType.Infinite,
+    )
+    .setInitialSupply(options.initialSupply * Math.pow(10, options.decimals))
+    .setMaxSupply(options.maxSupply * Math.pow(10, options.decimals))
+    .setExpirationTime(new Date(options.expirationTime))
     .setAutoRenewAccountId(options.autoRenewAccountId)
     .setTokenMemo(options.tokenMemo)
-    .setCustomFees(options.customFees)
-    .setSupplyType(options.supplyType)
-    .setMaxSupply(options.maxSupply)
-    .freezeWith(client);
+    .setFreezeDefault(options.freezeDefault);
+
+  if (options.kycPublicKey) {
+    transaction.setKycKey(PublicKey.fromString(options.kycPublicKey));
+  }
+  if (options.freezePublicKey) {
+    transaction.setKycKey(PublicKey.fromString(options.freezePublicKey));
+  }
+  if (options.pausePublicKey) {
+    transaction.setKycKey(PublicKey.fromString(options.pausePublicKey));
+  }
+  if (options.wipePublicKey) {
+    transaction.setKycKey(PublicKey.fromString(options.wipePublicKey));
+  }
+  if (options.supplyPublicKey) {
+    transaction.setKycKey(PublicKey.fromString(options.supplyPublicKey));
+  }
+  if (options.feeSchedulePublicKey) {
+    transaction.setKycKey(PublicKey.fromString(options.feeSchedulePublicKey));
+  }
+
+  if (options.customFees) {
+    // Convert TokenCustomFee[] to CustomFixedFee[]
+    const customFees: CustomFixedFee[] = options.customFees.map(
+      (tokenCustomFee: TokenCustomFee) => {
+        const customFee = new CustomFixedFee({
+          feeCollectorAccountId: tokenCustomFee.feeCollectorAccountId,
+        });
+        if (tokenCustomFee.hbarAmount) {
+          customFee.setHbarAmount(new Hbar(tokenCustomFee.hbarAmount));
+        }
+        if (tokenCustomFee.tokenAmount) {
+          customFee.setAmount(
+            tokenCustomFee.tokenAmount * Math.pow(10, options.decimals),
+          );
+        }
+        if (tokenCustomFee.denominatingTokenId) {
+          customFee.setDenominatingTokenId(tokenCustomFee.denominatingTokenId);
+        }
+        if (tokenCustomFee.allCollectorsAreExempt) {
+          customFee.setAllCollectorsAreExempt(
+            tokenCustomFee.allCollectorsAreExempt,
+          );
+        }
+        return customFee;
+      },
+    );
+    transaction.setCustomFees(customFees);
+  }
+
+  transaction.freezeWith(client);
 
   // Sign the transaction with the token adminKey and the token treasury account private key
   const signTx = await (await transaction.sign(privateKey)).sign(privateKey);

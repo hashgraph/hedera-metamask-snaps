@@ -19,10 +19,6 @@
  */
 
 import {
-  CustomFee,
-  Key,
-  Timestamp,
-  TokenSupplyType,
   type AccountId,
   type Client,
   type PrivateKey,
@@ -35,7 +31,10 @@ import {
   SimpleTransfer,
   TxReceipt,
 } from '../../../../types/hedera';
-import { ApproveAllowanceAssetDetail } from '../../../../types/params';
+import {
+  ApproveAllowanceAssetDetail,
+  TokenCustomFee,
+} from '../../../../types/params';
 import { approveAllowance } from './approveAllowance';
 import { deleteAccount } from './deleteAccount';
 import { deleteAllowance } from './deleteAllowance';
@@ -134,23 +133,24 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   }
 
   async createToken(options: {
+    assetType: 'TOKEN' | 'NFT';
     name: string;
     symbol: string;
     decimals: number;
+    supplyType: 'FINITE' | 'INFINITE';
     initialSupply: number;
-    kycPublicKey: Key;
-    freezePublicKey: Key;
-    pausePublicKey: Key;
-    wipePublicKey: Key;
-    supplyPublicKey: Key;
-    feeSchedulePublicKey: Key;
-    freezeDefault: boolean;
-    expirationTime: Timestamp | Date;
+    maxSupply: number;
+    expirationTime: string;
     autoRenewAccountId: string;
     tokenMemo: string;
-    customFees: CustomFee[];
-    supplyType: TokenSupplyType;
-    maxSupply: number;
+    freezeDefault: boolean;
+    kycPublicKey: string | undefined;
+    freezePublicKey: string | undefined;
+    pausePublicKey: string | undefined;
+    wipePublicKey: string | undefined;
+    supplyPublicKey: string | undefined;
+    feeSchedulePublicKey: string | undefined;
+    customFees: TokenCustomFee[] | undefined;
   }): Promise<TxReceipt> {
     return createToken(this._client, this._privateKey as PrivateKey, options);
   }

@@ -82,8 +82,8 @@ export type AssociateTokensRequestParams = {
 
 export type TokenCustomFee = {
   feeCollectorAccountId: string; // Sets the fee collector account ID that collects the fee
-  hbarAmount: number; // Set the amount of HBAR to be collected
-  tokenAmount: number; // Sets the amount of tokens to be collected as the fee
+  hbarAmount?: number; // Set the amount of HBAR to be collected
+  tokenAmount?: number; // Sets the amount of tokens to be collected as the fee
   denominatingTokenId?: string; // The ID of the token used to charge the fee. The denomination of the fee is taken as HBAR if left unset
   allCollectorsAreExempt?: boolean; // If true, exempts all the token's fee collector accounts from this fee
 };

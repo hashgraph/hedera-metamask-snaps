@@ -180,6 +180,50 @@ export class HederaUtils {
   }
 
   /**
+   * Checks if the specified property in the given object is a valid timestamp.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidTimestamp(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid timestamp
+
+    // Regular expression for validating date in YYYY-MM-DD format
+    // and date-time in YYYY-MM-DDTHH:mm:ss format
+    const dateTimeRegex =
+      /^\d{4}-[01]\d-[0-3]\d(?:T([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])?$/u;
+
+    if (
+      propertyName in parameter &&
+      (!dateTimeRegex.test(parameter[propertyName]) ||
+        typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
+      );
+    }
+  }
+
+  /**
    * Checks if the specified property in the given object is a valid public key.
    *
    * @param parameter - The object containing the property to check.
@@ -885,9 +929,25 @@ export class HederaUtils {
 
     // Check if name is valid
     HederaUtils.checkValidString(parameter, 'createToken', 'name', true);
+    if (parameter.name.length > 100) {
+      console.error(
+        'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+      );
+    }
 
     // Check if symbol is valid
     HederaUtils.checkValidString(parameter, 'createToken', 'symbol', true);
+    if (parameter.symbol.length > 100) {
+      console.error(
+        'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+      );
+    }
 
     // Check if decimals is valid
     HederaUtils.checkValidNumber(parameter, 'createToken', 'decimals', true);
@@ -899,6 +959,14 @@ export class HederaUtils {
       'initialSupply',
       false,
     );
+    if (parameter.assetType === 'NFT' && parameter.initialSupply !== 0) {
+      console.error(
+        'Invalid createToken Params passed. "initialSupply" must be 0 for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "initialSupply" must be 0 for "NFT" assetType',
+      );
+    }
 
     // Check if kycPublicKey is valid
     HederaUtils.checkValidPublicKey(
@@ -957,7 +1025,7 @@ export class HederaUtils {
     );
 
     // Check if expirationTime is valid
-    HederaUtils.checkValidString(
+    HederaUtils.checkValidTimestamp(
       parameter,
       'createToken',
       'expirationTime',
@@ -1001,14 +1069,14 @@ export class HederaUtils {
           customFee,
           'createToken',
           'hbarAmount',
-          true,
+          false,
         );
         // Check if tokenAmount is valid
         HederaUtils.checkValidNumber(
           customFee,
           'createToken',
           'tokenAmount',
-          true,
+          false,
         );
         // Check if denominatingTokenId is valid
         HederaUtils.checkValidString(
@@ -1044,5 +1112,13 @@ export class HederaUtils {
 
     // Check if maxSupply is valid
     HederaUtils.checkValidNumber(parameter, 'createToken', 'maxSupply', false);
+    if (parameter.maxSupply && parameter.supplyType === 'INFINITE') {
+      console.error(
+        'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
+      );
+    }
   }
 }

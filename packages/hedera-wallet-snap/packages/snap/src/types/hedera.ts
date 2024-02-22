@@ -32,7 +32,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from './account';
-import { ApproveAllowanceAssetDetail } from './params';
+import { ApproveAllowanceAssetDetail, TokenCustomFee } from './params';
 
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
@@ -168,8 +168,6 @@ export type SimpleHederaClient = {
   // returns the account balance in HBARs
   getAccountBalance(): Promise<number>;
 
-  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
-
   transferCrypto(options: {
     transfers: SimpleTransfer[];
     memo: string | null;
@@ -198,6 +196,29 @@ export type SimpleHederaClient = {
   }): Promise<TxReceipt>;
 
   deleteAccount(options: { transferAccountId: string }): Promise<TxReceipt>;
+
+  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
+
+  createToken(options: {
+    assetType: 'TOKEN' | 'NFT';
+    name: string;
+    symbol: string;
+    decimals: number;
+    supplyType: 'FINITE' | 'INFINITE';
+    initialSupply: number;
+    maxSupply: number;
+    expirationTime: string;
+    autoRenewAccountId: string;
+    tokenMemo: string;
+    freezeDefault: boolean;
+    kycPublicKey: string | undefined;
+    freezePublicKey: string | undefined;
+    pausePublicKey: string | undefined;
+    wipePublicKey: string | undefined;
+    supplyPublicKey: string | undefined;
+    feeSchedulePublicKey: string | undefined;
+    customFees: TokenCustomFee[] | undefined;
+  }): Promise<TxReceipt>;
 };
 
 export type MirrorStakingInfoServiceEndpoint = {

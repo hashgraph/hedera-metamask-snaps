@@ -21,11 +21,10 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { TxReceipt } from '../../types/hedera';
 import { AssociateTokensRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 
@@ -56,12 +55,6 @@ export async function associateTokens(
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
 
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
-
   let txReceipt = {} as TxReceipt;
   try {
     const panelToShow = [
@@ -71,7 +64,7 @@ export async function associateTokens(
       ),
       divider(),
     ];
-    const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+    const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
     for (const tokenId of tokenIds) {
       const tokenNumber = tokenIds.indexOf(tokenId) + 1;
       panelToShow.push(text(`Token #${tokenNumber}`));
@@ -128,10 +121,6 @@ export async function associateTokens(
       network,
     );
     txReceipt = await hederaClient.associateTokens({ tokenIds });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to associate tokens to the account: ${String(
       error,

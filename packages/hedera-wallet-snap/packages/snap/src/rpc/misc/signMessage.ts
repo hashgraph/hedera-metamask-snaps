@@ -25,7 +25,6 @@ import { Wallet, ethers } from 'ethers';
 import { Wallet as HederaWallet } from '../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../domain/wallet/software-private-key';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
 import { SignMessageRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -82,8 +81,6 @@ export async function signMessage(
     if (!signature.startsWith('0x')) {
       signature = `0x${signature}`;
     }
-
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to sign message: ${String(error)}`;
     console.error(errMessage);

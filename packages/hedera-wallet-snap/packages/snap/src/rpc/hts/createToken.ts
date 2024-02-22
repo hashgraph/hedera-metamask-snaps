@@ -21,10 +21,8 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
 import { TxReceipt } from '../../types/hedera';
 import { CreateTokenRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
@@ -47,7 +45,7 @@ export async function createToken(
   walletSnapParams: WalletSnapParams,
   createTokenRequestParams: CreateTokenRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
 
@@ -67,7 +65,7 @@ export async function createToken(
     supplyPublicKey,
     feeSchedulePublicKey,
     freezeDefault = false,
-    expirationTime = currentDate.toISOString(),
+    expirationTime = currentDate.toUTCString(),
     autoRenewAccountId = hederaAccountId,
     tokenMemo = 'Created via Hedera Wallet Snap',
     customFees,
@@ -75,61 +73,97 @@ export async function createToken(
     maxSupply = 0,
   } = createTokenRequestParams;
 
-  const { privateKey, curve } =
+  const { privateKey, publicKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
-
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
 
   let txReceipt = {} as TxReceipt;
   try {
     const panelToShow = [
       heading('Create a token'),
       text(
-        'Are you sure you want to associate the following tokens to your account?',
+        'Learn more about creating tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/define-a-token)',
+      ),
+      text(
+        `You are about to create a ${
+          assetType === 'TOKEN' ? 'Fungible Token' : 'Non Fungible Token(NFT)'
+        } with the following details:`,
       ),
       divider(),
+      text(`Name: ${name}`),
+      text(`Symbol: ${symbol}`),
+      text(`Decimals: ${decimals}`),
+      text(`Supply Type: ${supplyType}`),
+      text(`Initial Supply: ${initialSupply}`),
+      text(`Max Supply: ${maxSupply}`),
+      text(`Expiration Time: ${expirationTime}`),
+      text(`Auto Renew Account ID: ${autoRenewAccountId}`),
+      text(`Token Memo: ${tokenMemo}`),
+      text(`Freeze Default: ${freezeDefault}`),
+      text(`Admin Key: ${publicKey}`),
+      text(`Treasury Account: ${hederaAccountId}`),
+      text(
+        `KYC Public Key: ${
+          _.isEmpty(kycPublicKey) ? 'Not set' : (kycPublicKey as string)
+        }`,
+      ),
+      text(
+        `Freeze Public Key: ${
+          _.isEmpty(freezePublicKey) ? 'Not set' : (freezePublicKey as string)
+        }`,
+      ),
+      text(
+        `Pause Public Key: ${
+          _.isEmpty(pausePublicKey) ? 'Not set' : (pausePublicKey as string)
+        }`,
+      ),
+      text(
+        `Wipe Public Key: ${
+          _.isEmpty(wipePublicKey) ? 'Not set' : (wipePublicKey as string)
+        }`,
+      ),
+      text(
+        `Supply Public Key: ${
+          _.isEmpty(supplyPublicKey) ? 'Not set' : (supplyPublicKey as string)
+        }`,
+      ),
+      text(
+        `Fee Schedule Public Key: ${
+          _.isEmpty(feeSchedulePublicKey)
+            ? 'Not set'
+            : (feeSchedulePublicKey as string)
+        }`,
+      ),
+      text(
+        `Custom Fees: ${_.isEmpty(customFees) ? 'Not set' : 'Set as follows'}`,
+      ),
     ];
-    const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
-    for (const tokenId of tokenIds) {
-      const tokenNumber = tokenIds.indexOf(tokenId) + 1;
-      panelToShow.push(text(`Token #${tokenNumber}`));
+    if (customFees) {
       panelToShow.push(divider());
-
-      panelToShow.push(text(`Asset Id: ${tokenId}`));
-      const tokenInfo = await hederaService.getTokenById(tokenId);
-      if (_.isEmpty(tokenInfo)) {
-        const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
-        console.error(errMessage);
-        panelToShow.push(text(errMessage));
+      for (const customFee of customFees) {
         panelToShow.push(
-          text(`Proceed only if you are sure this asset ID exists`),
+          text(`Fee Collector Account ID: ${customFee.feeCollectorAccountId}`),
         );
-      } else {
-        panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
-        panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-        panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
-        panelToShow.push(
-          text(
-            `Total Supply: ${(
-              Number(tokenInfo.total_supply) /
-              Math.pow(10, Number(tokenInfo.decimals))
-            ).toString()}`,
-          ),
-        );
-        panelToShow.push(
-          text(
-            `Max Supply: ${(
-              Number(tokenInfo.max_supply) /
-              Math.pow(10, Number(tokenInfo.decimals))
-            ).toString()}`,
-          ),
-        );
+        if (customFee.hbarAmount) {
+          panelToShow.push(text(`HBAR Amount: ${customFee.hbarAmount}`));
+        }
+        if (customFee.tokenAmount) {
+          panelToShow.push(text(`Token Amount: ${customFee.tokenAmount}`));
+        }
+        if (customFee.denominatingTokenId) {
+          panelToShow.push(
+            text(`Denominating Token ID: ${customFee.denominatingTokenId}`),
+          );
+        }
+        if (customFee.allCollectorsAreExempt) {
+          panelToShow.push(
+            text(
+              `All Collectors Are Exempt: ${
+                customFee.allCollectorsAreExempt as boolean
+              }`,
+            ),
+          );
+        }
       }
-      panelToShow.push(text(tokenId));
       panelToShow.push(divider());
     }
 
@@ -149,15 +183,28 @@ export async function createToken(
       hederaAccountId,
       network,
     );
-    txReceipt = await hederaClient.associateTokens({ tokenIds });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
+    txReceipt = await hederaClient.createToken({
+      assetType,
+      name,
+      symbol,
+      decimals,
+      supplyType,
+      initialSupply,
+      maxSupply,
+      expirationTime,
+      autoRenewAccountId,
+      tokenMemo,
+      freezeDefault,
+      kycPublicKey,
+      freezePublicKey,
+      pausePublicKey,
+      wipePublicKey,
+      supplyPublicKey,
+      feeSchedulePublicKey,
+      customFees,
+    });
   } catch (error: any) {
-    const errMessage = `Error while trying to associate tokens to the account: ${String(
-      error,
-    )}`;
+    const errMessage = `Error while trying to create a token: ${String(error)}`;
     console.error(errMessage);
     throw providerErrors.unsupportedMethod(errMessage);
   }

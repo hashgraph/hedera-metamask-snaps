@@ -35,8 +35,10 @@ import { deleteAccount } from './rpc/account/deleteAccount';
 import { deleteAllowance } from './rpc/account/deleteAllowance';
 import { stakeHbar } from './rpc/account/stakeHbar';
 import { associateTokens } from './rpc/hts/associateTokens';
+import { createToken } from './rpc/hts/createToken';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
+import { getMirrorNodeUrl } from './snap/network';
 import { HederaUtils } from './utils/HederaUtils';
 
 /**
@@ -71,8 +73,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     isExternalAccount = true;
   }
 
-  const mirrorNodeUrl = HederaUtils.getMirrorNodeFlagIfExists(request.params);
+  // Set mirrorNodeUrl
+  const mirrorNodeUrl = await getMirrorNodeUrl(state, request.params);
 
+  // Set current account
   await setCurrentAccount(
     origin,
     state,
@@ -120,9 +124,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
+      const fetchUsingMirrorNode = !_.isEmpty(
+        HederaUtils.getMirrorNodeFlagIfExists(request.params),
+      );
       return {
         currentAccount: state.currentAccount,
-        accountInfo: await getAccountInfo(walletSnapParams, request.params),
+        accountInfo: await getAccountInfo(
+          walletSnapParams,
+          request.params,
+          fetchUsingMirrorNode,
+        ),
       };
     }
     case 'getAccountBalance': {
