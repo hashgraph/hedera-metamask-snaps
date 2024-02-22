@@ -1,10 +1,10 @@
-name: Run Snap Unit Tests
+name: Run Hedera Pulse Snap Unit Tests
 
 on: [push]
 
 jobs:
   eslint:
-    name: Run Snap Unit Tests
+    name: Run Hedera Pulse Snap Unit Tests
     runs-on: ubuntu-latest
 
     steps:
