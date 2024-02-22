@@ -22,6 +22,6 @@ jobs:
         run: yarn install
         working-directory: ./packages/hedera-wallet-snap/packages/snap
 
-      - name: Run ESLint in Subdirectory
+      - name: Run Snap Unit Tests
         run: yarn test
         working-directory: ./packages/hedera-wallet-snap/packages/snap
