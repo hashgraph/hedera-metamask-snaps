@@ -1,6 +1,6 @@
 name: Run Snap Unit Tests
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   eslint:
