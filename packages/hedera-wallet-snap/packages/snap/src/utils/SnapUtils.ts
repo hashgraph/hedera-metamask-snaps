@@ -19,7 +19,8 @@
  */
 
 import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
-import { SnapDialogParams, WalletSnapState } from '../types/state';
+import { SnapDialogParams } from '../types/state';
+
 export class SnapUtils {
   /**
    * Function to generate snap dialog panel.

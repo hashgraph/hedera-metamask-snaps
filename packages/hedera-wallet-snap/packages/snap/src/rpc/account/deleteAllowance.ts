@@ -22,7 +22,7 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { DeleteAllowanceRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
@@ -97,9 +97,11 @@ export async function deleteAllowance(
 
     const dialogParamsForDeleteAllowance: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForDeleteAllowance);
+    const confirmed = await SnapUtils.snapDialog(
+      dialogParamsForDeleteAllowance,
+    );
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
