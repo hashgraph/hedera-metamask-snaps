@@ -34,8 +34,8 @@ import { hederaNetworks } from '../types/constants';
 import { SimpleHederaClient } from '../types/hedera';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
-import { generateCommonPanel, snapDialog } from './dialog';
-import { validHederaNetwork } from './network';
+import { SnapUtils } from '../utils/SnapUtils';
+import { HederaUtils } from '../utils/HederaUtils';
 import {
   getHederaAccountIdIfExists,
   initAccountState,
@@ -82,7 +82,7 @@ export async function setCurrentAccount(
 ): Promise<void> {
   try {
     const { network = 'mainnet' } = (params ?? {}) as NetworkParams;
-    if (!validHederaNetwork(network)) {
+    if (!HederaUtils.validHederaNetwork(network)) {
       console.error(
         `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
           ', ',
@@ -244,7 +244,7 @@ async function connectEVMAccount(
   if (_.isEmpty(connectedAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: await generateCommonPanel(origin, [
+      content: await SnapUtils.generateCommonPanel(origin, [
         heading('Connect to EVM Account'),
         text('Enter private key for the following account'),
         divider(),
@@ -252,7 +252,9 @@ async function connectEVMAccount(
       ]),
       placeholder: '2386d1d21644dc65d...',
     };
-    const privateKey = (await snapDialog(dialogParamsForPrivateKey)) as string;
+    const privateKey = (await SnapUtils.snapDialog(
+      dialogParamsForPrivateKey,
+    )) as string;
 
     try {
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
@@ -337,14 +339,14 @@ async function connectEVMAccount(
       } else {
         const dialogParamsForHederaAccountId: SnapDialogParams = {
           type: 'alert',
-          content: await generateCommonPanel(origin, [
+          content: await SnapUtils.generateCommonPanel(origin, [
             heading('Hedera Account Status'),
             text(
               `The private key you passed is not associated with the Hedera account '${evmAddress}' on '${network}' that uses the elliptic curve '${curve}'`,
             ),
           ]),
         };
-        await snapDialog(dialogParamsForHederaAccountId);
+        await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
 
         console.error(
           `The private key you passed is not associated with the Hedera account '${result.address}' on '${network}' that uses the elliptic curve '${curve}'`,
@@ -415,7 +417,7 @@ async function connectHederaAccount(
   if (_.isEmpty(connectedAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: await generateCommonPanel(origin, [
+      content: await SnapUtils.generateCommonPanel(origin, [
         heading('Connect to Hedera Account'),
         text('Enter private key for the following account'),
         divider(),
@@ -423,7 +425,9 @@ async function connectHederaAccount(
       ]),
       placeholder: '2386d1d21644dc65d...',
     };
-    const privateKey = (await snapDialog(dialogParamsForPrivateKey)) as string;
+    const privateKey = (await SnapUtils.snapDialog(
+      dialogParamsForPrivateKey,
+    )) as string;
 
     try {
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
@@ -496,14 +500,14 @@ async function connectHederaAccount(
       } else {
         const dialogParamsForHederaAccountId: SnapDialogParams = {
           type: 'alert',
-          content: await generateCommonPanel(origin, [
+          content: await SnapUtils.generateCommonPanel(origin, [
             heading('Hedera Account Status'),
             text(
               `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
             ),
           ]),
         };
-        await snapDialog(dialogParamsForHederaAccountId);
+        await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
 
         console.error(
           `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,

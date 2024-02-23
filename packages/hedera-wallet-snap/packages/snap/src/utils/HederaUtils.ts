@@ -40,6 +40,7 @@ import {
   TransferCryptoRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
+import { hederaNetworks, isIn } from '../types/constants';
 
 export class HederaUtils {
   /**
@@ -1141,5 +1142,9 @@ export class HederaUtils {
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
     }
+  }
+
+  public static validHederaNetwork(network: string) {
+    return isIn(hederaNetworks, network);
   }
 }
