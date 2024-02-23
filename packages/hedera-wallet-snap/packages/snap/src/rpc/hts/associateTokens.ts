@@ -23,7 +23,7 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { TxReceipt } from '../../types/hedera';
 import { AssociateTokensRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
@@ -106,9 +106,9 @@ export async function associateTokens(
 
     const dialogParams: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParams);
+    const confirmed = await SnapUtils.snapDialog(dialogParams);
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();

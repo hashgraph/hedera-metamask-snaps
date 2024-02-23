@@ -21,7 +21,7 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { heading, text } from '@metamask/snaps-ui';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { updateSnapState } from '../../snap/state';
 import { Account, AccountInfo } from '../../types/account';
 import { AccountBalance, TxReceipt } from '../../types/hedera';
@@ -67,9 +67,9 @@ export async function deleteAccount(
     ];
     const dialogParamsForDeleteAccount: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForDeleteAccount);
+    const confirmed = await SnapUtils.snapDialog(dialogParamsForDeleteAccount);
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();

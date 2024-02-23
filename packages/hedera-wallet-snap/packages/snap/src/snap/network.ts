@@ -21,7 +21,6 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 
 import _ from 'lodash';
-import { hederaNetworks, isIn } from '../types/constants';
 import { WalletSnapState } from '../types/state';
 import { HederaUtils } from '../utils/HederaUtils';
 import { updateSnapState } from './state';
@@ -38,10 +37,6 @@ export async function getCurrentNetwork(
     method: 'eth_chainId',
   })) as string;
 }
-
-export const validHederaNetwork = (network: string) => {
-  return isIn(hederaNetworks, network);
-};
 
 /**
  * Function that gets  the mirror node url from snap state or whatever was passed in

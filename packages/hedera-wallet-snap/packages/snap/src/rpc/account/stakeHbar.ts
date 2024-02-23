@@ -24,7 +24,7 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { updateSnapState } from '../../snap/state';
 import { TxReceipt } from '../../types/hedera';
 import { StakeHbarRequestParams } from '../../types/params';
@@ -127,9 +127,9 @@ export async function stakeHbar(
 
     const dialogParamsForStakeHbar: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForStakeHbar);
+    const confirmed = await SnapUtils.snapDialog(dialogParamsForStakeHbar);
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
