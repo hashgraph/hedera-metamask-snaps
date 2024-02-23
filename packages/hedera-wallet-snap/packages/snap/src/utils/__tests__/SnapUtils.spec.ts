@@ -17,7 +17,8 @@
  * limitations under the License.
  *
  */
-
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-shadow */
 import { SnapUtils } from '../SnapUtils';
 import { text, heading } from '@metamask/snaps-ui';
 
