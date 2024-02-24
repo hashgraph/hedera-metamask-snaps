@@ -7,6 +7,10 @@ MetaMask Snaps is a system that allows anyone to safely expand the capabilities 
 **_DISCLAIMER_**
 _This snap is developed by Tuum Tech while the code for the snap is managed by Swirlds Labs. Furthermore, this wallet is neither created nor sponsored by Hedera and is built specifically for Metamask_
 
+## Github Actions ##
+
+Linting, static analysis and testing via Jest are configured via Github Actions in the repository. Replication of these steps locally is covered below.
+
 ## Getting Started
 
 ### Setup the development environment
@@ -15,11 +19,11 @@ _This snap is developed by Tuum Tech while the code for the snap is managed by S
 yarn install && yarn start
 ```
 
-### Testing and Linting
+### Unit Testing and Linting
 
-Run `yarn test` to run the tests once.
+Run `yarn test` to run the tests once. 
 
-Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and fix any automatically fixable issues.
+Run `yarn lint` to run the linter, or run `yarn lint:fix` to run the linter and fix any automatically fixable issues. Note that linting currently will run through ESLint and Prettier rules. 
 
 ### Releasing & Publishing
 
