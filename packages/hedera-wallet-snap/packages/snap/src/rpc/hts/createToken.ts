@@ -21,7 +21,7 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { createHederaClient } from '../../snap/account';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { TxReceipt } from '../../types/hedera';
 import { CreateTokenRequestParams } from '../../types/params';
@@ -186,7 +186,7 @@ export async function createToken(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       curve,
       privateKey,
       hederaAccountId,

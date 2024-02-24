@@ -26,10 +26,9 @@ import _ from 'lodash';
 import { getAccountBalance } from './rpc/account/getAccountBalance';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { transferCrypto } from './rpc/transactions/transferCrypto';
-import { setCurrentAccount } from './snap/account';
-import { getSnapStateUnchecked, initSnapState } from './snap/state';
+import { SnapAccounts } from './snap/SnapAccounts';
+import { SnapState } from './snap/SnapState';
 import { WalletSnapParams } from './types/state';
-
 import { approveAllowance } from './rpc/account/approveAllowance';
 import { deleteAccount } from './rpc/account/deleteAccount';
 import { deleteAllowance } from './rpc/account/deleteAllowance';
@@ -38,7 +37,6 @@ import { associateTokens } from './rpc/hts/associateTokens';
 import { createToken } from './rpc/hts/createToken';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
-import { getMirrorNodeUrl } from './snap/network';
 import { HederaUtils } from './utils/HederaUtils';
 
 /**
@@ -63,9 +61,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     JSON.stringify(request.params, null, 4),
   );
 
-  let state = await getSnapStateUnchecked();
+  let state = await SnapState.getStateUnchecked();
   if (_.isEmpty(state)) {
-    state = await initSnapState();
+    state = await SnapState.initState();
   }
 
   let isExternalAccount = false;
@@ -74,10 +72,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   // Set mirrorNodeUrl
-  const mirrorNodeUrl = await getMirrorNodeUrl(state, request.params);
+  const mirrorNodeUrl = await SnapState.getMirrorNodeUrl(state, request.params);
 
   // Set current account
-  await setCurrentAccount(
+  await SnapAccounts.setCurrentAccount(
     origin,
     state,
     request.params,

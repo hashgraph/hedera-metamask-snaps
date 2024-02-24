@@ -19,8 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { createHederaClient } from '../../snap/account';
-import { updateSnapState } from '../../snap/state';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
+import { SnapState } from '../../snap/SnapState';
 import { WalletSnapParams } from '../../types/state';
 
 /**
@@ -40,7 +40,7 @@ export async function getAccountBalance(
   const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
   try {
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       state.accountState[hederaEvmAddress][network].keyStore.curve,
       state.accountState[hederaEvmAddress][network].keyStore.privateKey,
       hederaAccountId,
@@ -60,7 +60,7 @@ export async function getAccountBalance(
     ].accountInfo.balance.timestamp = currentTimestamp;
     state.currentAccount.balance.timestamp = currentTimestamp;
 
-    await updateSnapState(state);
+    await SnapState.updateState(state);
   } catch (error: any) {
     console.error(
       `Error while trying to get account balance: ${String(error)}`,

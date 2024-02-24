@@ -23,9 +23,9 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { createHederaClient } from '../../snap/account';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { updateSnapState } from '../../snap/state';
+import { SnapState } from '../../snap/SnapState';
 import { AccountInfo } from '../../types/account';
 import { GetAccountInfoRequestParams, ServiceFee } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
@@ -88,7 +88,7 @@ export async function getAccountInfo(
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       accountInfo = await hederaService.getMirrorAccountInfo(accountIdToQuery);
     } else {
-      const hederaClient = await createHederaClient(
+      const hederaClient = await HederaClientFactory.create(
         curve,
         privateKey,
         hederaAccountId,
@@ -182,7 +182,7 @@ export async function getAccountInfo(
       state.currentAccount.balance = accountInfo.balance;
       state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
         mirrorNodeUrl;
-      await updateSnapState(state);
+      await SnapState.updateState(state);
     }
   } catch (error: any) {
     console.error(`Error while trying to get account info: ${String(error)}`);

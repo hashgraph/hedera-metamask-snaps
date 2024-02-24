@@ -23,9 +23,9 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { createHederaClient } from '../../snap/account';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { updateSnapState } from '../../snap/state';
+import { SnapState } from '../../snap/SnapState';
 import { TxReceipt } from '../../types/hedera';
 import { StakeHbarRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
@@ -135,7 +135,7 @@ export async function stakeHbar(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       curve,
       privateKey,
       hederaAccountId,
@@ -156,7 +156,7 @@ export async function stakeHbar(
     state.accountState[hederaEvmAddress][
       network
     ].accountInfo.stakingInfo.declineStakingReward = declineStakingReward;
-    await updateSnapState(state);
+    await SnapState.updateState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to stake Hbar: ${String(error)}`;
     console.error(errMessage);
