@@ -35,8 +35,10 @@ import { deleteAccount } from './rpc/account/deleteAccount';
 import { deleteAllowance } from './rpc/account/deleteAllowance';
 import { stakeHbar } from './rpc/account/stakeHbar';
 import { associateTokens } from './rpc/hts/associateTokens';
+import { createToken } from './rpc/hts/createToken';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
+import { StakeHbarRequestParams } from './types/params';
 import { HederaUtils } from './utils/HederaUtils';
 
 /**
@@ -71,12 +73,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     isExternalAccount = true;
   }
 
-  const mirrorNodeUrl = HederaUtils.getMirrorNodeFlagIfExists(request.params);
+  // Get network and mirrorNodeUrl
+  const { network, mirrorNodeUrl } = HederaUtils.getNetworkInfoFromUser(
+    request.params,
+  );
 
+  // Set current account
   await setCurrentAccount(
     origin,
     state,
     request.params,
+    network,
     mirrorNodeUrl,
     isExternalAccount,
   );
@@ -87,7 +94,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   const walletSnapParams: WalletSnapParams = {
     origin,
     state,
-    mirrorNodeUrl,
   };
 
   switch (request.method) {
@@ -138,13 +144,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         transactions: await getTransactions(walletSnapParams, request.params),
       };
     }
-    case 'associateTokens': {
-      HederaUtils.isValidAssociateTokensParams(request.params);
-      return {
-        currentAccount: state.currentAccount,
-        receipt: await associateTokens(walletSnapParams, request.params),
-      };
-    }
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
@@ -157,6 +156,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await stakeHbar(walletSnapParams, request.params),
+      };
+    }
+    case 'unstakeHbar': {
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await stakeHbar(
+          walletSnapParams,
+          {} as StakeHbarRequestParams,
+        ),
       };
     }
     case 'approveAllowance': {
@@ -178,6 +186,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await deleteAccount(walletSnapParams, request.params),
+      };
+    }
+    case 'hts/associateTokens': {
+      HederaUtils.isValidAssociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await associateTokens(walletSnapParams, request.params),
+      };
+    }
+    case 'hts/createToken': {
+      HederaUtils.isValidCreateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await createToken(walletSnapParams, request.params),
       };
     }
     default:

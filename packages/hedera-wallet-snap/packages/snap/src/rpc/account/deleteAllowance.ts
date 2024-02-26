@@ -20,14 +20,12 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import _ from 'lodash';
-import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { DeleteAllowanceRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Delete an allowance for a given asset.
@@ -42,20 +40,15 @@ export async function deleteAllowance(
   walletSnapParams: WalletSnapParams,
   deleteAllowanceRequestParams: DeleteAllowanceRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { assetType, assetId, spenderAccountId } = deleteAllowanceRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
-
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
 
   let txReceipt = {} as TxReceipt;
   try {
@@ -76,7 +69,7 @@ export async function deleteAllowance(
     if (assetType === 'HBAR') {
       panelToShow.push(text(`Asset: ${assetType}`));
     } else {
-      const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const tokenInfo: MirrorTokenInfo = await hederaService.getTokenById(
         assetId as string,
       );
@@ -105,9 +98,11 @@ export async function deleteAllowance(
 
     const dialogParamsForDeleteAllowance: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForDeleteAllowance);
+    const confirmed = await SnapUtils.snapDialog(
+      dialogParamsForDeleteAllowance,
+    );
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
@@ -118,16 +113,13 @@ export async function deleteAllowance(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.deleteAllowance({
       assetType,
       assetId: assetId as string,
       spenderAccountId,
     });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to delete an allowance: ${String(
       error,

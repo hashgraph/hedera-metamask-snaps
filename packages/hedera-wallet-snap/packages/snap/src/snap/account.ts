@@ -23,19 +23,12 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import { SimpleHederaClient } from '../types/hedera';
 import { HederaServiceImpl, getHederaClient } from '../services/impl/hedera';
-import {
-  Account,
-  AccountInfo,
-  ExternalAccount,
-  NetworkParams,
-} from '../types/account';
-import { hederaNetworks } from '../types/constants';
+import { Account, AccountInfo, ExternalAccount } from '../types/account';
+import { SimpleHederaClient } from '../types/hedera';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
-import { generateCommonPanel, snapDialog } from './dialog';
-import { validHederaNetwork } from './network';
+import { SnapUtils } from '../utils/SnapUtils';
 import {
   getHederaAccountIdIfExists,
   initAccountState,
@@ -69,33 +62,22 @@ function ensure0xPrefix(address: string): string {
  * @param origin - Source.
  * @param state - WalletSnapState.
  * @param params - Parameters that were passed by the user.
+ * @param network - Hedera network.
  * @param mirrorNodeUrl - Hedera mirror node URL.
  * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
- * @returns MetaMask Hedera client.
+ * @returns Nothing.
  */
 export async function setCurrentAccount(
   origin: string,
   state: WalletSnapState,
   params: unknown,
+  network: string,
   mirrorNodeUrl: string,
   isExternalAccount: boolean,
 ): Promise<void> {
   try {
-    const { network = 'mainnet' } = (params ?? {}) as NetworkParams;
-    if (!validHederaNetwork(network)) {
-      console.error(
-        `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
-          ', ',
-        )}'`,
-      );
-
-      throw providerErrors.unsupportedMethod(
-        `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
-          ', ',
-        )}'`,
-      );
-    }
-
+    let metamaskEvmAddress = '';
+    let externalEvmAddress = '';
     let connectedAddress = '';
     let keyStore = {} as KeyStore;
     // Handle external account(non-metamask account)
@@ -147,6 +129,7 @@ export async function setCurrentAccount(
     } else {
       // Handle metamask connected account
       connectedAddress = await getCurrentMetamaskAccount();
+
       // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
       const res = await CryptoUtils.generateWallet(connectedAddress);
       if (!res) {
@@ -168,6 +151,11 @@ export async function setCurrentAccount(
     }
 
     connectedAddress = connectedAddress.toLowerCase();
+    if (isExternalAccount) {
+      externalEvmAddress = connectedAddress;
+    } else {
+      metamaskEvmAddress = connectedAddress;
+    }
 
     // Initialize if not in snap state
     if (
@@ -187,11 +175,17 @@ export async function setCurrentAccount(
       network,
       mirrorNodeUrl,
       connectedAddress,
+      metamaskEvmAddress,
+      externalEvmAddress,
       keyStore,
     );
   } catch (error: any) {
     console.error(`Error while trying to get the account: ${String(error)}`);
-    throw error;
+    throw providerErrors.custom({
+      code: 4200,
+      message: `Error while trying to get the account`,
+      data: { error: String(error) },
+    });
   }
 }
 
@@ -240,7 +234,7 @@ async function connectEVMAccount(
   if (_.isEmpty(connectedAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: await generateCommonPanel(origin, [
+      content: await SnapUtils.generateCommonPanel(origin, [
         heading('Connect to EVM Account'),
         text('Enter private key for the following account'),
         divider(),
@@ -248,7 +242,9 @@ async function connectEVMAccount(
       ]),
       placeholder: '2386d1d21644dc65d...',
     };
-    const privateKey = (await snapDialog(dialogParamsForPrivateKey)) as string;
+    const privateKey = (await SnapUtils.snapDialog(
+      dialogParamsForPrivateKey,
+    )) as string;
 
     try {
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
@@ -322,6 +318,7 @@ async function connectEVMAccount(
         privateKey,
         accountInfo.accountId,
         network,
+        mirrorNodeUrl,
       );
       if (hederaClient) {
         result.curve = curve;
@@ -333,14 +330,14 @@ async function connectEVMAccount(
       } else {
         const dialogParamsForHederaAccountId: SnapDialogParams = {
           type: 'alert',
-          content: await generateCommonPanel(origin, [
+          content: await SnapUtils.generateCommonPanel(origin, [
             heading('Hedera Account Status'),
             text(
               `The private key you passed is not associated with the Hedera account '${evmAddress}' on '${network}' that uses the elliptic curve '${curve}'`,
             ),
           ]),
         };
-        await snapDialog(dialogParamsForHederaAccountId);
+        await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
 
         console.error(
           `The private key you passed is not associated with the Hedera account '${result.address}' on '${network}' that uses the elliptic curve '${curve}'`,
@@ -411,7 +408,7 @@ async function connectHederaAccount(
   if (_.isEmpty(connectedAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: await generateCommonPanel(origin, [
+      content: await SnapUtils.generateCommonPanel(origin, [
         heading('Connect to Hedera Account'),
         text('Enter private key for the following account'),
         divider(),
@@ -419,9 +416,12 @@ async function connectHederaAccount(
       ]),
       placeholder: '2386d1d21644dc65d...',
     };
-    const privateKey = (await snapDialog(dialogParamsForPrivateKey)) as string;
+    const privateKey = (await SnapUtils.snapDialog(
+      dialogParamsForPrivateKey,
+    )) as string;
 
     try {
+      console.log('mirrorNodeUrl', mirrorNodeUrl);
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
         accountId,
@@ -479,6 +479,7 @@ async function connectHederaAccount(
         privateKey,
         accountId,
         network,
+        mirrorNodeUrl,
       );
       if (hederaClient) {
         result.privateKey = hederaClient
@@ -492,14 +493,14 @@ async function connectHederaAccount(
       } else {
         const dialogParamsForHederaAccountId: SnapDialogParams = {
           type: 'alert',
-          content: await generateCommonPanel(origin, [
+          content: await SnapUtils.generateCommonPanel(origin, [
             heading('Hedera Account Status'),
             text(
               `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
             ),
           ]),
         };
-        await snapDialog(dialogParamsForHederaAccountId);
+        await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
 
         console.error(
           `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
@@ -530,10 +531,12 @@ async function connectHederaAccount(
  * Veramo Import metamask account.
  *
  * @param _origin - Source.
- * @param state - IdentitySnapState.
+ * @param state - HederaWalletSnapState.
  * @param network - Hedera network.
  * @param mirrorNode - Hedera mirror node URL.
  * @param connectedAddress - Currently connected EVm address.
+ * @param metamaskEvmAddress - Metamask EVM address.
+ * @param externalEvmAddress - External EVM address.
  * @param keyStore - Keystore for private, public keys and EVM address.
  */
 export async function importMetaMaskAccount(
@@ -542,18 +545,14 @@ export async function importMetaMaskAccount(
   network: string,
   mirrorNode: string,
   connectedAddress: string,
+  metamaskEvmAddress: string,
+  externalEvmAddress: string,
   keyStore: KeyStore,
 ): Promise<void> {
   const { curve, privateKey, publicKey, address } = keyStore;
 
-  let { mirrorNodeUrl } = state.accountState[connectedAddress][network];
-  if (!_.isEmpty(mirrorNode)) {
-    mirrorNodeUrl = mirrorNode;
-  }
-
   console.log('Retrieving account info from Hedera Mirror node');
-  const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-  mirrorNodeUrl = hederaService.mirrorNodeUrl;
+  const hederaService = new HederaServiceImpl(network, mirrorNode);
   const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
     address,
   );
@@ -569,16 +568,19 @@ export async function importMetaMaskAccount(
   }
 
   // eslint-disable-next-line require-atomic-updates
-  state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNodeUrl;
+  state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNode;
   // eslint-disable-next-line require-atomic-updates
   state.accountState[connectedAddress][network].accountInfo = accountInfo;
 
   // eslint-disable-next-line require-atomic-updates
   state.currentAccount = {
+    metamaskEvmAddress,
+    externalEvmAddress,
     hederaAccountId: accountInfo.accountId,
     hederaEvmAddress: accountInfo.evmAddress,
     balance: accountInfo.balance,
     network,
+    mirrorNodeUrl: mirrorNode,
   } as Account;
 
   // eslint-disable-next-line require-atomic-updates
@@ -600,18 +602,22 @@ export async function importMetaMaskAccount(
  * @param privateKey - Private key of the account.
  * @param hederaAccountId - Hedera Account ID.
  * @param network - Hedera network.
+ * @param mirrorNodeUrl - Hedera mirror node URL.
+ * @returns SimpleHederaClient.
  */
 export async function createHederaClient(
   curve: string,
   privateKey: string,
   hederaAccountId: string,
   network: string,
+  mirrorNodeUrl: string,
 ): Promise<SimpleHederaClient> {
   const hederaClient = await getHederaClient(
     curve,
     privateKey,
     hederaAccountId,
     network,
+    mirrorNodeUrl,
   );
   if (!hederaClient) {
     console.error(

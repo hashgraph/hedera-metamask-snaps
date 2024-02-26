@@ -29,10 +29,13 @@ export type ExternalAccount = {
 };
 
 export type Account = {
+  metamaskEvmAddress: string;
+  externalEvmAddress: string;
   hederaAccountId: string;
   hederaEvmAddress: string;
   balance: AccountBalance;
   network: string;
+  mirrorNodeUrl: string;
 };
 
 export type AccountInfo = {

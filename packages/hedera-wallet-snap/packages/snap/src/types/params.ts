@@ -24,7 +24,7 @@ export type MirrorNodeParams = { mirrorNodeUrl?: string };
 
 export type ServiceFee = {
   percentageCut: number;
-  toAddress: string;
+  toAddress?: string;
 };
 
 export type SignMessageRequestParams = {
@@ -35,14 +35,11 @@ export type SignMessageRequestParams = {
 export type GetAccountInfoRequestParams = {
   accountId?: string;
   serviceFee?: ServiceFee;
+  fetchUsingMirrorNode?: boolean;
 };
 
 export type GetTransactionsRequestParams = {
   transactionId?: string;
-};
-
-export type AssociateTokensRequestParams = {
-  tokenIds: string[];
 };
 
 export type TransferCryptoRequestParams = {
@@ -78,4 +75,37 @@ export type DeleteAllowanceRequestParams = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
   assetId?: string;
   spenderAccountId?: string;
+};
+
+export type AssociateTokensRequestParams = {
+  tokenIds: string[];
+};
+
+export type TokenCustomFee = {
+  feeCollectorAccountId: string; // Sets the fee collector account ID that collects the fee
+  hbarAmount?: number; // Set the amount of HBAR to be collected
+  tokenAmount?: number; // Sets the amount of tokens to be collected as the fee
+  denominatingTokenId?: string; // The ID of the token used to charge the fee. The denomination of the fee is taken as HBAR if left unset
+  allCollectorsAreExempt?: boolean; // If true, exempts all the token's fee collector accounts from this fee
+};
+
+export type CreateTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  name: string;
+  symbol: string;
+  decimals: number;
+  initialSupply?: number;
+  kycPublicKey?: string;
+  freezePublicKey?: string;
+  pausePublicKey?: string;
+  wipePublicKey?: string;
+  supplyPublicKey?: string;
+  feeSchedulePublicKey?: string;
+  freezeDefault?: boolean;
+  expirationTime?: string;
+  autoRenewAccountId?: string;
+  tokenMemo?: string;
+  customFees?: TokenCustomFee[];
+  supplyType: 'FINITE' | 'INFINITE';
+  maxSupply?: number;
 };

@@ -19,10 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import _ from 'lodash';
-import { MirrorTransactionInfo } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { updateSnapState } from '../../snap/state';
+import { MirrorTransactionInfo } from '../../types/hedera';
 import { GetTransactionsRequestParams } from '../../types/params';
 import { WalletSnapParams } from '../../types/state';
 
@@ -41,31 +39,21 @@ export async function getTransactions(
   walletSnapParams: WalletSnapParams,
   getTransactionsParams: GetTransactionsRequestParams,
 ): Promise<MirrorTransactionInfo[]> {
-  const { state, mirrorNodeUrl } = walletSnapParams;
+  const { state } = walletSnapParams;
 
   const { transactionId = '' } = getTransactionsParams;
 
-  const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+  const { hederaAccountId, network, mirrorNodeUrl } = state.currentAccount;
 
   let transactionsHistory = {} as MirrorTransactionInfo[];
 
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
-
   try {
     console.log('Retrieving transaction history using Hedera Mirror node');
-    const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+    const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
     transactionsHistory = await hederaService.getMirrorTransactions(
       hederaAccountId,
       transactionId,
     );
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to get transaction history: ${String(
       error,

@@ -24,11 +24,11 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
 import { AccountInfo } from '../../types/account';
 import { GetAccountInfoRequestParams, ServiceFee } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { TuumUtils } from '../../utils/TuumUtils';
 
 /**
@@ -54,7 +54,7 @@ export async function getAccountInfo(
   walletSnapParams: WalletSnapParams,
   getAccountInfoParams: GetAccountInfoRequestParams,
 ): Promise<AccountInfo> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     accountId = '',
@@ -62,9 +62,11 @@ export async function getAccountInfo(
       percentageCut: 0,
       toAddress: '0.0.98', // Hedera Fee collection account
     } as ServiceFee,
+    fetchUsingMirrorNode = true,
   } = getAccountInfoParams;
 
-  const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+  const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -81,12 +83,17 @@ export async function getAccountInfo(
   let accountInfo = {} as AccountInfo;
 
   try {
-    if (_.isEmpty(mirrorNodeUrl)) {
+    if (fetchUsingMirrorNode) {
+      console.log('Retrieving account info using Hedera Mirror node');
+      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
+      accountInfo = await hederaService.getMirrorAccountInfo(accountIdToQuery);
+    } else {
       const hederaClient = await createHederaClient(
         curve,
         privateKey,
         hederaAccountId,
         network,
+        mirrorNodeUrl,
       );
 
       // Create the account info query
@@ -134,9 +141,11 @@ export async function getAccountInfo(
 
       const dialogParamsForHederaAccountId: SnapDialogParams = {
         type: 'confirmation',
-        content: await generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };
-      const confirmed = await snapDialog(dialogParamsForHederaAccountId);
+      const confirmed = await SnapUtils.snapDialog(
+        dialogParamsForHederaAccountId,
+      );
       if (!confirmed) {
         console.error(`User rejected the transaction`);
         throw providerErrors.userRejectedRequest();
@@ -161,14 +170,10 @@ export async function getAccountInfo(
       if (serviceFee.percentageCut > 0) {
         await TuumUtils.deductServiceFee(
           serviceFeeToPay,
-          serviceFee.toAddress,
+          serviceFee.toAddress as string,
           hederaClient,
         );
       }
-    } else {
-      console.log('Retrieving account info using Hedera Mirror node');
-      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-      accountInfo = await hederaService.getMirrorAccountInfo(accountIdToQuery);
     }
 
     // Only change the state if we are retrieving account Id of the currently logged in user

@@ -32,7 +32,12 @@ import { BigNumber } from 'bignumber.js';
 
 import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from './account';
-import { ApproveAllowanceAssetDetail } from './params';
+import { ApproveAllowanceAssetDetail, TokenCustomFee } from './params';
+
+export type NetworkInfo = {
+  network: string;
+  mirrorNodeUrl: string;
+};
 
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
@@ -52,6 +57,7 @@ export type TokenBalance = {
   balance: number;
   decimals: number;
   tokenId: string;
+  nftSerialNumber: string;
   name: string;
   symbol: string;
   tokenType: string;
@@ -141,6 +147,11 @@ export type HederaService = {
 
   getTokenById(tokenId: string): Promise<MirrorTokenInfo>;
 
+  getNftSerialNumber(
+    tokenId: string,
+    accountId: string,
+  ): Promise<MirrorNftInfo[]>;
+
   getMirrorTransactions(
     accountId: string,
     transactionId: string,
@@ -167,8 +178,6 @@ export type SimpleHederaClient = {
 
   // returns the account balance in HBARs
   getAccountBalance(): Promise<number>;
-
-  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
 
   transferCrypto(options: {
     transfers: SimpleTransfer[];
@@ -198,6 +207,29 @@ export type SimpleHederaClient = {
   }): Promise<TxReceipt>;
 
   deleteAccount(options: { transferAccountId: string }): Promise<TxReceipt>;
+
+  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
+
+  createToken(options: {
+    assetType: 'TOKEN' | 'NFT';
+    name: string;
+    symbol: string;
+    decimals: number;
+    supplyType: 'FINITE' | 'INFINITE';
+    initialSupply: number;
+    maxSupply: number;
+    expirationTime: string | undefined;
+    autoRenewAccountId: string;
+    tokenMemo: string;
+    freezeDefault: boolean;
+    kycPublicKey: string | undefined;
+    freezePublicKey: string | undefined;
+    pausePublicKey: string | undefined;
+    wipePublicKey: string | undefined;
+    supplyPublicKey: string | undefined;
+    feeSchedulePublicKey: string | undefined;
+    customFees: TokenCustomFee[] | undefined;
+  }): Promise<TxReceipt>;
 };
 
 export type MirrorStakingInfoServiceEndpoint = {
@@ -288,6 +320,16 @@ export type MirrorTokenInfo = {
   total_supply: string;
   type: string;
   wipe_key: Key;
+};
+
+export type MirrorNftInfo = {
+  account_id: string;
+  created_timestamp: string;
+  deleted: boolean;
+  metadata: string;
+  modified_timestamp: string;
+  serial_number: string;
+  token_id: string;
 };
 
 export type MirrorTransactionInfoTransfer = {

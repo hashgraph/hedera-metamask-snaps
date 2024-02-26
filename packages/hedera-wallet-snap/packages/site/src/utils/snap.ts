@@ -24,6 +24,7 @@ import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
+  CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   GetAccountInfoRequestParams,
@@ -168,8 +169,7 @@ export const getAccountInfo = async (
         params: {
           network,
           mirrorNodeUrl,
-          accountId: getAccountInfoParams.accountId,
-          serviceFee: getAccountInfoParams.serviceFee,
+          ...getAccountInfoParams,
           ...externalAccountparams,
         },
       },
@@ -216,33 +216,7 @@ export const getTransactions = async (
         params: {
           network,
           mirrorNodeUrl,
-          transactionId: getTransactionsParams.transactionId,
-          ...externalAccountparams,
-        },
-      },
-    },
-  });
-};
-
-/**
- * Invoke the "associateTokens" method from the snap.
- */
-export const associateTokens = async (
-  network: string,
-  mirrorNodeUrl: string,
-  associateTokensRequestParams: AssociateTokensRequestParams,
-  externalAccountparams?: ExternalAccountParams,
-) => {
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: {
-        method: 'associateTokens',
-        params: {
-          network,
-          mirrorNodeUrl,
-          tokenIds: associateTokensRequestParams.tokenIds,
+          ...getTransactionsParams,
           ...externalAccountparams,
         },
       },
@@ -269,10 +243,7 @@ export const transferCrypto = async (
         params: {
           network,
           mirrorNodeUrl,
-          transfers: transferCryptoParams.transfers,
-          memo: transferCryptoParams.memo,
-          maxFee: transferCryptoParams.maxFee,
-          serviceFee: transferCryptoParams.serviceFee,
+          ...transferCryptoParams,
           ...externalAccountparams,
         },
       },
@@ -298,7 +269,7 @@ export const signMessage = async (
         params: {
           network,
           mirrorNodeUrl,
-          message: signMessageRequestParams.message,
+          ...signMessageRequestParams,
           ...externalAccountparams,
         },
       },
@@ -324,8 +295,31 @@ export const stakeHbar = async (
         params: {
           network,
           mirrorNodeUrl,
-          nodeId: stakeHbarParams.nodeId,
-          accountId: stakeHbarParams.accountId,
+          ...stakeHbarParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "unstakeHbar" method from the snap.
+ */
+export const unstakeHbar = async (
+  network: string,
+  mirrorNodeUrl: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'unstakeHbar',
+        params: {
+          network,
+          mirrorNodeUrl,
           ...externalAccountparams,
         },
       },
@@ -351,10 +345,7 @@ export const approveAllowance = async (
         params: {
           network,
           mirrorNodeUrl,
-          spenderAccountId: approveAllowanceParams.spenderAccountId,
-          amount: approveAllowanceParams.amount,
-          assetType: approveAllowanceParams.assetType,
-          assetDetail: approveAllowanceParams.assetDetail,
+          ...approveAllowanceParams,
           ...externalAccountparams,
         },
       },
@@ -380,9 +371,7 @@ export const deleteAllowance = async (
         params: {
           network,
           mirrorNodeUrl,
-          assetType: deleteAllowanceParams.assetType,
-          assetId: deleteAllowanceParams.assetId,
-          spenderAccountId: deleteAllowanceParams.spenderAccountId,
+          ...deleteAllowanceParams,
           ...externalAccountparams,
         },
       },
@@ -408,7 +397,59 @@ export const deleteAccount = async (
         params: {
           network,
           mirrorNodeUrl,
-          transferAccountId: deleteAccountParams.transferAccountId,
+          ...deleteAccountParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "associateTokens" method from the snap.
+ */
+export const associateTokens = async (
+  network: string,
+  mirrorNodeUrl: string,
+  associateTokensRequestParams: AssociateTokensRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/associateTokens',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...associateTokensRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "createToken" method from the snap.
+ */
+export const createToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  createTokenRequestParams: CreateTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/createToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...createTokenRequestParams,
           ...externalAccountparams,
         },
       },

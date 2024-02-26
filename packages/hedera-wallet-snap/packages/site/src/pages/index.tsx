@@ -37,6 +37,7 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
+import { CreateToken } from '../components/cards/hts/CreateToken';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -206,6 +207,12 @@ const Index = () => {
         />
 
         <DeleteAllowance
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

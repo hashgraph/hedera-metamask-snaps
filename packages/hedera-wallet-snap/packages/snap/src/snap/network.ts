@@ -20,8 +20,6 @@
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
 
-import { hederaNetworks, isIn } from '../types/constants';
-
 /**
  * Get current network.
  *
@@ -34,7 +32,3 @@ export async function getCurrentNetwork(
     method: 'eth_chainId',
   })) as string;
 }
-
-export const validHederaNetwork = (network: string) => {
-  return isIn(hederaNetworks, network);
-};

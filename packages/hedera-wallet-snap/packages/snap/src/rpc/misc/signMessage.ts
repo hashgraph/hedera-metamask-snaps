@@ -24,8 +24,7 @@ import { heading, text } from '@metamask/snaps-ui';
 import { Wallet, ethers } from 'ethers';
 import { Wallet as HederaWallet } from '../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../domain/wallet/software-private-key';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { SignMessageRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -59,9 +58,9 @@ export async function signMessage(
     ];
     const dialogParamsForSignMessage: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForSignMessage);
+    const confirmed = await SnapUtils.snapDialog(dialogParamsForSignMessage);
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
@@ -82,8 +81,6 @@ export async function signMessage(
     if (!signature.startsWith('0x')) {
       signature = `0x${signature}`;
     }
-
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to sign message: ${String(error)}`;
     console.error(errMessage);

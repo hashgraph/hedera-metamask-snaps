@@ -18,10 +18,79 @@
  *
  */
 
-import { HDNodeWallet, Mnemonic, ethers } from 'ethers';
+import { PublicKey } from '@hashgraph/sdk';
+import { HDNodeWallet, Mnemonic, assertArgument, ethers } from 'ethers';
 import { DEFAULTCOINTYPE } from '../types/constants';
 
 export class CryptoUtils {
+  /**
+   * Derives a wallet from the provided node using the provided path.
+   * NOTE: This method is a copy of the 'derivePath' method from the 'ethers' library as that method
+   * changed in the recent version and the new method does not work as expected.
+   *
+   * @param node - The node to derive the wallet from.
+   * @param path - The path to use for derivation.
+   * @returns The derived HDNodeWallet.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static derivePathForWallet(
+    node: HDNodeWallet,
+    path: string,
+  ): HDNodeWallet {
+    const components = path.split('/');
+
+    assertArgument(
+      components.length > 0 && (components[0] === 'm' || node.depth > 0),
+      'invalid path',
+      'path',
+      path,
+    );
+
+    if (components[0] === 'm') {
+      components.shift();
+    }
+
+    let result: HDNodeWallet = node;
+
+    const HardenedBit = 0x80000000;
+    for (let i = 0; i < components.length; i++) {
+      const component = components[i];
+
+      if (component.match(/^[0-9]+'$/u)) {
+        const index = parseInt(
+          component.substring(0, component.length - 1),
+          10,
+        );
+
+        assertArgument(
+          index < HardenedBit,
+          'invalid path index',
+          `path[${i}]`,
+          component,
+        );
+        result = result.deriveChild(HardenedBit + index);
+      } else if (component.match(/^[0-9]+$/u)) {
+        const index = parseInt(component, 10);
+        assertArgument(
+          index < HardenedBit,
+          'invalid path index',
+          `path[${i}]`,
+          component,
+        );
+        result = result.deriveChild(index);
+      } else {
+        assertArgument(
+          false,
+          'invalid path component',
+          `path[${i}]`,
+          component,
+        );
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Generates a wallet using the provided EVM address to generate entropy.
    *
@@ -39,9 +108,11 @@ export class CryptoUtils {
       },
     });
 
-    const nodeWallet = HDNodeWallet.fromMnemonic(
-      Mnemonic.fromEntropy(entropy),
-    ).derivePath(`m/44/${DEFAULTCOINTYPE}/0/0/0`);
+    let nodeWallet = HDNodeWallet.fromMnemonic(Mnemonic.fromEntropy(entropy));
+    nodeWallet = CryptoUtils.derivePathForWallet(
+      nodeWallet,
+      `m/44/${DEFAULTCOINTYPE}/0/0/0`,
+    );
 
     return nodeWallet;
   }
@@ -64,6 +135,21 @@ export class CryptoUtils {
       (publicKey.length === 68 || publicKey.length === 130) &&
       ethers.isHexString(publicKey)
     );
+  }
+
+  /**
+   * Checks whether the provided key is a valid Hedera public key.
+   *
+   * @param key - The public key to check.
+   * @returns True if the key is valid, false otherwise.
+   */
+  public static isValidHederaPublicKey(key: string): boolean {
+    try {
+      PublicKey.fromString(key);
+    } catch (error: any) {
+      return false;
+    }
+    return true;
   }
 
   /**

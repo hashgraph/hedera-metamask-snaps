@@ -22,13 +22,13 @@ import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { updateSnapState } from '../../snap/state';
+import { TxReceipt } from '../../types/hedera';
 import { StakeHbarRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { Utils } from '../../utils/Utils';
 
 /**
@@ -42,23 +42,18 @@ export async function stakeHbar(
   walletSnapParams: WalletSnapParams,
   stakeHbarRequestParams: StakeHbarRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { nodeId = null, accountId = null } = stakeHbarRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
 
   let { stakedAccountId, stakedNodeId, declineStakingReward } =
     state.accountState[hederaEvmAddress][network].accountInfo.stakingInfo;
-
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
 
   let txReceipt = {} as TxReceipt;
 
@@ -91,10 +86,7 @@ export async function stakeHbar(
       );
       panelToShow.push(divider());
       if (!_.isNull(nodeId)) {
-        const hederaService = new HederaServiceImpl(
-          network,
-          mirrorNodeUrlToUse,
-        );
+        const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
         const stakingInfo = await hederaService.getNodeStakingInfo(nodeId);
         if (stakingInfo.length === 0) {
           throw providerErrors.unsupportedMethod(
@@ -136,9 +128,9 @@ export async function stakeHbar(
 
     const dialogParamsForStakeHbar: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForStakeHbar);
+    const confirmed = await SnapUtils.snapDialog(dialogParamsForStakeHbar);
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
@@ -149,6 +141,7 @@ export async function stakeHbar(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
 
     txReceipt = await hederaClient.stakeHbar({
@@ -165,8 +158,6 @@ export async function stakeHbar(
     state.accountState[hederaEvmAddress][
       network
     ].accountInfo.stakingInfo.declineStakingReward = declineStakingReward;
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
     await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to stake Hbar: ${String(error)}`;

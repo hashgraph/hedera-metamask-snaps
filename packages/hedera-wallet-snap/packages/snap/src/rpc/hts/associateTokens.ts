@@ -21,13 +21,12 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { TxReceipt } from '../../types/hedera';
 import { AssociateTokensRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Associates the provided Hedera account with the provided Hedera token(s).
@@ -47,20 +46,15 @@ export async function associateTokens(
   walletSnapParams: WalletSnapParams,
   associateTokensRequestParams: AssociateTokensRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { tokenIds = [] as string[] } = associateTokensRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
-
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
 
   let txReceipt = {} as TxReceipt;
   try {
@@ -71,7 +65,7 @@ export async function associateTokens(
       ),
       divider(),
     ];
-    const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+    const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
     for (const tokenId of tokenIds) {
       const tokenNumber = tokenIds.indexOf(tokenId) + 1;
       panelToShow.push(text(`Token #${tokenNumber}`));
@@ -113,9 +107,9 @@ export async function associateTokens(
 
     const dialogParams: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParams);
+    const confirmed = await SnapUtils.snapDialog(dialogParams);
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
@@ -126,12 +120,9 @@ export async function associateTokens(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.associateTokens({ tokenIds });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to associate tokens to the account: ${String(
       error,

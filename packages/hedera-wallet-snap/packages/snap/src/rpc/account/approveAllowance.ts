@@ -21,16 +21,15 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
 } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Approve an allowance for a given asset.
@@ -59,7 +58,7 @@ export async function approveAllowance(
   walletSnapParams: WalletSnapParams,
   approveAllowanceRequestParams: ApproveAllowanceRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     spenderAccountId,
@@ -68,16 +67,11 @@ export async function approveAllowance(
     assetDetail = {} as ApproveAllowanceAssetDetail,
   } = approveAllowanceRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
-
-  let mirrorNodeUrlToUse = mirrorNodeUrl;
-  if (_.isEmpty(mirrorNodeUrlToUse)) {
-    mirrorNodeUrlToUse =
-      state.accountState[hederaEvmAddress][network].mirrorNodeUrl;
-  }
 
   let txReceipt = {} as TxReceipt;
   try {
@@ -98,7 +92,7 @@ export async function approveAllowance(
         ? walletBalance.tokens[assetDetail.assetId].decimals
         : NaN;
 
-      const hederaService = new HederaServiceImpl(network, mirrorNodeUrlToUse);
+      const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const tokenInfo: MirrorTokenInfo = await hederaService.getTokenById(
         assetDetail.assetId,
       );
@@ -154,9 +148,11 @@ export async function approveAllowance(
 
     const dialogParamsForApproveAllowance: SnapDialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, panelToShow),
+      content: await SnapUtils.generateCommonPanel(origin, panelToShow),
     };
-    const confirmed = await snapDialog(dialogParamsForApproveAllowance);
+    const confirmed = await SnapUtils.snapDialog(
+      dialogParamsForApproveAllowance,
+    );
     if (!confirmed) {
       console.error(`User rejected the transaction`);
       throw providerErrors.userRejectedRequest();
@@ -167,6 +163,7 @@ export async function approveAllowance(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.approveAllowance({
       spenderAccountId,
@@ -174,10 +171,6 @@ export async function approveAllowance(
       assetType,
       assetDetail,
     });
-
-    state.accountState[hederaEvmAddress][network].mirrorNodeUrl =
-      mirrorNodeUrlToUse;
-    await updateSnapState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to approve an alloance: ${String(
       error,
