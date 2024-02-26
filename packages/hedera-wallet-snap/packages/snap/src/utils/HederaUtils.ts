@@ -22,8 +22,13 @@ import { AccountId } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
-import { SimpleTransfer } from 'src/types/hedera';
-import { ExternalAccount } from '../types/account';
+import { NetworkInfo, SimpleTransfer } from 'src/types/hedera';
+import { ExternalAccount, NetworkParams } from '../types/account';
+import {
+  DEFAULTHEDERAMIRRORNODES,
+  hederaNetworks,
+  isIn,
+} from '../types/constants';
 import {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
@@ -40,7 +45,6 @@ import {
   TransferCryptoRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
-import { hederaNetworks, isIn } from '../types/constants';
 
 export class HederaUtils {
   /**
@@ -271,13 +275,38 @@ export class HederaUtils {
   }
 
   /**
-   * Check Validation of MirrorNode flag.
+   * Check Validation of network flag and mirrorNodeUrl flag and return their values.
    *
    * @param params - Request params.
-   * @returns MirrornodeUrl.
+   * @returns Network and MirrorNodeUrl.
    */
-  public static getMirrorNodeFlagIfExists(params: unknown): string {
-    let mirrorNodeUrl = '';
+  public static getNetworkInfoFromUser(params: unknown): NetworkInfo {
+    const networkInfo = {
+      network: 'mainnet',
+      mirrorNodeUrl: DEFAULTHEDERAMIRRORNODES.mainnet,
+    } as NetworkInfo;
+    if (params !== null && typeof params === 'object' && 'network' in params) {
+      const parameter = params as NetworkParams;
+
+      // Check if network that was passed is valid
+      if (!_.isEmpty(parameter.network)) {
+        if (!HederaUtils.validHederaNetwork(parameter.network)) {
+          console.error(
+            `Invalid Hedera network '${
+              parameter.network
+            }'. Valid networks are '${hederaNetworks.join(', ')}'`,
+          );
+
+          throw providerErrors.unsupportedMethod(
+            `Invalid Hedera network '${
+              parameter.network
+            }'. Valid networks are '${hederaNetworks.join(', ')}'`,
+          );
+        }
+        networkInfo.network = parameter.network;
+      }
+    }
+
     if (
       params !== null &&
       typeof params === 'object' &&
@@ -285,13 +314,32 @@ export class HederaUtils {
     ) {
       const parameter = params as MirrorNodeParams;
 
-      // Check if mirrorNodeUrl was passed
+      // Check if mirrorNodeUrl that was passed is valid
       if (!_.isEmpty(parameter.mirrorNodeUrl)) {
-        mirrorNodeUrl = normalizeUrl(parameter.mirrorNodeUrl as string);
+        HederaUtils.checkValidString(
+          parameter,
+          'params',
+          'mirrorNodeUrl',
+          false,
+        );
+        const mirrorNodeUrl = parameter.mirrorNodeUrl as string;
+        try {
+          // eslint-disable-next-line no-new
+          new URL(mirrorNodeUrl);
+        } catch (error: any) {
+          console.error(
+            `Invalid mirrorNodeUrl '${mirrorNodeUrl}'. Error: ${String(error)}`,
+          );
+
+          throw providerErrors.unsupportedMethod(
+            `Invalid mirrorNodeUrl '${mirrorNodeUrl}'. Error: ${String(error)}`,
+          );
+        }
+        networkInfo.mirrorNodeUrl = normalizeUrl(mirrorNodeUrl);
       }
     }
 
-    return mirrorNodeUrl;
+    return networkInfo;
   }
 
   /**
@@ -424,6 +472,14 @@ export class HederaUtils {
     ) {
       HederaUtils.isValidServiceFee(parameter.serviceFee);
     }
+
+    // Check if fetchUsingMirrorNode is valid
+    HederaUtils.checkValidBoolean(
+      parameter,
+      'getAccountInfo',
+      'fetchUsingMirrorNode',
+      false,
+    );
   }
 
   /**

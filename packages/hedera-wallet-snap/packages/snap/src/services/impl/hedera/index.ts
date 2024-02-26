@@ -34,8 +34,6 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
 import { AccountInfo } from '../../../types/account';
-import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
-import { Utils } from '../../../utils/Utils';
 import {
   AccountBalance,
   HederaService,
@@ -47,6 +45,8 @@ import {
   Token,
   TokenBalance,
 } from '../../../types/hedera';
+import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
+import { Utils } from '../../../utils/Utils';
 import { SimpleHederaClientImpl } from './client';
 
 export class HederaServiceImpl implements HederaService {
@@ -56,23 +56,9 @@ export class HederaServiceImpl implements HederaService {
   // eslint-disable-next-line no-restricted-syntax
   public readonly mirrorNodeUrl: string;
 
-  constructor(network: string, mirrorNodeUrl?: string) {
+  constructor(network: string, mirrorNodeUrl: string) {
     this.network = network;
-    // eslint-disable-next-line default-case
-    switch (network) {
-      case 'testnet':
-        this.mirrorNodeUrl = 'https://testnet.mirrornode.hedera.com';
-        break;
-      case 'previewnet':
-        this.mirrorNodeUrl = 'https://previewnet.mirrornode.hedera.com';
-        break;
-      default:
-        this.mirrorNodeUrl = 'https://mainnet-public.mirrornode.hedera.com';
-    }
-
-    if (!_.isEmpty(mirrorNodeUrl)) {
-      this.mirrorNodeUrl = mirrorNodeUrl as string;
-    }
+    this.mirrorNodeUrl = mirrorNodeUrl;
   }
 
   async createClient(options: {
@@ -345,12 +331,14 @@ async function testClientOperatorMatch(client: Client) {
  * @param _privateKey - Private Key.
  * @param _accountId - Account Id.
  * @param _network - Network.
+ * @param _mirrorNodeUrl - Mirror Node Url.
  */
 export async function getHederaClient(
   _curve: string,
   _privateKey: string,
   _accountId: string,
   _network: string,
+  _mirrorNodeUrl: string,
 ): Promise<SimpleHederaClient | null> {
   const accountId = AccountId.fromString(_accountId);
 
@@ -365,7 +353,7 @@ export async function getHederaClient(
   }
 
   const wallet: Wallet = new PrivateKeySoftwareWallet(privateKey);
-  const hederaService = new HederaServiceImpl(_network);
+  const hederaService = new HederaServiceImpl(_network, _mirrorNodeUrl);
 
   const client = await hederaService.createClient({
     wallet,

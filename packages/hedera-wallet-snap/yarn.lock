@@ -3979,7 +3979,7 @@ __metadata:
 
 "@hashgraph/sdk@npm:^2.38.0":
   version: 2.41.0
-  resolution: "@hashgraph/sdk@npm:2.41.0"
+  resolution: "@hashgraph/sdk@npm:2.38.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
@@ -4004,7 +4004,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: f96b4ce63c881b7589df6ab5d65c4f421f598c4546c4a41a9628beea6c8bffa0f3b5ac1c9ab96388fac85993530ca007e8d41cc7bf0d5651d0cd0fe9c08dfee3
+  checksum: 2cf9ae2059ae314e9ba69639480d0de032c2dd156aa40c5411735da287b13f1ee21bf53622a45e23dd326079e6d0056b5386f46680b7b71454b3f21200447055
   languageName: node
   linkType: hard
 

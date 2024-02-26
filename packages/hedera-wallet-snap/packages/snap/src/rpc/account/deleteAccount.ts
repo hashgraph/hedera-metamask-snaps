@@ -21,12 +21,12 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { heading, text } from '@metamask/snaps-ui';
 import { createHederaClient } from '../../snap/account';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { updateSnapState } from '../../snap/state';
 import { Account, AccountInfo } from '../../types/account';
 import { AccountBalance, TxReceipt } from '../../types/hedera';
 import { DeleteAccountRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Delete an account.
@@ -50,7 +50,8 @@ export async function deleteAccount(
 
   const { transferAccountId } = deleteAccountRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -80,6 +81,7 @@ export async function deleteAccount(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.deleteAccount({ transferAccountId });
 

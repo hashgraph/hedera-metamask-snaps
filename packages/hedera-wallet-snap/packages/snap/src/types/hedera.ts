@@ -34,6 +34,11 @@ import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from './account';
 import { ApproveAllowanceAssetDetail, TokenCustomFee } from './params';
 
+export type NetworkInfo = {
+  network: string;
+  mirrorNodeUrl: string;
+};
+
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
   to: string;

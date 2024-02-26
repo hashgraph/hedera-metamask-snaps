@@ -67,7 +67,6 @@ export type WalletAccountState = {
 export type WalletSnapParams = {
   origin: string;
   state: WalletSnapState;
-  mirrorNodeUrl: string;
 };
 
 export type SnapDialogParams = {

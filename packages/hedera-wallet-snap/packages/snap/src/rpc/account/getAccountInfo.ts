@@ -24,11 +24,11 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { updateSnapState } from '../../snap/state';
 import { AccountInfo } from '../../types/account';
 import { GetAccountInfoRequestParams, ServiceFee } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { TuumUtils } from '../../utils/TuumUtils';
 
 /**
@@ -48,15 +48,13 @@ import { TuumUtils } from '../../utils/TuumUtils';
  *
  * @param walletSnapParams - Wallet snap params.
  * @param getAccountInfoParams - Parameters for getting acocunt info.
- * @param fetchUsingMirrorNode - Whether to fetch using Mirror Node.
  * @returns Account Info.
  */
 export async function getAccountInfo(
   walletSnapParams: WalletSnapParams,
   getAccountInfoParams: GetAccountInfoRequestParams,
-  fetchUsingMirrorNode: boolean,
 ): Promise<AccountInfo> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     accountId = '',
@@ -64,9 +62,11 @@ export async function getAccountInfo(
       percentageCut: 0,
       toAddress: '0.0.98', // Hedera Fee collection account
     } as ServiceFee,
+    fetchUsingMirrorNode = true,
   } = getAccountInfoParams;
 
-  const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+  const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -93,6 +93,7 @@ export async function getAccountInfo(
         privateKey,
         hederaAccountId,
         network,
+        mirrorNodeUrl,
       );
 
       // Create the account info query
