@@ -307,6 +307,10 @@ export class HederaUtils {
       }
     }
 
+    if (networkInfo.network === 'testnet') {
+      networkInfo.mirrorNodeUrl = DEFAULTHEDERAMIRRORNODES.testnet;
+    }
+
     if (
       params !== null &&
       typeof params === 'object' &&

@@ -531,7 +531,7 @@ async function connectHederaAccount(
  * Veramo Import metamask account.
  *
  * @param _origin - Source.
- * @param state - IdentitySnapState.
+ * @param state - HederaWalletSnapState.
  * @param network - Hedera network.
  * @param mirrorNode - Hedera mirror node URL.
  * @param connectedAddress - Currently connected EVm address.
@@ -551,17 +551,12 @@ export async function importMetaMaskAccount(
 ): Promise<void> {
   const { curve, privateKey, publicKey, address } = keyStore;
 
-  let { mirrorNodeUrl } = state.accountState[connectedAddress][network];
-  if (!_.isEmpty(mirrorNode)) {
-    mirrorNodeUrl = mirrorNode;
-  }
-
   console.log('Retrieving account info from Hedera Mirror node');
-  const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-  mirrorNodeUrl = hederaService.mirrorNodeUrl;
+  const hederaService = new HederaServiceImpl(network, mirrorNode);
   const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
     address,
   );
+  console.log('accountInfo: ', JSON.stringify(accountInfo, null, 4));
   if (_.isEmpty(accountInfo)) {
     console.error(
       `Could not get account info from Hedera Mirror Node for ${address}. Please try again.`,
@@ -574,7 +569,7 @@ export async function importMetaMaskAccount(
   }
 
   // eslint-disable-next-line require-atomic-updates
-  state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNodeUrl;
+  state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNode;
   // eslint-disable-next-line require-atomic-updates
   state.accountState[connectedAddress][network].accountInfo = accountInfo;
 
@@ -586,7 +581,7 @@ export async function importMetaMaskAccount(
     hederaEvmAddress: accountInfo.evmAddress,
     balance: accountInfo.balance,
     network,
-    mirrorNodeUrl,
+    mirrorNodeUrl: mirrorNode,
   } as Account;
 
   // eslint-disable-next-line require-atomic-updates

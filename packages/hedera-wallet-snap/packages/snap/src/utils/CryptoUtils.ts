@@ -108,8 +108,6 @@ export class CryptoUtils {
       },
     });
 
-    console.log('entropy: ', entropy);
-
     let nodeWallet = HDNodeWallet.fromMnemonic(Mnemonic.fromEntropy(entropy));
     nodeWallet = CryptoUtils.derivePathForWallet(
       nodeWallet,
