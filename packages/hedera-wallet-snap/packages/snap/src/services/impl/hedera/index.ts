@@ -22,9 +22,11 @@ import {
   AccountId,
   Client,
   Hbar,
+  NftId,
   PrivateKey,
   Status,
   StatusError,
+  TokenId,
   TransferTransaction,
 } from '@hashgraph/sdk';
 import _ from 'lodash';
@@ -34,12 +36,11 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { Wallet } from '../../../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
 import { AccountInfo } from '../../../types/account';
-import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
-import { Utils } from '../../../utils/Utils';
 import {
   AccountBalance,
   HederaService,
   MirrorAccountInfo,
+  MirrorNftInfo,
   MirrorStakingInfo,
   MirrorTokenInfo,
   MirrorTransactionInfo,
@@ -47,6 +48,8 @@ import {
   Token,
   TokenBalance,
 } from '../../../types/hedera';
+import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
+import { Utils } from '../../../utils/Utils';
 import { SimpleHederaClientImpl } from './client';
 
 export class HederaServiceImpl implements HederaService {
@@ -56,23 +59,9 @@ export class HederaServiceImpl implements HederaService {
   // eslint-disable-next-line no-restricted-syntax
   public readonly mirrorNodeUrl: string;
 
-  constructor(network: string, mirrorNodeUrl?: string) {
+  constructor(network: string, mirrorNodeUrl: string) {
     this.network = network;
-    // eslint-disable-next-line default-case
-    switch (network) {
-      case 'testnet':
-        this.mirrorNodeUrl = 'https://testnet.mirrornode.hedera.com';
-        break;
-      case 'previewnet':
-        this.mirrorNodeUrl = 'https://previewnet.mirrornode.hedera.com';
-        break;
-      default:
-        this.mirrorNodeUrl = 'https://mainnet-public.mirrornode.hedera.com';
-    }
-
-    if (!_.isEmpty(mirrorNodeUrl)) {
-      this.mirrorNodeUrl = mirrorNodeUrl as string;
-    }
+    this.mirrorNodeUrl = mirrorNodeUrl;
   }
 
   async createClient(options: {
@@ -217,23 +206,54 @@ export class HederaServiceImpl implements HederaService {
         async (token: Token) => {
           const tokenId = token.token_id;
           const tokenInfo: MirrorTokenInfo = await this.getTokenById(tokenId);
-          tokens[tokenId] = {
-            balance: token.balance / Math.pow(10, Number(tokenInfo.decimals)),
-            decimals: Number(tokenInfo.decimals),
-            tokenId,
-            name: tokenInfo.name,
-            symbol: tokenInfo.symbol,
-            tokenType: tokenInfo.type,
-            supplyType: tokenInfo.supply_type,
-            totalSupply: (
-              Number(tokenInfo.total_supply) /
-              Math.pow(10, Number(tokenInfo.decimals))
-            ).toString(),
-            maxSupply: (
-              Number(tokenInfo.max_supply) /
-              Math.pow(10, Number(tokenInfo.decimals))
-            ).toString(),
-          } as TokenBalance;
+          if (tokenInfo.type === 'NON_FUNGIBLE_UNIQUE') {
+            const nfts: MirrorNftInfo[] = await this.getNftSerialNumber(
+              tokenId,
+              result.accountId,
+            );
+            nfts.forEach((nftInfo) => {
+              const nftId = new NftId(
+                TokenId.fromString(tokenId),
+                Number(nftInfo.serial_number),
+              );
+              tokens[nftId.toString()] = {
+                balance: 1,
+                decimals: 0,
+                tokenId,
+                nftSerialNumber: nftInfo.serial_number,
+                name: tokenInfo.name,
+                symbol: tokenInfo.symbol,
+                tokenType: tokenInfo.type,
+                supplyType: tokenInfo.supply_type,
+                totalSupply: (
+                  Number(tokenInfo.total_supply) /
+                  Math.pow(10, Number(tokenInfo.decimals))
+                ).toString(),
+                maxSupply: (
+                  Number(tokenInfo.max_supply) /
+                  Math.pow(10, Number(tokenInfo.decimals))
+                ).toString(),
+              } as TokenBalance;
+            });
+          } else {
+            tokens[tokenId] = {
+              balance: token.balance / Math.pow(10, Number(tokenInfo.decimals)),
+              decimals: Number(tokenInfo.decimals),
+              tokenId,
+              name: tokenInfo.name,
+              symbol: tokenInfo.symbol,
+              tokenType: tokenInfo.type,
+              supplyType: tokenInfo.supply_type,
+              totalSupply: (
+                Number(tokenInfo.total_supply) /
+                Math.pow(10, Number(tokenInfo.decimals))
+              ).toString(),
+              maxSupply: (
+                Number(tokenInfo.max_supply) /
+                Math.pow(10, Number(tokenInfo.decimals))
+              ).toString(),
+            } as TokenBalance;
+          }
         },
       );
 
@@ -258,6 +278,19 @@ export class HederaServiceImpl implements HederaService {
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (response.success) {
       result = response.data;
+    }
+    return result;
+  }
+
+  async getNftSerialNumber(
+    tokenId: string,
+    accountId: string,
+  ): Promise<MirrorNftInfo[]> {
+    let result = [] as MirrorNftInfo[];
+    const url = `${this.mirrorNodeUrl}/api/v1/tokens/${tokenId}/nfts?account.id=${accountId}`;
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (response.success) {
+      result = response.data.nfts;
     }
     return result;
   }
@@ -345,12 +378,14 @@ async function testClientOperatorMatch(client: Client) {
  * @param _privateKey - Private Key.
  * @param _accountId - Account Id.
  * @param _network - Network.
+ * @param _mirrorNodeUrl - Mirror Node Url.
  */
 export async function getHederaClient(
   _curve: string,
   _privateKey: string,
   _accountId: string,
   _network: string,
+  _mirrorNodeUrl: string,
 ): Promise<SimpleHederaClient | null> {
   const accountId = AccountId.fromString(_accountId);
 
@@ -365,7 +400,7 @@ export async function getHederaClient(
   }
 
   const wallet: Wallet = new PrivateKeySoftwareWallet(privateKey);
-  const hederaService = new HederaServiceImpl(_network);
+  const hederaService = new HederaServiceImpl(_network, _mirrorNodeUrl);
 
   const client = await hederaService.createClient({
     wallet,

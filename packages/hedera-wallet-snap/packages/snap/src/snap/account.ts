@@ -24,18 +24,11 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaServiceImpl, getHederaClient } from '../services/impl/hedera';
-import {
-  Account,
-  AccountInfo,
-  ExternalAccount,
-  NetworkParams,
-} from '../types/account';
-import { hederaNetworks } from '../types/constants';
+import { Account, AccountInfo, ExternalAccount } from '../types/account';
 import { SimpleHederaClient } from '../types/hedera';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { SnapUtils } from '../utils/SnapUtils';
-import { HederaUtils } from '../utils/HederaUtils';
 import {
   getHederaAccountIdIfExists,
   initAccountState,
@@ -69,6 +62,7 @@ function ensure0xPrefix(address: string): string {
  * @param origin - Source.
  * @param state - WalletSnapState.
  * @param params - Parameters that were passed by the user.
+ * @param network - Hedera network.
  * @param mirrorNodeUrl - Hedera mirror node URL.
  * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
  * @returns Nothing.
@@ -77,25 +71,13 @@ export async function setCurrentAccount(
   origin: string,
   state: WalletSnapState,
   params: unknown,
+  network: string,
   mirrorNodeUrl: string,
   isExternalAccount: boolean,
 ): Promise<void> {
   try {
-    const { network = 'mainnet' } = (params ?? {}) as NetworkParams;
-    if (!HederaUtils.validHederaNetwork(network)) {
-      console.error(
-        `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
-          ', ',
-        )}'`,
-      );
-
-      throw providerErrors.unsupportedMethod(
-        `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
-          ', ',
-        )}'`,
-      );
-    }
-
+    let metamaskEvmAddress = '';
+    let externalEvmAddress = '';
     let connectedAddress = '';
     let keyStore = {} as KeyStore;
     // Handle external account(non-metamask account)
@@ -147,6 +129,7 @@ export async function setCurrentAccount(
     } else {
       // Handle metamask connected account
       connectedAddress = await getCurrentMetamaskAccount();
+
       // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
       const res = await CryptoUtils.generateWallet(connectedAddress);
       if (!res) {
@@ -168,6 +151,11 @@ export async function setCurrentAccount(
     }
 
     connectedAddress = connectedAddress.toLowerCase();
+    if (isExternalAccount) {
+      externalEvmAddress = connectedAddress;
+    } else {
+      metamaskEvmAddress = connectedAddress;
+    }
 
     // Initialize if not in snap state
     if (
@@ -187,6 +175,8 @@ export async function setCurrentAccount(
       network,
       mirrorNodeUrl,
       connectedAddress,
+      metamaskEvmAddress,
+      externalEvmAddress,
       keyStore,
     );
   } catch (error: any) {
@@ -328,6 +318,7 @@ async function connectEVMAccount(
         privateKey,
         accountInfo.accountId,
         network,
+        mirrorNodeUrl,
       );
       if (hederaClient) {
         result.curve = curve;
@@ -430,6 +421,7 @@ async function connectHederaAccount(
     )) as string;
 
     try {
+      console.log('mirrorNodeUrl', mirrorNodeUrl);
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
         accountId,
@@ -487,6 +479,7 @@ async function connectHederaAccount(
         privateKey,
         accountId,
         network,
+        mirrorNodeUrl,
       );
       if (hederaClient) {
         result.privateKey = hederaClient
@@ -538,10 +531,12 @@ async function connectHederaAccount(
  * Veramo Import metamask account.
  *
  * @param _origin - Source.
- * @param state - IdentitySnapState.
+ * @param state - HederaWalletSnapState.
  * @param network - Hedera network.
  * @param mirrorNode - Hedera mirror node URL.
  * @param connectedAddress - Currently connected EVm address.
+ * @param metamaskEvmAddress - Metamask EVM address.
+ * @param externalEvmAddress - External EVM address.
  * @param keyStore - Keystore for private, public keys and EVM address.
  */
 export async function importMetaMaskAccount(
@@ -550,21 +545,18 @@ export async function importMetaMaskAccount(
   network: string,
   mirrorNode: string,
   connectedAddress: string,
+  metamaskEvmAddress: string,
+  externalEvmAddress: string,
   keyStore: KeyStore,
 ): Promise<void> {
   const { curve, privateKey, publicKey, address } = keyStore;
 
-  let { mirrorNodeUrl } = state.accountState[connectedAddress][network];
-  if (!_.isEmpty(mirrorNode)) {
-    mirrorNodeUrl = mirrorNode;
-  }
-
   console.log('Retrieving account info from Hedera Mirror node');
-  const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-  mirrorNodeUrl = hederaService.mirrorNodeUrl;
+  const hederaService = new HederaServiceImpl(network, mirrorNode);
   const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
     address,
   );
+  console.log('accountInfo: ', JSON.stringify(accountInfo, null, 4));
   if (_.isEmpty(accountInfo)) {
     console.error(
       `Could not get account info from Hedera Mirror Node for ${address}. Please try again.`,
@@ -577,16 +569,19 @@ export async function importMetaMaskAccount(
   }
 
   // eslint-disable-next-line require-atomic-updates
-  state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNodeUrl;
+  state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNode;
   // eslint-disable-next-line require-atomic-updates
   state.accountState[connectedAddress][network].accountInfo = accountInfo;
 
   // eslint-disable-next-line require-atomic-updates
   state.currentAccount = {
+    metamaskEvmAddress,
+    externalEvmAddress,
     hederaAccountId: accountInfo.accountId,
     hederaEvmAddress: accountInfo.evmAddress,
     balance: accountInfo.balance,
     network,
+    mirrorNodeUrl: mirrorNode,
   } as Account;
 
   // eslint-disable-next-line require-atomic-updates
@@ -608,18 +603,22 @@ export async function importMetaMaskAccount(
  * @param privateKey - Private key of the account.
  * @param hederaAccountId - Hedera Account ID.
  * @param network - Hedera network.
+ * @param mirrorNodeUrl - Hedera mirror node URL.
+ * @returns SimpleHederaClient.
  */
 export async function createHederaClient(
   curve: string,
   privateKey: string,
   hederaAccountId: string,
   network: string,
+  mirrorNodeUrl: string,
 ): Promise<SimpleHederaClient> {
   const hederaClient = await getHederaClient(
     curve,
     privateKey,
     hederaAccountId,
     network,
+    mirrorNodeUrl,
   );
   if (!hederaClient) {
     console.error(

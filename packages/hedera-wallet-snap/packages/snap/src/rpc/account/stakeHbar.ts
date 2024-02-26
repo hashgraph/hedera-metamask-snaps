@@ -24,11 +24,11 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { updateSnapState } from '../../snap/state';
 import { TxReceipt } from '../../types/hedera';
 import { StakeHbarRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { Utils } from '../../utils/Utils';
 
 /**
@@ -42,11 +42,12 @@ export async function stakeHbar(
   walletSnapParams: WalletSnapParams,
   stakeHbarRequestParams: StakeHbarRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { nodeId = null, accountId = null } = stakeHbarRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -140,6 +141,7 @@ export async function stakeHbar(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
 
     txReceipt = await hederaClient.stakeHbar({

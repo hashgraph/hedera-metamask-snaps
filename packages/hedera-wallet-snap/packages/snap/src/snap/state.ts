@@ -86,7 +86,7 @@ export async function initSnapState(): Promise<WalletSnapState> {
 }
 
 /**
- * Function that creates an empty IdentitySnapState object in the Identity Snap state for the provided address.
+ * Function that creates an empty HederaWalletSnapState object in the Hedera Wallet Snap state for the provided address.
  *
  * @param state - WalletSnapState.
  * @param network - Hedera network.

@@ -39,11 +39,11 @@ export async function getTransactions(
   walletSnapParams: WalletSnapParams,
   getTransactionsParams: GetTransactionsRequestParams,
 ): Promise<MirrorTransactionInfo[]> {
-  const { state, mirrorNodeUrl } = walletSnapParams;
+  const { state } = walletSnapParams;
 
   const { transactionId = '' } = getTransactionsParams;
 
-  const { hederaAccountId, network } = state.currentAccount;
+  const { hederaAccountId, network, mirrorNodeUrl } = state.currentAccount;
 
   let transactionsHistory = {} as MirrorTransactionInfo[];
 
