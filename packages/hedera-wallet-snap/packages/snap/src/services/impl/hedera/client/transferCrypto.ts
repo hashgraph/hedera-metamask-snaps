@@ -21,15 +21,16 @@
 import {
   AccountId,
   Hbar,
+  NftId,
   TransferTransaction,
   type Client,
 } from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
 import _ from 'lodash';
+import { SimpleTransfer, TxReceipt } from '../../../../types/hedera';
 import { CryptoUtils } from '../../../../utils/CryptoUtils';
 import { Utils } from '../../../../utils/Utils';
-import { SimpleTransfer, TxReceipt } from '../../../../types/hedera';
 
 /**
  * Transfer crypto(hbar or other tokens).
@@ -131,7 +132,7 @@ export async function transferCrypto(
         );
       }
     } else if (transfer.assetType === 'NFT') {
-      const assetid = transfer.assetId as string;
+      const assetid = NftId.fromString(transfer.assetId as string);
       if (_.isEmpty(transfer.from)) {
         transaction.addNftTransfer(
           assetid,

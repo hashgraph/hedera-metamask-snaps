@@ -614,6 +614,20 @@ export class HederaUtils {
             true,
           );
         }
+        // Check if assetId is valid for NFT
+        // Regular expression to match the "substring/substring" format
+        const regex = /^[^\s/]+\/[^\s/]+$/u;
+        if (
+          transfer.assetType === 'NFT' &&
+          !regex.test(transfer.assetId as string)
+        ) {
+          console.error(
+            'Invalid transferCrypto Params passed. "transfers[].assetId" must be in the format "tokenId/serialNumber"',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid transferCrypto Params passed. "transfers[].assetId" must be in the format "tokenId/serialNumber"',
+          );
+        }
 
         // Check if from is valid
         if (
