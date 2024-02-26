@@ -23,8 +23,8 @@ import {
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, StakeHbarRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, stakeHbar } from '../../utils';
+import { Account } from '../../types/snap';
+import { shouldDisplayReconnectButton, unstakeHbar } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -49,14 +49,9 @@ const UnstakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const stakeHbarParams = {
-        nodeId: null,
-        accountId: null,
-      } as StakeHbarRequestParams;
-      const response: any = await stakeHbar(
+      const response: any = await unstakeHbar(
         network,
         mirrorNodeUrl,
-        stakeHbarParams,
         externalAccountParams,
       );
 

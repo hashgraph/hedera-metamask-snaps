@@ -114,7 +114,6 @@ export async function transferCrypto(
       const txNumber = transfers.indexOf(transfer) + 1;
       panelToShow.push(text(`Transaction #${txNumber}`));
       panelToShow.push(divider());
-      panelToShow.push(divider());
 
       let asset = '';
       let feeToDisplay = 0;
@@ -137,7 +136,6 @@ export async function transferCrypto(
         panelToShow.push(text(`Owner Account Id: ${transfer.from as string}`));
       }
       panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
-      panelToShow.push(divider());
       if (transfer.assetType === 'HBAR') {
         if (walletBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
           const errMessage = `There is not enough Hbar in the wallet to transfer the requested amount`;
@@ -170,14 +168,18 @@ export async function transferCrypto(
             ),
           );
         }
+
+        let assetId = transfer.assetId as string;
+        let nftSerialNumber = '';
+        if (transfer.assetType === 'NFT') {
+          const assetIdSplit = assetId.split('/');
+          assetId = assetIdSplit[0];
+          nftSerialNumber = assetIdSplit[1];
+        }
         panelToShow.push(text(`Asset Id: ${transfer.assetId as string}`));
-        const tokenInfo = await hederaService.getTokenById(
-          transfer.assetId as string,
-        );
+        const tokenInfo = await hederaService.getTokenById(assetId);
         if (_.isEmpty(tokenInfo)) {
-          const errMessage = `Error while trying to get token info for ${
-            transfer.assetId as string
-          } from Hedera Mirror Nodes at this time`;
+          const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
           console.error(errMessage);
           panelToShow.push(text(errMessage));
           panelToShow.push(
@@ -193,11 +195,13 @@ export async function transferCrypto(
           transfer.decimals = Number(tokenInfo.decimals);
         }
         if (!Number.isFinite(transfer.decimals)) {
-          const errMessage = `Error while trying to get token info for ${
-            transfer.assetId as string
-          } from Hedera Mirror Nodes at this time`;
+          const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
           console.error(errMessage);
           throw providerErrors.unsupportedMethod(errMessage);
+        }
+
+        if (transfer.assetType === 'NFT') {
+          panelToShow.push(text(`NFT Serial Number: ${nftSerialNumber}`));
         }
 
         if (serviceFeesToPay[transfer.assetType] > 0) {
@@ -205,7 +209,6 @@ export async function transferCrypto(
         } else {
           feeToDisplay = serviceFeesToPay[transfer.assetId as string];
         }
-        panelToShow.push(divider());
       }
       panelToShow.push(text(`To: ${transfer.to}`));
       panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
