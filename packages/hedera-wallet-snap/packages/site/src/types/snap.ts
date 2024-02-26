@@ -31,6 +31,7 @@ export type TokenBalance = {
   balance: number;
   decimals: number;
   tokenId: string;
+  nftSerialNumber: string;
   name: string;
   symbol: string;
   tokenType: string;
@@ -69,6 +70,7 @@ export type ServiceFee = {
 export type GetAccountInfoRequestParams = {
   accountId?: string;
   serviceFee?: ServiceFee;
+  fetchUsingMirrorNode?: boolean;
 };
 
 export type GetTransactionsRequestParams = {

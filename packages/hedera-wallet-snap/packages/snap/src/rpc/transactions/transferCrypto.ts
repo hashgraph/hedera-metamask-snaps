@@ -23,7 +23,6 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { AccountInfo } from '../../types/account';
 import { SimpleTransfer, TxReceipt } from '../../types/hedera';
 import {
@@ -32,6 +31,7 @@ import {
   TransferCryptoRequestParams,
 } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { getAccountInfo } from '../account/getAccountInfo';
 
 /**
@@ -45,7 +45,7 @@ export async function transferCrypto(
   walletSnapParams: WalletSnapParams,
   transferCryptoParams: TransferCryptoRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     transfers = [] as SimpleTransfer[],
@@ -57,7 +57,8 @@ export async function transferCrypto(
     } as ServiceFee,
   } = transferCryptoParams;
 
-  const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+  const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const serviceFeesToPay: Record<string, number> = transfers.reduce<
     Record<string, number>
@@ -91,9 +92,8 @@ export async function transferCrypto(
 
   try {
     await getAccountInfo(
-      { origin, state, mirrorNodeUrl } as WalletSnapParams,
-      {} as GetAccountInfoRequestParams,
-      true,
+      { origin, state } as WalletSnapParams,
+      { fetchUsingMirrorNode: true } as GetAccountInfoRequestParams,
     );
 
     const panelToShow = [
@@ -114,7 +114,6 @@ export async function transferCrypto(
       const txNumber = transfers.indexOf(transfer) + 1;
       panelToShow.push(text(`Transaction #${txNumber}`));
       panelToShow.push(divider());
-      panelToShow.push(divider());
 
       let asset = '';
       let feeToDisplay = 0;
@@ -127,15 +126,16 @@ export async function transferCrypto(
             state,
             mirrorNodeUrl,
           } as WalletSnapParams,
-          { accountId: transfer.from } as GetAccountInfoRequestParams,
-          true,
+          {
+            accountId: transfer.from,
+            fetchUsingMirrorNode: true,
+          } as GetAccountInfoRequestParams,
         );
         walletBalance = ownerAccountInfo.balance;
         panelToShow.push(text(`Transaction Type: Delegated Transfer`));
         panelToShow.push(text(`Owner Account Id: ${transfer.from as string}`));
       }
       panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
-      panelToShow.push(divider());
       if (transfer.assetType === 'HBAR') {
         if (walletBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
           const errMessage = `There is not enough Hbar in the wallet to transfer the requested amount`;
@@ -168,14 +168,18 @@ export async function transferCrypto(
             ),
           );
         }
+
+        let assetId = transfer.assetId as string;
+        let nftSerialNumber = '';
+        if (transfer.assetType === 'NFT') {
+          const assetIdSplit = assetId.split('/');
+          assetId = assetIdSplit[0];
+          nftSerialNumber = assetIdSplit[1];
+        }
         panelToShow.push(text(`Asset Id: ${transfer.assetId as string}`));
-        const tokenInfo = await hederaService.getTokenById(
-          transfer.assetId as string,
-        );
+        const tokenInfo = await hederaService.getTokenById(assetId);
         if (_.isEmpty(tokenInfo)) {
-          const errMessage = `Error while trying to get token info for ${
-            transfer.assetId as string
-          } from Hedera Mirror Nodes at this time`;
+          const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
           console.error(errMessage);
           panelToShow.push(text(errMessage));
           panelToShow.push(
@@ -191,11 +195,13 @@ export async function transferCrypto(
           transfer.decimals = Number(tokenInfo.decimals);
         }
         if (!Number.isFinite(transfer.decimals)) {
-          const errMessage = `Error while trying to get token info for ${
-            transfer.assetId as string
-          } from Hedera Mirror Nodes at this time`;
+          const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
           console.error(errMessage);
           throw providerErrors.unsupportedMethod(errMessage);
+        }
+
+        if (transfer.assetType === 'NFT') {
+          panelToShow.push(text(`NFT Serial Number: ${nftSerialNumber}`));
         }
 
         if (serviceFeesToPay[transfer.assetType] > 0) {
@@ -203,7 +209,6 @@ export async function transferCrypto(
         } else {
           feeToDisplay = serviceFeesToPay[transfer.assetId as string];
         }
-        panelToShow.push(divider());
       }
       panelToShow.push(text(`To: ${transfer.to}`));
       panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
@@ -247,6 +252,7 @@ export async function transferCrypto(
       state.accountState[hederaEvmAddress][network].keyStore.privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
 
     txReceipt = await hederaClient.transferCrypto({

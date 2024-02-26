@@ -23,10 +23,10 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { TxReceipt } from '../../types/hedera';
 import { AssociateTokensRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Associates the provided Hedera account with the provided Hedera token(s).
@@ -46,11 +46,12 @@ export async function associateTokens(
   walletSnapParams: WalletSnapParams,
   associateTokensRequestParams: AssociateTokensRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { tokenIds = [] as string[] } = associateTokensRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -119,6 +120,7 @@ export async function associateTokens(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.associateTokens({ tokenIds });
   } catch (error: any) {

@@ -23,13 +23,13 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
 import { createHederaClient } from '../../snap/account';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
 } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Approve an allowance for a given asset.
@@ -58,7 +58,7 @@ export async function approveAllowance(
   walletSnapParams: WalletSnapParams,
   approveAllowanceRequestParams: ApproveAllowanceRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     spenderAccountId,
@@ -67,7 +67,8 @@ export async function approveAllowance(
     assetDetail = {} as ApproveAllowanceAssetDetail,
   } = approveAllowanceRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -162,6 +163,7 @@ export async function approveAllowance(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.approveAllowance({
       spenderAccountId,

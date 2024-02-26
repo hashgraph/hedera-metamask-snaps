@@ -169,8 +169,7 @@ export const getAccountInfo = async (
         params: {
           network,
           mirrorNodeUrl,
-          accountId: getAccountInfoParams.accountId,
-          serviceFee: getAccountInfoParams.serviceFee,
+          ...getAccountInfoParams,
           ...externalAccountparams,
         },
       },
@@ -217,7 +216,7 @@ export const getTransactions = async (
         params: {
           network,
           mirrorNodeUrl,
-          transactionId: getTransactionsParams.transactionId,
+          ...getTransactionsParams,
           ...externalAccountparams,
         },
       },
@@ -244,10 +243,7 @@ export const transferCrypto = async (
         params: {
           network,
           mirrorNodeUrl,
-          transfers: transferCryptoParams.transfers,
-          memo: transferCryptoParams.memo,
-          maxFee: transferCryptoParams.maxFee,
-          serviceFee: transferCryptoParams.serviceFee,
+          ...transferCryptoParams,
           ...externalAccountparams,
         },
       },
@@ -273,7 +269,7 @@ export const signMessage = async (
         params: {
           network,
           mirrorNodeUrl,
-          message: signMessageRequestParams.message,
+          ...signMessageRequestParams,
           ...externalAccountparams,
         },
       },
@@ -299,8 +295,31 @@ export const stakeHbar = async (
         params: {
           network,
           mirrorNodeUrl,
-          nodeId: stakeHbarParams.nodeId,
-          accountId: stakeHbarParams.accountId,
+          ...stakeHbarParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "unstakeHbar" method from the snap.
+ */
+export const unstakeHbar = async (
+  network: string,
+  mirrorNodeUrl: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'unstakeHbar',
+        params: {
+          network,
+          mirrorNodeUrl,
           ...externalAccountparams,
         },
       },
@@ -326,10 +345,7 @@ export const approveAllowance = async (
         params: {
           network,
           mirrorNodeUrl,
-          spenderAccountId: approveAllowanceParams.spenderAccountId,
-          amount: approveAllowanceParams.amount,
-          assetType: approveAllowanceParams.assetType,
-          assetDetail: approveAllowanceParams.assetDetail,
+          ...approveAllowanceParams,
           ...externalAccountparams,
         },
       },
@@ -355,9 +371,7 @@ export const deleteAllowance = async (
         params: {
           network,
           mirrorNodeUrl,
-          assetType: deleteAllowanceParams.assetType,
-          assetId: deleteAllowanceParams.assetId,
-          spenderAccountId: deleteAllowanceParams.spenderAccountId,
+          ...deleteAllowanceParams,
           ...externalAccountparams,
         },
       },
@@ -383,7 +397,7 @@ export const deleteAccount = async (
         params: {
           network,
           mirrorNodeUrl,
-          transferAccountId: deleteAccountParams.transferAccountId,
+          ...deleteAccountParams,
           ...externalAccountparams,
         },
       },
@@ -409,7 +423,7 @@ export const associateTokens = async (
         params: {
           network,
           mirrorNodeUrl,
-          tokenIds: associateTokensRequestParams.tokenIds,
+          ...associateTokensRequestParams,
           ...externalAccountparams,
         },
       },

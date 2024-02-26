@@ -48,7 +48,9 @@ const GetAccountInfo: FC<Props> = ({
       const getAccountInfoParams = {
         accountId: accountId || undefined,
         serviceFee,
+        fetchUsingMirrorNode: true,
       } as GetAccountInfoRequestParams;
+
       const response: any = await getAccountInfo(
         network,
         mirrorNodeUrl,
