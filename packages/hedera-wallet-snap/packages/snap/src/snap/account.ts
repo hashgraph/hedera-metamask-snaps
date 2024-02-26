@@ -556,7 +556,6 @@ export async function importMetaMaskAccount(
   const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
     address,
   );
-  console.log('accountInfo: ', JSON.stringify(accountInfo, null, 4));
   if (_.isEmpty(accountInfo)) {
     console.error(
       `Could not get account info from Hedera Mirror Node for ${address}. Please try again.`,
