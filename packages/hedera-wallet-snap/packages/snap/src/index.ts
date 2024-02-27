@@ -38,7 +38,7 @@ import { createToken } from './rpc/hts/createToken';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import { HederaUtils } from './utils/HederaUtils';
-import { StakeHbarRequestParams } from "./types/params";
+import { StakeHbarRequestParams } from './types/params';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
