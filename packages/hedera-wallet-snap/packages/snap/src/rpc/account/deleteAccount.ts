@@ -20,13 +20,13 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { heading, text } from '@metamask/snaps-ui';
-import { createHederaClient } from '../../snap/account';
-import { updateSnapState } from '../../snap/state';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
+import { SnapUtils } from '../../utils/SnapUtils';
+import { SnapState } from '../../snap/SnapState';
 import { Account, AccountInfo } from '../../types/account';
 import { AccountBalance, TxReceipt } from '../../types/hedera';
 import { DeleteAccountRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Delete an account.
@@ -76,7 +76,7 @@ export async function deleteAccount(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       curve,
       privateKey,
       hederaAccountId,
@@ -99,7 +99,7 @@ export async function deleteAccount(
     // eslint-disable-next-line require-atomic-updates
     state.accountState[hederaEvmAddress][network].accountInfo =
       {} as AccountInfo;
-    await updateSnapState(state);
+    await SnapState.updateState(state);
   } catch (error: any) {
     const errMessage = `Error while trying to delete account: ${String(error)}`;
     console.error(errMessage);

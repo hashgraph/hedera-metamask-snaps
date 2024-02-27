@@ -37,4 +37,18 @@ export class Utils {
 
     return new Date(timestamp * 1000).toUTCString();
   }
+
+  /**
+   * Adds the prefix to the EVM address.
+   *
+   * @param address - EVM Account address.
+   * @returns EVM address.
+   */
+  public static ensure0xPrefix(address: string): string {
+    let result = address;
+    if (!address.startsWith('0x')) {
+      result = `0x${address}`;
+    }
+    return result.toLowerCase();
+  }
 }

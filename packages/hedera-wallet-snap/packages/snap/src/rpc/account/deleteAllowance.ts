@@ -21,11 +21,11 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { createHederaClient } from '../../snap/account';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import { DeleteAllowanceRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Delete an allowance for a given asset.
@@ -108,7 +108,7 @@ export async function deleteAllowance(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       curve,
       privateKey,
       hederaAccountId,
