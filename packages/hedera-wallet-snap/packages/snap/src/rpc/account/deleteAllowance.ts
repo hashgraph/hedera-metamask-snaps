@@ -40,11 +40,12 @@ export async function deleteAllowance(
   walletSnapParams: WalletSnapParams,
   deleteAllowanceRequestParams: DeleteAllowanceRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { assetType, assetId, spenderAccountId } = deleteAllowanceRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -112,6 +113,7 @@ export async function deleteAllowance(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.deleteAllowance({
       assetType,

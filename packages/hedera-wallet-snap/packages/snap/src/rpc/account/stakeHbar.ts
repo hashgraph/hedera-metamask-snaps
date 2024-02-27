@@ -42,11 +42,12 @@ export async function stakeHbar(
   walletSnapParams: WalletSnapParams,
   stakeHbarRequestParams: StakeHbarRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { nodeId = null, accountId = null } = stakeHbarRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -140,6 +141,7 @@ export async function stakeHbar(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
 
     txReceipt = await hederaClient.stakeHbar({

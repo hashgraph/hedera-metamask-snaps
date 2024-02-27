@@ -47,7 +47,8 @@ export async function createToken(
 ): Promise<TxReceipt> {
   const { origin, state } = walletSnapParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const {
     assetType,
@@ -191,6 +192,7 @@ export async function createToken(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.createToken({
       assetType,

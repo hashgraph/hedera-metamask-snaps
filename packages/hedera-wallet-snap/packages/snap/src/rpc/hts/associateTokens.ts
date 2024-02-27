@@ -46,11 +46,12 @@ export async function associateTokens(
   walletSnapParams: WalletSnapParams,
   associateTokensRequestParams: AssociateTokensRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const { tokenIds = [] as string[] } = associateTokensRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -119,6 +120,7 @@ export async function associateTokens(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.associateTokens({ tokenIds });
   } catch (error: any) {

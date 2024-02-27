@@ -71,14 +71,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     isExternalAccount = true;
   }
 
-  // Set mirrorNodeUrl
-  const mirrorNodeUrl = await SnapState.getMirrorNodeUrl(state, request.params);
+  // Get network and mirrorNodeUrl
+  const { network, mirrorNodeUrl } = HederaUtils.getNetworkInfoFromUser(
+    request.params,
+  );
 
   // Set current account
   await SnapAccounts.setCurrentAccount(
     origin,
     state,
     request.params,
+    network,
     mirrorNodeUrl,
     isExternalAccount,
   );
@@ -89,7 +92,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   const walletSnapParams: WalletSnapParams = {
     origin,
     state,
-    mirrorNodeUrl,
   };
 
   switch (request.method) {
@@ -122,16 +124,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
-      const fetchUsingMirrorNode = !_.isEmpty(
-        HederaUtils.getMirrorNodeFlagIfExists(request.params),
-      );
       return {
         currentAccount: state.currentAccount,
-        accountInfo: await getAccountInfo(
-          walletSnapParams,
-          request.params,
-          fetchUsingMirrorNode,
-        ),
+        accountInfo: await getAccountInfo(walletSnapParams, request.params),
       };
     }
     case 'getAccountBalance': {

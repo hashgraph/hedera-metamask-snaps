@@ -50,7 +50,8 @@ export async function deleteAccount(
 
   const { transferAccountId } = deleteAccountRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -80,6 +81,7 @@ export async function deleteAccount(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.deleteAccount({ transferAccountId });
 

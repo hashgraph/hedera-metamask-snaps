@@ -58,7 +58,7 @@ export async function approveAllowance(
   walletSnapParams: WalletSnapParams,
   approveAllowanceRequestParams: ApproveAllowanceRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     spenderAccountId,
@@ -67,7 +67,8 @@ export async function approveAllowance(
     assetDetail = {} as ApproveAllowanceAssetDetail,
   } = approveAllowanceRequestParams;
 
-  const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+  const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const { privateKey, curve } =
     state.accountState[hederaEvmAddress][network].keyStore;
@@ -162,6 +163,7 @@ export async function approveAllowance(
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     txReceipt = await hederaClient.approveAllowance({
       spenderAccountId,

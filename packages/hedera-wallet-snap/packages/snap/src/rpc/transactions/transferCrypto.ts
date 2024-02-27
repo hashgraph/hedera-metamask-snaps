@@ -45,7 +45,7 @@ export async function transferCrypto(
   walletSnapParams: WalletSnapParams,
   transferCryptoParams: TransferCryptoRequestParams,
 ): Promise<TxReceipt> {
-  const { origin, state, mirrorNodeUrl } = walletSnapParams;
+  const { origin, state } = walletSnapParams;
 
   const {
     transfers = [] as SimpleTransfer[],
@@ -57,7 +57,8 @@ export async function transferCrypto(
     } as ServiceFee,
   } = transferCryptoParams;
 
-  const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+  const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   const serviceFeesToPay: Record<string, number> = transfers.reduce<
     Record<string, number>
@@ -91,9 +92,8 @@ export async function transferCrypto(
 
   try {
     await getAccountInfo(
-      { origin, state, mirrorNodeUrl } as WalletSnapParams,
-      {} as GetAccountInfoRequestParams,
-      true,
+      { origin, state } as WalletSnapParams,
+      { fetchUsingMirrorNode: true } as GetAccountInfoRequestParams,
     );
 
     const panelToShow = [
@@ -127,8 +127,10 @@ export async function transferCrypto(
             state,
             mirrorNodeUrl,
           } as WalletSnapParams,
-          { accountId: transfer.from } as GetAccountInfoRequestParams,
-          true,
+          {
+            accountId: transfer.from,
+            fetchUsingMirrorNode: true,
+          } as GetAccountInfoRequestParams,
         );
         walletBalance = ownerAccountInfo.balance;
         panelToShow.push(text(`Transaction Type: Delegated Transfer`));
@@ -247,6 +249,7 @@ export async function transferCrypto(
       state.accountState[hederaEvmAddress][network].keyStore.privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
 
     txReceipt = await hederaClient.transferCrypto({
