@@ -38,6 +38,7 @@ import { createToken } from './rpc/hts/createToken';
 import { signMessage } from './rpc/misc/signMessage';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import { HederaUtils } from './utils/HederaUtils';
+import { StakeHbarRequestParams } from "./types/params";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -154,6 +155,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await stakeHbar(walletSnapParams, request.params),
+      };
+    }
+    case 'unstakeHbar': {
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await stakeHbar(
+          walletSnapParams,
+          {} as StakeHbarRequestParams,
+        ),
       };
     }
     case 'approveAllowance': {
