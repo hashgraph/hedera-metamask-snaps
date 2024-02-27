@@ -409,6 +409,7 @@ async function connectHederaAccount(
     )) as string;
 
     try {
+      console.log('mirrorNodeUrl', mirrorNodeUrl);
       const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
       const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
         accountId,
