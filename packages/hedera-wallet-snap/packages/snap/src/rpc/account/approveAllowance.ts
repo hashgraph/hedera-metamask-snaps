@@ -21,15 +21,15 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { createHederaClient } from '../../snap/account';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
 } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Approve an allowance for a given asset.
@@ -158,7 +158,7 @@ export async function approveAllowance(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       curve,
       privateKey,
       hederaAccountId,

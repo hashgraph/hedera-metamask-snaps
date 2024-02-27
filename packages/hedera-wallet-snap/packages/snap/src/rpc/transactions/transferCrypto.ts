@@ -22,7 +22,8 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { createHederaClient } from '../../snap/account';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { AccountInfo } from '../../types/account';
 import { SimpleTransfer, TxReceipt } from '../../types/hedera';
 import {
@@ -31,7 +32,6 @@ import {
   TransferCryptoRequestParams,
 } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { getAccountInfo } from '../account/getAccountInfo';
 
 /**
@@ -247,7 +247,7 @@ export async function transferCrypto(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       state.accountState[hederaEvmAddress][network].keyStore.curve,
       state.accountState[hederaEvmAddress][network].keyStore.privateKey,
       hederaAccountId,

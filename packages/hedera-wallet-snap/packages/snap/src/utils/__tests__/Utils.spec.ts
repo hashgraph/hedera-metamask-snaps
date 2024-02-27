@@ -52,4 +52,24 @@ describe('HederaWalletSnap', () => {
       expect(Utils.timestampToString('invalid')).toBe('Invalid Date');
     });
   });
+
+  describe('ensure0xPrefix', () => {
+    it('should add 0x prefix if not present', () => {
+      const addressWithoutPrefix = 'abcdef1234567890';
+      const result = Utils.ensure0xPrefix(addressWithoutPrefix);
+      expect(result).toBe('0xabcdef1234567890'.toLowerCase());
+    });
+
+    it('should not add 0x prefix if already present', () => {
+      const addressWithPrefix = '0xabcdef1234567890';
+      const result = Utils.ensure0xPrefix(addressWithPrefix);
+      expect(result).toBe('0xabcdef1234567890'.toLowerCase());
+    });
+
+    it('should convert the address to lowercase', () => {
+      const addressWithUppercase = '0xABCD1234';
+      const result = Utils.ensure0xPrefix(addressWithUppercase);
+      expect(result).toBe('0xabcd1234');
+    });
+  });
 });

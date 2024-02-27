@@ -22,11 +22,11 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaServiceImpl } from '../../services/impl/hedera';
-import { createHederaClient } from '../../snap/account';
+import { HederaClientFactory } from '../../snap/HederaClientFactory';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { TxReceipt } from '../../types/hedera';
 import { AssociateTokensRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  * Associates the provided Hedera account with the provided Hedera token(s).
@@ -115,7 +115,7 @@ export async function associateTokens(
       throw providerErrors.userRejectedRequest();
     }
 
-    const hederaClient = await createHederaClient(
+    const hederaClient = await HederaClientFactory.create(
       curve,
       privateKey,
       hederaAccountId,
