@@ -11,7 +11,7 @@ import { CryptoUtils } from '../utils/CryptoUtils';
 import { SnapUtils } from '../utils/SnapUtils';
 import { SnapState } from './SnapState';
 import { Utils } from '../utils/Utils';
-import { Account, AccountInfo, ExternalAccount } from '../types/account';
+import {Account, AccountInfo, ExternalAccount } from '../types/account';
 import { HederaClientFactory } from './HederaClientFactory';
 
 export class SnapAccounts {
@@ -77,6 +77,7 @@ export class SnapAccounts {
     isExternalAccount: boolean,
   ): Promise<void> {
     try {
+
       let metamaskEvmAddress = '';
       let externalEvmAddress = '';
       let connectedAddress = '';
@@ -249,6 +250,7 @@ export class SnapAccounts {
       )) as string;
 
       try {
+        console.log('mirrorNodeUrl', mirrorNodeUrl);
         const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
         const accountInfo: AccountInfo =
           await hederaService.getMirrorAccountInfo(evmAddress);
@@ -422,6 +424,7 @@ export class SnapAccounts {
       )) as string;
 
       try {
+        console.log('mirrorNodeUrl', mirrorNodeUrl);
         const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
         const accountInfo: AccountInfo =
           await hederaService.getMirrorAccountInfo(accountId);
@@ -555,6 +558,7 @@ export class SnapAccounts {
     const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
       address,
     );
+    console.log('accountInfo: ', JSON.stringify(accountInfo, null, 4));
     if (_.isEmpty(accountInfo)) {
       console.error(
         `Could not get account info from Hedera Mirror Node for ${address}. Please try again.`,

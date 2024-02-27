@@ -9,8 +9,8 @@ export class HederaClientFactory {
    * @param curve - Curve that was used to derive the keys('ECDSA_SECP256K1' | 'ED25519').
    * @param privateKey - Private key of the account.
    * @param hederaAccountId - Hedera Account ID.
-   * @param network - Hedera network.
-   * @param mirrorNodeUrl - URL of mirror node to use.
+   * @param mirrorNodeUrl - Hedera mirror node URL.
+   * @returns SimpleHederaClient.
    */
   public static async create(
     curve: string,
