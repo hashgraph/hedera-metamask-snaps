@@ -1,4 +1,4 @@
-name: Lint Snap Code
+name: Hedera Wallet Snap Code Lint
 
 on: [push, pull_request]
 

@@ -75,118 +75,106 @@ export async function setCurrentAccount(
   mirrorNodeUrl: string,
   isExternalAccount: boolean,
 ): Promise<void> {
-  try {
-    let metamaskEvmAddress = '';
-    let externalEvmAddress = '';
-    let connectedAddress = '';
-    let keyStore = {} as KeyStore;
-    // Handle external account(non-metamask account)
-    if (isExternalAccount) {
-      const nonMetamaskAccount = params as ExternalAccount;
-      const { accountIdOrEvmAddress, curve = 'ECDSA_SECP256K1' } =
-        nonMetamaskAccount.externalAccount;
-      if (ethers.isAddress(accountIdOrEvmAddress)) {
+  let metamaskEvmAddress = '';
+  let externalEvmAddress = '';
+  let connectedAddress = '';
+  let keyStore = {} as KeyStore;
+  // Handle external account(non-metamask account)
+  if (isExternalAccount) {
+    const nonMetamaskAccount = params as ExternalAccount;
+    const { accountIdOrEvmAddress, curve = 'ECDSA_SECP256K1' } =
+      nonMetamaskAccount.externalAccount;
+    if (ethers.isAddress(accountIdOrEvmAddress)) {
+      const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
+        await connectEVMAccount(
+          origin,
+          state,
+          network,
+          mirrorNodeUrl,
+          curve,
+          ensure0xPrefix(accountIdOrEvmAddress),
+        );
+      connectedAddress = _connectedAddress;
+      keyStore = _keyStore;
+    } else {
+      try {
         const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
-          await connectEVMAccount(
+          await connectHederaAccount(
             origin,
             state,
             network,
             mirrorNodeUrl,
             curve,
-            ensure0xPrefix(accountIdOrEvmAddress),
+            (accountIdOrEvmAddress as string).toLowerCase(),
           );
         connectedAddress = _connectedAddress;
         keyStore = _keyStore;
-      } else {
-        try {
-          const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
-            await connectHederaAccount(
-              origin,
-              state,
-              network,
-              mirrorNodeUrl,
-              curve,
-              (accountIdOrEvmAddress as string).toLowerCase(),
-            );
-          connectedAddress = _connectedAddress;
-          keyStore = _keyStore;
-        } catch (error: any) {
-          const address = accountIdOrEvmAddress as string;
-          console.error(
-            `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
-              error,
-            )}`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
-              error,
-            )}`,
-            data: address,
-          });
-        }
-      }
-    } else {
-      // Handle metamask connected account
-      connectedAddress = await getCurrentMetamaskAccount();
-
-      // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
-      const res = await CryptoUtils.generateWallet(connectedAddress);
-      if (!res) {
-        console.log('Failed to generate snap wallet for DID operations');
-        throw providerErrors.unsupportedMethod(
-          'Failed to generate snap wallet for DID operations',
+      } catch (error: any) {
+        const address = accountIdOrEvmAddress as string;
+        console.error(
+          `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
+            error,
+          )}`,
         );
+        throw providerErrors.custom({
+          code: 4200,
+          message: `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
+            error,
+          )}`,
+          data: address,
+        });
       }
-      keyStore.curve = 'ECDSA_SECP256K1';
-      keyStore.privateKey = res.privateKey;
-      keyStore.publicKey = res.publicKey;
-      keyStore.address = res.address.toLowerCase();
-      connectedAddress = res.address.toLowerCase();
-      keyStore.hederaAccountId = await getHederaAccountIdIfExists(
-        state,
-        network,
-        connectedAddress,
+    }
+    externalEvmAddress = connectedAddress.toLowerCase();
+  } else {
+    // Handle metamask connected account
+    connectedAddress = await getCurrentMetamaskAccount();
+    metamaskEvmAddress = connectedAddress.toLowerCase();
+
+    // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
+    const res = await CryptoUtils.generateWallet(connectedAddress);
+    if (!res) {
+      console.log('Failed to generate snap wallet for DID operations');
+      throw providerErrors.unsupportedMethod(
+        'Failed to generate snap wallet for DID operations',
       );
     }
-
-    connectedAddress = connectedAddress.toLowerCase();
-    if (isExternalAccount) {
-      externalEvmAddress = connectedAddress;
-    } else {
-      metamaskEvmAddress = connectedAddress;
-    }
-
-    // Initialize if not in snap state
-    if (
-      !Object.keys(state.accountState).includes(connectedAddress) ||
-      (Object.keys(state.accountState).includes(connectedAddress) &&
-        !Object.keys(state.accountState[connectedAddress]).includes(network))
-    ) {
-      console.log(
-        `The address ${connectedAddress} has NOT yet been configured for the '${network}' network in the Hedera Wallet. Configuring now...`,
-      );
-      await initAccountState(state, network, connectedAddress);
-    }
-
-    await importMetaMaskAccount(
-      origin,
+    keyStore.curve = 'ECDSA_SECP256K1';
+    keyStore.privateKey = res.privateKey;
+    keyStore.publicKey = res.publicKey;
+    keyStore.address = res.address.toLowerCase();
+    connectedAddress = res.address.toLowerCase();
+    keyStore.hederaAccountId = await getHederaAccountIdIfExists(
       state,
       network,
-      mirrorNodeUrl,
       connectedAddress,
-      metamaskEvmAddress,
-      externalEvmAddress,
-      keyStore,
     );
-  } catch (error: any) {
-    console.error(`Error while trying to get the account: ${String(error)}`);
-    throw providerErrors.custom({
-      code: 4200,
-      message: `Error while trying to get the account`,
-      data: { error: String(error) },
-    });
   }
+
+  connectedAddress = connectedAddress.toLowerCase();
+
+  // Initialize if not in snap state
+  if (
+    !Object.keys(state.accountState).includes(connectedAddress) ||
+    (Object.keys(state.accountState).includes(connectedAddress) &&
+      !Object.keys(state.accountState[connectedAddress]).includes(network))
+  ) {
+    console.log(
+      `The address ${connectedAddress} has NOT yet been configured for the '${network}' network in the Hedera Wallet. Configuring now...`,
+    );
+    await initAccountState(state, network, connectedAddress);
+  }
+
+  await importMetaMaskAccount(
+    origin,
+    state,
+    network,
+    mirrorNodeUrl,
+    connectedAddress,
+    metamaskEvmAddress,
+    externalEvmAddress,
+    keyStore,
+  );
 }
 
 /**
@@ -558,11 +546,11 @@ export async function importMetaMaskAccount(
   );
   if (_.isEmpty(accountInfo)) {
     console.error(
-      `Could not get account info from Hedera Mirror Node for ${address}. Please try again.`,
+      `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`,
     );
     throw providerErrors.custom({
       code: 4200,
-      message: `Could not get account info from Hedera Mirror Node for ${address}. Please try again.`,
+      message: `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`,
       data: address,
     });
   }

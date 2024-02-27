@@ -15,10 +15,5 @@ module.exports = {
     project: './tsconfig.eslint.json',
     sourceType: 'module',
   },
-  ignorePatterns: [
-    '!.eslintrc.js',
-    'dist/',
-    './postBuild.js',
-    'jest.config.js',
-  ],
+  ignorePatterns: ['!.eslintrc.js', 'dist/', './postBuild.js','jest.config.js'],
 };
