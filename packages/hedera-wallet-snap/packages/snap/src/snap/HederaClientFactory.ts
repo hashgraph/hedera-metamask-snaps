@@ -1,5 +1,4 @@
 import { providerErrors } from '@metamask/rpc-errors';
-
 import { getHederaClient } from '../services/impl/hedera';
 import { SimpleHederaClient } from '../types/hedera';
 
@@ -11,18 +10,21 @@ export class HederaClientFactory {
    * @param privateKey - Private key of the account.
    * @param hederaAccountId - Hedera Account ID.
    * @param network - Hedera network.
+   * @param mirrorNodeUrl - URL of mirror node to use.
    */
   public static async create(
     curve: string,
     privateKey: string,
     hederaAccountId: string,
     network: string,
+    mirrorNodeUrl: string,
   ): Promise<SimpleHederaClient> {
     const hederaClient = await getHederaClient(
       curve,
       privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
     if (!hederaClient) {
       console.error(

@@ -27,6 +27,7 @@ describe('HederaClientFactory', () => {
         'privateKey',
         'hederaAccountId',
         'network',
+        'mainnet-public.mirrornode.hedera.com',
       );
 
       expect(client).toEqual(mockClient);
@@ -35,6 +36,7 @@ describe('HederaClientFactory', () => {
         'privateKey',
         'hederaAccountId',
         'network',
+        'mainnet-public.mirrornode.hedera.com',
       );
     });
 
@@ -45,6 +47,7 @@ describe('HederaClientFactory', () => {
         'privateKey',
         'hederaAccountId',
         'network',
+        'mainnet-public.mirrornode.hedera.com',
       );
 
       await expect(action).rejects.toEqual({

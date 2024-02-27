@@ -3,22 +3,16 @@ import { PrivateKey } from '@hashgraph/sdk';
 
 import _ from 'lodash';
 import { ethers } from 'ethers';
-import { hederaNetworks } from '../types/constants';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { HederaServiceImpl, getHederaClient } from '../services/impl/hedera';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { StateUtils } from '../utils/StateUtils';
-import { HederaUtils } from '../utils/HederaUtils';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { SnapUtils } from '../utils/SnapUtils';
 import { SnapState } from './SnapState';
 import { Utils } from '../utils/Utils';
-import {
-  Account,
-  AccountInfo,
-  ExternalAccount,
-  NetworkParams,
-} from '../types/account';
+import { Account, AccountInfo, ExternalAccount } from '../types/account';
+import { HederaClientFactory } from './HederaClientFactory';
 
 export class SnapAccounts {
   /**
@@ -74,39 +68,17 @@ export class SnapAccounts {
     return accounts[0];
   }
 
-  /**
-   * Function that returns account info of the currently selected MetaMask account.
-   *
-   * @param origin - Source.
-   * @param state - WalletSnapState.
-   * @param params - Parameters that were passed by the user.
-   * @param mirrorNodeUrl - Hedera mirror node URL.
-   * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
-   * @returns Nothing.
-   */
   public static async setCurrentAccount(
     origin: string,
     state: WalletSnapState,
     params: unknown,
+    network: string,
     mirrorNodeUrl: string,
     isExternalAccount: boolean,
   ): Promise<void> {
     try {
-      const { network = 'mainnet' } = (params ?? {}) as NetworkParams;
-      if (!HederaUtils.validHederaNetwork(network)) {
-        console.error(
-          `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
-            ', ',
-          )}'`,
-        );
-
-        throw providerErrors.unsupportedMethod(
-          `Invalid Hedera network '${network}'. Valid networks are '${hederaNetworks.join(
-            ', ',
-          )}'`,
-        );
-      }
-
+      let metamaskEvmAddress = '';
+      let externalEvmAddress = '';
       let connectedAddress = '';
       let keyStore = {} as KeyStore;
       // Handle external account(non-metamask account)
@@ -158,6 +130,7 @@ export class SnapAccounts {
       } else {
         // Handle metamask connected account
         connectedAddress = await SnapAccounts.getCurrentMetamaskAccount();
+
         // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
         const res = await CryptoUtils.generateWallet(connectedAddress);
         if (!res) {
@@ -180,6 +153,11 @@ export class SnapAccounts {
       }
 
       connectedAddress = connectedAddress.toLowerCase();
+      if (isExternalAccount) {
+        externalEvmAddress = connectedAddress;
+      } else {
+        metamaskEvmAddress = connectedAddress;
+      }
 
       // Initialize if not in snap state
       if (
@@ -199,6 +177,8 @@ export class SnapAccounts {
         network,
         mirrorNodeUrl,
         connectedAddress,
+        metamaskEvmAddress,
+        externalEvmAddress,
         keyStore,
       );
     } catch (error: any) {
@@ -339,6 +319,7 @@ export class SnapAccounts {
           privateKey,
           accountInfo.accountId,
           network,
+          mirrorNodeUrl,
         );
         if (hederaClient) {
           result.curve = curve;
@@ -492,11 +473,12 @@ export class SnapAccounts {
           });
         }
 
-        const hederaClient = await getHederaClient(
+        const hederaClient = await HederaClientFactory.create(
           curve,
           privateKey,
           accountId,
           network,
+          mirrorNodeUrl,
         );
         if (hederaClient) {
           result.privateKey = hederaClient
@@ -548,10 +530,12 @@ export class SnapAccounts {
    * Veramo Import metamask account.
    *
    * @param _origin - Source.
-   * @param state - IdentitySnapState.
+   * @param state - HederaWalletSnapState.
    * @param network - Hedera network.
    * @param mirrorNode - Hedera mirror node URL.
    * @param connectedAddress - Currently connected EVm address.
+   * @param metamaskEvmAddress - Metamask EVM address.
+   * @param externalEvmAddress - External EVM address.
    * @param keyStore - Keystore for private, public keys and EVM address.
    */
   public static async importMetaMaskAccount(
@@ -560,18 +544,14 @@ export class SnapAccounts {
     network: string,
     mirrorNode: string,
     connectedAddress: string,
+    metamaskEvmAddress: string,
+    externalEvmAddress: string,
     keyStore: KeyStore,
   ): Promise<void> {
     const { curve, privateKey, publicKey, address } = keyStore;
 
-    let { mirrorNodeUrl } = state.accountState[connectedAddress][network];
-    if (!_.isEmpty(mirrorNode)) {
-      mirrorNodeUrl = mirrorNode;
-    }
-
     console.log('Retrieving account info from Hedera Mirror node');
-    const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-    mirrorNodeUrl = hederaService.mirrorNodeUrl;
+    const hederaService = new HederaServiceImpl(network, mirrorNode);
     const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
       address,
     );
@@ -587,16 +567,19 @@ export class SnapAccounts {
     }
 
     // eslint-disable-next-line require-atomic-updates
-    state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNodeUrl;
+    state.accountState[connectedAddress][network].mirrorNodeUrl = mirrorNode;
     // eslint-disable-next-line require-atomic-updates
     state.accountState[connectedAddress][network].accountInfo = accountInfo;
 
     // eslint-disable-next-line require-atomic-updates
     state.currentAccount = {
+      metamaskEvmAddress,
+      externalEvmAddress,
       hederaAccountId: accountInfo.accountId,
       hederaEvmAddress: accountInfo.evmAddress,
       balance: accountInfo.balance,
       network,
+      mirrorNodeUrl: mirrorNode,
     } as Account;
 
     // eslint-disable-next-line require-atomic-updates

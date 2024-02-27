@@ -34,6 +34,11 @@ import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from './account';
 import { ApproveAllowanceAssetDetail, TokenCustomFee } from './params';
 
+export type NetworkInfo = {
+  network: string;
+  mirrorNodeUrl: string;
+};
+
 export type SimpleTransfer = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
   to: string;
@@ -52,6 +57,7 @@ export type TokenBalance = {
   balance: number;
   decimals: number;
   tokenId: string;
+  nftSerialNumber: string;
   name: string;
   symbol: string;
   tokenType: string;
@@ -140,6 +146,11 @@ export type HederaService = {
   getMirrorAccountInfo(idOrAliasOrEvmAddress: string): Promise<AccountInfo>;
 
   getTokenById(tokenId: string): Promise<MirrorTokenInfo>;
+
+  getNftSerialNumber(
+    tokenId: string,
+    accountId: string,
+  ): Promise<MirrorNftInfo[]>;
 
   getMirrorTransactions(
     accountId: string,
@@ -309,6 +320,16 @@ export type MirrorTokenInfo = {
   total_supply: string;
   type: string;
   wipe_key: Key;
+};
+
+export type MirrorNftInfo = {
+  account_id: string;
+  created_timestamp: string;
+  deleted: boolean;
+  metadata: string;
+  modified_timestamp: string;
+  serial_number: string;
+  token_id: string;
 };
 
 export type MirrorTransactionInfoTransfer = {

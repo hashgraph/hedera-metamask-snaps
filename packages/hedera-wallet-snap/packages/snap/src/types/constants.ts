@@ -26,3 +26,9 @@ export const isIn = <T>(values: readonly T[], value: any): value is T => {
 export const DEFAULTCOINTYPE = 3030;
 
 export const hederaNetworks: string[] = ['mainnet', 'testnet', 'previewnet'];
+
+export const DEFAULTHEDERAMIRRORNODES: Record<string, string> = {
+  mainnet: 'https://mainnet-public.mirrornode.hedera.com',
+  testnet: 'https://testnet.mirrornode.hedera.com',
+  previewnet: 'https://previewnet.mirrornode.hedera.com',
+};

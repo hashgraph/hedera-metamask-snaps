@@ -37,7 +37,8 @@ export async function getAccountBalance(
 ): Promise<number> {
   const { state } = walletSnapParams;
 
-  const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+  const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
+    state.currentAccount;
 
   try {
     const hederaClient = await HederaClientFactory.create(
@@ -45,6 +46,7 @@ export async function getAccountBalance(
       state.accountState[hederaEvmAddress][network].keyStore.privateKey,
       hederaAccountId,
       network,
+      mirrorNodeUrl,
     );
 
     const hbarBalance = await hederaClient.getAccountBalance();

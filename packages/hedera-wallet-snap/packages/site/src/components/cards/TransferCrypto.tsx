@@ -71,10 +71,12 @@ const TransferCrypto: FC<Props> = ({
 
       const transferCryptoParams = {
         transfers,
-        memo,
         undefined,
         serviceFee,
       } as TransferCryptoRequestParams;
+      if (!_.isEmpty(memo)) {
+        transferCryptoParams.memo = memo;
+      }
 
       const response: any = await transferCrypto(
         network,

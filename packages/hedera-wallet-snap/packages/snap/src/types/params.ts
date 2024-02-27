@@ -35,6 +35,7 @@ export type SignMessageRequestParams = {
 export type GetAccountInfoRequestParams = {
   accountId?: string;
   serviceFee?: ServiceFee;
+  fetchUsingMirrorNode?: boolean;
 };
 
 export type GetTransactionsRequestParams = {
