@@ -11,7 +11,7 @@ import { CryptoUtils } from '../utils/CryptoUtils';
 import { SnapUtils } from '../utils/SnapUtils';
 import { SnapState } from './SnapState';
 import { Utils } from '../utils/Utils';
-import {Account, AccountInfo, ExternalAccount } from '../types/account';
+import { Account, AccountInfo, ExternalAccount } from '../types/account';
 import { HederaClientFactory } from './HederaClientFactory';
 
 export class SnapAccounts {
@@ -68,6 +68,17 @@ export class SnapAccounts {
     return accounts[0];
   }
 
+  /**
+   * Get current account.
+   *
+   * @param origin - Source.
+   * @param state - WalletSnapState.
+   * @param params - Parameters that were passed by the user.
+   * @param network - Hedera network.
+   * @param mirrorNodeUrl - Hedera mirror node URL.
+   * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
+   * @returns Nothing.
+   */
   public static async setCurrentAccount(
     origin: string,
     state: WalletSnapState,
@@ -77,7 +88,6 @@ export class SnapAccounts {
     isExternalAccount: boolean,
   ): Promise<void> {
     try {
-
       let metamaskEvmAddress = '';
       let externalEvmAddress = '';
       let connectedAddress = '';
