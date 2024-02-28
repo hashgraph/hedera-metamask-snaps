@@ -21,7 +21,7 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaServiceImpl } from '../../services/impl/hedera/HederaServiceImpl';
+import { HederaServiceImpl } from '../../services/impl/hedera/service/HederaServiceImpl';
 import { HederaClientFactory } from '../../snap/HederaClientFactory';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { TxReceipt } from '../../types/hedera';

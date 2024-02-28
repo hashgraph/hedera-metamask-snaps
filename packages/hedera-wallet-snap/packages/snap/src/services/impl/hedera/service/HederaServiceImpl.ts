@@ -33,9 +33,9 @@ import _ from 'lodash';
 
 import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 import { providerErrors } from '@metamask/rpc-errors';
-import { Wallet } from '../../../domain/wallet/abstract';
-import { PrivateKeySoftwareWallet } from '../../../domain/wallet/software-private-key';
-import { AccountInfo } from '../../../types/account';
+import { Wallet } from '../../../../domain/wallet/abstract';
+import { PrivateKeySoftwareWallet } from '../../../../domain/wallet/software-private-key';
+import { AccountInfo } from '../../../../types/account';
 import {
   AccountBalance,
   HederaService,
@@ -47,10 +47,10 @@ import {
   SimpleHederaClient,
   Token,
   TokenBalance,
-} from '../../../types/hedera';
-import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
-import { Utils } from '../../../utils/Utils';
-import { SimpleHederaClientImpl } from './client/SimpleHederaClientImpl';
+} from '../../../../types/hedera';
+import { FetchResponse, FetchUtils } from '../../../../utils/FetchUtils';
+import { Utils } from '../../../../utils/Utils';
+import { SimpleHederaClientImpl } from '../client/SimpleHederaClientImpl';
 
 export class HederaServiceImpl implements HederaService {
   // eslint-disable-next-line no-restricted-syntax
