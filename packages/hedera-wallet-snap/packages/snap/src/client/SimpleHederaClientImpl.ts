@@ -94,13 +94,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return this.#getAccountBalance(this._client);
   }
 
-  async stakeHbar(options: {
-    nodeId: number | null;
-    accountId: string | null;
-  }): Promise<TxReceipt> {
-    return this.#stakeHbar(this._client, options);
-  }
-
   async deleteAllowance(options: {
     assetType: string;
     assetId: string;
@@ -113,10 +106,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     transferAccountId: string;
   }): Promise<TxReceipt> {
     return this.#deleteAccount(this._client, options);
-  }
-
-  async associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt> {
-    return this.#associateTokens(this._client, options);
   }
 
   async createToken(options: {
@@ -343,119 +332,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
       isDeleted: accountInfoJson.isDeleted,
       stakingInfo,
     } as AccountInfo;
-  }
-
-  async #stakeHbar(
-    client: Client,
-    options: {
-      nodeId: number | null;
-      accountId: string | null;
-    },
-  ): Promise<TxReceipt> {
-    const transaction = new AccountUpdateTransaction().setAccountId(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      client.operatorAccountId!,
-    );
-
-    if (_.isNull(options.nodeId) && _.isNull(options.accountId)) {
-      transaction.setDeclineStakingReward(true);
-    } else {
-      if (Number.isFinite(options.nodeId)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        transaction.setStakedNodeId(options.nodeId!);
-      }
-      if (!_.isEmpty(options.accountId)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        transaction.setStakedAccountId(options.accountId!);
-      }
-      transaction.setDeclineStakingReward(false);
-    }
-
-    transaction.freezeWith(client);
-
-    const txResponse = await transaction.execute(client);
-
-    const receipt = await txResponse.getReceipt(client);
-
-    let newExchangeRate;
-    if (receipt.exchangeRate) {
-      newExchangeRate = {
-        ...receipt.exchangeRate,
-        expirationTime: Utils.timestampToString(
-          receipt.exchangeRate.expirationTime,
-        ),
-      };
-    }
-
-    return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      fileId: receipt.fileId ? receipt.fileId : '',
-      contractId: receipt.contractId ? receipt.contractId : '',
-      topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-      exchangeRate: newExchangeRate,
-      topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
-        : '',
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
-      scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
-        : '',
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
-    } as TxReceipt;
-  }
-
-  async #associateTokens(
-    client: Client,
-    options: {
-      tokenIds: string[];
-    },
-  ): Promise<TxReceipt> {
-    const transaction = new TokenAssociateTransaction()
-      .setAccountId(client.operatorAccountId as AccountId)
-      .setTokenIds(options.tokenIds)
-      .freezeWith(client);
-
-    const txResponse = await transaction.execute(client);
-
-    const receipt = await txResponse.getReceipt(client);
-
-    let newExchangeRate;
-    if (receipt.exchangeRate) {
-      newExchangeRate = {
-        ...receipt.exchangeRate,
-        expirationTime: Utils.timestampToString(
-          receipt.exchangeRate.expirationTime,
-        ),
-      };
-    }
-
-    return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      fileId: receipt.fileId ? receipt.fileId : '',
-      contractId: receipt.contractId ? receipt.contractId : '',
-      topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-      exchangeRate: newExchangeRate,
-      topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
-        : '',
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
-      scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
-        : '',
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
-    } as TxReceipt;
   }
 
   /**
