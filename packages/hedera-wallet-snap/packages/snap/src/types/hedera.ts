@@ -131,15 +131,6 @@ export type TxRecord = {
 };
 
 export type HederaService = {
-  // returns null if the account ID does not match the chosen key
-  createClient(options: {
-    wallet: Wallet;
-    // index into the wallet, meaning depends on the wallet type
-    // 0 always means the canonical key for the wallet
-    keyIndex: number;
-    // account ID we wish to associate with the wallet
-    accountId: AccountId;
-  }): Promise<SimpleHederaClient | null>;
 
   getNodeStakingInfo(): Promise<MirrorStakingInfo[]>;
 
