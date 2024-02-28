@@ -4,7 +4,10 @@ import { PrivateKey } from '@hashgraph/sdk';
 import _ from 'lodash';
 import { ethers } from 'ethers';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { HederaServiceImpl, getHederaClient } from '../services/impl/hedera';
+import {
+  HederaServiceImpl,
+  getHederaClient,
+} from '../services/impl/hedera/HederaServiceImpl';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { StateUtils } from '../utils/StateUtils';
 import { CryptoUtils } from '../utils/CryptoUtils';

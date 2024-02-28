@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { HederaServiceImpl } from '../../services/impl/hedera';
+import { HederaServiceImpl } from '../../services/impl/hedera/HederaServiceImpl';
 import { HederaClientFactory } from '../../snap/HederaClientFactory';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { MirrorTokenInfo, TxReceipt } from '../../types/hedera';

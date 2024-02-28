@@ -50,7 +50,7 @@ import {
 } from '../../../types/hedera';
 import { FetchResponse, FetchUtils } from '../../../utils/FetchUtils';
 import { Utils } from '../../../utils/Utils';
-import { SimpleHederaClientImpl } from './client';
+import { SimpleHederaClientImpl } from './client/SimpleHederaClientImpl';
 
 export class HederaServiceImpl implements HederaService {
   // eslint-disable-next-line no-restricted-syntax

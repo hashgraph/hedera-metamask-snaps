@@ -19,7 +19,7 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaServiceImpl } from '../../services/impl/hedera';
+import { HederaServiceImpl } from '../../services/impl/hedera/HederaServiceImpl';
 import { MirrorTransactionInfo } from '../../types/hedera';
 import { GetTransactionsRequestParams } from '../../types/params';
 import { WalletSnapParams } from '../../types/state';
