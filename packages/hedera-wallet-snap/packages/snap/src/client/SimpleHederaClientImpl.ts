@@ -40,18 +40,18 @@ import {
   TransferTransaction,
 } from '@hashgraph/sdk';
 
-import { AccountInfo } from '../../../../types/account';
+import { AccountInfo } from '../types/account';
 import {
   SimpleHederaClient,
   SimpleTransfer,
   TxReceipt,
-} from '../../../../types/hedera';
+} from '../types/hedera';
 import {
   ApproveAllowanceAssetDetail,
   TokenCustomFee,
-} from '../../../../types/params';
-import { Utils } from '../../../../utils/Utils';
-import { CryptoUtils } from '../../../../utils/CryptoUtils';
+} from '../types/params';
+import { Utils } from '../utils/Utils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 import {
   AccountInfoJson,
   StakingInfoJson,

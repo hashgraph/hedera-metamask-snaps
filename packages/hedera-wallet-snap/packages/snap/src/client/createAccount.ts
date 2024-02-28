@@ -28,13 +28,13 @@ import {
   type Client,
 } from '@hashgraph/sdk';
 
-import { CryptoUtils } from '../../../../utils/CryptoUtils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 import {
   AccountBalance,
   SimpleTransfer,
   TxReceipt,
   TxReceiptExchangeRate,
-} from '../../../../types/hedera';
+} from '../types/hedera';
 
 /**
  * Create a new account for someone else by transferring HBAR or any other token.

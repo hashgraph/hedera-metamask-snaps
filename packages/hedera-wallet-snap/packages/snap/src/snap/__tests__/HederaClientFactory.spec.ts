@@ -1,8 +1,8 @@
 import { providerErrors } from '@metamask/rpc-errors';
-import { getHederaClient } from '../../services/impl/hedera/service/HederaServiceImpl';
+import { getHederaClient } from '../../client/impl/hedera/service/HederaServiceImpl';
 import { HederaClientFactory } from '../HederaClientFactory';
 
-jest.mock('../../services/impl/hedera', () => ({
+jest.mock('../../client/impl/hedera', () => ({
   getHederaClient: jest.fn(),
 }));
 
