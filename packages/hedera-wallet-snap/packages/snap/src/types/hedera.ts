@@ -30,9 +30,7 @@ import type {
 import { Long } from '@hashgraph/sdk/lib/long';
 import { BigNumber } from 'bignumber.js';
 
-import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from './account';
-import { ApproveAllowanceAssetDetail, TokenCustomFee } from './params';
 
 export type NetworkInfo = {
   network: string;
