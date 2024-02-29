@@ -94,12 +94,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return this.#getAccountBalance(this._client);
   }
 
-  async deleteAccount(options: {
-    transferAccountId: string;
-  }): Promise<TxReceipt> {
-    return this.#deleteAccount(this._client, options);
-  }
-
   async #getAccountBalance(client: Client): Promise<number> {
     // Create the account balance query
     const query = new AccountBalanceQuery().setAccountId(
@@ -111,57 +105,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
 
     const amount = accountBalance.hbars.to(HbarUnit.Hbar);
     return amount.toNumber();
-  }
-
-  async #deleteAccount(
-    client: Client,
-    options: {
-      transferAccountId: string;
-    },
-  ): Promise<TxReceipt> {
-    const transaction = new AccountDeleteTransaction()
-      .setAccountId(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        client.operatorAccountId!,
-      )
-      .setTransferAccountId(options.transferAccountId)
-      .freezeWith(client);
-
-    const txResponse = await transaction.execute(client);
-
-    const receipt = await txResponse.getReceipt(client);
-
-    let newExchangeRate;
-    if (receipt.exchangeRate) {
-      newExchangeRate = {
-        ...receipt.exchangeRate,
-        expirationTime: Utils.timestampToString(
-          receipt.exchangeRate.expirationTime,
-        ),
-      };
-    }
-
-    return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      fileId: receipt.fileId ? receipt.fileId : '',
-      contractId: receipt.contractId ? receipt.contractId : '',
-      topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-      exchangeRate: newExchangeRate,
-      topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
-        : '',
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
-      scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
-        : '',
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
-    } as TxReceipt;
   }
 
   async #getAccountInfo(
