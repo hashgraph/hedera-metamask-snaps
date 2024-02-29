@@ -19,151 +19,55 @@
  */
 
 import {
-  AccountAllowanceApproveTransaction,
-  AccountAllowanceDeleteTransaction,
-  AccountBalanceQuery,
-  AccountDeleteTransaction,
   type AccountId,
-  AccountInfoQuery,
-  AccountUpdateTransaction,
   type Client,
-  CustomFixedFee,
-  Hbar,
-  HbarUnit,
-  NftId,
   type PrivateKey,
   PublicKey,
-  TokenAssociateTransaction,
-  TokenCreateTransaction,
-  TokenSupplyType,
-  TokenType,
-  TransferTransaction,
 } from '@hashgraph/sdk';
 
 import { AccountInfo } from '../types/account';
-import { SimpleHederaClient, SimpleTransfer, TxReceipt } from '../types/hedera';
-import { ApproveAllowanceAssetDetail, TokenCustomFee } from '../types/params';
-import { Utils } from '../utils/Utils';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import {
-  AccountInfoJson,
-  StakingInfoJson,
-} from '@hashgraph/sdk/lib/account/AccountInfo';
-import _ from 'lodash';
-import { ethers } from 'ethers';
+import { SimpleHederaClient } from '../types/hedera';
+import { HederaAccountStrategy } from './strategies/HederaAccountStrategy';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   // eslint-disable-next-line no-restricted-syntax
-  private readonly _client: Client;
+  readonly #client: Client;
 
   // eslint-disable-next-line no-restricted-syntax
-  private readonly _privateKey: PrivateKey | null;
+  readonly #privateKey: PrivateKey | null;
 
   constructor(client: Client, privateKey: PrivateKey | null) {
-    this._client = client;
-    this._privateKey = privateKey;
+    this.#client = client;
+    this.#privateKey = privateKey;
   }
 
   close() {
-    this._client.close();
+    this.#client.close();
   }
 
   getClient(): Client {
-    return this._client;
+    return this.#client;
   }
 
   getPrivateKey(): PrivateKey | null {
-    return this._privateKey;
+    return this.#privateKey;
   }
 
   getPublicKey(): PublicKey {
     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-    return this._client.operatorPublicKey!;
+    return this.#client.operatorPublicKey!;
   }
 
   getAccountId(): AccountId {
     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-    return this._client.operatorAccountId!;
+    return this.#client.operatorAccountId!;
   }
 
   async getAccountInfo(accountId: string): Promise<AccountInfo> {
-    return this.#getAccountInfo(this._client, accountId);
+    return HederaAccountStrategy.getAccountInfo(this.#client, accountId);
   }
 
   async getAccountBalance(): Promise<number> {
-    return this.#getAccountBalance(this._client);
-  }
-
-  async #getAccountBalance(client: Client): Promise<number> {
-    // Create the account balance query
-    const query = new AccountBalanceQuery().setAccountId(
-      client.operatorAccountId as AccountId,
-    );
-
-    // Submit the query to a Hedera network
-    const accountBalance = await query.execute(client);
-
-    const amount = accountBalance.hbars.to(HbarUnit.Hbar);
-    return amount.toNumber();
-  }
-
-  async #getAccountInfo(
-    client: Client,
-    accountId: string,
-  ): Promise<AccountInfo> {
-    // Create the account info query
-    const query = new AccountInfoQuery({ accountId });
-    await query.getCost(client);
-
-    const accountInfo = await query.execute(client);
-    const accountInfoJson: AccountInfoJson = accountInfo.toJSON();
-
-    const hbarBalance = Number(accountInfoJson.balance.replace(' ℏ', ''));
-    const stakingInfo = {} as StakingInfoJson;
-    if (accountInfoJson.stakingInfo) {
-      stakingInfo.declineStakingReward =
-        accountInfoJson.stakingInfo.declineStakingReward;
-
-      stakingInfo.stakePeriodStart = Utils.timestampToString(
-        accountInfoJson.stakingInfo.stakePeriodStart,
-      );
-
-      stakingInfo.pendingReward = Hbar.fromString(
-        accountInfoJson.stakingInfo.pendingReward ?? '0',
-      )
-        .toString(HbarUnit.Hbar)
-        .replace(' ℏ', '');
-      stakingInfo.stakedToMe = Hbar.fromString(
-        accountInfoJson.stakingInfo.stakedToMe ?? '0',
-      )
-        .toString(HbarUnit.Hbar)
-        .replace(' ℏ', '');
-      stakingInfo.stakedAccountId =
-        accountInfoJson.stakingInfo.stakedAccountId ?? '';
-      stakingInfo.stakedNodeId = accountInfoJson.stakingInfo.stakedNodeId ?? '';
-    }
-
-    return {
-      accountId: accountInfoJson.accountId,
-      alias: accountInfoJson.aliasKey ?? '',
-      expirationTime: Utils.timestampToString(accountInfoJson.expirationTime),
-      memo: accountInfoJson.accountMemo,
-      evmAddress: accountInfoJson.contractAccountId
-        ? `0x${accountInfoJson.contractAccountId}`
-        : '',
-      key: {
-        key: accountInfoJson.key
-          ? PublicKey.fromString(accountInfoJson.key).toStringRaw()
-          : '',
-      },
-      balance: {
-        hbars: hbarBalance,
-        timestamp: Utils.timestampToString(new Date()),
-      },
-      autoRenewPeriod: accountInfo.autoRenewPeriod.seconds.toString(),
-      ethereumNonce: accountInfoJson.ethereumNonce ?? '',
-      isDeleted: accountInfoJson.isDeleted,
-      stakingInfo,
-    } as AccountInfo;
+    return await HederaAccountStrategy.getAccountBalance(this.#client);
   }
 }
