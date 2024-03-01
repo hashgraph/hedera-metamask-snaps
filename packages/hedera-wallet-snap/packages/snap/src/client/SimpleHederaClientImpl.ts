@@ -63,11 +63,11 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return this.#client.operatorAccountId!;
   }
 
-  async getAccountInfo(accountId: string): Promise<AccountInfo> {
+  public async getAccountInfo(accountId: string): Promise<AccountInfo> {
     return HederaAccountStrategy.getAccountInfo(this.#client, accountId);
   }
 
-  async getAccountBalance(): Promise<number> {
+  public async getAccountBalance(): Promise<number> {
     return await HederaAccountStrategy.getAccountBalance(this.#client);
   }
 }

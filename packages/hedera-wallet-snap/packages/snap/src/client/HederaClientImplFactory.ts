@@ -36,11 +36,11 @@ export class HederaClientImplFactory implements HederaClientFactory {
   readonly #privateKey: string;
 
   constructor(
-    keyIndex: number,
     accountId: string,
     network: string,
     curve: string,
     privateKey: string,
+    keyIndex = 0, // note that 0 is default here for the first key in a HD wallet
   ) {
     this.#keyIndex = keyIndex;
     this.#accountId = accountId;
@@ -65,7 +65,7 @@ export class HederaClientImplFactory implements HederaClientFactory {
     return new PrivateKeySoftwareWallet(myPrivateKey);
   }
 
-  public async createClient(): Promise<SimpleHederaClient | null> {
+  public async createClient(): Promise<SimpleHederaClientImpl | null> {
     if (this.#wallet === null) {
       return null;
     }

@@ -35,10 +35,12 @@ import { deleteAllowance } from './rpc/account/deleteAllowance';
 import { stakeHbar } from './rpc/account/stakeHbar';
 import { associateTokens } from './rpc/hts/associateTokens';
 import { createToken } from './rpc/hts/createToken';
-import { signMessage } from './rpc/misc/signMessage';
+import { SignMessageCommand } from './client/commands/SignMessageCommand';
 import { getTransactions } from './rpc/transactions/getTransactions';
 import { HederaUtils } from './utils/HederaUtils';
 import { StakeHbarRequestParams } from './types/params';
+import { GetAccountInfoFacade } from './Facades/GetAccountInfoFacade';
+import {GetAccountBalanceFacade} from "./Facades/GetAccountBalanceFacade";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -118,22 +120,31 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     case 'signMessage': {
       HederaUtils.isValidSignMessageRequest(request.params);
+      const signMessageCommand = new SignMessageCommand(
+        walletSnapParams,
+        request.params,
+      );
       return {
         currentAccount: state.currentAccount,
-        signature: await signMessage(walletSnapParams, request.params),
+        signature: await signMessageCommand.execute(),
       };
     }
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
+      const getAccountInfoFacade = new GetAccountInfoFacade(
+        walletSnapParams,
+        request.params,
+      );
       return {
         currentAccount: state.currentAccount,
-        accountInfo: await getAccountInfo(walletSnapParams, request.params),
+        accountInfo: await getAccountInfoFacade.getAccountInfo(),
       };
     }
     case 'getAccountBalance': {
+      const getAccountBalanceFacade = new GetAccountBalanceFacade(walletSnapParams)
       return {
         currentAccount: state.currentAccount,
-        accountBalance: await getAccountBalance(walletSnapParams),
+        accountBalance: await getAccountBalanceFacade.getAccountBalance(),
       };
     }
     case 'getTransactions': {
