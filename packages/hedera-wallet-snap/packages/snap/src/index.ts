@@ -41,6 +41,7 @@ import { HederaUtils } from './utils/HederaUtils';
 import { StakeHbarRequestParams } from './types/params';
 import { GetAccountInfoFacade } from './Facades/GetAccountInfoFacade';
 import {GetAccountBalanceFacade} from "./Facades/GetAccountBalanceFacade";
+import {HederaTransactionsStrategy} from "./client/strategies/HederaTransactionsStrategy";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -141,7 +142,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
     case 'getAccountBalance': {
-      const getAccountBalanceFacade = new GetAccountBalanceFacade(walletSnapParams)
+      const getAccountBalanceFacade = new GetAccountBalanceFacade(
+        walletSnapParams,
+      );
       return {
         currentAccount: state.currentAccount,
         accountBalance: await getAccountBalanceFacade.getAccountBalance(),
@@ -151,7 +154,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidGetTransactionsParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        transactions: await getTransactions(walletSnapParams, request.params),
+        transactions: await HederaTransactionsStrategy.getTransactions(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'transferCrypto': {
