@@ -27,9 +27,7 @@ import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { WalletSnapParams } from './types/state';
-import { approveAllowance } from './rpc/account/approveAllowance';
 import { deleteAccount } from './rpc/account/deleteAccount';
-import { deleteAllowance } from './rpc/account/deleteAllowance';
 import { associateTokens } from './rpc/hts/associateTokens';
 import { createToken } from './rpc/hts/createToken';
 import { SignMessageCommand } from './commands/SignMessageCommand';
@@ -39,7 +37,8 @@ import { GetAccountInfoFacade } from './Facades/GetAccountInfoFacade';
 import { GetAccountBalanceFacade } from './Facades/GetAccountBalanceFacade';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
 import { StakeHbarFacade } from './Facades/StakeHbarFacade';
-import {ApproveAllowanceFacade} from "./Facades/ApproveAllowanceFacade";
+import { ApproveAllowanceFacade } from './Facades/ApproveAllowanceFacade';
+import { DeleteAllowanceFacade } from './Facades/DeleteAllowanceFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -188,14 +187,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidApproveAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await ApproveAllowanceFacade.approveAllowance(walletSnapParams, request.params),
+        receipt: await ApproveAllowanceFacade.approveAllowance(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'deleteAllowance': {
       HederaUtils.isValidDeleteAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await deleteAllowance(walletSnapParams, request.params),
+        receipt: await DeleteAllowanceFacade.deleteAllowance(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'deleteAccount': {
