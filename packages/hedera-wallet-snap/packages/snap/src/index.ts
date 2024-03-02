@@ -39,6 +39,7 @@ import { GetAccountInfoFacade } from './Facades/GetAccountInfoFacade';
 import { GetAccountBalanceFacade } from './Facades/GetAccountBalanceFacade';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
 import { StakeHbarFacade } from './Facades/StakeHbarFacade';
+import {ApproveAllowanceFacade} from "./Facades/ApproveAllowanceFacade";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -187,7 +188,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidApproveAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await approveAllowance(walletSnapParams, request.params),
+        receipt: await ApproveAllowanceFacade.approveAllowance(walletSnapParams, request.params),
       };
     }
     case 'deleteAllowance': {
