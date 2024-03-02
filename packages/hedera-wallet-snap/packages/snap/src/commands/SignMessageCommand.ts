@@ -1,13 +1,13 @@
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { SignMessageRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../types/state';
+import { SignMessageRequestParams } from '../types/params';
 import { heading, text } from '@metamask/snaps-ui';
-import { SnapUtils } from '../../utils/SnapUtils';
+import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { ethers, Wallet } from 'ethers';
 import { PrivateKey } from '@hashgraph/sdk';
-import { Wallet as HederaWallet } from '../../domain/wallet/abstract';
-import { PrivateKeySoftwareWallet } from '../../domain/wallet/software-private-key';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Wallet as HederaWallet } from '../domain/wallet/abstract';
+import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
+import { CryptoUtils } from '../utils/CryptoUtils';
 
 export class SignMessageCommand {
   readonly #walletSnapParams: WalletSnapParams;

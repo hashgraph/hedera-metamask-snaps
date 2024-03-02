@@ -1,4 +1,4 @@
-import { TokenCustomFee } from '../../types/params';
+import { TokenCustomFee } from '../types/params';
 import {
   AccountId,
   Client,
@@ -10,9 +10,9 @@ import {
   TokenSupplyType,
   TokenType,
 } from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { TxReceipt } from '../types/hedera';
+import { Utils } from '../utils/Utils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 
 /**
  * Create a token on Hedera.

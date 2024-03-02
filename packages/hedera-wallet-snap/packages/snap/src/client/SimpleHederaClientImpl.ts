@@ -27,7 +27,7 @@ import {
 
 import { AccountInfo } from '../types/account';
 import { SimpleHederaClient } from '../types/hedera';
-import { HederaAccountStrategy } from './strategies/HederaAccountStrategy';
+import { HederaAccountStrategy } from '../strategies/HederaAccountStrategy';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   // eslint-disable-next-line no-restricted-syntax

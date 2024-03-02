@@ -1,53 +1,37 @@
-import {
-  AccountAllowanceApproveTransaction,
-  AccountAllowanceDeleteTransaction,
-  AccountId,
-  Client,
-} from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { AccountUpdateTransaction, Client } from '@hashgraph/sdk';
+import { TxReceipt } from '../types/hedera';
+import _ from 'lodash';
+import { Utils } from '../utils/Utils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 
-export class DeleteAllowanceCommand {
-  readonly #assetType: string;
+export class StakeHbarCommand {
+  readonly #nodeId: number | null;
 
-  readonly #assetId: string;
+  readonly #accountId: string | null;
 
-  readonly #spenderAccountId?: string;
-
-  constructor(assetType: string, assetId: string, spenderAccountId?: string) {
-    this.#assetType = assetType;
-    this.#assetId = assetId;
-    this.#spenderAccountId = spenderAccountId;
+  constructor(nodeId: number | null, accountId: string | null) {
+    this.#nodeId = nodeId;
+    this.#accountId = accountId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    let transaction:
-      | AccountAllowanceApproveTransaction
-      | AccountAllowanceDeleteTransaction;
+    const transaction = new AccountUpdateTransaction().setAccountId(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      client.operatorAccountId!,
+    );
 
-    if (this.#assetType === 'HBAR' || this.#assetType === 'TOKEN') {
-      transaction = new AccountAllowanceApproveTransaction();
-      if (this.#assetType === 'HBAR') {
-        transaction.approveHbarAllowance(
-          client.operatorAccountId as AccountId,
-          this.#spenderAccountId as string,
-          0,
-        );
-      } else {
-        transaction.approveTokenAllowance(
-          this.#assetId,
-          client.operatorAccountId as AccountId,
-          this.#spenderAccountId as string,
-          0,
-        );
-      }
+    if (_.isNull(this.#nodeId) && _.isNull(this.#accountId)) {
+      transaction.setDeclineStakingReward(true);
     } else {
-      transaction =
-        new AccountAllowanceDeleteTransaction().deleteAllTokenNftAllowances(
-          this.#assetId,
-          client.operatorAccountId as AccountId,
-        );
+      if (Number.isFinite(this.#nodeId)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        transaction.setStakedNodeId(this.#nodeId!);
+      }
+      if (!_.isEmpty(this.#accountId)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        transaction.setStakedAccountId(this.#accountId!);
+      }
+      transaction.setDeclineStakingReward(false);
     }
 
     transaction.freezeWith(client);

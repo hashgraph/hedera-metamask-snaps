@@ -1,69 +1,53 @@
-import { ApproveAllowanceAssetDetail } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
 import {
   AccountAllowanceApproveTransaction,
+  AccountAllowanceDeleteTransaction,
   AccountId,
   Client,
-  Hbar,
 } from '@hashgraph/sdk';
-import { Utils } from '../../utils/Utils';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { TxReceipt } from '../types/hedera';
+import { Utils } from '../utils/Utils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 
-export class ApproveAllowanceCommand {
-  readonly #spenderAccountId: string;
-
-  readonly #amount: number;
-
+export class DeleteAllowanceCommand {
   readonly #assetType: string;
 
-  readonly #assetDetail: ApproveAllowanceAssetDetail | undefined;
+  readonly #assetId: string;
 
-  constructor(
-    spenderAccountId: string,
-    amount: number,
-    assetType: string,
-    assetDetail?: ApproveAllowanceAssetDetail,
-  ) {
-    this.#spenderAccountId = spenderAccountId;
-    this.#amount = amount;
+  readonly #spenderAccountId?: string;
+
+  constructor(assetType: string, assetId: string, spenderAccountId?: string) {
     this.#assetType = assetType;
-    this.#assetDetail = assetDetail;
+    this.#assetId = assetId;
+    this.#spenderAccountId = spenderAccountId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new AccountAllowanceApproveTransaction();
+    let transaction:
+      | AccountAllowanceApproveTransaction
+      | AccountAllowanceDeleteTransaction;
 
-    if (this.#assetType === 'HBAR') {
-      transaction.approveHbarAllowance(
-        client.operatorAccountId as AccountId,
-        this.#spenderAccountId,
-        new Hbar(this.#amount),
-      );
-    } else if (this.#assetType === 'TOKEN') {
-      const multiplier = Math.pow(
-        10,
-        this.#assetDetail?.assetDecimals as number,
-      );
-      transaction.approveTokenAllowance(
-        this.#assetDetail?.assetId as string,
-        client.operatorAccountId as AccountId,
-        this.#spenderAccountId,
-        this.#amount * multiplier,
-      );
-    } else if (this.#assetType === 'NFT') {
-      if (this.#assetDetail?.all) {
-        transaction.approveTokenNftAllowanceAllSerials(
-          this.#assetDetail?.assetId,
+    if (this.#assetType === 'HBAR' || this.#assetType === 'TOKEN') {
+      transaction = new AccountAllowanceApproveTransaction();
+      if (this.#assetType === 'HBAR') {
+        transaction.approveHbarAllowance(
           client.operatorAccountId as AccountId,
-          this.#spenderAccountId,
+          this.#spenderAccountId as string,
+          0,
         );
       } else {
-        transaction.approveTokenNftAllowance(
-          this.#assetDetail?.assetId as string,
+        transaction.approveTokenAllowance(
+          this.#assetId,
           client.operatorAccountId as AccountId,
-          this.#spenderAccountId,
+          this.#spenderAccountId as string,
+          0,
         );
       }
+    } else {
+      transaction =
+        new AccountAllowanceDeleteTransaction().deleteAllTokenNftAllowances(
+          this.#assetId,
+          client.operatorAccountId as AccountId,
+        );
     }
 
     transaction.freezeWith(client);

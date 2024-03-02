@@ -11,8 +11,8 @@ import {
   AccountInfoJson,
   StakingInfoJson,
 } from '@hashgraph/sdk/lib/account/AccountInfo';
-import { Utils } from '../../utils/Utils';
-import { AccountInfo } from '../../types/account';
+import { Utils } from '../utils/Utils';
+import { AccountInfo } from '../types/account';
 
 export class HederaAccountStrategy {
   public static async getAccountInfo(

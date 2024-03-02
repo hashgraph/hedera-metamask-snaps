@@ -1,8 +1,8 @@
-import { WalletSnapParams } from '../../types/state';
-import { GetTransactionsRequestParams } from '../../types/params';
-import { MirrorTransactionInfo } from '../../types/hedera';
+import { WalletSnapParams } from '../types/state';
+import { GetTransactionsRequestParams } from '../types/params';
+import { MirrorTransactionInfo } from '../types/hedera';
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaUtils } from '../../utils/HederaUtils';
+import { HederaUtils } from '../utils/HederaUtils';
 
 export class HederaTransactionsStrategy {
   public static async getTransactions(

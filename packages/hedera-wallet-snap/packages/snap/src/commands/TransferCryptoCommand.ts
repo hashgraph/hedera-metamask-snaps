@@ -1,4 +1,4 @@
-import { SimpleTransfer, TxReceipt } from '../../types/hedera';
+import { SimpleTransfer, TxReceipt } from '../types/hedera';
 import {
   AccountId,
   Client,
@@ -8,8 +8,8 @@ import {
 } from '@hashgraph/sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import { Utils } from '../../utils/Utils';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../utils/Utils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 
 export class TransferCryptoCommand {
   readonly #transfers: SimpleTransfer[];

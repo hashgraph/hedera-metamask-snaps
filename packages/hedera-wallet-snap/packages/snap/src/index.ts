@@ -23,8 +23,6 @@ import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { getAccountBalance } from './rpc/account/getAccountBalance';
-import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
@@ -32,16 +30,15 @@ import { WalletSnapParams } from './types/state';
 import { approveAllowance } from './rpc/account/approveAllowance';
 import { deleteAccount } from './rpc/account/deleteAccount';
 import { deleteAllowance } from './rpc/account/deleteAllowance';
-import { stakeHbar } from './rpc/account/stakeHbar';
 import { associateTokens } from './rpc/hts/associateTokens';
 import { createToken } from './rpc/hts/createToken';
-import { SignMessageCommand } from './client/commands/SignMessageCommand';
-import { getTransactions } from './rpc/transactions/getTransactions';
+import { SignMessageCommand } from './commands/SignMessageCommand';
 import { HederaUtils } from './utils/HederaUtils';
 import { StakeHbarRequestParams } from './types/params';
 import { GetAccountInfoFacade } from './Facades/GetAccountInfoFacade';
-import {GetAccountBalanceFacade} from "./Facades/GetAccountBalanceFacade";
-import {HederaTransactionsStrategy} from "./client/strategies/HederaTransactionsStrategy";
+import { GetAccountBalanceFacade } from './Facades/GetAccountBalanceFacade';
+import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
+import { StakeHbarFacade } from './Facades/StakeHbarFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -171,13 +168,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidStakeHbarParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await stakeHbar(walletSnapParams, request.params),
+        receipt: await StakeHbarFacade.stakeHbar(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'unstakeHbar': {
       return {
         currentAccount: state.currentAccount,
-        receipt: await stakeHbar(
+        receipt: await StakeHbarFacade.stakeHbar(
           walletSnapParams,
           {} as StakeHbarRequestParams,
         ),
