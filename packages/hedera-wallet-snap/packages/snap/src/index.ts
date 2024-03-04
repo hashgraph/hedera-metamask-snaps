@@ -27,7 +27,6 @@ import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { WalletSnapParams } from './types/state';
-import { deleteAccount } from './rpc/account/deleteAccount';
 import { associateTokens } from './rpc/hts/associateTokens';
 import { createToken } from './rpc/hts/createToken';
 import { SignMessageCommand } from './commands/SignMessageCommand';
@@ -39,6 +38,7 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import { StakeHbarFacade } from './Facades/StakeHbarFacade';
 import { ApproveAllowanceFacade } from './Facades/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './Facades/DeleteAllowanceFacade';
+import { DeleteAccountFacade } from './Facades/DeleteAccountFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -207,7 +207,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidDeleteAccountParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await deleteAccount(walletSnapParams, request.params),
+        receipt: await DeleteAccountFacade.deleteAccount(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'hts/associateTokens': {
