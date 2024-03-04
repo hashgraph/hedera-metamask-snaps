@@ -27,7 +27,6 @@ import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { WalletSnapParams } from './types/state';
-import { createToken } from './rpc/hts/createToken';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { HederaUtils } from './utils/HederaUtils';
 import { StakeHbarRequestParams } from './types/params';
@@ -38,7 +37,8 @@ import { StakeHbarFacade } from './Facades/StakeHbarFacade';
 import { ApproveAllowanceFacade } from './Facades/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './Facades/DeleteAllowanceFacade';
 import { DeleteAccountFacade } from './Facades/DeleteAccountFacade';
-import {AssociateTokensFacade} from "./Facades/AssociateTokensFacade";
+import { AssociateTokensFacade } from './Facades/AssociateTokensFacade';
+import { CreateTokenFacade } from './Facades/CreateTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -217,14 +217,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidAssociateTokensParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await AssociateTokensFacade.associateTokens(walletSnapParams, request.params),
+        receipt: await AssociateTokensFacade.associateTokens(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'hts/createToken': {
       HederaUtils.isValidCreateTokenParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await createToken(walletSnapParams, request.params),
+        receipt: await CreateTokenFacade.createToken(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     default:
