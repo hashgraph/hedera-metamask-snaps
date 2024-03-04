@@ -23,7 +23,6 @@ import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { WalletSnapParams } from './types/state';
@@ -39,6 +38,7 @@ import { DeleteAllowanceFacade } from './Facades/DeleteAllowanceFacade';
 import { DeleteAccountFacade } from './Facades/DeleteAccountFacade';
 import { AssociateTokensFacade } from './Facades/AssociateTokensFacade';
 import { CreateTokenFacade } from './Facades/CreateTokenFacade';
+import { TransferCryptoFacade } from './Facades/TransferCryptoFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -161,7 +161,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await transferCrypto(walletSnapParams, request.params),
+        receipt: await TransferCryptoFacade.transferCrypto(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'stakeHbar': {
