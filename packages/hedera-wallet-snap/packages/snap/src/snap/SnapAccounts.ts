@@ -4,10 +4,6 @@ import { PrivateKey } from '@hashgraph/sdk';
 import _ from 'lodash';
 import { ethers } from 'ethers';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import {
-  HederaServiceImpl,
-  getHederaClient,
-} from '../client/impl/hedera/service/HederaServiceImpl';
 import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
 import { StateUtils } from '../utils/StateUtils';
 import { CryptoUtils } from '../utils/CryptoUtils';
@@ -15,6 +11,8 @@ import { SnapUtils } from '../utils/SnapUtils';
 import { SnapState } from './SnapState';
 import { Utils } from '../utils/Utils';
 import { Account, AccountInfo, ExternalAccount } from '../types/account';
+import { HederaUtils } from '../utils/HederaUtils';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 
 export class SnapAccounts {
   /**
@@ -249,9 +247,10 @@ export class SnapAccounts {
       )) as string;
 
       try {
-        const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-        const accountInfo: AccountInfo =
-          await hederaService.getMirrorAccountInfo(evmAddress);
+        const accountInfo: AccountInfo = await HederaUtils.getMirrorAccountInfo(
+          evmAddress,
+          mirrorNodeUrl,
+        );
 
         const publicKey =
           PrivateKey.fromStringECDSA(privateKey).publicKey.toStringRaw();
@@ -314,13 +313,14 @@ export class SnapAccounts {
           });
         }
 
-        const hederaClient = await getHederaClient(
-          curve,
-          privateKey,
+        const hederaClientFactory = new HederaClientImplFactory(
           accountInfo.accountId,
           network,
-          mirrorNodeUrl,
+          curve,
+          privateKey,
         );
+
+        const hederaClient = await hederaClientFactory.createClient();
         if (hederaClient) {
           result.curve = curve;
           result.privateKey = privateKey;
@@ -423,9 +423,10 @@ export class SnapAccounts {
 
       try {
         console.log('mirrorNodeUrl', mirrorNodeUrl);
-        const hederaService = new HederaServiceImpl(network, mirrorNodeUrl);
-        const accountInfo: AccountInfo =
-          await hederaService.getMirrorAccountInfo(accountId);
+        const accountInfo: AccountInfo = await HederaUtils.getMirrorAccountInfo(
+          accountId,
+          mirrorNodeUrl,
+        );
 
         let publicKey =
           PrivateKey.fromStringECDSA(privateKey).publicKey.toStringRaw();
@@ -474,13 +475,14 @@ export class SnapAccounts {
           });
         }
 
-        const hederaClient = await getHederaClient(
-          curve,
-          privateKey,
+        const hederaClientFactory = new HederaClientImplFactory(
           accountId,
           network,
-          mirrorNodeUrl,
+          curve,
+          privateKey,
         );
+        const hederaClient = await hederaClientFactory.createClient();
+
         if (hederaClient) {
           result.privateKey = hederaClient
             ?.getPrivateKey()
@@ -552,9 +554,9 @@ export class SnapAccounts {
     const { curve, privateKey, publicKey, address } = keyStore;
 
     console.log('Retrieving account info from Hedera Mirror node');
-    const hederaService = new HederaServiceImpl(network, mirrorNode);
-    const accountInfo: AccountInfo = await hederaService.getMirrorAccountInfo(
+    const accountInfo: AccountInfo = await HederaUtils.getMirrorAccountInfo(
       address,
+      mirrorNode,
     );
     if (_.isEmpty(accountInfo)) {
       console.error(

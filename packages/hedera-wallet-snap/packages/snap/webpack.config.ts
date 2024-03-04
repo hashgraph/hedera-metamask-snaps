@@ -94,7 +94,7 @@ const common: Configuration = {
 // Configuration for the Snap bundle
 const snapConfig: Configuration = merge(common, {
   entry: {
-    snap: './src/HederaServiceImpl.ts',
+    snap: './src/index.ts',
   },
   output: {
     // Required so that webpack doesn't mangle our `exports` variable
