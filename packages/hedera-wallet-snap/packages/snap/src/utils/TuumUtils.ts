@@ -21,6 +21,7 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 import { SimpleHederaClient, SimpleTransfer } from '../types/hedera';
+import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
 
 export type QueryCost = {
   serviceFeeToPay: number;
@@ -66,13 +67,15 @@ export class TuumUtils {
           amount: serviceFeeToPay,
         } as SimpleTransfer,
       ];
-      await hederaClient.transferCrypto({
+      const serviceFeesToPay: Record<string, number> = {};
+      const transferCryptoCommand = new TransferCryptoCommand(
         transfers,
-        memo: null,
-        maxFee: null,
-        serviceFeesToPay: {},
-        serviceFeeToAddress: null,
-      });
+        null,
+        null,
+        serviceFeesToPay,
+        null,
+      );
+      await transferCryptoCommand.execute(hederaClient.getClient());
     } catch (error: any) {
       console.error('Error while deducting service fee: ', error);
     }
