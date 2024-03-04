@@ -33,8 +33,7 @@ export class DeleteAccountFacade {
 
     const { transferAccountId } = deleteAccountRequestParams;
 
-    const { hederaEvmAddress, hederaAccountId, network} =
-      state.currentAccount;
+    const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;

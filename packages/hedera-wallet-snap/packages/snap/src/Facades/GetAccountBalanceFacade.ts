@@ -1,5 +1,4 @@
 import { WalletSnapParams } from '../types/state';
-import { GetAccountInfoRequestParams } from '../types/params';
 import { SnapState } from '../snap/SnapState';
 import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -7,9 +6,7 @@ import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 export class GetAccountBalanceFacade {
   readonly #walletSnapParams: WalletSnapParams;
 
-  constructor(
-    walletSnapParams: WalletSnapParams,
-  ) {
+  constructor(walletSnapParams: WalletSnapParams) {
     this.#walletSnapParams = walletSnapParams;
   }
 

@@ -7,7 +7,6 @@ import {
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { SimpleHederaClient } from '../types/hedera';
 import { SimpleHederaClientImpl } from './SimpleHederaClientImpl';
 import { HederaClientFactory } from '../interfaces/HederaClientFactory';
 import { Wallet } from '../domain/wallet/abstract';
