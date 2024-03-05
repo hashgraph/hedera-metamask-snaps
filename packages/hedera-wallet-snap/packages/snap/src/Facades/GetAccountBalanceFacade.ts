@@ -4,14 +4,8 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 
 export class GetAccountBalanceFacade {
-  readonly #walletSnapParams: WalletSnapParams;
-
-  constructor(walletSnapParams: WalletSnapParams) {
-    this.#walletSnapParams = walletSnapParams;
-  }
-
-  async getAccountBalance() {
-    const { state } = this.#walletSnapParams;
+  public static async getAccountBalance(walletSnapParams: WalletSnapParams) {
+    const { state } = walletSnapParams;
 
     const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
@@ -25,7 +19,7 @@ export class GetAccountBalanceFacade {
       const hederaClient = await hederaClientImplFactory.createClient();
 
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client is null');
       }
       const hbarBalance = await hederaClient.getAccountBalance();
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -129,22 +129,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
-      const getAccountInfoFacade = new GetAccountInfoFacade(
-        walletSnapParams,
-        request.params,
-      );
       return {
         currentAccount: state.currentAccount,
-        accountInfo: await getAccountInfoFacade.getAccountInfo(),
+        accountInfo: await GetAccountInfoFacade.getAccountInfo(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'getAccountBalance': {
-      const getAccountBalanceFacade = new GetAccountBalanceFacade(
-        walletSnapParams,
-      );
       return {
         currentAccount: state.currentAccount,
-        accountBalance: await getAccountBalanceFacade.getAccountBalance(),
+        accountBalance: await GetAccountBalanceFacade.getAccountBalance(
+          walletSnapParams,
+        ),
       };
     }
     case 'getTransactions': {

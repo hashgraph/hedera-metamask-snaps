@@ -12,20 +12,11 @@ import { HederaUtils } from '../utils/HederaUtils';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 
 export class GetAccountInfoFacade {
-  readonly #walletSnapParams: WalletSnapParams;
-
-  readonly #getAccountInfoParams: GetAccountInfoRequestParams;
-
-  constructor(
+  public static async getAccountInfo(
     walletSnapParams: WalletSnapParams,
     getAccountInfoParams: GetAccountInfoRequestParams,
   ) {
-    this.#walletSnapParams = walletSnapParams;
-    this.#getAccountInfoParams = getAccountInfoParams;
-  }
-
-  async getAccountInfo() {
-    const { origin, state } = this.#walletSnapParams;
+    const { origin, state } = walletSnapParams;
 
     const {
       accountId = '',
@@ -34,7 +25,7 @@ export class GetAccountInfoFacade {
         toAddress: '0.0.98', // Hedera Fee collection account
       } as ServiceFee,
       fetchUsingMirrorNode = true,
-    } = this.#getAccountInfoParams;
+    } = getAccountInfoParams;
 
     const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
       state.currentAccount;
@@ -72,7 +63,7 @@ export class GetAccountInfoFacade {
         // Create the account info query
         const query = new AccountInfoQuery({ accountId: accountIdToQuery });
         if (hederaClient === null) {
-          return null;
+          throw new Error('hedera client returned null');
         }
         const queryCost = (
           await query.getCost(hederaClient.getClient())
