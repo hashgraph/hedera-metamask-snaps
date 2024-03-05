@@ -29,16 +29,16 @@ import { WalletSnapParams } from './types/state';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { HederaUtils } from './utils/HederaUtils';
 import { StakeHbarRequestParams } from './types/params';
-import { GetAccountInfoFacade } from './Facades/GetAccountInfoFacade';
-import { GetAccountBalanceFacade } from './Facades/GetAccountBalanceFacade';
+import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
+import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
-import { StakeHbarFacade } from './Facades/StakeHbarFacade';
-import { ApproveAllowanceFacade } from './Facades/ApproveAllowanceFacade';
-import { DeleteAllowanceFacade } from './Facades/DeleteAllowanceFacade';
-import { DeleteAccountFacade } from './Facades/DeleteAccountFacade';
-import { AssociateTokensFacade } from './Facades/AssociateTokensFacade';
-import { CreateTokenFacade } from './Facades/CreateTokenFacade';
-import { TransferCryptoFacade } from './Facades/TransferCryptoFacade';
+import { StakeHbarFacade } from './facades/StakeHbarFacade';
+import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
+import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
+import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
+import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
+import { CreateTokenFacade } from './facades/CreateTokenFacade';
+import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
