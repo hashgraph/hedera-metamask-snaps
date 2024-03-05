@@ -28,7 +28,7 @@ export class DeleteAccountFacade {
   public static async deleteAccount(
     walletSnapParams: WalletSnapParams,
     deleteAccountRequestParams: DeleteAccountRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { transferAccountId } = deleteAccountRequestParams;
@@ -69,7 +69,7 @@ export class DeleteAccountFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client returned null');
       }
       const deleteAccountCommand = new DeleteAccountCommand(transferAccountId);
       txReceipt = await deleteAccountCommand.execute(hederaClient.getClient());

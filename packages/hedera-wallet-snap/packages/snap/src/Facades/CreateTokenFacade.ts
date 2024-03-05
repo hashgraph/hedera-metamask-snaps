@@ -26,7 +26,7 @@ export class CreateTokenFacade {
   public static async createToken(
     walletSnapParams: WalletSnapParams,
     createTokenRequestParams: CreateTokenRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
@@ -183,7 +183,7 @@ export class CreateTokenFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client returned null');
       }
       const createTokenCommand = new CreateTokenCommand(
         assetType,
@@ -208,7 +208,7 @@ export class CreateTokenFacade {
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
-        return null;
+        throw new Error('private key object returned null');
       }
       txReceipt = await createTokenCommand.execute(
         hederaClient.getClient(),

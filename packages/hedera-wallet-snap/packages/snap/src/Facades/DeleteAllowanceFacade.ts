@@ -17,7 +17,7 @@ export class DeleteAllowanceFacade {
   public static async deleteAllowance(
     walletSnapParams: WalletSnapParams,
     deleteAllowanceRequestParams: DeleteAllowanceRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { assetType, assetId, spenderAccountId } =
@@ -97,7 +97,7 @@ export class DeleteAllowanceFacade {
       const hederaClient = await hederaClientFactory.createClient();
 
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client returned null');
       }
 
       const deleteAllowanceCommand = new DeleteAllowanceCommand(

@@ -44,7 +44,7 @@ export class StakeHbarFacade {
   public static async stakeHbar(
     walletSnapParams: WalletSnapParams,
     stakeHbarRequestParams: StakeHbarRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { nodeId = null, accountId = null } = stakeHbarRequestParams;
@@ -149,7 +149,7 @@ export class StakeHbarFacade {
       );
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client returned null');
       }
       const stakeHbarCommand = new StakeHbarCommand(nodeId, accountId);
 

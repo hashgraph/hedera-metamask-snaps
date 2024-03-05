@@ -27,7 +27,7 @@ export class AssociateTokensFacade {
   public static async associateTokens(
     walletSnapParams: WalletSnapParams,
     associateTokensRequestParams: AssociateTokensRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { tokenIds = [] as string[] } = associateTokensRequestParams;
@@ -109,7 +109,7 @@ export class AssociateTokensFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client returned null');
       }
       const associateTokensCommand = new AssociateTokensCommand(tokenIds);
       txReceipt = await associateTokensCommand.execute(

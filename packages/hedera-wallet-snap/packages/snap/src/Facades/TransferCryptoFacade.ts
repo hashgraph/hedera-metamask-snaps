@@ -22,7 +22,7 @@ export class TransferCryptoFacade {
   public static async transferCrypto(
     walletSnapParams: WalletSnapParams,
     transferCryptoParams: TransferCryptoRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const {
@@ -79,7 +79,7 @@ export class TransferCryptoFacade {
 
     const hederaClient = await hederaClientFactory.createClient();
     if (hederaClient === null) {
-      return null;
+      throw new Error('hederaClient is null');
     }
 
     try {
@@ -111,7 +111,7 @@ export class TransferCryptoFacade {
         let walletBalance =
           state.accountState[hederaEvmAddress][network].accountInfo.balance;
         if (transfer.from === undefined) {
-          return null;
+          throw new Error('Transfer from address is undefined');
         }
         if (!_.isEmpty(transfer.from)) {
           const ownerAccountInfo: AccountInfo =

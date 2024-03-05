@@ -16,7 +16,7 @@ export class ApproveAllowanceFacade {
   public static async approveAllowance(
     walletSnapParams: WalletSnapParams,
     approveAllowanceRequestParams: ApproveAllowanceRequestParams,
-  ): Promise<TxReceipt | null> {
+  ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const {
@@ -129,7 +129,7 @@ export class ApproveAllowanceFacade {
       const hederaClient = await hederaClientImplFactory.createClient();
 
       if (hederaClient === null) {
-        return null;
+        throw new Error('hedera client returned null');
       }
 
       const approveAllowanceCommand = new ApproveAllowanceCommand(
