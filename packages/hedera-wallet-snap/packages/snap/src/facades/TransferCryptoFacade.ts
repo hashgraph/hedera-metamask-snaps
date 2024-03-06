@@ -1,7 +1,6 @@
 import { SnapDialogParams, WalletSnapParams } from '../types/state';
 import { ServiceFee, TransferCryptoRequestParams } from '../types/params';
 import { SimpleTransfer, TxReceipt } from '../types/hedera';
-import { HederaAccountStrategy } from '../strategies/HederaAccountStrategy';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
@@ -10,6 +9,7 @@ import { CryptoUtils } from '../utils/CryptoUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { SnapUtils } from '../utils/SnapUtils';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
+import { HederaUtils } from '../utils/HederaUtils';
 
 export class TransferCryptoFacade {
   /**
@@ -83,10 +83,7 @@ export class TransferCryptoFacade {
     }
 
     try {
-      await HederaAccountStrategy.getAccountInfo(
-        hederaClient.getClient(),
-        hederaAccountId,
-      );
+      await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
       const panelToShow = [
         heading('Transfer Crypto'),
@@ -113,9 +110,9 @@ export class TransferCryptoFacade {
 
         if (transfer.from !== undefined && !_.isEmpty(transfer.from)) {
           const ownerAccountInfo: AccountInfo =
-            await HederaAccountStrategy.getAccountInfo(
-              hederaClient.getClient(),
+            await HederaUtils.getMirrorAccountInfo(
               transfer.from,
+              mirrorNodeUrl,
             );
           walletBalance = ownerAccountInfo.balance;
           panelToShow.push(text(`Transaction Type: Delegated Transfer`));
