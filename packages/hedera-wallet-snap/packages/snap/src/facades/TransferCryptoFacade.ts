@@ -110,10 +110,8 @@ export class TransferCryptoFacade {
         let feeToDisplay = 0;
         let walletBalance =
           state.accountState[hederaEvmAddress][network].accountInfo.balance;
-        if (transfer.from === undefined) {
-          throw new Error('Transfer from address is undefined');
-        }
-        if (!_.isEmpty(transfer.from)) {
+
+        if (transfer.from !== undefined && !_.isEmpty(transfer.from)) {
           const ownerAccountInfo: AccountInfo =
             await HederaAccountStrategy.getAccountInfo(
               hederaClient.getClient(),
