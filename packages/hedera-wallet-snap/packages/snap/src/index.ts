@@ -39,6 +39,7 @@ import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
 import { CreateTokenFacade } from './facades/CreateTokenFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { DissociateTokensFacade } from './facades/DissociateTokensFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -224,6 +225,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+
+    case 'hts/dissociateTokens': {
+      HederaUtils.isValidDissociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DissociateTokensFacade.dissociateTokens(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
     case 'hts/createToken': {
       HederaUtils.isValidCreateTokenParams(request.params);
       return {
