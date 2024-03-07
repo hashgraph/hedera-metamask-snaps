@@ -27,7 +27,7 @@ import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
 } from '../../types/constants';
-import { SimpleTransfer } from '@hashgraph/hedera-wallet-snap-site/src/types/snap';
+import { SimpleTransfer } from '../../../../site/src/types/snap';
 
 jest.mock('@metamask/snaps-ui', () => ({
   text: jest.fn().mockImplementation((text) => `text-${text}`),
