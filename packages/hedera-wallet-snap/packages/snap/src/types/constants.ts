@@ -32,3 +32,5 @@ export const DEFAULTHEDERAMIRRORNODES: Record<string, string> = {
   testnet: 'https://testnet.mirrornode.hedera.com',
   previewnet: 'https://previewnet.mirrornode.hedera.com',
 };
+
+export const EMPTY_STRING = '';

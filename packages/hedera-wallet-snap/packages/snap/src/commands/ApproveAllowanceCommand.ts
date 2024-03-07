@@ -28,6 +28,7 @@ import {
 } from '@hashgraph/sdk';
 import { Utils } from '../utils/Utils';
 import { CryptoUtils } from '../utils/CryptoUtils';
+import { EMPTY_STRING } from '../types/constants';
 
 export class ApproveAllowanceCommand {
   readonly #spenderAccountId: string;
@@ -104,21 +105,25 @@ export class ApproveAllowanceCommand {
 
     return {
       status: receipt.status.toString(),
-      accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      fileId: receipt.fileId ? receipt.fileId : '',
-      contractId: receipt.contractId ? receipt.contractId : '',
-      topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
+      accountId: receipt.accountId
+        ? receipt.accountId.toString()
+        : EMPTY_STRING,
+      fileId: receipt.fileId ? receipt.fileId : EMPTY_STRING,
+      contractId: receipt.contractId ? receipt.contractId : EMPTY_STRING,
+      topicId: receipt.topicId ? receipt.topicId : EMPTY_STRING,
+      tokenId: receipt.tokenId ? receipt.tokenId : EMPTY_STRING,
+      scheduleId: receipt.scheduleId ? receipt.scheduleId : EMPTY_STRING,
       exchangeRate: newExchangeRate,
       topicSequenceNumber: receipt.topicSequenceNumber
         ? String(receipt.topicSequenceNumber)
-        : '',
+        : EMPTY_STRING,
       topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
+      totalSupply: receipt.totalSupply
+        ? String(receipt.totalSupply)
+        : EMPTY_STRING,
       scheduledTransactionId: receipt.scheduledTransactionId
         ? receipt.scheduledTransactionId.toString()
-        : '',
+        : EMPTY_STRING,
       serials: JSON.parse(JSON.stringify(receipt.serials)),
       duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
       children: JSON.parse(JSON.stringify(receipt.children)),
