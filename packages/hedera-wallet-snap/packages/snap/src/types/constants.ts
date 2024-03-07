@@ -32,3 +32,9 @@ export const DEFAULTHEDERAMIRRORNODES: Record<string, string> = {
   testnet: 'https://testnet.mirrornode.hedera.com',
   previewnet: 'https://previewnet.mirrornode.hedera.com',
 };
+
+export const EMPTY_STRING = '';
+export const FEE_DISPLAY_REGEX = /(\.\d*?[1-9])0+$|\.0*$/u;
+export const FEE_DIGIT_LENGTH = 8;
+export const HBAR_ASSET_STRING = 'HBAR';
+export const NFT_ASSET_STRING = 'NFT';

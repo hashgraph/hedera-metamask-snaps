@@ -1,7 +1,26 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { SnapDialogParams, WalletSnapParams } from '../types/state';
 import { ServiceFee, TransferCryptoRequestParams } from '../types/params';
 import { SimpleTransfer, TxReceipt } from '../types/hedera';
-import { HederaAccountStrategy } from '../strategies/HederaAccountStrategy';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
@@ -10,6 +29,7 @@ import { CryptoUtils } from '../utils/CryptoUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { SnapUtils } from '../utils/SnapUtils';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
+import { HederaUtils } from '../utils/HederaUtils';
 
 export class TransferCryptoFacade {
   /**
@@ -83,10 +103,7 @@ export class TransferCryptoFacade {
     }
 
     try {
-      await HederaAccountStrategy.getAccountInfo(
-        hederaClient.getClient(),
-        hederaAccountId,
-      );
+      await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
       const panelToShow = [
         heading('Transfer Crypto'),
@@ -110,14 +127,12 @@ export class TransferCryptoFacade {
         let feeToDisplay = 0;
         let walletBalance =
           state.accountState[hederaEvmAddress][network].accountInfo.balance;
-        if (transfer.from === undefined) {
-          throw new Error('Transfer from address is undefined');
-        }
-        if (!_.isEmpty(transfer.from)) {
+
+        if (transfer.from !== undefined && !_.isEmpty(transfer.from)) {
           const ownerAccountInfo: AccountInfo =
-            await HederaAccountStrategy.getAccountInfo(
-              hederaClient.getClient(),
+            await HederaUtils.getMirrorAccountInfo(
               transfer.from,
+              mirrorNodeUrl,
             );
           walletBalance = ownerAccountInfo.balance;
           panelToShow.push(text(`Transaction Type: Delegated Transfer`));
@@ -205,23 +220,10 @@ export class TransferCryptoFacade {
         panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
         if (feeToDisplay > 0) {
           panelToShow.push(
-            text(
-              `Service Fee: ${feeToDisplay
-                .toFixed(8)
-                .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
-                transfer.assetType === 'HBAR'
-                  ? 'HBAR'
-                  : (transfer.assetId as string)
-              }`,
-            ),
-            text(
-              `Total Amount: ${(transfer.amount + feeToDisplay)
-                .toFixed(8)
-                .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
-                transfer.assetType === 'HBAR'
-                  ? 'HBAR'
-                  : (transfer.assetId as string)
-              }`,
+            SnapUtils.formatFeeDisplay(feeToDisplay, transfer),
+            SnapUtils.formatFeeDisplay(
+              transfer.amount + feeToDisplay,
+              transfer,
             ),
           );
         }
