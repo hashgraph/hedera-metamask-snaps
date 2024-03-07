@@ -23,7 +23,7 @@ import { GetAccountInfoRequestParams, ServiceFee } from '../types/params';
 import _ from 'lodash';
 import { AccountInfo } from '../types/account';
 import { AccountInfoQuery } from '@hashgraph/sdk';
-import { TuumUtils } from '../utils/TuumUtils';
+import { FeeUtils } from '../utils/FeeUtils';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
@@ -88,7 +88,7 @@ export class GetAccountInfoFacade {
         const queryCost = (
           await query.getCost(hederaClient.getClient())
         ).toBigNumber();
-        const { serviceFeeToPay, maxCost } = TuumUtils.calculateHederaQueryFees(
+        const { serviceFeeToPay, maxCost } = FeeUtils.calculateHederaQueryFees(
           queryCost,
           serviceFee.percentageCut,
         );
@@ -157,7 +157,7 @@ export class GetAccountInfoFacade {
 
         // Deduct service Fee if set
         if (serviceFee.percentageCut > 0) {
-          await TuumUtils.deductServiceFee(
+          await FeeUtils.deductServiceFee(
             serviceFeeToPay,
             serviceFee.toAddress as string,
             hederaClient,

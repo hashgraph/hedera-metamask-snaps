@@ -28,7 +28,7 @@ export type QueryCost = {
   maxCost: number;
 };
 
-export class TuumUtils {
+export class FeeUtils {
   public static calculateHederaQueryFees(
     queryCost: BigNumber,
     serviceFeePercentage: number,
