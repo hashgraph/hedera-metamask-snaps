@@ -220,8 +220,11 @@ export class TransferCryptoFacade {
         panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
         if (feeToDisplay > 0) {
           panelToShow.push(
-            SnapUtils.formatFeeDisplay(feeToDisplay,transfer),
-            SnapUtils.formatFeeDisplay((transfer.amount + feeToDisplay), transfer),
+            SnapUtils.formatFeeDisplay(feeToDisplay, transfer),
+            SnapUtils.formatFeeDisplay(
+              transfer.amount + feeToDisplay,
+              transfer,
+            ),
           );
         }
         panelToShow.push(divider());

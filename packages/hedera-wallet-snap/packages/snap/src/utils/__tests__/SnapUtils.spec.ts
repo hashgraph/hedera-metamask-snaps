@@ -21,6 +21,13 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { SnapUtils } from '../SnapUtils';
 import { text, heading } from '@metamask/snaps-ui';
+import {
+  HBAR_ASSET_STRING,
+  NFT_ASSET_STRING,
+  FEE_DIGIT_LENGTH,
+  FEE_DISPLAY_REGEX,
+} from '../../types/constants';
+import { SimpleTransfer } from '@hashgraph/hedera-wallet-snap-site/src/types/snap';
 
 jest.mock('@metamask/snaps-ui', () => ({
   text: jest.fn().mockImplementation((text) => `text-${text}`),
@@ -45,6 +52,43 @@ describe('SnapUtils', () => {
           'text-Test Text',
         ],
       });
+    });
+  });
+
+  describe('formatFeeDisplay', () => {
+    it('should format fee correctly for HBAR transactions', () => {
+      const fee = 1234.567;
+      const hbarTransfer: SimpleTransfer = {
+        assetType: HBAR_ASSET_STRING,
+        to: '0x1111',
+        amount: 200,
+      } as SimpleTransfer;
+
+      const result = SnapUtils.formatFeeDisplay(fee, hbarTransfer);
+      const expectedFee = fee
+        .toFixed(FEE_DIGIT_LENGTH)
+        .replace(FEE_DISPLAY_REGEX, '$1');
+      expect(result).toBe(
+        `text-Service Fee: ${expectedFee} ${HBAR_ASSET_STRING}`,
+      );
+    });
+
+    it('should format fee correctly for non-HBAR transactions', () => {
+      const fee = 1234.567;
+      const nftTransfer: SimpleTransfer = {
+        assetType: NFT_ASSET_STRING,
+        assetId: '0.001',
+        to: '0x1111',
+        amount: 1,
+      };
+
+      const result = SnapUtils.formatFeeDisplay(fee, nftTransfer);
+      const expectedFee = fee
+        .toFixed(FEE_DIGIT_LENGTH)
+        .replace(FEE_DISPLAY_REGEX, '$1');
+      expect(result).toBe(
+        `text-Service Fee: ${expectedFee} ${nftTransfer.assetId}`,
+      );
     });
   });
 });
