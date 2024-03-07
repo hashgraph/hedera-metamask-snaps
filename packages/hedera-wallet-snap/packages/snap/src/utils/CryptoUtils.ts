@@ -21,6 +21,8 @@
 import { PublicKey } from '@hashgraph/sdk';
 import { HDNodeWallet, Mnemonic, assertArgument, ethers } from 'ethers';
 import { DEFAULTCOINTYPE } from '../types/constants';
+import { MirrorNftInfo, MirrorTokenInfo } from '../types/hedera';
+import { FetchResponse, FetchUtils } from './FetchUtils';
 
 export class CryptoUtils {
   /**
@@ -205,5 +207,32 @@ export class CryptoUtils {
     }
 
     return byteArray;
+  }
+
+  public static async GetNftSerialNumber(
+    tokenId: string,
+    accountId: string,
+    mirrorNodeUrl: string,
+  ): Promise<MirrorNftInfo[]> {
+    let result = [] as MirrorNftInfo[];
+    const url = `${mirrorNodeUrl}/api/v1/tokens/${tokenId}/nfts?account.id=${accountId}`;
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (response.success) {
+      result = response.data.nfts;
+    }
+    return result;
+  }
+
+  public static async getTokenById(
+    tokenId: string,
+    mirrorNodeUrl: string,
+  ): Promise<MirrorTokenInfo> {
+    let result = {} as MirrorTokenInfo;
+    const url = `${mirrorNodeUrl}/api/v1/tokens/${tokenId}`;
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (response.success) {
+      result = response.data;
+    }
+    return result;
   }
 }

@@ -18,12 +18,23 @@
  *
  */
 
-import { AccountId } from '@hashgraph/sdk';
+import { AccountId, NftId, TokenId } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
-import { NetworkInfo, SimpleTransfer } from 'src/types/hedera';
-import { ExternalAccount, NetworkParams } from '../types/account';
+import {
+  AccountBalance,
+  MirrorAccountInfo,
+  MirrorNftInfo,
+  MirrorStakingInfo,
+  MirrorTokenInfo,
+  MirrorTransactionInfo,
+  NetworkInfo,
+  SimpleTransfer,
+  Token,
+  TokenBalance,
+} from 'src/types/hedera';
+import { AccountInfo, ExternalAccount, NetworkParams } from '../types/account';
 import {
   DEFAULTHEDERAMIRRORNODES,
   hederaNetworks,
@@ -45,6 +56,9 @@ import {
   TransferCryptoRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
+import { FetchResponse, FetchUtils } from './FetchUtils';
+import { Utils } from './Utils';
+import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 
 export class HederaUtils {
   /**
@@ -1220,5 +1234,207 @@ export class HederaUtils {
 
   public static validHederaNetwork(network: string) {
     return isIn(hederaNetworks, network);
+  }
+
+  public static async getMirrorTransactions(
+    accountId: string,
+    transactionId: string,
+    mirrorNodeUrl: string,
+  ): Promise<MirrorTransactionInfo[]> {
+    let result = [] as MirrorTransactionInfo[];
+    let url = `${mirrorNodeUrl}/api/v1/transactions/`;
+    if (_.isEmpty(transactionId)) {
+      url = `${url}?account.id=${accountId}&limit=50&order=desc`;
+    } else {
+      url = `${url}${transactionId}`;
+    }
+
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (!response.success) {
+      return result;
+    }
+
+    try {
+      result = response.data.transactions as MirrorTransactionInfo[];
+
+      result.forEach((transaction) => {
+        transaction.consensus_timestamp = Utils.timestampToString(
+          transaction.consensus_timestamp,
+        );
+        transaction.parent_consensus_timestamp = Utils.timestampToString(
+          transaction.parent_consensus_timestamp,
+        );
+        transaction.valid_start_timestamp = Utils.timestampToString(
+          transaction.valid_start_timestamp,
+        );
+      });
+    } catch (error: any) {
+      console.error('Error in getMirrorTransactions:', String(error));
+    }
+
+    return result;
+  }
+
+  public static async getMirrorAccountInfo(
+    idOrAliasOrEvmAddress: string,
+    mirrorNodeUrl: string,
+  ): Promise<AccountInfo> {
+    const result = {} as AccountInfo;
+    const url = `${mirrorNodeUrl}/api/v1/accounts/${idOrAliasOrEvmAddress}`;
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (!response.success) {
+      return result;
+    }
+
+    const mirrorNodeData = response.data as MirrorAccountInfo;
+
+    try {
+      result.accountId = mirrorNodeData.account;
+      result.alias = mirrorNodeData.alias;
+      result.createdTime = Utils.timestampToString(
+        mirrorNodeData.created_timestamp,
+      );
+      result.expirationTime = Utils.timestampToString(
+        mirrorNodeData.expiry_timestamp,
+      );
+      result.memo = mirrorNodeData.memo;
+      result.evmAddress = mirrorNodeData.evm_address;
+      result.key = {
+        type: mirrorNodeData.key._type,
+        key: mirrorNodeData.key.key,
+      };
+      result.autoRenewPeriod = String(mirrorNodeData.auto_renew_period);
+      result.ethereumNonce = String(mirrorNodeData.ethereum_nonce);
+      result.isDeleted = mirrorNodeData.deleted;
+      result.stakingInfo = {
+        declineStakingReward: mirrorNodeData.decline_reward,
+        stakePeriodStart: Utils.timestampToString(
+          mirrorNodeData.stake_period_start,
+        ),
+        pendingReward: String(mirrorNodeData.pending_reward),
+        stakedToMe: '0', // TODO
+        stakedAccountId: mirrorNodeData.staked_account_id ?? '',
+        stakedNodeId: mirrorNodeData.staked_node_id ?? '',
+      } as StakingInfoJson;
+
+      const hbars = mirrorNodeData.balance.balance / 1e8;
+      const tokens: Record<string, TokenBalance> = {};
+      // Use map to create an array of promises
+      const tokenPromises = mirrorNodeData.balance.tokens.map(
+        async (token: Token) => {
+          const tokenId = token.token_id;
+          const tokenInfo: MirrorTokenInfo = await CryptoUtils.getTokenById(
+            tokenId,
+            mirrorNodeUrl,
+          );
+          if (tokenInfo.type === 'NON_FUNGIBLE_UNIQUE') {
+            const nfts: MirrorNftInfo[] = await CryptoUtils.GetNftSerialNumber(
+              tokenId,
+              result.accountId,
+              mirrorNodeUrl,
+            );
+            nfts.forEach((nftInfo) => {
+              const nftId = new NftId(
+                TokenId.fromString(tokenId),
+                Number(nftInfo.serial_number),
+              );
+              tokens[nftId.toString()] = {
+                balance: 1,
+                decimals: 0,
+                tokenId,
+                nftSerialNumber: nftInfo.serial_number,
+                name: tokenInfo.name,
+                symbol: tokenInfo.symbol,
+                tokenType: tokenInfo.type,
+                supplyType: tokenInfo.supply_type,
+                totalSupply: (
+                  Number(tokenInfo.total_supply) /
+                  Math.pow(10, Number(tokenInfo.decimals))
+                ).toString(),
+                maxSupply: (
+                  Number(tokenInfo.max_supply) /
+                  Math.pow(10, Number(tokenInfo.decimals))
+                ).toString(),
+              } as TokenBalance;
+            });
+          } else {
+            tokens[tokenId] = {
+              balance: token.balance / Math.pow(10, Number(tokenInfo.decimals)),
+              decimals: Number(tokenInfo.decimals),
+              tokenId,
+              name: tokenInfo.name,
+              symbol: tokenInfo.symbol,
+              tokenType: tokenInfo.type,
+              supplyType: tokenInfo.supply_type,
+              totalSupply: (
+                Number(tokenInfo.total_supply) /
+                Math.pow(10, Number(tokenInfo.decimals))
+              ).toString(),
+              maxSupply: (
+                Number(tokenInfo.max_supply) /
+                Math.pow(10, Number(tokenInfo.decimals))
+              ).toString(),
+            } as TokenBalance;
+          }
+        },
+      );
+
+      // Wait for all promises to resolve
+      await Promise.all(tokenPromises);
+
+      result.balance = {
+        hbars,
+        timestamp: Utils.timestampToString(mirrorNodeData.balance.timestamp),
+        tokens,
+      } as AccountBalance;
+    } catch (error: any) {
+      console.error('Error in getMirrorAccountInfo:', String(error));
+    }
+
+    return result;
+  }
+
+  public static async getNodeStakingInfo(
+    mirrorNodeUrl: string,
+    nodeId?: number,
+  ): Promise<MirrorStakingInfo[]> {
+    const result: MirrorStakingInfo[] = [];
+
+    let url = `${mirrorNodeUrl}/api/v1/network/nodes`;
+
+    if (_.isNull(nodeId)) {
+      url = `${url}?order=desc&limit=50`;
+    } else {
+      url = `${url}?node.id=${nodeId as number}`;
+    }
+
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (!response.success) {
+      return result;
+    }
+
+    try {
+      for (const node of response.data.nodes) {
+        result.push(node);
+      }
+
+      if (response.data.links.next) {
+        const secondUrl = `${mirrorNodeUrl}${
+          response.data.links.next as string
+        }`;
+        const secondResponse: FetchResponse = await FetchUtils.fetchDataFromUrl(
+          secondUrl,
+        );
+        if (secondResponse.success) {
+          for (const node of secondResponse.data.nodes) {
+            result.push(node);
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error('Error in getNodeStakingInfo:', String(error));
+    }
+
+    return result;
   }
 }

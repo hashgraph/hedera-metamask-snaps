@@ -20,6 +20,12 @@
 
 import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
 import { SnapDialogParams } from '../types/state';
+import { SimpleTransfer } from '../types/hedera';
+import {
+  FEE_DIGIT_LENGTH,
+  FEE_DISPLAY_REGEX,
+  HBAR_ASSET_STRING,
+} from '../types/constants';
 
 export class SnapUtils {
   /**
@@ -79,5 +85,20 @@ export class SnapUtils {
       method: 'snap_dialog',
       params,
     })) as boolean;
+  }
+
+  public static formatFeeDisplay(
+    feeToDisplay: number,
+    transfer: SimpleTransfer,
+  ) {
+    return text(
+      `Service Fee: ${feeToDisplay
+        .toFixed(FEE_DIGIT_LENGTH)
+        .replace(FEE_DISPLAY_REGEX, '$1')} ${
+        transfer.assetType === HBAR_ASSET_STRING
+          ? HBAR_ASSET_STRING
+          : (transfer.assetId as string)
+      }`,
+    );
   }
 }
