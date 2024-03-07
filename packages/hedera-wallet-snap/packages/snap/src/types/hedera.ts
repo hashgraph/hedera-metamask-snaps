@@ -30,9 +30,7 @@ import type {
 import { Long } from '@hashgraph/sdk/lib/long';
 import { BigNumber } from 'bignumber.js';
 
-import { Wallet } from '../domain/wallet/abstract';
 import { AccountInfo } from './account';
-import { ApproveAllowanceAssetDetail, TokenCustomFee } from './params';
 
 export type NetworkInfo = {
   network: string;
@@ -131,16 +129,6 @@ export type TxRecord = {
 };
 
 export type HederaService = {
-  // returns null if the account ID does not match the chosen key
-  createClient(options: {
-    wallet: Wallet;
-    // index into the wallet, meaning depends on the wallet type
-    // 0 always means the canonical key for the wallet
-    keyIndex: number;
-    // account ID we wish to associate with the wallet
-    accountId: AccountId;
-  }): Promise<SimpleHederaClient | null>;
-
   getNodeStakingInfo(): Promise<MirrorStakingInfo[]>;
 
   getMirrorAccountInfo(idOrAliasOrEvmAddress: string): Promise<AccountInfo>;
@@ -173,63 +161,6 @@ export type SimpleHederaClient = {
 
   // get the associated account ID
   getAccountId(): AccountId;
-
-  getAccountInfo(accountId: string): Promise<AccountInfo>;
-
-  // returns the account balance in HBARs
-  getAccountBalance(): Promise<number>;
-
-  transferCrypto(options: {
-    transfers: SimpleTransfer[];
-    memo: string | null;
-    maxFee: number | null; // hbars
-    serviceFeesToPay: Record<string, number>;
-    serviceFeeToAddress: string | null;
-    onBeforeConfirm?: () => void;
-  }): Promise<TxReceipt>;
-
-  stakeHbar(options: {
-    nodeId: number | null;
-    accountId: string | null;
-  }): Promise<TxReceipt>;
-
-  approveAllowance(options: {
-    spenderAccountId: string;
-    amount: number;
-    assetType: string;
-    assetDetail?: ApproveAllowanceAssetDetail;
-  }): Promise<TxReceipt>;
-
-  deleteAllowance(options: {
-    assetType: string;
-    assetId: string;
-    spenderAccountId?: string;
-  }): Promise<TxReceipt>;
-
-  deleteAccount(options: { transferAccountId: string }): Promise<TxReceipt>;
-
-  associateTokens(options: { tokenIds: string[] }): Promise<TxReceipt>;
-
-  createToken(options: {
-    assetType: 'TOKEN' | 'NFT';
-    name: string;
-    symbol: string;
-    decimals: number;
-    supplyType: 'FINITE' | 'INFINITE';
-    initialSupply: number;
-    maxSupply: number;
-    expirationTime: string | undefined;
-    autoRenewAccountId: string;
-    tokenMemo: string;
-    freezeDefault: boolean;
-    kycPublicKey: string | undefined;
-    freezePublicKey: string | undefined;
-    pausePublicKey: string | undefined;
-    wipePublicKey: string | undefined;
-    supplyPublicKey: string | undefined;
-    feeSchedulePublicKey: string | undefined;
-    customFees: TokenCustomFee[] | undefined;
-  }): Promise<TxReceipt>;
 };
 
 export type MirrorStakingInfoServiceEndpoint = {

@@ -23,22 +23,22 @@ import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { getAccountBalance } from './rpc/account/getAccountBalance';
-import { getAccountInfo } from './rpc/account/getAccountInfo';
-import { transferCrypto } from './rpc/transactions/transferCrypto';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { WalletSnapParams } from './types/state';
-import { approveAllowance } from './rpc/account/approveAllowance';
-import { deleteAccount } from './rpc/account/deleteAccount';
-import { deleteAllowance } from './rpc/account/deleteAllowance';
-import { stakeHbar } from './rpc/account/stakeHbar';
-import { associateTokens } from './rpc/hts/associateTokens';
-import { createToken } from './rpc/hts/createToken';
-import { signMessage } from './rpc/misc/signMessage';
-import { getTransactions } from './rpc/transactions/getTransactions';
+import { SignMessageCommand } from './commands/SignMessageCommand';
 import { HederaUtils } from './utils/HederaUtils';
 import { StakeHbarRequestParams } from './types/params';
+import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
+import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
+import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
+import { StakeHbarFacade } from './facades/StakeHbarFacade';
+import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
+import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
+import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
+import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
+import { CreateTokenFacade } from './facades/CreateTokenFacade';
+import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -118,49 +118,67 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     case 'signMessage': {
       HederaUtils.isValidSignMessageRequest(request.params);
+      const signMessageCommand = new SignMessageCommand(
+        walletSnapParams,
+        request.params,
+      );
       return {
         currentAccount: state.currentAccount,
-        signature: await signMessage(walletSnapParams, request.params),
+        signature: await signMessageCommand.execute(),
       };
     }
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
       return {
         currentAccount: state.currentAccount,
-        accountInfo: await getAccountInfo(walletSnapParams, request.params),
+        accountInfo: await GetAccountInfoFacade.getAccountInfo(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'getAccountBalance': {
       return {
         currentAccount: state.currentAccount,
-        accountBalance: await getAccountBalance(walletSnapParams),
+        accountBalance: await GetAccountBalanceFacade.getAccountBalance(
+          walletSnapParams,
+        ),
       };
     }
     case 'getTransactions': {
       HederaUtils.isValidGetTransactionsParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        transactions: await getTransactions(walletSnapParams, request.params),
+        transactions: await HederaTransactionsStrategy.getTransactions(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await transferCrypto(walletSnapParams, request.params),
+        receipt: await TransferCryptoFacade.transferCrypto(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'stakeHbar': {
       HederaUtils.isValidStakeHbarParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await stakeHbar(walletSnapParams, request.params),
+        receipt: await StakeHbarFacade.stakeHbar(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'unstakeHbar': {
       return {
         currentAccount: state.currentAccount,
-        receipt: await stakeHbar(
+        receipt: await StakeHbarFacade.stakeHbar(
           walletSnapParams,
           {} as StakeHbarRequestParams,
         ),
@@ -170,35 +188,50 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidApproveAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await approveAllowance(walletSnapParams, request.params),
+        receipt: await ApproveAllowanceFacade.approveAllowance(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'deleteAllowance': {
       HederaUtils.isValidDeleteAllowanceParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await deleteAllowance(walletSnapParams, request.params),
+        receipt: await DeleteAllowanceFacade.deleteAllowance(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'deleteAccount': {
       HederaUtils.isValidDeleteAccountParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await deleteAccount(walletSnapParams, request.params),
+        receipt: await DeleteAccountFacade.deleteAccount(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'hts/associateTokens': {
       HederaUtils.isValidAssociateTokensParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await associateTokens(walletSnapParams, request.params),
+        receipt: await AssociateTokensFacade.associateTokens(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     case 'hts/createToken': {
       HederaUtils.isValidCreateTokenParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await createToken(walletSnapParams, request.params),
+        receipt: await CreateTokenFacade.createToken(
+          walletSnapParams,
+          request.params,
+        ),
       };
     }
     default:
