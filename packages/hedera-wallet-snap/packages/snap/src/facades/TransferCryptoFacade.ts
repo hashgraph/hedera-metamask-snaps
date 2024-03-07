@@ -220,24 +220,8 @@ export class TransferCryptoFacade {
         panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
         if (feeToDisplay > 0) {
           panelToShow.push(
-            text(
-              `Service Fee: ${feeToDisplay
-                .toFixed(8)
-                .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
-                transfer.assetType === 'HBAR'
-                  ? 'HBAR'
-                  : (transfer.assetId as string)
-              }`,
-            ),
-            text(
-              `Total Amount: ${(transfer.amount + feeToDisplay)
-                .toFixed(8)
-                .replace(/(\.\d*?[1-9])0+$|\.0*$/u, '$1')} ${
-                transfer.assetType === 'HBAR'
-                  ? 'HBAR'
-                  : (transfer.assetId as string)
-              }`,
-            ),
+            SnapUtils.formatFeeDisplay(feeToDisplay,transfer),
+            SnapUtils.formatFeeDisplay((transfer.amount + feeToDisplay), transfer),
           );
         }
         panelToShow.push(divider());
