@@ -292,6 +292,9 @@ export const onUpdate: OnUpdateHandler = async () => {
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
         text(
+          '🚀 Added a new API to dissociate fungible/non-fungible tokens to an account',
+        ),
+        text(
           '🚀 Added a new API to associate fungible/non-fungible tokens to an account',
         ),
         text(
