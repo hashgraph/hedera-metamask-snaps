@@ -27,6 +27,7 @@ import {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
+  DissociateTokensRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   SignMessageRequestParams,
@@ -128,6 +129,10 @@ export const sendHello = async (network: string, mirrorNodeUrl: string) => {
 
 /**
  * Invoke the "getCurrentAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param externalAccountparams
  */
 export const getCurrentAccount = async (
   network: string,
@@ -253,6 +258,11 @@ export const transferCrypto = async (
 
 /**
  * Invoke the "signMessage" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param signMessageRequestParams
+ * @param externalAccountparams
  */
 export const signMessage = async (
   network: string,
@@ -279,6 +289,11 @@ export const signMessage = async (
 
 /**
  * Invoke the "stakeHbar" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param stakeHbarParams
+ * @param externalAccountparams
  */
 export const stakeHbar = async (
   network: string,
@@ -305,6 +320,10 @@ export const stakeHbar = async (
 
 /**
  * Invoke the "unstakeHbar" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param externalAccountparams
  */
 export const unstakeHbar = async (
   network: string,
@@ -329,6 +348,11 @@ export const unstakeHbar = async (
 
 /**
  * Invoke the "approveAllowance" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param approveAllowanceParams
+ * @param externalAccountparams
  */
 export const approveAllowance = async (
   network: string,
@@ -355,6 +379,11 @@ export const approveAllowance = async (
 
 /**
  * Invoke the "deleteAllowance" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param deleteAllowanceParams
+ * @param externalAccountparams
  */
 export const deleteAllowance = async (
   network: string,
@@ -381,6 +410,11 @@ export const deleteAllowance = async (
 
 /**
  * Invoke the "deleteAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param deleteAccountParams
+ * @param externalAccountparams
  */
 export const deleteAccount = async (
   network: string,
@@ -407,6 +441,11 @@ export const deleteAccount = async (
 
 /**
  * Invoke the "associateTokens" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param associateTokensRequestParams
+ * @param externalAccountparams
  */
 export const associateTokens = async (
   network: string,
@@ -432,7 +471,43 @@ export const associateTokens = async (
 };
 
 /**
+ * Invoke the "dissociateTokens" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param dissociateTokensRequestParams
+ * @param externalAccountparams
+ */
+export const dissociateTokens = async (
+  network: string,
+  mirrorNodeUrl: string,
+  dissociateTokensRequestParams: DissociateTokensRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/dissociateTokens',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...dissociateTokensRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "createToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param createTokenRequestParams
+ * @param externalAccountparams
  */
 export const createToken = async (
   network: string,

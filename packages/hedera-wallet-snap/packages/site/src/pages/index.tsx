@@ -37,6 +37,7 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
+import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { networkOptions } from '../config/constants';
 import {
@@ -73,9 +74,9 @@ const Index = () => {
         payload: installedSnap,
       });
       setAccountInfo({} as Account);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
     }
   };
 
@@ -107,7 +108,7 @@ const Index = () => {
           type="text"
           placeholder="eg. https://testnet.mirrornode.hedera.com"
           style={{ marginBottom: 8 }}
-          onChange={(e) => setMirrorNodeUrl(e.target.value)}
+          onChange={(error) => setMirrorNodeUrl(error.target.value)}
         />
       </Subtitle>
       <Container>
@@ -165,6 +166,12 @@ const Index = () => {
         />
 
         <AssociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DissociateTokens
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
