@@ -37,8 +37,9 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
-import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
 import { CreateToken } from '../components/cards/hts/CreateToken';
+import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
+import { MintToken } from '../components/cards/hts/MintToken';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -165,13 +166,13 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <AssociateTokens
+        <SignMessage
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
         />
 
-        <DissociateTokens
+        <GetTransactions
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
@@ -183,13 +184,25 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <SignMessage
+        <CreateToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
         />
 
-        <GetTransactions
+        <MintToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <AssociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DissociateTokens
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
@@ -214,12 +227,6 @@ const Index = () => {
         />
 
         <DeleteAllowance
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <CreateToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

@@ -18,15 +18,15 @@
  *
  */
 
-import { WalletSnapParams, SnapDialogParams } from '../types/state';
-import { CreateTokenRequestParams } from '../types/params';
-import { TxReceipt } from '../types/hedera';
+import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { SnapUtils } from '../utils/SnapUtils';
-import { providerErrors } from '@metamask/rpc-errors';
-import { CreateTokenCommand } from '../commands/CreateTokenCommand';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { CreateTokenCommand } from '../commands/CreateTokenCommand';
+import { TxReceipt } from '../types/hedera';
+import { CreateTokenRequestParams } from '../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../types/state';
+import { SnapUtils } from '../utils/SnapUtils';
 
 export class CreateTokenFacade {
   /**
@@ -51,6 +51,9 @@ export class CreateTokenFacade {
 
     const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
 
+    const { privateKey, publicKey, curve } =
+      state.accountState[hederaEvmAddress][network].keyStore;
+
     const {
       assetType,
       name,
@@ -71,9 +74,6 @@ export class CreateTokenFacade {
       supplyType = 'INFINITE',
       maxSupply = 0,
     } = createTokenRequestParams;
-
-    const { privateKey, publicKey, curve } =
-      state.accountState[hederaEvmAddress][network].keyStore;
 
     let txReceipt = {} as TxReceipt;
     try {
@@ -105,11 +105,7 @@ export class CreateTokenFacade {
         text(`Auto Renew Account ID: ${autoRenewAccountId}`),
         text(`Token Memo: ${tokenMemo}`),
         text(`Freeze Default: ${freezeDefault}`),
-        text(
-          `Admin Key: ${
-            publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey
-          }`,
-        ),
+        text(`Admin Key: ${publicKey}`),
         text(`Treasury Account: ${hederaAccountId}`),
         text(
           `KYC Public Key: ${
@@ -122,7 +118,7 @@ export class CreateTokenFacade {
           }`,
         ),
         text(
-          `Pause Public Key: ${
+          `Pause Public Key:${
             _.isEmpty(pausePublicKey) ? 'Not set' : (pausePublicKey as string)
           }`,
         ),
