@@ -24,6 +24,7 @@ import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 import {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
+  BurnTokenRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -495,6 +496,37 @@ export const mintToken = async (
           network,
           mirrorNodeUrl,
           ...mintTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "burnToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param burnTokenRequestParams
+ * @param externalAccountparams
+ */
+export const burnToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  burnTokenRequestParams: BurnTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/burnToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...burnTokenRequestParams,
           ...externalAccountparams,
         },
       },

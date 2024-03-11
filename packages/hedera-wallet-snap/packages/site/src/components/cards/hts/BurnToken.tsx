@@ -23,8 +23,8 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, MintTokenRequestParams } from '../../../types/snap';
-import { mintToken, shouldDisplayReconnectButton } from '../../../utils';
+import { Account, BurnTokenRequestParams } from '../../../types/snap';
+import { burnToken, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -36,39 +36,39 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const MintToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [assetType, setAssetType] = useState<'TOKEN' | 'NFT'>('TOKEN');
   const [tokenId, setTokenId] = useState('');
   const [amount, setAmount] = useState<number>();
-  const [metadata, setMetadata] = useState('');
+  const [serialNumber, setSerialNumber] = useState<number>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleMintTokenClick = async () => {
+  const handleBurnTokenClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const mintTokenParams = {
+      const burnTokenParams = {
         assetType,
         tokenId,
-      } as MintTokenRequestParams;
+      } as BurnTokenRequestParams;
       if (assetType === 'NFT') {
-        mintTokenParams.metadata = [metadata];
+        burnTokenParams.serialNumbers = [serialNumber as number];
       } else {
         if (Number.isFinite(amount)) {
-          mintTokenParams.amount = amount;
+          burnTokenParams.amount = amount;
         }
       }
 
-      const response: any = await mintToken(
+      const response: any = await burnToken(
         network,
         mirrorNodeUrl,
-        mintTokenParams,
+        burnTokenParams,
         externalAccountParams,
       );
 
@@ -91,9 +91,9 @@ const MintToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'mintToken',
+        title: 'burnToken',
         description:
-          'Mint fungible/non-fungible tokens to the Treasury account id.',
+          'Burn fungible/non-fungible tokens from the Treasury account id.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -143,14 +143,13 @@ const MintToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
             {assetType === 'NFT' && (
               <>
                 <label>
-                  Enter the metadata field for your NFT. Once minted, the
-                  metadata cannot be changed and is immutable.{' '}
+                  Enter the serial numbers for your NFT to be burned.{' '}
                   <input
-                    type="string"
+                    type="number"
                     style={{ width: '100%' }}
-                    value={metadata}
-                    placeholder="Enter metadata"
-                    onChange={(e) => setMetadata(e.target.value)}
+                    value={serialNumber}
+                    placeholder="Enter serial number"
+                    onChange={(e) => setSerialNumber(parseInt(e.target.value))}
                   />
                 </label>
                 <br />
@@ -160,8 +159,8 @@ const MintToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Mint"
-            onClick={handleMintTokenClick}
+            buttonText="Burn"
+            onClick={handleBurnTokenClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -177,4 +176,4 @@ const MintToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { MintToken };
+export { BurnToken };

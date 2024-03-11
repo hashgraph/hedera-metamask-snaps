@@ -18,43 +18,37 @@
  *
  */
 
-import { Client, TokenMintTransaction } from '@hashgraph/sdk';
+import { Client, TokenBurnTransaction } from '@hashgraph/sdk';
 import { TxReceipt } from '../types/hedera';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { Utils } from '../utils/Utils';
 
-export class MintTokenCommand {
+export class BurnTokenCommand {
   readonly #assetType: 'TOKEN' | 'NFT';
 
   readonly #tokenId: string;
 
-  readonly #metadata: string[];
+  readonly #serialNumbers: number[];
 
   readonly #amount: number | undefined;
 
   constructor(
     assetType: 'TOKEN' | 'NFT',
     tokenId: string,
-    metadata: string[],
+    serialNumbers: number[],
     amount?: number,
   ) {
     this.#assetType = assetType;
     this.#tokenId = tokenId;
-    this.#metadata = metadata;
+    this.#serialNumbers = serialNumbers;
     this.#amount = amount;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new TokenMintTransaction().setTokenId(this.#tokenId);
+    const transaction = new TokenBurnTransaction().setTokenId(this.#tokenId);
 
     if (this.#assetType === 'NFT') {
-      // Iterate through metadata and convert each metadata to Uint8Array and store
-      // everything in Uint8Array[]
-      transaction.setMetadata(
-        this.#metadata.map((metadata) =>
-          CryptoUtils.stringToUint8Array(metadata),
-        ),
-      );
+      transaction.setSerials(this.#serialNumbers);
     } else {
       transaction.setAmount(this.#amount as number);
     }

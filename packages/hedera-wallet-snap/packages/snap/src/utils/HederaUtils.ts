@@ -44,6 +44,7 @@ import {
 import {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
+  BurnTokenRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -1241,7 +1242,36 @@ export class HederaUtils {
         );
       }
       // Check if metadata is valid
-      HederaUtils.checkValidString(parameter, 'mintToken', 'metadata', true);
+      if ('metadata' in parameter) {
+        if (
+          _.isEmpty(parameter.metadata) ||
+          !Array.isArray(parameter.metadata)
+        ) {
+          console.error(
+            'Invalid mintToken Params passed. "tokenIds" must be passed as an array of strings',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid mintToken Params passed. "tokenIds" must be passed as an array of strings',
+          );
+        }
+        parameter.metadata.forEach((metadata: string) => {
+          if (_.isEmpty(metadata) || typeof metadata !== 'string') {
+            console.error(
+              'Invalid mintToken Params passed. "metadata" must be passed as an array of strings',
+            );
+            throw providerErrors.unsupportedMethod(
+              'Invalid mintToken Params passed. "metadata" must be passed as an array of strings',
+            );
+          }
+        });
+      } else {
+        console.error(
+          'Invalid mintToken Params passed. "metadata" must be passed for NFTs',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid mintToken Params passed. "metadata" must be passed for NFTs',
+        );
+      }
     } else {
       HederaUtils.checkValidNumber(parameter, 'mintToken', 'amount', true);
       if (parameter.amount === 0) {
@@ -1258,6 +1288,106 @@ export class HederaUtils {
         );
         throw providerErrors.unsupportedMethod(
           'Invalid mintToken Params passed. "metadata" can only be passed to NFTs',
+        );
+      }
+    }
+  }
+
+  /**
+   * Check Validation of burnToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidBurnTokenParams(
+    params: unknown,
+  ): asserts params is BurnTokenRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('assetType' in params) ||
+      !('tokenId' in params)
+    ) {
+      console.error(
+        'Invalid burnToken Params passed. "assetType", and "tokenId" must be passed as parameters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid burnToken Params passed. "assetType", and "tokenId" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as BurnTokenRequestParams;
+
+    // Check if assetType is valid
+    HederaUtils.checkValidString(parameter, 'burnToken', 'assetType', true);
+    if (!(parameter.assetType === 'TOKEN' || parameter.assetType === 'NFT')) {
+      console.error(
+        'Invalid burnToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid burnToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+    }
+
+    // Check if tokenId is valid
+    HederaUtils.checkValidString(parameter, 'burnToken', 'tokenId', true);
+
+    // Check for NFT assetType
+    if (parameter.assetType === 'NFT') {
+      if ('amount' in parameter) {
+        console.error(
+          'Invalid burnToken Params passed. "amount" can only be passed to fungible tokens',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid burnToken Params passed. "amount" can only be passed to fungible tokens',
+        );
+      }
+      // Check if serialNumbers is valid
+      if ('serialNumbers' in parameter) {
+        if (
+          _.isEmpty(parameter.serialNumbers) ||
+          !Array.isArray(parameter.serialNumbers)
+        ) {
+          console.error(
+            'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
+          );
+        }
+        parameter.serialNumbers.forEach((serialNumber: number) => {
+          if (typeof serialNumber !== 'number' || serialNumber < 0) {
+            console.error(
+              'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
+            );
+            throw providerErrors.unsupportedMethod(
+              'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
+            );
+          }
+        });
+      } else {
+        console.error(
+          'Invalid burnToken Params passed. "serialNumbers" must be passed for NFTs',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid burnToken Params passed. "serialNumbers" must be passed for NFTs',
+        );
+      }
+    } else {
+      HederaUtils.checkValidNumber(parameter, 'burnToken', 'amount', true);
+      if (parameter.amount === 0) {
+        console.error(
+          'Invalid burnToken Params passed. "amount" must be greater than 0',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid burnToken Params passed. "amount" must be greater than 0',
+        );
+      }
+      if ('serialNumbers' in parameter) {
+        console.error(
+          'Invalid burnToken Params passed. "serialNumbers" can only be passed to NFTs',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid burnToken Params passed. "serialNumbers" can only be passed to NFTs',
         );
       }
     }
