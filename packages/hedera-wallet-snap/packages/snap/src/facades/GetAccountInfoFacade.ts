@@ -88,6 +88,7 @@ export class GetAccountInfoFacade {
         const queryCost = (
           await query.getCost(hederaClient.getClient())
         ).toBigNumber();
+
         const { serviceFeeToPay, maxCost } = FeeUtils.calculateHederaQueryFees(
           queryCost,
           serviceFee.percentageCut,
