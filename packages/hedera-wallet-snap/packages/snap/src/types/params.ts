@@ -110,7 +110,14 @@ export type MintTokenRequestParams = {
   assetType: 'TOKEN' | 'NFT';
   tokenId: string;
   amount?: number;
-  metadata?: string;
+  metadata?: string[];
+};
+
+export type BurnTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  amount?: number;
+  serialNumbers?: number[];
 };
 
 export type AssociateTokensRequestParams = {
