@@ -41,6 +41,7 @@ import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
 import { MintTokenFacade } from './facades/MintTokenFacade';
+import { BurnTokenFacade } from './facades/BurnTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -232,6 +233,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await MintTokenFacade.mintToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/burnToken': {
+      HederaUtils.isValidBurnTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await BurnTokenFacade.burnToken(
           walletSnapParams,
           request.params,
         ),
