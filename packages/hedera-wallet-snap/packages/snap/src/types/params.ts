@@ -81,6 +81,10 @@ export type AssociateTokensRequestParams = {
   tokenIds: string[];
 };
 
+export type DissociateTokensRequestParams = {
+  tokenIds: string[];
+};
+
 export type TokenCustomFee = {
   feeCollectorAccountId: string; // Sets the fee collector account ID that collects the fee
   hbarAmount?: number; // Set the amount of HBAR to be collected

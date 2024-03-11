@@ -46,6 +46,7 @@ import {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
+  DissociateTokensRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MirrorNodeParams,
@@ -977,6 +978,48 @@ export class HederaUtils {
           );
           throw providerErrors.unsupportedMethod(
             'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+        }
+      });
+    }
+  }
+
+  /**
+   * Check Validation of dissociateTokens request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidDissociateTokensParams(
+    params: unknown,
+  ): asserts params is DissociateTokensRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
+      console.error(
+        'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as DissociateTokensRequestParams;
+
+    // Check if tokenIds is valid
+    if ('tokenIds' in parameter) {
+      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
+        console.error(
+          'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+      }
+      parameter.tokenIds.forEach((tokenId: string) => {
+        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+          console.error(
+            'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
           );
         }
       });
