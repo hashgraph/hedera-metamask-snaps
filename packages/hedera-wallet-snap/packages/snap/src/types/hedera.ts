@@ -249,6 +249,7 @@ export type MirrorTokenInfo = {
   symbol: string;
   token_id: string;
   total_supply: string;
+  treasury_account_id: string;
   type: string;
   wipe_key: Key;
 };

@@ -17,15 +17,14 @@
  * limitations under the License.
  *
  */
-import _ from 'lodash';
 import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, CreateTokenRequestParams } from '../../../types/snap';
-import { createToken, shouldDisplayReconnectButton } from '../../../utils';
+import { Account, MintTokenRequestParams } from '../../../types/snap';
+import { mintToken, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -37,40 +36,39 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const MintToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [assetType, setAssetType] = useState<'TOKEN' | 'NFT'>('TOKEN');
-  const [tokenName, setTokenName] = useState('');
-  const [tokenSymbol, setTokenSymbol] = useState('');
-  const [tokenDecimals, setTokenDecimals] = useState(1);
-  const [initialSupply, setInitialSupply] = useState(100);
-  const [supplyPublicKey, setSupplyPublicKey] = useState('');
+  const [tokenId, setTokenId] = useState('');
+  const [amount, setAmount] = useState<number>();
+  const [metadata, setMetadata] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleCreateTokenClick = async () => {
+  const handleMintTokenClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const createTokenParams = {
+      const mintTokenParams = {
         assetType,
-        name: tokenName,
-        symbol: tokenSymbol,
-        decimals: assetType === 'NFT' ? 0 : tokenDecimals,
-        supplyType: 'INFINITE',
-        initialSupply: assetType === 'NFT' ? 0 : initialSupply,
-      } as CreateTokenRequestParams;
-      if (assetType === 'NFT' || !_.isEmpty(supplyPublicKey)) {
-        createTokenParams.supplyPublicKey = supplyPublicKey;
+        tokenId,
+      } as MintTokenRequestParams;
+      if (assetType === 'NFT') {
+        mintTokenParams.metadata = metadata;
+      } else {
+        if (Number.isFinite(amount)) {
+          mintTokenParams.amount = amount;
+        }
       }
-      const response: any = await createToken(
+
+      const response: any = await mintToken(
         network,
         mirrorNodeUrl,
-        createTokenParams,
+        mintTokenParams,
         externalAccountParams,
       );
 
@@ -93,8 +91,9 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'createToken',
-        description: 'Create a token on Hedera using Hedera Token Service.',
+        title: 'mintToken',
+        description:
+          'Mint a fungible/non-fungible tokens to the Treasury account id.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -114,25 +113,13 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
             <br />
 
             <label>
-              Enter the name for your token/NFT
+              Enter the token Id for your token
               <input
-                type="text"
+                type="string"
                 style={{ width: '100%' }}
-                value={tokenName}
-                placeholder="Token Name"
-                onChange={(e) => setTokenName(e.target.value)}
-              />
-            </label>
-            <br />
-
-            <label>
-              Enter the symbol for your token/NFT
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={tokenSymbol}
-                placeholder="Token Symbol"
-                onChange={(e) => setTokenSymbol(e.target.value)}
+                value={tokenId}
+                placeholder="Enter Token Id(0.0.x)"
+                onChange={(e) => setTokenId(e.target.value)}
               />
             </label>
             <br />
@@ -140,52 +127,41 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
             {assetType === 'TOKEN' && (
               <>
                 <label>
-                  Enter the decimals for your token
+                  Enter the amount of tokens to mint.{' '}
                   <input
                     type="number"
                     style={{ width: '100%' }}
-                    value={tokenDecimals}
-                    placeholder="Enter the number of decimals"
-                    onChange={(e) =>
-                      setTokenDecimals(parseFloat(e.target.value))
-                    }
-                  />
-                </label>
-                <br />
-                <label>
-                  Enter the initial supply for your token
-                  <input
-                    type="number"
-                    style={{ width: '100%' }}
-                    value={initialSupply}
-                    placeholder="Enter the amount of initial supply"
-                    onChange={(e) =>
-                      setInitialSupply(parseFloat(e.target.value))
-                    }
+                    value={amount}
+                    placeholder="Enter the amount of tokens"
+                    onChange={(e) => setAmount(parseInt(e.target.value))}
                   />
                 </label>
                 <br />
               </>
             )}
 
-            <label>
-              Enter the supply public key for your NFT(Optional for TOKEN and
-              required for NFT)
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={supplyPublicKey}
-                placeholder="Enter the supply key"
-                onChange={(e) => setSupplyPublicKey(e.target.value)}
-              />
-            </label>
-            <br />
+            {assetType === 'NFT' && (
+              <>
+                <label>
+                  Enter the metadata field for your NFT. Once minted, the
+                  metadata cannot be changed and is immutable.{' '}
+                  <input
+                    type="string"
+                    style={{ width: '100%' }}
+                    value={metadata}
+                    placeholder="Enter metadata"
+                    onChange={(e) => setMetadata(e.target.value)}
+                  />
+                </label>
+                <br />
+              </>
+            )}
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Create Token"
-            onClick={handleCreateTokenClick}
+            buttonText="Mint"
+            onClick={handleMintTokenClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -201,4 +177,4 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { CreateToken };
+export { MintToken };

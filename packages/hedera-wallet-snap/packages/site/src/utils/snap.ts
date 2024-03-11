@@ -30,6 +30,7 @@ import {
   DissociateTokensRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
+  MintTokenRequestParams,
   SignMessageRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
@@ -440,6 +441,68 @@ export const deleteAccount = async (
 };
 
 /**
+ * Invoke the "createToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param createTokenRequestParams
+ * @param externalAccountparams
+ */
+export const createToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  createTokenRequestParams: CreateTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/createToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...createTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "mintToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param mintTokenRequestParams
+ * @param externalAccountparams
+ */
+export const mintToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  mintTokenRequestParams: MintTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/mintToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...mintTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "associateTokens" method from the snap.
  *
  * @param network
@@ -494,37 +557,6 @@ export const dissociateTokens = async (
           network,
           mirrorNodeUrl,
           ...dissociateTokensRequestParams,
-          ...externalAccountparams,
-        },
-      },
-    },
-  });
-};
-
-/**
- * Invoke the "createToken" method from the snap.
- *
- * @param network
- * @param mirrorNodeUrl
- * @param createTokenRequestParams
- * @param externalAccountparams
- */
-export const createToken = async (
-  network: string,
-  mirrorNodeUrl: string,
-  createTokenRequestParams: CreateTokenRequestParams,
-  externalAccountparams?: ExternalAccountParams,
-) => {
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: {
-        method: 'hts/createToken',
-        params: {
-          network,
-          mirrorNodeUrl,
-          ...createTokenRequestParams,
           ...externalAccountparams,
         },
       },
