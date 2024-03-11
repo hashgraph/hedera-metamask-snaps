@@ -34,31 +34,6 @@ import { TxReceipt } from '../types/hedera';
 import { Utils } from '../utils/Utils';
 import { CryptoUtils } from '../utils/CryptoUtils';
 
-/**
- * Create a token on Hedera.
- *
- * @param client - Hedera Client.
- * @param privateKey - Private key of the token creator.
- * @param options - Create Token options.
- * @param options.assetType - Token assetType.
- * @param options.name - Token name.
- * @param options.symbol - Token symbol.
- * @param options.decimals - Token decimals.
- * @param options.supplyType - Token supplyType.
- * @param options.initialSupply - Token initialSupply.
- * @param options.maxSupply - Token maxSupply.
- * @param options.expirationTime - Token expirationTime.
- * @param options.autoRenewAccountId - Token autoRenewAccountId.
- * @param options.tokenMemo - Token tokenMemo.
- * @param options.freezeDefault - Token freezeDefault.
- * @param options.kycPublicKey - Token kycPublicKey.
- * @param options.freezePublicKey - Token freezePublicKey.
- * @param options.pausePublicKey - Token pausePublicKey.
- * @param options.wipePublicKey - Token wipePublicKey.
- * @param options.supplyPublicKey - Token supplyPublicKey.
- * @param options.feeSchedulePublicKey - Token feeSchedulePublicKey.
- * @param options.customFees - Token customFees.
- */
 export class CreateTokenCommand {
   readonly #assetType: 'TOKEN' | 'NFT';
 

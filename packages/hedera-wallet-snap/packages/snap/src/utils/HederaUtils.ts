@@ -19,6 +19,7 @@
  */
 
 import { AccountId, NftId, TokenId } from '@hashgraph/sdk';
+import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
@@ -49,6 +50,7 @@ import {
   DissociateTokensRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
+  MintTokenRequestParams,
   MirrorNodeParams,
   ServiceFee,
   SignMessageRequestParams,
@@ -59,7 +61,6 @@ import {
 import { CryptoUtils } from './CryptoUtils';
 import { FetchResponse, FetchUtils } from './FetchUtils';
 import { Utils } from './Utils';
-import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 
 export class HederaUtils {
   /**
@@ -943,90 +944,6 @@ export class HederaUtils {
   }
 
   /**
-   * Check Validation of associateTokens request.
-   *
-   * @param params - Request params.
-   */
-  public static isValidAssociateTokensParams(
-    params: unknown,
-  ): asserts params is AssociateTokensRequestParams {
-    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
-      console.error(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
-      );
-    }
-
-    const parameter = params as AssociateTokensRequestParams;
-
-    // Check if tokenIds is valid
-    if ('tokenIds' in parameter) {
-      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
-        console.error(
-          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-        );
-        throw providerErrors.unsupportedMethod(
-          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-        );
-      }
-      parameter.tokenIds.forEach((tokenId: string) => {
-        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
-          console.error(
-            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-          );
-          throw providerErrors.unsupportedMethod(
-            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
-          );
-        }
-      });
-    }
-  }
-
-  /**
-   * Check Validation of dissociateTokens request.
-   *
-   * @param params - Request params.
-   */
-  public static isValidDissociateTokensParams(
-    params: unknown,
-  ): asserts params is DissociateTokensRequestParams {
-    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
-      console.error(
-        'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
-      );
-    }
-
-    const parameter = params as DissociateTokensRequestParams;
-
-    // Check if tokenIds is valid
-    if ('tokenIds' in parameter) {
-      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
-        console.error(
-          'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
-        );
-        throw providerErrors.unsupportedMethod(
-          'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
-        );
-      }
-      parameter.tokenIds.forEach((tokenId: string) => {
-        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
-          console.error(
-            'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
-          );
-          throw providerErrors.unsupportedMethod(
-            'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
-          );
-        }
-      });
-    }
-  }
-
-  /**
    * Check Validation of createToken request.
    *
    * @param params - Request params.
@@ -1272,6 +1189,161 @@ export class HederaUtils {
       throw providerErrors.unsupportedMethod(
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
+    }
+  }
+
+  /**
+   * Check Validation of mintToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidMintTokenParams(
+    params: unknown,
+  ): asserts params is MintTokenRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('assetType' in params) ||
+      !('tokenId' in params)
+    ) {
+      console.error(
+        'Invalid mintToken Params passed. "assetType", and "tokenId" must be passed as parameters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid mintToken Params passed. "assetType", and "tokenId" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as MintTokenRequestParams;
+
+    // Check if assetType is valid
+    HederaUtils.checkValidString(parameter, 'mintToken', 'assetType', true);
+    if (!(parameter.assetType === 'TOKEN' || parameter.assetType === 'NFT')) {
+      console.error(
+        'Invalid mintToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid mintToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+    }
+
+    // Check if tokenId is valid
+    HederaUtils.checkValidString(parameter, 'mintToken', 'tokenId', true);
+
+    // Check for NFT assetType
+    if (parameter.assetType === 'NFT') {
+      if ('amount' in parameter) {
+        console.error(
+          'Invalid mintToken Params passed. "amount" can only be passed to fungible tokens',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid mintToken Params passed. "amount" can only be passed to fungible tokens',
+        );
+      }
+      // Check if metadata is valid
+      HederaUtils.checkValidString(parameter, 'mintToken', 'metadata', true);
+    } else {
+      HederaUtils.checkValidNumber(parameter, 'mintToken', 'amount', true);
+      if (parameter.amount === 0) {
+        console.error(
+          'Invalid mintToken Params passed. "amount" must be greater than 0',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid mintToken Params passed. "amount" must be greater than 0',
+        );
+      }
+      if ('metadata' in parameter) {
+        console.error(
+          'Invalid mintToken Params passed. "metadata" can only be passed to NFTs',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid mintToken Params passed. "metadata" can only be passed to NFTs',
+        );
+      }
+    }
+  }
+
+  /**
+   * Check Validation of associateTokens request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidAssociateTokensParams(
+    params: unknown,
+  ): asserts params is AssociateTokensRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
+      console.error(
+        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as AssociateTokensRequestParams;
+
+    // Check if tokenIds is valid
+    if ('tokenIds' in parameter) {
+      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
+        console.error(
+          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+      }
+      parameter.tokenIds.forEach((tokenId: string) => {
+        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+          console.error(
+            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+        }
+      });
+    }
+  }
+
+  /**
+   * Check Validation of dissociateTokens request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidDissociateTokensParams(
+    params: unknown,
+  ): asserts params is DissociateTokensRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenIds' in params)) {
+      console.error(
+        'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as DissociateTokensRequestParams;
+
+    // Check if tokenIds is valid
+    if ('tokenIds' in parameter) {
+      if (_.isEmpty(parameter.tokenIds) || !Array.isArray(parameter.tokenIds)) {
+        console.error(
+          'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+        );
+      }
+      parameter.tokenIds.forEach((tokenId: string) => {
+        if (_.isEmpty(tokenId) || typeof tokenId !== 'string') {
+          console.error(
+            'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
+          );
+        }
+      });
     }
   }
 

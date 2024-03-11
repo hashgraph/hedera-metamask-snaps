@@ -23,23 +23,24 @@ import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { SnapAccounts } from './snap/SnapAccounts';
-import { SnapState } from './snap/SnapState';
-import { WalletSnapParams } from './types/state';
 import { SignMessageCommand } from './commands/SignMessageCommand';
-import { HederaUtils } from './utils/HederaUtils';
-import { StakeHbarRequestParams } from './types/params';
-import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
-import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
-import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
-import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
-import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
-import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
 import { CreateTokenFacade } from './facades/CreateTokenFacade';
-import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
+import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
 import { DissociateTokensFacade } from './facades/DissociateTokensFacade';
+import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
+import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
+import { StakeHbarFacade } from './facades/StakeHbarFacade';
+import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { SnapAccounts } from './snap/SnapAccounts';
+import { SnapState } from './snap/SnapState';
+import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
+import { StakeHbarRequestParams } from './types/params';
+import { WalletSnapParams } from './types/state';
+import { HederaUtils } from './utils/HederaUtils';
+import { MintTokenFacade } from './facades/MintTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -215,27 +216,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-    case 'hts/associateTokens': {
-      HederaUtils.isValidAssociateTokensParams(request.params);
-      return {
-        currentAccount: state.currentAccount,
-        receipt: await AssociateTokensFacade.associateTokens(
-          walletSnapParams,
-          request.params,
-        ),
-      };
-    }
-
-    case 'hts/dissociateTokens': {
-      HederaUtils.isValidDissociateTokensParams(request.params);
-      return {
-        currentAccount: state.currentAccount,
-        receipt: await DissociateTokensFacade.dissociateTokens(
-          walletSnapParams,
-          request.params,
-        ),
-      };
-    }
 
     case 'hts/createToken': {
       HederaUtils.isValidCreateTokenParams(request.params);
@@ -247,6 +227,37 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+    case 'hts/mintToken': {
+      HederaUtils.isValidMintTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await MintTokenFacade.mintToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/associateTokens': {
+      HederaUtils.isValidAssociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await AssociateTokensFacade.associateTokens(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/dissociateTokens': {
+      HederaUtils.isValidDissociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DissociateTokensFacade.dissociateTokens(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
     default:
       throw providerErrors.unsupportedMethod();
   }
@@ -292,22 +303,14 @@ export const onUpdate: OnUpdateHandler = async () => {
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
         text(
-          '🚀 Added a new API to dissociate fungible/non-fungible tokens to an account',
-        ),
-        text(
-          '🚀 Added a new API to associate fungible/non-fungible tokens to an account',
+          'Added a new API to create a new token(fungible and non-fungible)',
         ),
         text(
           '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
         ),
+        text('Added a new API to mint/burn fungible and non-fungible tokens'),
         text(
-          '🚀 Added a new API to stake/unstake Hbar to and from Hedera Network nodes',
-        ),
-        text(
-          '🚀 Added a new API to approve/delete an allowance for Hbar, tokens and NFTs',
-        ),
-        text(
-          '🚀 Added a new API to delete a Hedera account from the ledger permanently. This action is irreversible!',
+          '🚀 Added a new API to associate/dissociate fungible/non-fungible tokens to an account',
         ),
       ]),
     },
