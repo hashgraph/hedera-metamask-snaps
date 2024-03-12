@@ -40,7 +40,9 @@ import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
+import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
+import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { WipeToken } from '../components/cards/hts/WipeToken';
 import { networkOptions } from '../config/constants';
 import {
@@ -223,6 +225,18 @@ const Index = () => {
         />
 
         <DissociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <FreezeAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnfreezeAccount
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

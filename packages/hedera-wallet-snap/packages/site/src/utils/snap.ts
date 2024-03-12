@@ -29,6 +29,7 @@ import {
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DissociateTokensRequestParams,
+  FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
@@ -590,6 +591,68 @@ export const dissociateTokens = async (
           network,
           mirrorNodeUrl,
           ...dissociateTokensRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "freezeAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param freezeAccountRequestParams
+ * @param externalAccountparams
+ */
+export const freezeAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  freezeAccountRequestParams: FreezeAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/freezeAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...freezeAccountRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "unfreezeAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param unfreezeAccountRequestParams
+ * @param externalAccountparams
+ */
+export const unfreezeAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  unfreezeAccountRequestParams: FreezeAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/unfreezeAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...unfreezeAccountRequestParams,
           ...externalAccountparams,
         },
       },

@@ -31,6 +31,7 @@ import { CreateTokenFacade } from './facades/CreateTokenFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
 import { DissociateTokensFacade } from './facades/DissociateTokensFacade';
+import { FreezeAccountFacade } from './facades/FreezeAccountFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
 import { MintTokenFacade } from './facades/MintTokenFacade';
@@ -269,6 +270,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+    case 'hts/freezeAccount': {
+      HederaUtils.isValidFreezeAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/unfreezeAccount': {
+      HederaUtils.isValidFreezeAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
     case 'hts/wipeToken': {
       HederaUtils.isValidWipeTokenParams(request.params);
       return {
@@ -335,6 +358,9 @@ export const onUpdate: OnUpdateHandler = async () => {
         ),
         text(
           '🚀 Added a new API to associate/dissociate fungible/non-fungible tokens to an account',
+        ),
+        text(
+          '🚀 Added a new API to freeze/unfreeze account for a given fungible/non-fungible token',
         ),
         text(
           '🚀 Added a new API to wipe fungible/non-fungible tokens from an account',
