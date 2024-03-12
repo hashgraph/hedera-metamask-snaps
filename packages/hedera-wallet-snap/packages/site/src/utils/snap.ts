@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,17 @@ import {
   BurnTokenRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
-  DeleteAllowanceRequestParams, DeleteTokenRequestParams,
+  DeleteAllowanceRequestParams,
+  DeleteTokenRequestParams,
   DissociateTokensRequestParams,
+  FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
   SignMessageRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
+  WipeTokenRequestParams,
 } from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
@@ -620,6 +623,99 @@ export const deleteToken = async (
           network,
           mirrorNodeUrl,
           ...deleteTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "freezeAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param freezeAccountRequestParams
+ * @param externalAccountparams
+ */
+export const freezeAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  freezeAccountRequestParams: FreezeAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/freezeAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...freezeAccountRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "unfreezeAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param unfreezeAccountRequestParams
+ * @param externalAccountparams
+ */
+export const unfreezeAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  unfreezeAccountRequestParams: FreezeAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/unfreezeAccount',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...unfreezeAccountRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "wipeToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param wipeTokenRequestParams
+ * @param externalAccountparams
+ */
+export const wipeToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  wipeTokenRequestParams: WipeTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/wipeToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...wipeTokenRequestParams,
           ...externalAccountparams,
         },
       },

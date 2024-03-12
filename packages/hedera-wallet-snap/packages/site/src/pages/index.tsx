@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,10 @@ import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
+import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
+import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
+import { WipeToken } from '../components/cards/hts/WipeToken';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -61,6 +64,7 @@ const Index = () => {
   const [currentNetwork, setCurrentNetwork] = useState(networkOptions[0]);
   const [mirrorNodeUrl, setMirrorNodeUrl] = useState('');
   const [accountInfo, setAccountInfo] = useState<Account>({} as Account);
+  const [showZeroBalances, setShowZeroBalances] = useState(false);
 
   const handleNetworkChange = (network: any) => {
     setCurrentNetwork(network);
@@ -121,6 +125,8 @@ const Index = () => {
             <dd>{accountInfo?.hederaAccountId}</dd>
             <dt>Hedera EVM Address: </dt>
             <dd>{accountInfo?.hederaEvmAddress}</dd>
+            <dt>Hedera Public Key: </dt>
+            <dd>{accountInfo?.publicKey}</dd>
 
             <dt>Balance: </dt>
             <dd>
@@ -131,7 +137,16 @@ const Index = () => {
           </Col>
           {accountInfo?.balance?.tokens && (
             <Col>
-              <Tokens tokens={accountInfo?.balance?.tokens} />
+              <Form.Check
+                type="checkbox"
+                label="Show tokens with 0 balances"
+                checked={showZeroBalances}
+                onChange={() => setShowZeroBalances(!showZeroBalances)}
+              />
+              <Tokens
+                tokens={accountInfo?.balance?.tokens}
+                showZeroBalances={showZeroBalances}
+              />
             </Col>
           )}
         </Row>
@@ -217,6 +232,24 @@ const Index = () => {
         />
 
         <DissociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <FreezeAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnfreezeAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <WipeToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

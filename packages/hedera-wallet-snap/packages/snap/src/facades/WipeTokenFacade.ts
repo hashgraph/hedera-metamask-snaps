@@ -21,25 +21,28 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { BurnTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import { SnapUtils } from '../../utils/SnapUtils';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { WipeTokenCommand } from '../commands/WipeTokenCommand';
+import { TxReceipt } from '../types/hedera';
+import { WipeTokenRequestParams } from '../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../types/state';
+import { CryptoUtils } from '../utils/CryptoUtils';
+import { SnapUtils } from '../utils/SnapUtils';
 
-export class BurnTokenFacade {
+export class WipeTokenFacade {
   /**
-   * Burns fungible and non-fungible tokens owned by the Treasury Account.
+   * Wipes the provided amount of fungible or non-fungible tokens from the specified
+   * Hedera account. This transaction does not delete tokens from the treasury account.
+   * This transaction must be signed by the token's Wipe Key. Wiping an account's tokens
+   * burns the tokens and decreases the total supply.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param burnTokenRequestParams - Parameters for burning a token.
+   * @param wipeTokenRequestParams - Parameters for wiping a token.
    * @returns Receipt of the transaction.
    */
-  public static async burnToken(
+  public static async wipeToken(
     walletSnapParams: WalletSnapParams,
-    burnTokenRequestParams: BurnTokenRequestParams,
+    wipeTokenRequestParams: WipeTokenRequestParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
@@ -49,9 +52,10 @@ export class BurnTokenFacade {
     const {
       assetType,
       tokenId,
+      accountId,
       amount,
       serialNumbers = [],
-    } = burnTokenRequestParams;
+    } = wipeTokenRequestParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -59,21 +63,22 @@ export class BurnTokenFacade {
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Burn token'),
+        heading('Wipe token'),
         text(
-          'Learn more about burning tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/burn-a-token)',
+          'Learn more about wiping tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/wipe-a-token)',
         ),
         text(
-          `You are about to burn a ${
+          `You are about to wipe a ${
             assetType === 'TOKEN' ? 'Fungible Token' : 'Non Fungible Token(NFT)'
           } with the following details:`,
         ),
         divider(),
         text(`Asset Id: ${tokenId}`),
+        text(`Account Id to wipe from: ${accountId}`),
       ];
       if (assetType === 'NFT') {
         panelToShow.push(
-          text(`Amount to burn: ${serialNumbers.length}`),
+          text(`Amount to wipe: ${serialNumbers.length}`),
           text(`Serial Numbers: `),
         );
         panelToShow.push(divider());
@@ -82,7 +87,7 @@ export class BurnTokenFacade {
         }
         panelToShow.push(divider());
       } else {
-        panelToShow.push(text(`Amount to burn: ${amount as number}`));
+        panelToShow.push(text(`Amount to wipe: ${amount as number}`));
       }
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
@@ -98,9 +103,6 @@ export class BurnTokenFacade {
           );
         }
       }
-      panelToShow.push(
-        text(`Burn from Treasury account: ${tokenInfo.treasury_account_id}`),
-      );
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
       panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
@@ -142,9 +144,10 @@ export class BurnTokenFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const command = new BurnTokenCommand(
+      const command = new WipeTokenCommand(
         assetType,
         tokenId,
+        accountId,
         serialNumbers,
         assetType === 'TOKEN'
           ? Number(amount) * Math.pow(10, Number(tokenInfo.decimals))
@@ -157,7 +160,7 @@ export class BurnTokenFacade {
       }
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to burn tokens: ${String(error)}`;
+      const errMessage = `Error while trying to wipe tokens: ${String(error)}`;
       console.error(errMessage);
       throw providerErrors.unsupportedMethod(errMessage);
     }

@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,9 +151,9 @@ export class StakeHbarFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const stakeHbarCommand = new StakeHbarCommand(nodeId, accountId);
+      const command = new StakeHbarCommand(nodeId, accountId);
 
-      txReceipt = await stakeHbarCommand.execute(hederaClient.getClient());
+      txReceipt = await command.execute(hederaClient.getClient());
 
       state.accountState[hederaEvmAddress][
         network

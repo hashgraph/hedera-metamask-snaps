@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,4 +130,17 @@ export type AssociateTokensRequestParams = {
 
 export type DissociateTokensRequestParams = {
   tokenIds: string[];
+};
+
+export type FreezeAccountRequestParams = {
+  tokenId: string;
+  accountId: string;
+};
+
+export type WipeTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  accountId: string;
+  amount?: number;
+  serialNumbers?: number[];
 };

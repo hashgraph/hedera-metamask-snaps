@@ -22,14 +22,12 @@ import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
-} from '../../contexts/MetamaskContext';
-import useModal from '../../hooks/useModal';
-import { Account, StakeHbarRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, stakeHbar } from '../../utils';
-import { Card, SendHelloButton } from '../base';
-import ExternalAccount, {
-  GetExternalAccountRef,
-} from '../sections/ExternalAccount';
+} from '../../../contexts/MetamaskContext';
+import useModal from '../../../hooks/useModal';
+import { Account, FreezeAccountRequestParams } from '../../../types/snap';
+import { shouldDisplayReconnectButton, unfreezeAccount } from '../../../utils';
+import { Card, SendHelloButton } from '../../base';
+import { GetExternalAccountRef } from '../../sections/ExternalAccount';
 
 type Props = {
   network: string;
@@ -37,31 +35,34 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const UnfreezeAccount: FC<Props> = ({
+  network,
+  mirrorNodeUrl,
+  setAccountInfo,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [nodeId, setNodeId] = useState<number>();
+  const [tokenId, setTokenId] = useState('');
   const [accountId, setAccountId] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleStakeHbarClick = async () => {
+  const handleUnfreezeAccountClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const stakeHbarParams = {
-        accountId: accountId || undefined,
-      } as StakeHbarRequestParams;
-      if (Number.isFinite(nodeId)) {
-        stakeHbarParams.nodeId = nodeId;
-      }
-      const response: any = await stakeHbar(
+      const unfreezeAccountParams = {
+        tokenId,
+        accountId,
+      } as FreezeAccountRequestParams;
+
+      const response: any = await unfreezeAccount(
         network,
         mirrorNodeUrl,
-        stakeHbarParams,
+        unfreezeAccountParams,
         externalAccountParams,
       );
 
@@ -84,29 +85,25 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'stakeHbar',
+        title: 'unfreezeAccount',
         description:
-          'Use your Hedera snap account to stake your HBAR to a Node ID or Account ID.',
+          'Unfreezes transfers of the specified token for the account.',
         form: (
           <>
-            <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter the node ID to stake to. Visit{' '}
-              <a href="https://docs.hedera.com/hedera/networks/mainnet/mainnet-nodes">
-                here
-              </a>{' '}
-              to find the node ID for the node you would like to stake to.
+              Enter the token Id to use
               <input
-                type="number"
+                type="string"
                 style={{ width: '100%' }}
-                value={nodeId}
-                placeholder="Enter the number of the Node ID(eg. 0, 1, 2, etc.)"
-                onChange={(e) => setNodeId(parseInt(e.target.value))}
+                value={tokenId}
+                placeholder="Enter Token Id(0.0.x)"
+                onChange={(e) => setTokenId(e.target.value)}
               />
             </label>
             <br />
+
             <label>
-              Enter the account ID to stake to
+              Enter the account Id to unfreeze token transfers
               <input
                 type="string"
                 style={{ width: '100%' }}
@@ -120,8 +117,8 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Stake"
-            onClick={handleStakeHbarClick}
+            buttonText="Unfreeze Account"
+            onClick={handleUnfreezeAccountClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -137,4 +134,4 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { StakeHbar };
+export { UnfreezeAccount };

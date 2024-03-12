@@ -21,86 +21,80 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { BurnTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import { SnapUtils } from '../../utils/SnapUtils';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { FreezeAccountCommand } from '../commands/FreezeAccountCommand';
+import { TxReceipt } from '../types/hedera';
+import { FreezeAccountRequestParams } from '../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../types/state';
+import { CryptoUtils } from '../utils/CryptoUtils';
+import { SnapUtils } from '../utils/SnapUtils';
 
-export class BurnTokenFacade {
+export class FreezeAccountFacade {
   /**
-   * Burns fungible and non-fungible tokens owned by the Treasury Account.
+   * Capitalizes the first letter of the given string.
+   *
+   * @param string - The string to capitalize.
+   * @returns The string with the first letter capitalized.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static readonly capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  /**
+   * Freezes transfers of the specified token for the account. The transaction must be
+   * signed by the token's Freeze Key.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param burnTokenRequestParams - Parameters for burning a token.
+   * @param freezeAccountRequestParams - Parameters for freezing/unfreezing an account.
+   * @param freeze - If true, the account will be frozen. If false, the account will be unfrozen.
    * @returns Receipt of the transaction.
    */
-  public static async burnToken(
+  public static async freezeAccount(
     walletSnapParams: WalletSnapParams,
-    burnTokenRequestParams: BurnTokenRequestParams,
+    freezeAccountRequestParams: FreezeAccountRequestParams,
+    freeze: boolean,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const {
-      assetType,
-      tokenId,
-      amount,
-      serialNumbers = [],
-    } = burnTokenRequestParams;
+    const { tokenId, accountId } = freezeAccountRequestParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
+    const freezeText = freeze ? 'freeze' : 'unfreeze';
+
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Burn token'),
-        text(
-          'Learn more about burning tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/burn-a-token)',
+        heading(
+          `${FreezeAccountFacade.capitalizeFirstLetter(
+            freezeText,
+          )} account for the specified token`,
         ),
         text(
-          `You are about to burn a ${
-            assetType === 'TOKEN' ? 'Fungible Token' : 'Non Fungible Token(NFT)'
-          } with the following details:`,
+          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/${freezeText}-an-account)`,
+        ),
+        text(
+          `You are about to ${freezeText} transfers of the specified token for the given account:`,
         ),
         divider(),
         text(`Asset Id: ${tokenId}`),
+        text(`Account Id to ${freezeText} transfers for: ${accountId}`),
       ];
-      if (assetType === 'NFT') {
-        panelToShow.push(
-          text(`Amount to burn: ${serialNumbers.length}`),
-          text(`Serial Numbers: `),
-        );
-        panelToShow.push(divider());
-        for (const serialNumber of serialNumbers) {
-          panelToShow.push(text(`🔥 ${serialNumber}`));
-        }
-        panelToShow.push(divider());
-      } else {
-        panelToShow.push(text(`Amount to burn: ${amount as number}`));
-      }
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
         console.error(errMessage);
-        if (assetType === 'TOKEN') {
-          throw new Error(errMessage);
-        } else {
-          panelToShow.push(
-            text(
-              `Token Info: Not available. Please proceed only if you know this NFT exists!`,
-            ),
-          );
-        }
+        panelToShow.push(
+          text(
+            `Token Info: Not available. Please proceed only if you know this Token/NFT exists!`,
+          ),
+        );
       }
-      panelToShow.push(
-        text(`Burn from Treasury account: ${tokenInfo.treasury_account_id}`),
-      );
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
       panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
@@ -142,14 +136,7 @@ export class BurnTokenFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const command = new BurnTokenCommand(
-        assetType,
-        tokenId,
-        serialNumbers,
-        assetType === 'TOKEN'
-          ? Number(amount) * Math.pow(10, Number(tokenInfo.decimals))
-          : amount,
-      );
+      const command = new FreezeAccountCommand(freeze, tokenId, accountId);
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
@@ -157,7 +144,9 @@ export class BurnTokenFacade {
       }
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to burn tokens: ${String(error)}`;
+      const errMessage = `Error while trying to ${freezeText} an account: ${String(
+        error,
+      )}`;
       console.error(errMessage);
       throw providerErrors.unsupportedMethod(errMessage);
     }

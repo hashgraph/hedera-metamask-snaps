@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,17 @@ import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
-import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
-import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
+import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
+import { FreezeAccountFacade } from './facades/FreezeAccountFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { WipeTokenFacade } from './facades/WipeTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
@@ -269,6 +271,38 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+    case 'hts/freezeAccount': {
+      HederaUtils.isValidFreezeAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/unfreezeAccount': {
+      HederaUtils.isValidFreezeAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
+    case 'hts/wipeToken': {
+      HederaUtils.isValidWipeTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await WipeTokenFacade.wipeToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
 
     case 'hts/deleteToken': {
       HederaUtils.isValidDeleteTokenParams(request.params);
@@ -326,14 +360,22 @@ export const onUpdate: OnUpdateHandler = async () => {
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
         text(
-          'Added a new API to create a new token(fungible and non-fungible)',
+          '🚀 Added a new API to create a new token(fungible and non-fungible)',
         ),
         text(
           '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
         ),
-        text('Added a new API to mint/burn fungible and non-fungible tokens'),
+        text(
+          '🚀 Added a new API to mint/burn fungible and non-fungible tokens',
+        ),
         text(
           '🚀 Added a new API to associate/dissociate fungible/non-fungible tokens to an account',
+        ),
+        text(
+          '🚀 Added a new API to freeze/unfreeze account for a given fungible/non-fungible token',
+        ),
+        text(
+          '🚀 Added a new API to wipe fungible/non-fungible tokens from an account',
         ),
       ]),
     },

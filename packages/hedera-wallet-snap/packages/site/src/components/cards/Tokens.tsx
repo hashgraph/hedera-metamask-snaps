@@ -4,9 +4,17 @@ import { TokenBalance } from '../../types/snap';
 
 type TokenBalanceTableProps = {
   tokens: Record<string, TokenBalance>;
+  showZeroBalances: boolean; // Add this line
 };
 
-const Tokens: React.FC<TokenBalanceTableProps> = ({ tokens }) => {
+const Tokens: React.FC<TokenBalanceTableProps> = ({
+  tokens,
+  showZeroBalances,
+}) => {
+  const filteredTokens = Object.values(tokens).filter(
+    (token) => showZeroBalances || token.balance > 0,
+  );
+
   return (
     <Table striped bordered hover responsive>
       <thead>
@@ -22,7 +30,7 @@ const Tokens: React.FC<TokenBalanceTableProps> = ({ tokens }) => {
         </tr>
       </thead>
       <tbody>
-        {Object.values(tokens).map((token) => (
+        {filteredTokens.map((token) => (
           <tr key={token.tokenId}>
             <td>{token.name}</td>
             <td>{token.symbol}</td>

@@ -91,8 +91,8 @@ export class DeleteAccountFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const deleteAccountCommand = new DeleteAccountCommand(transferAccountId);
-      txReceipt = await deleteAccountCommand.execute(hederaClient.getClient());
+      const command = new DeleteAccountCommand(transferAccountId);
+      txReceipt = await command.execute(hederaClient.getClient());
 
       // eslint-disable-next-line require-atomic-updates
       state.currentAccount = {

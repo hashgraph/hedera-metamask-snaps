@@ -111,10 +111,8 @@ export class DissociateTokensFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const dissociateTokensCommand = new DissociateTokensCommand(tokenIds);
-      txReceipt = await dissociateTokensCommand.execute(
-        hederaClient.getClient(),
-      );
+      const command = new DissociateTokensCommand(tokenIds);
+      txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to dissociate tokens from the account: ${String(
         error,

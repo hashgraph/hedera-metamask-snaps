@@ -90,7 +90,15 @@ export class MintTokenFacade {
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
         console.error(errMessage);
-        throw new Error(errMessage);
+        if (assetType === 'TOKEN') {
+          throw new Error(errMessage);
+        } else {
+          panelToShow.push(
+            text(
+              `Token Info: Not available. Please proceed only if you know this NFT exists!`,
+            ),
+          );
+        }
       }
       panelToShow.push(
         text(`Mint to Treasury account: ${tokenInfo.treasury_account_id}`),
@@ -136,7 +144,7 @@ export class MintTokenFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const mintTokenCommand = new MintTokenCommand(
+      const command = new MintTokenCommand(
         assetType,
         tokenId,
         metadata,
@@ -149,7 +157,7 @@ export class MintTokenFacade {
       if (privateKeyObj === null) {
         throw new Error('private key object returned null');
       }
-      txReceipt = await mintTokenCommand.execute(hederaClient.getClient());
+      txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to mint tokens: ${String(error)}`;
       console.error(errMessage);
