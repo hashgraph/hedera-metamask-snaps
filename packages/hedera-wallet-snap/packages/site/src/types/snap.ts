@@ -167,6 +167,10 @@ export type DissociateTokensRequestParams = {
   tokenIds: string[];
 };
 
+export type DeleteTokenRequestParams = {
+  tokenId: string | undefined;
+};
+
 export type ExternalAccountParams = {
   externalAccount: {
     accountIdOrEvmAddress: string;
