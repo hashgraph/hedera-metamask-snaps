@@ -35,6 +35,7 @@ import {
   SignMessageRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
+  WipeTokenRequestParams,
 } from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
@@ -589,6 +590,37 @@ export const dissociateTokens = async (
           network,
           mirrorNodeUrl,
           ...dissociateTokensRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "wipeToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param wipeTokenRequestParams
+ * @param externalAccountparams
+ */
+export const wipeToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  wipeTokenRequestParams: WipeTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/wipeToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...wipeTokenRequestParams,
           ...externalAccountparams,
         },
       },

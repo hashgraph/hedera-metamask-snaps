@@ -48,10 +48,14 @@ export type AccountBalance = {
 };
 
 export type Account = {
+  metamaskEvmAddress: string;
+  externalEvmAddress: string;
   hederaAccountId: string;
   hederaEvmAddress: string;
+  publicKey: string;
   balance: AccountBalance;
   network: string;
+  mirrorNodeUrl: string;
 };
 
 export type SimpleTransfer = {
@@ -165,6 +169,14 @@ export type AssociateTokensRequestParams = {
 
 export type DissociateTokensRequestParams = {
   tokenIds: string[];
+};
+
+export type WipeTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  accountId: string;
+  amount?: number;
+  serialNumbers?: number[];
 };
 
 export type ExternalAccountParams = {

@@ -24,8 +24,8 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, BurnTokenRequestParams } from '../../../types/snap';
-import { burnToken, shouldDisplayReconnectButton } from '../../../utils';
+import { Account, WipeTokenRequestParams } from '../../../types/snap';
+import { shouldDisplayReconnectButton, wipeToken } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -37,39 +37,41 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const WipeToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [assetType, setAssetType] = useState<'TOKEN' | 'NFT'>('TOKEN');
   const [tokenId, setTokenId] = useState('');
+  const [accountId, setAccountId] = useState('');
   const [amount, setAmount] = useState<number>();
   const [serialNumber, setSerialNumber] = useState<number>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleBurnTokenClick = async () => {
+  const handleWipeTokenClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const burnTokenParams = {
+      const wipeTokenParams = {
         assetType,
         tokenId,
-      } as BurnTokenRequestParams;
+        accountId,
+      } as WipeTokenRequestParams;
       if (assetType === 'NFT') {
-        burnTokenParams.serialNumbers = [serialNumber as number];
+        wipeTokenParams.serialNumbers = [serialNumber as number];
       } else {
         if (Number.isFinite(amount)) {
-          burnTokenParams.amount = amount;
+          wipeTokenParams.amount = amount;
         }
       }
 
-      const response: any = await burnToken(
+      const response: any = await wipeToken(
         network,
         mirrorNodeUrl,
-        burnTokenParams,
+        wipeTokenParams,
         externalAccountParams,
       );
 
@@ -92,9 +94,8 @@ const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'burnToken',
-        description:
-          'Burn fungible/non-fungible tokens from the Treasury account id.',
+        title: 'wipeToken',
+        description: 'Wipe fungible/non-fungible tokens from an account.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -125,10 +126,22 @@ const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
             </label>
             <br />
 
+            <label>
+              Enter the account Id for to wipe the tokens from
+              <input
+                type="string"
+                style={{ width: '100%' }}
+                value={accountId}
+                placeholder="Enter Account Id(0.0.x)"
+                onChange={(e) => setAccountId(e.target.value)}
+              />
+            </label>
+            <br />
+
             {assetType === 'TOKEN' && (
               <>
                 <label>
-                  Enter the amount of tokens to burn.{' '}
+                  Enter the amount of tokens to wipe.{' '}
                   <input
                     type="number"
                     style={{ width: '100%' }}
@@ -144,7 +157,7 @@ const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
             {assetType === 'NFT' && (
               <>
                 <label>
-                  Enter the serial numbers for your NFT to be burned.{' '}
+                  Enter the serial numbers for your NFT to be wiped.{' '}
                   <input
                     type="number"
                     style={{ width: '100%' }}
@@ -160,8 +173,8 @@ const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Burn"
-            onClick={handleBurnTokenClick}
+            buttonText="Wipe"
+            onClick={handleWipeTokenClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -177,4 +190,4 @@ const BurnToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { BurnToken };
+export { WipeToken };

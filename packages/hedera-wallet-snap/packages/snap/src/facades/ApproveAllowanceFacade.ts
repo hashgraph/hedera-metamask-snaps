@@ -152,16 +152,14 @@ export class ApproveAllowanceFacade {
         throw new Error('hedera client returned null');
       }
 
-      const approveAllowanceCommand = new ApproveAllowanceCommand(
+      const command = new ApproveAllowanceCommand(
         spenderAccountId,
         amount,
         assetType,
         assetDetail,
       );
 
-      txReceipt = await approveAllowanceCommand.execute(
-        hederaClient.getClient(),
-      );
+      txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to approve an allowance: ${String(
         error,

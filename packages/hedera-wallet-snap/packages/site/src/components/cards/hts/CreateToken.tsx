@@ -47,6 +47,11 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [tokenSymbol, setTokenSymbol] = useState('');
   const [tokenDecimals, setTokenDecimals] = useState(1);
   const [initialSupply, setInitialSupply] = useState(100);
+  const [kycPublicKey, setKycPublicKey] = useState('');
+  const [freezePublicKey, setFreezePublicKey] = useState('');
+  const [pausePublicKey, setPausePublicKey] = useState('');
+  const [wipePublicKey, setWipePublicKey] = useState('');
+  const [feeSchedulePublicKey, setFeeSchedulePublicKey] = useState('');
   const [supplyPublicKey, setSupplyPublicKey] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
@@ -65,6 +70,21 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         supplyType: 'INFINITE',
         initialSupply: assetType === 'NFT' ? 0 : initialSupply,
       } as CreateTokenRequestParams;
+      if (!_.isEmpty(kycPublicKey)) {
+        createTokenParams.kycPublicKey = kycPublicKey;
+      }
+      if (!_.isEmpty(freezePublicKey)) {
+        createTokenParams.freezePublicKey = freezePublicKey;
+      }
+      if (!_.isEmpty(pausePublicKey)) {
+        createTokenParams.pausePublicKey = pausePublicKey;
+      }
+      if (!_.isEmpty(wipePublicKey)) {
+        createTokenParams.wipePublicKey = wipePublicKey;
+      }
+      if (!_.isEmpty(feeSchedulePublicKey)) {
+        createTokenParams.feeSchedulePublicKey = feeSchedulePublicKey;
+      }
       if (assetType === 'NFT' || !_.isEmpty(supplyPublicKey)) {
         createTokenParams.supplyPublicKey = supplyPublicKey;
       }
@@ -113,7 +133,6 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
               </select>
             </label>
             <br />
-
             <label>
               Enter the name for your token/NFT
               <input
@@ -125,7 +144,6 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
               />
             </label>
             <br />
-
             <label>
               Enter the symbol for your token/NFT
               <input
@@ -137,7 +155,6 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
               />
             </label>
             <br />
-
             {assetType === 'TOKEN' && (
               <>
                 <label>
@@ -178,6 +195,66 @@ const CreateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
                 value={supplyPublicKey}
                 placeholder="Enter the supply key"
                 onChange={(e) => setSupplyPublicKey(e.target.value)}
+              />
+            </label>
+            <br />
+
+            <label>
+              Enter the KYC public key for your token(Optional)
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={kycPublicKey}
+                placeholder="Enter the kyc key"
+                onChange={(e) => setKycPublicKey(e.target.value)}
+              />
+            </label>
+            <br />
+
+            <label>
+              Enter the Freeze public key for your token(Optional)
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={freezePublicKey}
+                placeholder="Enter the freeze key"
+                onChange={(e) => setFreezePublicKey(e.target.value)}
+              />
+            </label>
+            <br />
+
+            <label>
+              Enter the Pause public key for your token(Optional)
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={pausePublicKey}
+                placeholder="Enter the pause key"
+                onChange={(e) => setPausePublicKey(e.target.value)}
+              />
+            </label>
+            <br />
+
+            <label>
+              Enter the Wipe public key for your token(Optional)
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={wipePublicKey}
+                placeholder="Enter the wipe key"
+                onChange={(e) => setWipePublicKey(e.target.value)}
+              />
+            </label>
+            <br />
+
+            <label>
+              Enter the Fee Schedule public key for your token(Optional)
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={feeSchedulePublicKey}
+                placeholder="Enter the fee schedule key"
+                onChange={(e) => setFeeSchedulePublicKey(e.target.value)}
               />
             </label>
             <br />

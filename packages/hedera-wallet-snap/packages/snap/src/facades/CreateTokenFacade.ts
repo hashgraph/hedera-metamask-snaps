@@ -201,7 +201,7 @@ export class CreateTokenFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const createTokenCommand = new CreateTokenCommand(
+      const command = new CreateTokenCommand(
         assetType,
         name,
         symbol,
@@ -226,7 +226,7 @@ export class CreateTokenFacade {
       if (privateKeyObj === null) {
         throw new Error('private key object returned null');
       }
-      txReceipt = await createTokenCommand.execute(
+      txReceipt = await command.execute(
         hederaClient.getClient(),
         privateKeyObj,
       );
