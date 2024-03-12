@@ -128,6 +128,11 @@ export type DissociateTokensRequestParams = {
   tokenIds: string[];
 };
 
+export type FreezeAccountRequestParams = {
+  tokenId: string;
+  accountId: string;
+};
+
 export type WipeTokenRequestParams = {
   assetType: 'TOKEN' | 'NFT';
   tokenId: string;

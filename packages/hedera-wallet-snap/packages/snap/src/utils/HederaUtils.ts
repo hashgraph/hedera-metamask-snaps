@@ -49,6 +49,7 @@ import {
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DissociateTokensRequestParams,
+  FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
@@ -1477,6 +1478,37 @@ export class HederaUtils {
         }
       });
     }
+  }
+
+  /**
+   * Check Validation of freezeAccount/unfreezeAccount request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidFreezeAccountParams(
+    params: unknown,
+  ): asserts params is FreezeAccountRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('tokenId' in params) ||
+      !('accountId' in params)
+    ) {
+      console.error(
+        'Invalid Params passed. "tokenId" and "accountId" must be passed as parameters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid Params passed. "tokenId" and "accountId" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as FreezeAccountRequestParams;
+
+    // Check if tokenId is valid
+    HederaUtils.checkValidString(parameter, 'wipeToken', 'tokenId', true);
+
+    // Check if accountId is valid
+    HederaUtils.checkValidAccountId(parameter, 'wipeToken', 'accountId', true);
   }
 
   /**
