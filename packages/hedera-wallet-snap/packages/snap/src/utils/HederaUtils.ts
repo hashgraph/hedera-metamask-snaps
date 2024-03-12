@@ -47,7 +47,7 @@ import {
   BurnTokenRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
-  DeleteAllowanceRequestParams,
+  DeleteAllowanceRequestParams, DeleteTokenRequestParams,
   DissociateTokensRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
@@ -1474,6 +1474,35 @@ export class HederaUtils {
           );
         }
       });
+    }
+  }
+
+  /**
+   * Check Validation of deleteToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidDeleteTokenParams(
+    params: unknown,
+  ): asserts params is DeleteTokenRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
+      console.error(
+        'Invalid deleteToken Params passed. "tokenId" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid deleteToken Params passed. "tokenId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as DeleteTokenRequestParams;
+
+    if (_.isEmpty(parameter.tokenId) || typeof parameter.tokenId !== 'string') {
+      console.error(
+        'Invalid deleteToken Params passed. "tokenId" must be a string.',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid deleteToken Params passed. "tokenId" must be a string.',
+      );
     }
   }
 

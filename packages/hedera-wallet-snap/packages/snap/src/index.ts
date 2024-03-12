@@ -42,6 +42,7 @@ import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
 import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
+import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -263,6 +264,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await DissociateTokensFacade.dissociateTokens(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/deleteToken': {
+      HederaUtils.isValidDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteTokenFacade.deleteToken(
           walletSnapParams,
           request.params,
         ),

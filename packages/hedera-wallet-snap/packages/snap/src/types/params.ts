@@ -120,6 +120,10 @@ export type BurnTokenRequestParams = {
   serialNumbers?: number[];
 };
 
+export type DeleteTokenRequestParams = {
+  tokenId: string;
+};
+
 export type AssociateTokensRequestParams = {
   tokenIds: string[];
 };
