@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,14 @@ import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
 import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
+import { BurnTokenFacade } from './facades/BurnTokenFacade';
 import { CreateTokenFacade } from './facades/CreateTokenFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
 import { DissociateTokensFacade } from './facades/DissociateTokensFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
+import { MintTokenFacade } from './facades/MintTokenFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
@@ -40,8 +42,6 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { MintTokenFacade } from './facades/MintTokenFacade';
-import { BurnTokenFacade } from './facades/BurnTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
