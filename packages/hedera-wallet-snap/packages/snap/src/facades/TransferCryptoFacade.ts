@@ -240,7 +240,7 @@ export class TransferCryptoFacade {
         throw providerErrors.userRejectedRequest();
       }
 
-      const transferCryptoCommand = new TransferCryptoCommand(
+      const command = new TransferCryptoCommand(
         transfers,
         memo,
         maxFee,
@@ -248,7 +248,7 @@ export class TransferCryptoFacade {
         serviceFee.toAddress as string,
       );
 
-      txReceipt = await transferCryptoCommand.execute(hederaClient.getClient());
+      txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       console.error(`Error while trying to transfer crypto: ${String(error)}`);
       throw providerErrors.unsupportedMethod(

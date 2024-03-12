@@ -127,3 +127,11 @@ export type AssociateTokensRequestParams = {
 export type DissociateTokensRequestParams = {
   tokenIds: string[];
 };
+
+export type WipeTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  accountId: string;
+  amount?: number;
+  serialNumbers?: number[];
+};
