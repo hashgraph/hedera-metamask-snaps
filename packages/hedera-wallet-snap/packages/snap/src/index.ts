@@ -25,11 +25,11 @@ import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
-import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
-import { CreateTokenFacade } from './facades/CreateTokenFacade';
+import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
-import { DissociateTokensFacade } from './facades/DissociateTokensFacade';
+import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
@@ -40,8 +40,8 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { MintTokenFacade } from './facades/MintTokenFacade';
-import { BurnTokenFacade } from './facades/BurnTokenFacade';
+import { MintTokenFacade } from './facades/hts/MintTokenFacade';
+import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.

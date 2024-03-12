@@ -21,27 +21,25 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { MintTokenCommand } from '../commands/hts/MintTokenCommand';
-import { TxReceipt } from '../types/hedera';
-import { MintTokenRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { SnapUtils } from '../utils/SnapUtils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
+import { TxReceipt } from '../../types/hedera';
+import { BurnTokenRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
-export class MintTokenFacade {
+export class BurnTokenFacade {
   /**
-   * Minting fungible token allows you to increase the total supply of the token. Minting a
-   * non-fungible token creates an NFT with its unique metadata for the class of NFTs defined by
-   * the token ID. The Supply Key must sign the transaction.
+   * Burns fungible and non-fungible tokens owned by the Treasury Account.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param mintTokenRequestParams - Parameters for minting a token.
+   * @param burnTokenRequestParams - Parameters for burning a token.
    * @returns Receipt of the transaction.
    */
-  public static async mintToken(
+  public static async burnToken(
     walletSnapParams: WalletSnapParams,
-    mintTokenRequestParams: MintTokenRequestParams,
+    burnTokenRequestParams: BurnTokenRequestParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
@@ -52,8 +50,8 @@ export class MintTokenFacade {
       assetType,
       tokenId,
       amount,
-      metadata = [],
-    } = mintTokenRequestParams;
+      serialNumbers = [],
+    } = burnTokenRequestParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -61,12 +59,12 @@ export class MintTokenFacade {
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Mint token'),
+        heading('Burn token'),
         text(
-          'Learn more about minting tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/mint-a-token)',
+          'Learn more about burning tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/burn-a-token)',
         ),
         text(
-          `You are about to mint a ${
+          `You are about to burn a ${
             assetType === 'TOKEN' ? 'Fungible Token' : 'Non Fungible Token(NFT)'
           } with the following details:`,
         ),
@@ -75,16 +73,16 @@ export class MintTokenFacade {
       ];
       if (assetType === 'NFT') {
         panelToShow.push(
-          text(`Amount to mint: ${metadata.length}`),
-          text(`Metadata: `),
+          text(`Amount to burn: ${serialNumbers.length}`),
+          text(`Serial Numbers: `),
         );
         panelToShow.push(divider());
-        for (const data of metadata) {
-          panelToShow.push(text(`🚀 ${data}`));
+        for (const serialNumber of serialNumbers) {
+          panelToShow.push(text(`🔥 ${serialNumber}`));
         }
         panelToShow.push(divider());
       } else {
-        panelToShow.push(text(`Amount to mint: ${amount as number}`));
+        panelToShow.push(text(`Amount to burn: ${amount as number}`));
       }
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
@@ -93,7 +91,7 @@ export class MintTokenFacade {
         throw new Error(errMessage);
       }
       panelToShow.push(
-        text(`Mint to Treasury account: ${tokenInfo.treasury_account_id}`),
+        text(`Burn from Treasury account: ${tokenInfo.treasury_account_id}`),
       );
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
@@ -136,10 +134,10 @@ export class MintTokenFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const mintTokenCommand = new MintTokenCommand(
+      const mintTokenCommand = new BurnTokenCommand(
         assetType,
         tokenId,
-        metadata,
+        serialNumbers,
         assetType === 'TOKEN'
           ? Number(amount) * Math.pow(10, Number(tokenInfo.decimals))
           : amount,
@@ -151,7 +149,7 @@ export class MintTokenFacade {
       }
       txReceipt = await mintTokenCommand.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to mint tokens: ${String(error)}`;
+      const errMessage = `Error while trying to burn tokens: ${String(error)}`;
       console.error(errMessage);
       throw providerErrors.unsupportedMethod(errMessage);
     }

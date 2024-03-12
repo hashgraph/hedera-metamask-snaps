@@ -1,35 +1,15 @@
-/*-
- *
- * Hedera Wallet Snap
- *
- * Copyright (C) 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-import { WalletSnapParams, SnapDialogParams } from '../types/state';
-import { AssociateTokensRequestParams } from '../types/params';
-import { TxReceipt } from '../types/hedera';
+import { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import { DissociateTokensRequestParams } from '../../types/params';
+import { TxReceipt } from '../../types/hedera';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { CryptoUtils } from '../utils/CryptoUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
-import { SnapUtils } from '../utils/SnapUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { AssociateTokensCommand } from '../commands/hts/AssociateTokensCommand';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { DissociateTokensCommand } from '../../commands/hts/DissociateTokensCommand';
 
-export class AssociateTokensFacade {
+export class DissociateTokensFacade {
   /**
    * Associates the provided Hedera account with the provided Hedera token(s).
    *
@@ -41,16 +21,16 @@ export class AssociateTokensFacade {
    * TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED responses for pre-HIP-367 transactions.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param associateTokensRequestParams - Parameters for associating tokens to the account.
+   * @param dissociateTokensRequestParams - Parameters for associating tokens to the account.
    * @returns Receipt of the transaction.
    */
-  public static async associateTokens(
+  public static async dissociateTokens(
     walletSnapParams: WalletSnapParams,
-    associateTokensRequestParams: AssociateTokensRequestParams,
+    dissociateTokensRequestParams: DissociateTokensRequestParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
-    const { tokenIds = [] as string[] } = associateTokensRequestParams;
+    const { tokenIds = [] as string[] } = dissociateTokensRequestParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
@@ -61,9 +41,9 @@ export class AssociateTokensFacade {
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Associate Tokens'),
+        heading('Dissociate Tokens'),
         text(
-          'Are you sure you want to associate the following tokens to your account?',
+          'Are you sure you want to dissociate the following tokens from your account?',
         ),
         divider(),
       ];
@@ -131,12 +111,12 @@ export class AssociateTokensFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const associateTokensCommand = new AssociateTokensCommand(tokenIds);
-      txReceipt = await associateTokensCommand.execute(
+      const dissociateTokensCommand = new DissociateTokensCommand(tokenIds);
+      txReceipt = await dissociateTokensCommand.execute(
         hederaClient.getClient(),
       );
     } catch (error: any) {
-      const errMessage = `Error while trying to associate tokens to the account: ${String(
+      const errMessage = `Error while trying to dissociate tokens from the account: ${String(
         error,
       )}`;
       console.error(errMessage);
