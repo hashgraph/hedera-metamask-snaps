@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * limitations under the License.
  *
  */
+
 import _ from 'lodash';
 import { FC, useContext, useRef, useState } from 'react';
 import {
