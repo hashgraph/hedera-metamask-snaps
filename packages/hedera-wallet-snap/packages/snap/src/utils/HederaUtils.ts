@@ -58,6 +58,7 @@ import {
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
+  WipeTokenRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
 import { FetchResponse, FetchUtils } from './FetchUtils';
@@ -123,6 +124,44 @@ export class HederaUtils {
       );
       throw providerErrors.unsupportedMethod(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid Hedera AccountId.
+   *
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static checkValidAccountId(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    HederaUtils.checkRequiredProperty(
+      parameter,
+      methodName,
+      propertyName,
+      isRequired,
+    );
+    // Check if the property exists and is a valid Hedera AccountId
+    if (
+      propertyName in parameter &&
+      (typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]) ||
+        !AccountId.fromString(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string and a valid Hedera Account Id`,
+      );
+      throw providerErrors.unsupportedMethod(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string and a valid Hedera Account Id`,
       );
     }
   }
@@ -471,19 +510,12 @@ export class HederaUtils {
     const parameter = params as GetAccountInfoRequestParams;
 
     // Check if accountId is valid
-    if (
-      'accountId' in parameter &&
-      (typeof parameter.accountId !== 'string' ||
-        _.isEmpty(parameter.accountId) ||
-        !AccountId.fromString(parameter.accountId))
-    ) {
-      console.error(
-        'Invalid getAccountInfo Params passed. "accountId" must be a string and be a valid Hedera Account Id',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid getAccountInfo Params passed. "accountId" must be a string and be a valid Hedera Account Id',
-      );
-    }
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'getAccountInfo',
+      'accountId',
+      false,
+    );
 
     // Check if serviceFee is valid
     if (
@@ -647,19 +679,12 @@ export class HederaUtils {
         }
 
         // Check if from is valid
-        if (
-          'from' in transfer &&
-          (_.isEmpty(transfer.from) ||
-            typeof transfer.from !== 'string' ||
-            !AccountId.fromString(transfer.from))
-        ) {
-          console.error(
-            `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
-          );
-          throw providerErrors.unsupportedMethod(
-            `Invalid transferCrypto Params passed. "transfers[].from" is not a valid Account ID`,
-          );
-        }
+        HederaUtils.checkValidAccountId(
+          transfer,
+          'transfers[].from',
+          'from',
+          false,
+        );
       });
     }
   }
@@ -689,17 +714,13 @@ export class HederaUtils {
     HederaUtils.checkValidNumber(parameter, 'stakeHbar', 'nodeId', false);
 
     // Check if accountId is valid
-    if (
-      'accountId' in parameter &&
-      !_.isNull(parameter.accountId) &&
-      (typeof parameter.accountId !== 'string' ||
-        _.isEmpty(parameter.accountId) ||
-        !AccountId.fromString(parameter.accountId))
-    ) {
-      const errMessage =
-        'Invalid stakeHbar Params passed. "accountId" is not a valid Hedera Account Id';
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+    if ('accountId' in parameter && !_.isNull(parameter.accountId)) {
+      HederaUtils.checkValidAccountId(
+        parameter,
+        'stakeHbar',
+        'accountId',
+        false,
+      );
     }
   }
 
@@ -727,19 +748,12 @@ export class HederaUtils {
     const parameter = params as DeleteAccountRequestParams;
 
     // Check if transferAccountId is valid
-    if (
-      'transferAccountId' in parameter &&
-      (_.isEmpty(parameter.transferAccountId) ||
-        typeof parameter.transferAccountId !== 'string' ||
-        !AccountId.fromString(parameter.transferAccountId))
-    ) {
-      console.error(
-        'Invalid deleteAccount Params passed. "transferAccountId" is not a valid Account ID',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid deleteAccount Params passed. "transferAccountId" is not a valid Account ID',
-      );
-    }
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'deleteAccount',
+      'transferAccountId',
+      true,
+    );
   }
 
   /**
@@ -768,19 +782,12 @@ export class HederaUtils {
     const parameter = params as ApproveAllowanceRequestParams;
 
     // Check if spenderAccountId is valid
-    if (
-      'spenderAccountId' in parameter &&
-      (_.isEmpty(parameter.spenderAccountId) ||
-        typeof parameter.spenderAccountId !== 'string' ||
-        !AccountId.fromString(parameter.spenderAccountId))
-    ) {
-      console.error(
-        'Invalid approveAllowance Params passed. "spenderAccountId" is not a valid Account ID',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid approveAllowance Params passed. "spenderAccountId" is not a valid Account ID',
-      );
-    }
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'approveAllowance',
+      'spenderAccountId',
+      true,
+    );
 
     // Check if amount is valid
     HederaUtils.checkValidNumber(parameter, 'approveAllowance', 'amount', true);
@@ -919,17 +926,12 @@ export class HederaUtils {
     }
 
     // Check if spenderAccountId is valid
-    if (
-      (parameter.assetType === 'HBAR' || parameter.assetType === 'TOKEN') &&
-      (_.isEmpty(parameter.spenderAccountId) ||
-        typeof parameter.spenderAccountId !== 'string' ||
-        !AccountId.fromString(parameter.spenderAccountId))
-    ) {
-      console.error(
-        'Invalid deleteAllowance Params passed. "spenderAccountId" must be passed for "HBAR/TOKEN" assetType and must be a valid string',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid deleteAllowance Params passed. "spenderAccountId" must be passed for "HBAR/TOKEN" assetType and must be a valid string',
+    if (parameter.assetType === 'HBAR' || parameter.assetType === 'TOKEN') {
+      HederaUtils.checkValidAccountId(
+        parameter,
+        'deleteAllowance',
+        'spenderAccountId',
+        true,
       );
     }
 
@@ -1474,6 +1476,110 @@ export class HederaUtils {
           );
         }
       });
+    }
+  }
+
+  /**
+   * Check Validation of wipeToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidWipeTokenParams(
+    params: unknown,
+  ): asserts params is WipeTokenRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('assetType' in params) ||
+      !('tokenId' in params) ||
+      !('accountId' in params)
+    ) {
+      console.error(
+        'Invalid wipeToken Params passed. "assetType", "tokenId" and "accountId" must be passed as parameters',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid wipeToken Params passed. "assetType", "tokenId" and "accountId" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as WipeTokenRequestParams;
+
+    // Check if assetType is valid
+    HederaUtils.checkValidString(parameter, 'wipeToken', 'assetType', true);
+    if (!(parameter.assetType === 'TOKEN' || parameter.assetType === 'NFT')) {
+      console.error(
+        'Invalid wipeToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid wipeToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
+      );
+    }
+
+    // Check if tokenId is valid
+    HederaUtils.checkValidString(parameter, 'wipeToken', 'tokenId', true);
+
+    // Check if accountId is valid
+    HederaUtils.checkValidAccountId(parameter, 'wipeToken', 'accountId', true);
+
+    // Check for NFT assetType
+    if (parameter.assetType === 'NFT') {
+      if ('amount' in parameter) {
+        console.error(
+          'Invalid wipeToken Params passed. "amount" can only be passed to fungible tokens',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid wipeToken Params passed. "amount" can only be passed to fungible tokens',
+        );
+      }
+      // Check if serialNumbers is valid
+      if ('serialNumbers' in parameter) {
+        if (
+          _.isEmpty(parameter.serialNumbers) ||
+          !Array.isArray(parameter.serialNumbers)
+        ) {
+          console.error(
+            'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
+          );
+        }
+        parameter.serialNumbers.forEach((serialNumber: number) => {
+          if (typeof serialNumber !== 'number' || serialNumber < 0) {
+            console.error(
+              'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
+            );
+            throw providerErrors.unsupportedMethod(
+              'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
+            );
+          }
+        });
+      } else {
+        console.error(
+          'Invalid wipeToken Params passed. "serialNumbers" must be passed for NFTs',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid wipeToken Params passed. "serialNumbers" must be passed for NFTs',
+        );
+      }
+    } else {
+      HederaUtils.checkValidNumber(parameter, 'wipeToken', 'amount', true);
+      if (parameter.amount === 0) {
+        console.error(
+          'Invalid wipeToken Params passed. "amount" must be greater than 0',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid wipeToken Params passed. "amount" must be greater than 0',
+        );
+      }
+      if ('serialNumbers' in parameter) {
+        console.error(
+          'Invalid wipeToken Params passed. "serialNumbers" can only be passed to NFTs',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid wipeToken Params passed. "serialNumbers" can only be passed to NFTs',
+        );
+      }
     }
   }
 

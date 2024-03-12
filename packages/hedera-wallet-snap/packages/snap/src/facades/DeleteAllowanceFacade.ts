@@ -120,15 +120,13 @@ export class DeleteAllowanceFacade {
         throw new Error('hedera client returned null');
       }
 
-      const deleteAllowanceCommand = new DeleteAllowanceCommand(
+      const command = new DeleteAllowanceCommand(
         assetType,
         assetId as string,
         spenderAccountId,
       );
 
-      txReceipt = await deleteAllowanceCommand.execute(
-        hederaClient.getClient(),
-      );
+      txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to delete an allowance: ${String(
         error,

@@ -151,9 +151,9 @@ export class StakeHbarFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const stakeHbarCommand = new StakeHbarCommand(nodeId, accountId);
+      const command = new StakeHbarCommand(nodeId, accountId);
 
-      txReceipt = await stakeHbarCommand.execute(hederaClient.getClient());
+      txReceipt = await command.execute(hederaClient.getClient());
 
       state.accountState[hederaEvmAddress][
         network

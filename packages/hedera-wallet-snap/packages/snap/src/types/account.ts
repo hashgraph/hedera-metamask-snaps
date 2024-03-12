@@ -33,6 +33,7 @@ export type Account = {
   externalEvmAddress: string;
   hederaAccountId: string;
   hederaEvmAddress: string;
+  publicKey: string;
   balance: AccountBalance;
   network: string;
   mirrorNodeUrl: string;

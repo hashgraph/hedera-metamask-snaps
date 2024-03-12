@@ -131,10 +131,8 @@ export class AssociateTokensFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const associateTokensCommand = new AssociateTokensCommand(tokenIds);
-      txReceipt = await associateTokensCommand.execute(
-        hederaClient.getClient(),
-      );
+      const command = new AssociateTokensCommand(tokenIds);
+      txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to associate tokens to the account: ${String(
         error,

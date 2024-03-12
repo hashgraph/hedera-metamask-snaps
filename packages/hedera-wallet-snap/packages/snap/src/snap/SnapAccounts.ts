@@ -18,21 +18,21 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
 import { PrivateKey } from '@hashgraph/sdk';
+import { providerErrors } from '@metamask/rpc-errors';
 
-import _ from 'lodash';
-import { ethers } from 'ethers';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
-import { StateUtils } from '../utils/StateUtils';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { SnapUtils } from '../utils/SnapUtils';
-import { SnapState } from './SnapState';
-import { Utils } from '../utils/Utils';
-import { Account, AccountInfo, ExternalAccount } from '../types/account';
-import { HederaUtils } from '../utils/HederaUtils';
+import { ethers } from 'ethers';
+import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { Account, AccountInfo, ExternalAccount } from '../types/account';
+import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
+import { CryptoUtils } from '../utils/CryptoUtils';
+import { HederaUtils } from '../utils/HederaUtils';
+import { SnapUtils } from '../utils/SnapUtils';
+import { StateUtils } from '../utils/StateUtils';
+import { Utils } from '../utils/Utils';
+import { SnapState } from './SnapState';
 
 export class SnapAccounts {
   /**
@@ -600,6 +600,7 @@ export class SnapAccounts {
       externalEvmAddress,
       hederaAccountId: accountInfo.accountId,
       hederaEvmAddress: accountInfo.evmAddress,
+      publicKey,
       balance: accountInfo.balance,
       network,
       mirrorNodeUrl: mirrorNode,
