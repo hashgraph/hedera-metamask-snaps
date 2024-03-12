@@ -36,13 +36,13 @@ import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
 import { MintTokenFacade } from './facades/MintTokenFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { WipeTokenFacade } from './facades/WipeTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
 import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { WipeTokenFacade } from './facades/WipeTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -325,14 +325,19 @@ export const onUpdate: OnUpdateHandler = async () => {
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
         text(
-          'Added a new API to create a new token(fungible and non-fungible)',
+          '🚀 Added a new API to create a new token(fungible and non-fungible)',
         ),
         text(
           '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
         ),
-        text('Added a new API to mint/burn fungible and non-fungible tokens'),
+        text(
+          '🚀 Added a new API to mint/burn fungible and non-fungible tokens',
+        ),
         text(
           '🚀 Added a new API to associate/dissociate fungible/non-fungible tokens to an account',
+        ),
+        text(
+          '🚀 Added a new API to wipe fungible/non-fungible tokens from an account',
         ),
       ]),
     },
