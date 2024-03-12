@@ -1500,14 +1500,7 @@ export class HederaUtils {
 
     const parameter = params as DeleteTokenRequestParams;
 
-    if (_.isEmpty(parameter.tokenId) || typeof parameter.tokenId !== 'string') {
-      console.error(
-        'Invalid deleteToken Params passed. "tokenId" must be a string.',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid deleteToken Params passed. "tokenId" must be a string.',
-      );
-    }
+    HederaUtils.checkValidString(parameter, 'deleteToken', 'tokenId', true);
   }
 
   /**
