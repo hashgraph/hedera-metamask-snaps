@@ -27,7 +27,7 @@ import _ from 'lodash';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { AssociateTokensCommand } from '../commands/AssociateTokensCommand';
+import { AssociateTokensCommand } from '../commands/hts/AssociateTokensCommand';
 
 export class AssociateTokensFacade {
   /**

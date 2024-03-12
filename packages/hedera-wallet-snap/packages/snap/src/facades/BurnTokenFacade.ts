@@ -22,7 +22,7 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { BurnTokenCommand } from '../commands/BurnTokenCommand';
+import { BurnTokenCommand } from '../commands/hts/BurnTokenCommand';
 import { TxReceipt } from '../types/hedera';
 import { BurnTokenRequestParams } from '../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../types/state';

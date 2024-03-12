@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { DissociateTokensCommand } from '../commands/DissociateTokensCommand';
+import { DissociateTokensCommand } from '../commands/hts/DissociateTokensCommand';
 
 export class DissociateTokensFacade {
   /**
