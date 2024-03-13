@@ -1,0 +1,50 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    open-pull-requests-limit: 15
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: "/packages/hedera-wallet-snap"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    open-pull-requests-limit: 15
+
+  - package-ecosystem: npm
+    directory: "/packages/hedera-wallet-snap/packages/site"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    open-pull-requests-limit: 15
+
+  - package-ecosystem: npm
+    directory: "/packages/hedera-wallet-snap/packages/snap"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: increase
+    open-pull-requests-limit: 15
