@@ -18,6 +18,10 @@
  *
  */
 
+import { TxReceipt } from '../types/hedera';
+import { TransactionReceipt } from '@hashgraph/sdk';
+import { CryptoUtils } from './CryptoUtils';
+
 export class Utils {
   public static timestampToString(
     data: string | number | Date | null | undefined,
@@ -50,5 +54,41 @@ export class Utils {
       result = `0x${address}`;
     }
     return result.toLowerCase();
+  }
+
+  public static formatTransactionReceipt(
+    receipt: TransactionReceipt,
+  ): TxReceipt {
+    let newExchangeRate;
+    if (receipt.exchangeRate) {
+      newExchangeRate = {
+        ...receipt.exchangeRate,
+        expirationTime: Utils.timestampToString(
+          receipt.exchangeRate.expirationTime,
+        ),
+      };
+    }
+
+    return {
+      status: receipt.status.toString(),
+      accountId: receipt.accountId ? receipt.accountId.toString() : '',
+      fileId: receipt.fileId ? receipt.fileId : '',
+      contractId: receipt.contractId ? receipt.contractId : '',
+      topicId: receipt.topicId ? receipt.topicId : '',
+      tokenId: receipt.tokenId ? receipt.tokenId : '',
+      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
+      exchangeRate: newExchangeRate,
+      topicSequenceNumber: receipt.topicSequenceNumber
+        ? String(receipt.topicSequenceNumber)
+        : '',
+      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
+      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
+      scheduledTransactionId: receipt.scheduledTransactionId
+        ? receipt.scheduledTransactionId.toString()
+        : '',
+      serials: JSON.parse(JSON.stringify(receipt.serials)),
+      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
+      children: JSON.parse(JSON.stringify(receipt.children)),
+    } as TxReceipt;
   }
 }
