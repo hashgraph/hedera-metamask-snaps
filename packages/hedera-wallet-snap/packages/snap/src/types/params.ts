@@ -146,18 +146,19 @@ export type WipeTokenRequestParams = {
 };
 
 export type UpdateTokenRequestParams = {
+  tokenId: string;
   name?: string;
   symbol?: string;
   treasuryAccountId?: string;
-  adminKey?: string;
-  kycKey?: string;
-  freezeKey?: string;
-  feeScheduleKey?: string;
-  pauseKey?: string;
-  wipeKey?: string;
-  supplyKey?: string;
+  adminPublicKey?: string;
+  kycPublicKey?: string;
+  freezePublicKey?: string;
+  feeSchedulePublicKey?: string;
+  pausePublicKey?: string;
+  wipePublicKey?: string;
+  supplyPublicKey?: string;
   expirationTime?: string;
-  memo?: string;
+  tokenMemo?: string;
   autoRenewAccountId?: string;
   autoRenewPeriod?: number;
 };
