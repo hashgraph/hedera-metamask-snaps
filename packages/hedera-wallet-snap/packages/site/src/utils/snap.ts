@@ -28,6 +28,7 @@ import {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
+  DeleteTokenRequestParams,
   DissociateTokensRequestParams,
   FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
@@ -591,6 +592,37 @@ export const dissociateTokens = async (
           network,
           mirrorNodeUrl,
           ...dissociateTokensRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param deleteTokenRequestParams
+ * @param externalAccountparams
+ */
+export const deleteToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteTokenRequestParams: DeleteTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/deleteToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...deleteTokenRequestParams,
           ...externalAccountparams,
         },
       },

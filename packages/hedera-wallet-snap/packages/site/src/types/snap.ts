@@ -171,6 +171,10 @@ export type DissociateTokensRequestParams = {
   tokenIds: string[];
 };
 
+export type DeleteTokenRequestParams = {
+  tokenId: string | undefined;
+};
+
 export type FreezeAccountRequestParams = {
   tokenId: string;
   accountId: string;

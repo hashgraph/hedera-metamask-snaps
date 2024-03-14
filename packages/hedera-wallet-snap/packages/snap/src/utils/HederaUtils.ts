@@ -48,6 +48,7 @@ import {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
+  DeleteTokenRequestParams,
   DissociateTokensRequestParams,
   FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
@@ -1478,6 +1479,28 @@ export class HederaUtils {
         }
       });
     }
+  }
+
+  /**
+   * Check Validation of deleteToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidDeleteTokenParams(
+    params: unknown,
+  ): asserts params is DeleteTokenRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
+      console.error(
+        'Invalid deleteToken Params passed. "tokenId" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid deleteToken Params passed. "tokenId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as DeleteTokenRequestParams;
+
+    HederaUtils.checkValidString(parameter, 'deleteToken', 'tokenId', true);
   }
 
   /**

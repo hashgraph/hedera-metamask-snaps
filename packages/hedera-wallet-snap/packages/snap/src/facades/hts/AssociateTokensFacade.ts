@@ -18,16 +18,16 @@
  *
  */
 
-import { WalletSnapParams, SnapDialogParams } from '../types/state';
-import { AssociateTokensRequestParams } from '../types/params';
-import { TxReceipt } from '../types/hedera';
+import { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import { AssociateTokensRequestParams } from '../../types/params';
+import { TxReceipt } from '../../types/hedera';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { CryptoUtils } from '../utils/CryptoUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
-import { SnapUtils } from '../utils/SnapUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { AssociateTokensCommand } from '../commands/AssociateTokensCommand';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { AssociateTokensCommand } from '../../commands/hts/AssociateTokensCommand';
 
 export class AssociateTokensFacade {
   /**

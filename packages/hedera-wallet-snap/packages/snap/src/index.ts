@@ -25,16 +25,14 @@ import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
-import { AssociateTokensFacade } from './facades/AssociateTokensFacade';
-import { BurnTokenFacade } from './facades/BurnTokenFacade';
-import { CreateTokenFacade } from './facades/CreateTokenFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
-import { DissociateTokensFacade } from './facades/DissociateTokensFacade';
+import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
+import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
 import { FreezeAccountFacade } from './facades/FreezeAccountFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
-import { MintTokenFacade } from './facades/MintTokenFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 import { WipeTokenFacade } from './facades/WipeTokenFacade';
@@ -44,6 +42,9 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
+import { MintTokenFacade } from './facades/hts/MintTokenFacade';
+import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
+import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -297,6 +298,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await WipeTokenFacade.wipeToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/deleteToken': {
+      HederaUtils.isValidDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteTokenFacade.deleteToken(
           walletSnapParams,
           request.params,
         ),
