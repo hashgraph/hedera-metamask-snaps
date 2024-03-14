@@ -46,7 +46,7 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-
+import { UpdateTokenFacade } from './facades/hts/UpdateTokenFacade';
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
  *
@@ -332,6 +332,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await DeleteTokenFacade.deleteToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/updateToken': {
+      HederaUtils.isValidUpdateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTokenFacade.updateToken(
           walletSnapParams,
           request.params,
         ),

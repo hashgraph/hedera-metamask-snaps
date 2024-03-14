@@ -60,6 +60,7 @@ import {
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
+  UpdateTokenRequestParams,
   WipeTokenRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
@@ -1193,6 +1194,131 @@ export class HederaUtils {
       );
       throw providerErrors.unsupportedMethod(
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
+      );
+    }
+  }
+
+  /**
+   * Check Validation of updateToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidUpdateTokenParams(
+    params: unknown,
+  ): asserts params is UpdateTokenRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenID' in params)) {
+      console.error(
+        'Invalid createToken Params passed. "tokenId" must be included.',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createToken Params passed. "tokenId" must be included.',
+      );
+    }
+
+    const parameter = params as CreateTokenRequestParams;
+
+    if (parameter.name) {
+      HederaUtils.checkValidString(parameter, 'createToken', 'name', true);
+      if (parameter.name.length > 100) {
+        console.error(
+          'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+        );
+      }
+    }
+
+    if (parameter.symbol) {
+      HederaUtils.checkValidString(parameter, 'createToken', 'symbol', true);
+      if (parameter.symbol.length > 100) {
+        console.error(
+          'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+        );
+      }
+    }
+
+    if (parameter.kycPublicKey) {
+      HederaUtils.checkValidPublicKey(
+        parameter,
+        'createToken',
+        'kycPublicKey',
+        false,
+      );
+    }
+
+    if (parameter.freezePublicKey) {
+      HederaUtils.checkValidPublicKey(
+        parameter,
+        'createToken',
+        'freezePublicKey',
+        false,
+      );
+    }
+
+    if (parameter.pausePublicKey) {
+      HederaUtils.checkValidPublicKey(
+        parameter,
+        'createToken',
+        'pausePublicKey',
+        false,
+      );
+    }
+
+    if (parameter.wipePublicKey) {
+      HederaUtils.checkValidPublicKey(
+        parameter,
+        'createToken',
+        'wipePublicKey',
+        false,
+      );
+    }
+
+    if (parameter.supplyPublicKey) {
+      HederaUtils.checkValidPublicKey(
+        parameter,
+        'createToken',
+        'supplyPublicKey',
+        false,
+      );
+    }
+
+    if (parameter.feeSchedulePublicKey) {
+      HederaUtils.checkValidPublicKey(
+        parameter,
+        'createToken',
+        'feeSchedulePublicKey',
+        false,
+      );
+    }
+
+    if (parameter.expirationTime) {
+      HederaUtils.checkValidTimestamp(
+        parameter,
+        'createToken',
+        'expirationTime',
+        false,
+      );
+    }
+
+    if (parameter.autoRenewAccountId) {
+      HederaUtils.checkValidString(
+        parameter,
+        'createToken',
+        'autoRenewAccountId',
+        false,
+      );
+    }
+
+    if (parameter.tokenMemo) {
+      HederaUtils.checkValidString(
+        parameter,
+        'createToken',
+        'tokenMemo',
+        false,
       );
     }
   }
