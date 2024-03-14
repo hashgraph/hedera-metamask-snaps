@@ -44,10 +44,7 @@ export class UpdateTokenCommand {
     client: Client,
     updateParams: UpdateTokenRequestParams,
   ): Promise<TxReceipt> {
-    const updateTransaction = this.#createTransaction(
-      updateParams,
-      this.#tokenId,
-    );
+    const updateTransaction = this.#createTransaction(updateParams);
 
     const signTx = await updateTransaction
       .freezeWith(client)
@@ -62,9 +59,10 @@ export class UpdateTokenCommand {
 
   #createTransaction(
     updateParams: UpdateTokenRequestParams,
-    tokenId: string,
   ): TokenUpdateTransaction {
-    const transaction = new TokenUpdateTransaction().setTokenId(tokenId);
+    const transaction = new TokenUpdateTransaction().setTokenId(
+      updateParams.tokenId,
+    );
 
     if (updateParams.name !== undefined) {
       transaction.setTokenName(updateParams.name);
@@ -78,37 +76,45 @@ export class UpdateTokenCommand {
       transaction.setTreasuryAccountId(updateParams.treasuryAccountId);
     }
 
-    if (updateParams.adminKey !== undefined) {
-      transaction.setAdminKey(PublicKey.fromStringECDSA(updateParams.adminKey));
+    if (updateParams.adminPublicKey !== undefined) {
+      transaction.setAdminKey(
+        PublicKey.fromStringECDSA(updateParams.adminPublicKey),
+      );
     }
 
-    if (updateParams.kycKey !== undefined) {
-      transaction.setKycKey(PublicKey.fromStringECDSA(updateParams.kycKey));
+    if (updateParams.kycPublicKey !== undefined) {
+      transaction.setKycKey(
+        PublicKey.fromStringECDSA(updateParams.kycPublicKey),
+      );
     }
 
-    if (updateParams.freezeKey !== undefined) {
+    if (updateParams.freezePublicKey !== undefined) {
       transaction.setFreezeKey(
-        PublicKey.fromStringECDSA(updateParams.freezeKey),
+        PublicKey.fromStringECDSA(updateParams.freezePublicKey),
       );
     }
 
-    if (updateParams.feeScheduleKey !== undefined) {
+    if (updateParams.feeSchedulePublicKey !== undefined) {
       transaction.setFeeScheduleKey(
-        PublicKey.fromStringECDSA(updateParams.feeScheduleKey),
+        PublicKey.fromStringECDSA(updateParams.feeSchedulePublicKey),
       );
     }
 
-    if (updateParams.pauseKey !== undefined) {
-      transaction.setPauseKey(PublicKey.fromStringECDSA(updateParams.pauseKey));
+    if (updateParams.pausePublicKey !== undefined) {
+      transaction.setPauseKey(
+        PublicKey.fromStringECDSA(updateParams.pausePublicKey),
+      );
     }
 
-    if (updateParams.wipeKey !== undefined) {
-      transaction.setWipeKey(PublicKey.fromStringECDSA(updateParams.wipeKey));
+    if (updateParams.wipePublicKey !== undefined) {
+      transaction.setWipeKey(
+        PublicKey.fromStringECDSA(updateParams.wipePublicKey),
+      );
     }
 
-    if (updateParams.supplyKey !== undefined) {
+    if (updateParams.supplyPublicKey !== undefined) {
       transaction.setSupplyKey(
-        PublicKey.fromStringECDSA(updateParams.supplyKey),
+        PublicKey.fromStringECDSA(updateParams.supplyPublicKey),
       );
     }
 
@@ -116,8 +122,8 @@ export class UpdateTokenCommand {
       transaction.setExpirationTime(new Date(updateParams.expirationTime));
     }
 
-    if (updateParams.memo !== undefined) {
-      transaction.setTokenMemo(updateParams.memo);
+    if (updateParams.tokenMemo !== undefined) {
+      transaction.setTokenMemo(updateParams.tokenMemo);
     }
 
     if (updateParams.autoRenewAccountId !== undefined) {
