@@ -57,6 +57,7 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
+import {DeleteToken} from "../components/cards/hts/DeleteToken";
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -201,6 +202,12 @@ const Index = () => {
         />
 
         <CreateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

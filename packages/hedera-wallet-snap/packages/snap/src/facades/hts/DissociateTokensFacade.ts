@@ -1,13 +1,13 @@
-import { WalletSnapParams, SnapDialogParams } from '../types/state';
-import { DissociateTokensRequestParams } from '../types/params';
-import { TxReceipt } from '../types/hedera';
+import { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import { DissociateTokensRequestParams } from '../../types/params';
+import { TxReceipt } from '../../types/hedera';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { CryptoUtils } from '../utils/CryptoUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
-import { SnapUtils } from '../utils/SnapUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { DissociateTokensCommand } from '../commands/DissociateTokensCommand';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { DissociateTokensCommand } from '../../commands/hts/DissociateTokensCommand';
 
 export class DissociateTokensFacade {
   /**
