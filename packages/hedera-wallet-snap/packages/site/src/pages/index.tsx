@@ -39,7 +39,6 @@ import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
-import { DeleteToken } from '../components/cards/hts/DeleteToken';
 import { DisableKYCAccount } from '../components/cards/hts/DisableKYCAccount';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
 import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
@@ -62,6 +61,8 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
+import { DeleteToken } from '../components/cards/hts/DeleteToken';
+import { UpdateToken } from '../components/cards/hts/UpdateToken';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -206,6 +207,12 @@ const Index = () => {
         />
 
         <CreateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
