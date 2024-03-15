@@ -162,3 +162,9 @@ export type UpdateTokenRequestParams = {
   autoRenewAccountId?: string;
   autoRenewPeriod?: number;
 };
+
+export type UpdateFeeScheduleRequestParams = {
+  tokenId: string;
+  feeSchedulePublicKey: string;
+  customFees: TokenCustomFee[];
+};
