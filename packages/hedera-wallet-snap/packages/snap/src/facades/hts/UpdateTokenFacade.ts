@@ -59,6 +59,7 @@ export class UpdateTokenFacade {
       wipePublicKey,
       supplyPublicKey,
       feeSchedulePublicKey,
+      customFees,
       expirationTime,
       autoRenewAccountId = hederaAccountId,
       tokenMemo = 'Created via Hedera Wallet Snap',

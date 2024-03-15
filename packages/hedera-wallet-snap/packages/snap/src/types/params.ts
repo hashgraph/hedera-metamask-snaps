@@ -154,6 +154,7 @@ export type UpdateTokenRequestParams = {
   kycPublicKey?: string;
   freezePublicKey?: string;
   feeSchedulePublicKey?: string;
+  customFees?: TokenCustomFee[];
   pausePublicKey?: string;
   wipePublicKey?: string;
   supplyPublicKey?: string;
@@ -161,10 +162,4 @@ export type UpdateTokenRequestParams = {
   tokenMemo?: string;
   autoRenewAccountId?: string;
   autoRenewPeriod?: number;
-};
-
-export type UpdateFeeScheduleRequestParams = {
-  tokenId: string;
-  feeSchedulePublicKey: string;
-  customFees: TokenCustomFee[];
 };

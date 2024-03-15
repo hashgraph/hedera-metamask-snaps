@@ -21,13 +21,13 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { FreezeAccountCommand } from '../commands/FreezeAccountCommand';
-import { TxReceipt } from '../types/hedera';
-import { FreezeAccountRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { SnapUtils } from '../utils/SnapUtils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { FreezeAccountCommand } from '../../commands/account/FreezeAccountCommand';
+import { TxReceipt } from '../../types/hedera';
+import { FreezeAccountRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class FreezeAccountFacade {
   /**

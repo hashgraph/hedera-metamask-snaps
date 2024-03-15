@@ -23,9 +23,9 @@ import {
   TokenFreezeTransaction,
   TokenUnfreezeTransaction,
 } from '@hashgraph/sdk';
-import { TxReceipt } from '../types/hedera';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { Utils } from '../utils/Utils';
+import { TxReceipt } from '../../types/hedera';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
 export class FreezeAccountCommand {
   readonly #freeze: boolean;
