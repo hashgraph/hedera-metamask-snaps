@@ -22,15 +22,25 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { FreezeAccountCommand } from '../../commands/hts/FreezeAccountCommand';
+import { FreezeAccountCommand } from '../../commands/account/FreezeAccountCommand';
 import { TxReceipt } from '../../types/hedera';
-import { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
+import { FreezeAccountRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { Utils } from '../../utils/Utils';
 
 export class FreezeAccountFacade {
+  /**
+   * Capitalizes the first letter of the given string.
+   *
+   * @param string - The string to capitalize.
+   * @returns The string with the first letter capitalized.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  private static readonly capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
   /**
    * Freezes transfers of the specified token for the account. The transaction must be
    * signed by the token's Freeze Key.
@@ -42,7 +52,7 @@ export class FreezeAccountFacade {
    */
   public static async freezeAccount(
     walletSnapParams: WalletSnapParams,
-    freezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
+    freezeAccountRequestParams: FreezeAccountRequestParams,
     freeze: boolean,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
@@ -61,12 +71,12 @@ export class FreezeAccountFacade {
     try {
       const panelToShow = [
         heading(
-          `${Utils.capitalizeFirstLetter(
+          `${FreezeAccountFacade.capitalizeFirstLetter(
             freezeText,
           )} account for the specified token`,
         ),
         text(
-          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/${freezeText}-an-account)`,
+          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/${freezeText}-an-account)`,
         ),
         text(
           `You are about to ${freezeText} transfers of the specified token for the given account:`,
