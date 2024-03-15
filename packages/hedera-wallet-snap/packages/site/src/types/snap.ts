@@ -194,3 +194,21 @@ export type ExternalAccountParams = {
     curve?: 'ECDSA_SECP256K1' | 'ED25519';
   };
 };
+
+export type UpdateTokenRequestParams = {
+  tokenId: string;
+  name?: string;
+  symbol?: string;
+  treasuryAccountId?: string;
+  adminPublicKey?: string;
+  kycPublicKey?: string;
+  freezePublicKey?: string;
+  feeSchedulePublicKey?: string;
+  pausePublicKey?: string;
+  wipePublicKey?: string;
+  supplyPublicKey?: string;
+  expirationTime?: string;
+  tokenMemo?: string;
+  autoRenewAccountId?: string;
+  autoRenewPeriod?: number;
+};
