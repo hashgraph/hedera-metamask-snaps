@@ -18,59 +18,26 @@
  *
  */
 
-import {
-  AccountAllowanceApproveTransaction,
-  AccountAllowanceDeleteTransaction,
-  AccountId,
-  Client,
-} from '@hashgraph/sdk';
-import { TxReceipt } from '../types/hedera';
-import { Utils } from '../utils/Utils';
-import { CryptoUtils } from '../utils/CryptoUtils';
+import { AccountDeleteTransaction, Client } from '@hashgraph/sdk';
+import { TxReceipt } from '../../types/hedera';
+import { Utils } from '../../utils/Utils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 
-export class DeleteAllowanceCommand {
-  readonly #assetType: string;
+export class DeleteAccountCommand {
+  readonly #transferAccountId: string;
 
-  readonly #assetId: string;
-
-  readonly #spenderAccountId?: string;
-
-  constructor(assetType: string, assetId: string, spenderAccountId?: string) {
-    this.#assetType = assetType;
-    this.#assetId = assetId;
-    this.#spenderAccountId = spenderAccountId;
+  constructor(transferAccountId: string) {
+    this.#transferAccountId = transferAccountId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    let transaction:
-      | AccountAllowanceApproveTransaction
-      | AccountAllowanceDeleteTransaction;
-
-    if (this.#assetType === 'HBAR' || this.#assetType === 'TOKEN') {
-      transaction = new AccountAllowanceApproveTransaction();
-      if (this.#assetType === 'HBAR') {
-        transaction.approveHbarAllowance(
-          client.operatorAccountId as AccountId,
-          this.#spenderAccountId as string,
-          0,
-        );
-      } else {
-        transaction.approveTokenAllowance(
-          this.#assetId,
-          client.operatorAccountId as AccountId,
-          this.#spenderAccountId as string,
-          0,
-        );
-      }
-    } else {
-      transaction =
-        new AccountAllowanceDeleteTransaction().deleteAllTokenNftAllowances(
-          this.#assetId,
-          client.operatorAccountId as AccountId,
-        );
-    }
-
-    transaction.freezeWith(client);
+    const transaction = new AccountDeleteTransaction()
+      .setAccountId(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        client.operatorAccountId!,
+      )
+      .setTransferAccountId(this.#transferAccountId)
+      .freezeWith(client);
 
     const txResponse = await transaction.execute(client);
 

@@ -18,18 +18,18 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { GetAccountInfoRequestParams, ServiceFee } from '../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { GetAccountInfoRequestParams, ServiceFee } from '../../types/params';
 import _ from 'lodash';
-import { AccountInfo } from '../types/account';
+import { AccountInfo } from '../../types/account';
 import { AccountInfoQuery } from '@hashgraph/sdk';
-import { FeeUtils } from '../utils/FeeUtils';
+import { FeeUtils } from '../../utils/FeeUtils';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import { SnapUtils } from '../utils/SnapUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { SnapState } from '../snap/SnapState';
-import { HederaUtils } from '../utils/HederaUtils';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { SnapState } from '../../snap/SnapState';
+import { HederaUtils } from '../../utils/HederaUtils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 
 export class GetAccountInfoFacade {
   public static async getAccountInfo(

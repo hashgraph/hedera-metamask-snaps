@@ -29,9 +29,12 @@ import { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class UpdateTokenCommand {
+  readonly #tokenId: string;
+
   readonly #adminKey: PrivateKey;
 
-  constructor(adminKey: PrivateKey) {
+  constructor(tokenId: string, adminKey: PrivateKey) {
+    this.#tokenId = tokenId;
     this.#adminKey = adminKey;
   }
 
@@ -55,9 +58,7 @@ export class UpdateTokenCommand {
   #createTransaction(
     updateParams: UpdateTokenRequestParams,
   ): TokenUpdateTransaction {
-    const transaction = new TokenUpdateTransaction().setTokenId(
-      updateParams.tokenId,
-    );
+    const transaction = new TokenUpdateTransaction().setTokenId(this.#tokenId);
 
     if (updateParams.name !== undefined) {
       transaction.setTokenName(updateParams.name);
