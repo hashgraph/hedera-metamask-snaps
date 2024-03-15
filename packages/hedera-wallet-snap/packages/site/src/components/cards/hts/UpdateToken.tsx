@@ -45,12 +45,18 @@ const UpdateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [tokenId, setTokenId] = useState('');
   const [tokenName, setTokenName] = useState('');
   const [tokenSymbol, setTokenSymbol] = useState('');
+  const [tokenMemo, setTokenMemo] = useState('');
+  const [treasuryAccountId, setTreasuryAccountId] = useState('');
+  const [adminKey, setAdminKey] = useState('');
   const [kycPublicKey, setKycPublicKey] = useState('');
   const [freezePublicKey, setFreezePublicKey] = useState('');
   const [pausePublicKey, setPausePublicKey] = useState('');
   const [wipePublicKey, setWipePublicKey] = useState('');
   const [feeSchedulePublicKey, setFeeSchedulePublicKey] = useState('');
   const [supplyPublicKey, setSupplyPublicKey] = useState('');
+  const [expirationTime, setExpirationTime] = useState('');
+  const [autoRenewAccountId, setAutoRenewAccountId] = useState('');
+  const [autoRenewPeriod, setAutoRenewPeriod] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
@@ -69,6 +75,15 @@ const UpdateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       if (!_.isEmpty(tokenSymbol)) {
         updateTokenParams.symbol = tokenSymbol;
       }
+      if (!_.isEmpty(tokenMemo)) {
+        updateTokenParams.tokenMemo = tokenMemo;
+      }
+      if (!_.isEmpty(treasuryAccountId)) {
+        updateTokenParams.treasuryAccountId = treasuryAccountId;
+      }
+      if (!_.isEmpty(adminKey)) {
+        updateTokenParams.adminPublicKey = adminKey;
+      }
       if (!_.isEmpty(kycPublicKey)) {
         updateTokenParams.kycPublicKey = kycPublicKey;
       }
@@ -83,6 +98,15 @@ const UpdateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       }
       if (!_.isEmpty(feeSchedulePublicKey)) {
         updateTokenParams.feeSchedulePublicKey = feeSchedulePublicKey;
+      }
+      if (!_.isEmpty(expirationTime)) {
+        updateTokenParams.expirationTime = expirationTime;
+      }
+      if (!_.isEmpty(autoRenewAccountId)) {
+        updateTokenParams.autoRenewAccountId = autoRenewAccountId;
+      }
+      if (!_.isEmpty(autoRenewPeriod)) {
+        updateTokenParams.autoRenewPeriod = Number(autoRenewPeriod);
       }
 
       const response: any = await updateToken(
@@ -150,6 +174,39 @@ const UpdateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
             </label>
             <br />
             <label>
+              Enter the new token memo
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={tokenMemo}
+                placeholder="Token Memo"
+                onChange={(error) => setTokenMemo(error.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the new treasury account ID
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={treasuryAccountId}
+                placeholder="Enter the new treasury account id"
+                onChange={(error) => setTreasuryAccountId(error.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the new admin key
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={adminKey}
+                placeholder="Enter the new admin key"
+                onChange={(error) => setAdminKey(error.target.value)}
+              />
+            </label>
+            <br />
+            <label>
               Enter the new supply public key
               <input
                 type="text"
@@ -208,7 +265,6 @@ const UpdateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
               />
             </label>
             <br />
-
             <label>
               Enter the new Fee Schedule Public Key
               <input
@@ -222,11 +278,43 @@ const UpdateToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
               />
             </label>
             <br />
+            <label>
+              Enter the new expiration time
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={expirationTime}
+                placeholder="Enter the new expiration time"
+                onChange={(error) => setExpirationTime(error.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the new auto renew account id
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={autoRenewAccountId}
+                placeholder="Enter the new auto renew account id"
+                onChange={(error) => setAutoRenewAccountId(error.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the new auto renew period
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={autoRenewPeriod}
+                placeholder="Enter the new auto renew period"
+                onChange={(error) => setAutoRenewPeriod(error.target.value)}
+              />
+            </label>
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Create Token"
+            buttonText="Update Token"
             onClick={handleUpdateTokenClick}
             disabled={!state.installedSnap}
             loading={loading}

@@ -1206,37 +1206,37 @@ export class HederaUtils {
   public static isValidUpdateTokenParams(
     params: unknown,
   ): asserts params is UpdateTokenRequestParams {
-    if (params === null || _.isEmpty(params) || !('tokenID' in params)) {
+    if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
       console.error(
-        'Invalid createToken Params passed. "tokenId" must be included.',
+        'Invalid updateToken Params passed. "tokenId" must be included.',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid createToken Params passed. "tokenId" must be included.',
+        'Invalid updateToken Params passed. "tokenId" must be included.',
       );
     }
 
-    const parameter = params as CreateTokenRequestParams;
+    const parameter = params as UpdateTokenRequestParams;
 
     if (parameter.name) {
-      HederaUtils.checkValidString(parameter, 'createToken', 'name', true);
+      HederaUtils.checkValidString(parameter, 'updateToken', 'name', true);
       if (parameter.name.length > 100) {
         console.error(
-          'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+          'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
         );
         throw providerErrors.unsupportedMethod(
-          'Invalid createToken Params passed. "name" must not be greater than 100 characters',
+          'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
         );
       }
     }
 
     if (parameter.symbol) {
-      HederaUtils.checkValidString(parameter, 'createToken', 'symbol', true);
+      HederaUtils.checkValidString(parameter, 'updateToken', 'symbol', true);
       if (parameter.symbol.length > 100) {
         console.error(
-          'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+          'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
         );
         throw providerErrors.unsupportedMethod(
-          'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
+          'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
         );
       }
     }
@@ -1244,7 +1244,7 @@ export class HederaUtils {
     if (parameter.kycPublicKey) {
       HederaUtils.checkValidPublicKey(
         parameter,
-        'createToken',
+        'updateToken',
         'kycPublicKey',
         false,
       );
@@ -1253,7 +1253,7 @@ export class HederaUtils {
     if (parameter.freezePublicKey) {
       HederaUtils.checkValidPublicKey(
         parameter,
-        'createToken',
+        'updateToken',
         'freezePublicKey',
         false,
       );
@@ -1262,7 +1262,7 @@ export class HederaUtils {
     if (parameter.pausePublicKey) {
       HederaUtils.checkValidPublicKey(
         parameter,
-        'createToken',
+        'updateToken',
         'pausePublicKey',
         false,
       );
@@ -1271,7 +1271,7 @@ export class HederaUtils {
     if (parameter.wipePublicKey) {
       HederaUtils.checkValidPublicKey(
         parameter,
-        'createToken',
+        'updateToken',
         'wipePublicKey',
         false,
       );
@@ -1280,7 +1280,7 @@ export class HederaUtils {
     if (parameter.supplyPublicKey) {
       HederaUtils.checkValidPublicKey(
         parameter,
-        'createToken',
+        'updateToken',
         'supplyPublicKey',
         false,
       );
@@ -1289,7 +1289,7 @@ export class HederaUtils {
     if (parameter.feeSchedulePublicKey) {
       HederaUtils.checkValidPublicKey(
         parameter,
-        'createToken',
+        'updateToken',
         'feeSchedulePublicKey',
         false,
       );
@@ -1298,7 +1298,7 @@ export class HederaUtils {
     if (parameter.expirationTime) {
       HederaUtils.checkValidTimestamp(
         parameter,
-        'createToken',
+        'updateToken',
         'expirationTime',
         false,
       );
@@ -1307,7 +1307,7 @@ export class HederaUtils {
     if (parameter.autoRenewAccountId) {
       HederaUtils.checkValidString(
         parameter,
-        'createToken',
+        'updateToken',
         'autoRenewAccountId',
         false,
       );
@@ -1316,7 +1316,7 @@ export class HederaUtils {
     if (parameter.tokenMemo) {
       HederaUtils.checkValidString(
         parameter,
-        'createToken',
+        'updateToken',
         'tokenMemo',
         false,
       );

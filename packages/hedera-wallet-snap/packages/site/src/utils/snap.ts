@@ -495,7 +495,7 @@ export const updateToken = async (
     params: {
       snapId: defaultSnapOrigin,
       request: {
-        method: 'hts/createToken',
+        method: 'hts/updateToken',
         params: {
           network,
           mirrorNodeUrl,
