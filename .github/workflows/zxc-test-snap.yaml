@@ -1,0 +1,92 @@
+name: "ZXC: Test Snap"
+
+on:
+  workflow_call:
+    inputs:
+      snap-package-dir:
+        description: "The directory of the snap package to test:"
+        type: string
+        required: true
+      snap-report-name:
+        description: "The name of the snap project being tested:"
+        type: string
+        required: true
+      custom-job-label:
+        description: "Custom Job Label:"
+        type: string
+        required: false
+        default: "Unit Tests"
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+env:
+  PROJECT_DIRECTORY: packages/${{ inputs.snap-package-dir }}
+  SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
+
+jobs:
+  unit-test:
+    name: ${{ inputs.custom-job-label || 'Unit Tests' }}
+    runs-on: [self-hosted, Linux, medium, ephemeral]
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+          disable-sudo: true
+
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 18
+
+      - name: Setup Yarn
+        run: npm install -g corepack && corepack enable
+
+      - name: Yarn Cache
+        uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+        with:
+          path: ${{ env.PROJECT_DIRECTORY }}/.yarn/cache
+          key: yarn-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-${{ hashFiles(format('packages/{0}/yarn.lock', inputs.snap-package-dir)) }}
+          restore-keys: |
+            yarn-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-
+            yarn-cache-${{ runner.os }}-${{ inputs.snap-package-dir }}-
+
+      - name: Node Modules Cache
+        uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+        with:
+          path: |
+            ${{ env.PROJECT_DIRECTORY }}/node_modules
+            ${{ env.PROJECT_DIRECTORY }}/packages/snap/node_modules
+            ${{ env.PROJECT_DIRECTORY }}/packages/site/node_modules
+          key: node-modules-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-${{ hashFiles(format('packages/{0}/yarn.lock', inputs.snap-package-dir)) }}
+          restore-keys: |
+            node-modules-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-
+            node-modules-cache-${{ runner.os }}-${{ inputs.snap-package-dir }}-
+
+      - name: Install Snap Dependencies
+        working-directory: ${{ env.PROJECT_DIRECTORY }}
+        run: yarn install
+
+      - name: Run Snap Unit Tests
+        working-directory: ${{ env.SNAP_DIRECTORY }}
+        run: yarn test
+
+      - name: Publish Snap Unit Test Reports
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: ${{ inputs.snap-report-name }} Unit Test Reports
+          path: ${{ env.SNAP_DIRECTORY }}/junit*.xml
+
+      - name: Publish Snap Coverage Reports
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: ${{ inputs.snap-report-name }} Coverage Reports
+          path: ${{ env.SNAP_DIRECTORY }}/coverage

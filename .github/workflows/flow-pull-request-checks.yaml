@@ -1,0 +1,38 @@
+name: PR Checks
+
+on: [pull_request]
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: pr-checks-${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  wallet-snap-lint:
+    name: Wallet Snap
+    uses: ./.github/workflows/zxc-lint-snap.yaml
+    with:
+      snap-package-dir: hedera-wallet-snap
+
+  wallet-snap-test:
+    name: Wallet Snap
+    uses: ./.github/workflows/zxc-test-snap.yaml
+    with:
+      snap-package-dir: hedera-wallet-snap
+      snap-report-name: "Wallet Snap"
+
+  wallet-snap-analyze:
+    name: Wallet Snap
+    uses: ./.github/workflows/zxc-analyze-snap.yaml
+    needs:
+      - wallet-snap-test
+    if: ${{ github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && github.actor != 'dependabot[bot]' }}
+    with:
+      snap-package-dir: hedera-wallet-snap
+      snap-report-name: "Wallet Snap"
+    secrets:
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
+      codacy-project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
