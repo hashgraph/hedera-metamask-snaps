@@ -372,6 +372,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
+    case 'hts/updateTokenFeeSchedule': {
+      HederaUtils.isValidUpdateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTokenFacade.updateToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
     default:
       throw providerErrors.unsupportedMethod();
   }
