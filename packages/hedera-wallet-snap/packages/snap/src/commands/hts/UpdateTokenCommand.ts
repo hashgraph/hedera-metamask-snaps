@@ -18,8 +18,6 @@
  *
  */
 
-/* eslint-disable @typescript-eslint/unbound-method */
-
 import {
   Client,
   PrivateKey,
@@ -31,12 +29,9 @@ import { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class UpdateTokenCommand {
-  readonly #tokenId: string;
-
   readonly #adminKey: PrivateKey;
 
-  constructor(tokenId: string, adminKey: PrivateKey) {
-    this.#tokenId = tokenId;
+  constructor(adminKey: PrivateKey) {
     this.#adminKey = adminKey;
   }
 
