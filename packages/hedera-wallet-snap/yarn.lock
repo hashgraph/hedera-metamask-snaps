@@ -3347,7 +3347,7 @@ __metadata:
     "@babel/preset-typescript": ^7.21.0
     "@babel/register": ^7.18.9
     "@babel/types": ^7.21.2
-    "@hashgraph/sdk": ^2.38.0
+    "@hashgraph/sdk": ^2.42.0
     "@lavamoat/allow-scripts": ^2.0.3
     "@metamask/auto-changelog": ^3.1.0
     "@metamask/eslint-config": ^11.1.0
@@ -3400,19 +3400,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hashgraph/proto@npm:2.14.0-beta.3":
-  version: 2.14.0-beta.3
-  resolution: "@hashgraph/proto@npm:2.14.0-beta.3"
+"@hashgraph/proto@npm:2.14.0-beta.4":
+  version: 2.14.0-beta.4
+  resolution: "@hashgraph/proto@npm:2.14.0-beta.4"
   dependencies:
     long: ^4.0.0
     protobufjs: ^7.2.5
-  checksum: 4d5a5007a393d9fc87d9ad7d5c2aed571421ed4fa2aa117b180b9788f39eee47e8ee2fd73a2df640fc19f6ed48229d3ee1821a20f8ac9db8e8af3ca150a7e79a
+  checksum: cb6e41e1b8f7f5a106c1e6f94d8be69d63b0e9533df0358f5f6811c05d1e23a48b2b7bf15b3265969eb4451b7a712e208f79cb05232bfd65d4e2de21fcb971b6
   languageName: node
   linkType: hard
 
-"@hashgraph/sdk@npm:^2.38.0":
-  version: 2.41.0
-  resolution: "@hashgraph/sdk@npm:2.38.0"
+"@hashgraph/sdk@npm:^2.42.0":
+  version: 2.42.0
+  resolution: "@hashgraph/sdk@npm:2.42.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
@@ -3420,7 +3420,7 @@ __metadata:
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
     "@hashgraph/cryptography": 1.4.8-beta.5
-    "@hashgraph/proto": 2.14.0-beta.3
+    "@hashgraph/proto": 2.14.0-beta.4
     axios: ^1.6.4
     bignumber.js: ^9.1.1
     bn.js: ^5.1.1
@@ -3437,7 +3437,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 2cf9ae2059ae314e9ba69639480d0de032c2dd156aa40c5411735da287b13f1ee21bf53622a45e23dd326079e6d0056b5386f46680b7b71454b3f21200447055
+  checksum: 89e4ae7f2ef5bd1518e977c1778a69442d46bf47927385f2f5943fd7debf38a41e0fe5cc3343558f5028437bb9c4a18060998c3440af417c5a0b6b277c58b3a3
   languageName: node
   linkType: hard
 
