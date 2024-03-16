@@ -73,7 +73,7 @@
     "@babel/preset-typescript": "^7.21.0",
     "@babel/register": "^7.18.9",
     "@babel/types": "^7.21.2",
-    "@lavamoat/allow-scripts": "^2.0.3",
+    "@lavamoat/allow-scripts": "^3.0.3",
     "@metamask/auto-changelog": "^3.1.0",
     "@metamask/eslint-config": "^11.1.0",
     "@metamask/eslint-config-jest": "^11.1.0",
