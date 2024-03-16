@@ -60,7 +60,7 @@
     "ethers": "^6.3.0",
     "jest-mock": "^29.7.0",
     "lodash": "^4.17.21",
-    "normalize-url": "^8.0.0"
+    "normalize-url": "^8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",
