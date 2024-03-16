@@ -85,7 +85,7 @@
     "@types/jest": "^29.5.0",
     "@types/lodash.clonedeep": "^4.5.7",
     "@types/normalize-url": "^4.2.0",
-    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^5.57.1",
     "babel-loader": "^9.1.2",
     "chokidar-cli": "^3.0.0",
