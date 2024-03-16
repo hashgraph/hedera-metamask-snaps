@@ -24,7 +24,7 @@ import {
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
 import { Account, PauseOrDeleteTokenRequestParams } from '../../../types/snap';
-import { deleteToken, shouldDisplayReconnectButton } from '../../../utils';
+import { pauseToken, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -36,7 +36,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const DeleteToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const PauseToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
@@ -44,20 +44,20 @@ const DeleteToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleDeleteTokenClick = async () => {
+  const handlePauseTokenClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const deleteTokenParams = {
+      const pauseTokenParams = {
         tokenId,
       } as PauseOrDeleteTokenRequestParams;
 
-      const response: any = await deleteToken(
+      const response: any = await pauseToken(
         network,
         mirrorNodeUrl,
-        deleteTokenParams,
+        pauseTokenParams,
         externalAccountParams,
       );
 
@@ -80,14 +80,14 @@ const DeleteToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'deleteToken',
+        title: 'pauseToken',
         description:
-          'Delete a token from your Hedera account. This will allow you to manage your fungible and non-fungible tokens from your Hedera account.',
+          'Pause a token. This will prevent all transactions from occurring on the token.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter the token ID to delete
+              Enter the token ID to pause
               <input
                 type="text"
                 style={{ width: '100%' }}
@@ -101,8 +101,8 @@ const DeleteToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Delete"
-            onClick={handleDeleteTokenClick}
+            buttonText="Pause"
+            onClick={handlePauseTokenClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -118,4 +118,4 @@ const DeleteToken: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { DeleteToken };
+export { PauseToken };

@@ -7,7 +7,7 @@
     "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "CmjZhzdElS0nKOZTNa0JYjaBmNATyqvbF52KPjWqgPQ=",
+    "shasum": "O8ivHTonKK/ynFmrUcdt46Om7wdoB4RruXnnhkJfO6c=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",

@@ -39,10 +39,13 @@ import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
+import { DeleteToken } from '../components/cards/hts/DeleteToken';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
 import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
+import { PauseToken } from '../components/cards/hts/PauseToken';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
+import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
 import { WipeToken } from '../components/cards/hts/WipeToken';
 import { networkOptions } from '../config/constants';
 import {
@@ -57,7 +60,6 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
-import {DeleteToken} from "../components/cards/hts/DeleteToken";
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -220,6 +222,18 @@ const Index = () => {
         />
 
         <BurnToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <PauseToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnpauseToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

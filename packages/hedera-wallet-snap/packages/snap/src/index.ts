@@ -27,24 +27,25 @@ import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
-import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
-import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
-import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
 import { FreezeAccountFacade } from './facades/FreezeAccountFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 import { WipeTokenFacade } from './facades/WipeTokenFacade';
+import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
+import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
+import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
+import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
+import { MintTokenFacade } from './facades/hts/MintTokenFacade';
+import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
 import { StakeHbarRequestParams } from './types/params';
 import { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { MintTokenFacade } from './facades/hts/MintTokenFacade';
-import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
-import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -251,6 +252,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+    case 'hts/pauseToken': {
+      HederaUtils.isValidPauseOrDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await PauseTokenFacade.pauseToken(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/unpauseToken': {
+      HederaUtils.isValidPauseOrDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await PauseTokenFacade.pauseToken(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
     case 'hts/associateTokens': {
       HederaUtils.isValidAssociateTokensParams(request.params);
       return {
@@ -305,7 +328,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'hts/deleteToken': {
-      HederaUtils.isValidDeleteTokenParams(request.params);
+      HederaUtils.isValidPauseOrDeleteTokenParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await DeleteTokenFacade.deleteToken(

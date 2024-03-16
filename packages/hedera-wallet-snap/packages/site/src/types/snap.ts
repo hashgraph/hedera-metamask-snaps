@@ -163,16 +163,16 @@ export type BurnTokenRequestParams = {
   serialNumbers?: number[];
 };
 
+export type PauseOrDeleteTokenRequestParams = {
+  tokenId: string;
+};
+
 export type AssociateTokensRequestParams = {
   tokenIds: string[];
 };
 
 export type DissociateTokensRequestParams = {
   tokenIds: string[];
-};
-
-export type DeleteTokenRequestParams = {
-  tokenId: string | undefined;
 };
 
 export type FreezeAccountRequestParams = {

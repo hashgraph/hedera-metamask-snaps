@@ -21,59 +21,68 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { FreezeAccountCommand } from '../commands/FreezeAccountCommand';
-import { TxReceipt } from '../types/hedera';
-import { FreezeAccountRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { SnapUtils } from '../utils/SnapUtils';
-import { Utils } from '../utils/Utils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { PauseTokenCommand } from '../../commands/hts/PauseTokenCommand';
+import { TxReceipt } from '../../types/hedera';
+import { PauseOrDeleteTokenRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
+import { Utils } from '../../utils/Utils';
 
-export class FreezeAccountFacade {
+export class PauseTokenFacade {
   /**
-   * Freezes transfers of the specified token for the account. The transaction must be
-   * signed by the token's Freeze Key.
+   * A token pause transaction prevents the token from being involved in any kind of
+   * operation.
+   *
+   * The following operations cannot be performed when a token is paused and will result in
+   * a TOKEN_IS_PAUSED status.
+   * - Updating the token.
+   * - Transfering the token.
+   * - Transferring any other token where it has its paused key in a custom fee schedule.
+   * - Deleting the token.
+   * - Minting or burning a token.
+   * - Freezing or unfreezing an account that holds the token.
+   * - Enabling or disabling KYC.
+   * - Associating or disassociating a token.
+   * - Wiping a token.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param freezeAccountRequestParams - Parameters for freezing/unfreezing an account.
-   * @param freeze - If true, the account will be frozen. If false, the account will be unfrozen.
+   * @param pauseTokenRequestParams - Parameters for pausing/unpausing a token.
+   * @param pause - If true, the account will be paused. If false, the account will be unpased.
    * @returns Receipt of the transaction.
    */
-  public static async freezeAccount(
+  public static async pauseToken(
     walletSnapParams: WalletSnapParams,
-    freezeAccountRequestParams: FreezeAccountRequestParams,
-    freeze: boolean,
+    pauseTokenRequestParams: PauseOrDeleteTokenRequestParams,
+    pause: boolean,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const { tokenId, accountId } = freezeAccountRequestParams;
+    const { tokenId } = pauseTokenRequestParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    const freezeText = freeze ? 'freeze' : 'unfreeze';
+    const pauseText = pause ? 'pause' : 'unpause';
 
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
         heading(
           `${Utils.capitalizeFirstLetter(
-            freezeText,
+            pauseText,
           )} account for the specified token`,
         ),
         text(
-          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/${freezeText}-an-account)`,
+          `Learn more about ${pauseText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/${pauseText}-a-token)`,
         ),
-        text(
-          `You are about to ${freezeText} transfers of the specified token for the given account:`,
-        ),
+        text(`You are about to ${pauseText} the following token:`),
         divider(),
         text(`Asset Id: ${tokenId}`),
-        text(`Account Id to ${freezeText} transfers for: ${accountId}`),
       ];
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
@@ -126,7 +135,7 @@ export class FreezeAccountFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const command = new FreezeAccountCommand(freeze, tokenId, accountId);
+      const command = new PauseTokenCommand(pause, tokenId);
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
@@ -134,7 +143,7 @@ export class FreezeAccountFacade {
       }
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to ${freezeText} an account: ${String(
+      const errMessage = `Error while trying to ${pauseText} a token: ${String(
         error,
       )}`;
       console.error(errMessage);
