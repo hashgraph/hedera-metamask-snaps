@@ -37,4 +37,11 @@ module.exports = {
   testRegex: '.*\\.spec\\.ts$',
   transformIgnorePatterns: [],
   testTimeout: 120000,
+  reporters: [
+    'default',
+    ['jest-junit', {
+      suiteName: 'Wallet Snap Unit Tests',
+      outputName: 'junit-snap.xml',
+    }]
+  ],
 };

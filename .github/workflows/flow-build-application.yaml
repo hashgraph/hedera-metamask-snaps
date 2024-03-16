@@ -1,0 +1,45 @@
+name: Build Application
+
+on:
+  workflow_dispatch:
+    inputs:
+      enable-unit-tests:
+        description: "Unit Testing Enabled"
+        type: boolean
+        required: false
+        default: false
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  wallet-snap-lint:
+    name: Wallet Snap
+    uses: ./.github/workflows/zxc-lint-snap.yaml
+    with:
+      snap-package-dir: hedera-wallet-snap
+
+  wallet-snap-test:
+    name: Wallet Snap
+    uses: ./.github/workflows/zxc-test-snap.yaml
+    if: ${{ github.event_name == 'push' || github.event.inputs.enable-unit-tests == 'true' }}
+    with:
+      snap-package-dir: hedera-wallet-snap
+      snap-report-name: "Wallet Snap"
+
+  wallet-snap-analyze:
+    name: Wallet Snap
+    uses: ./.github/workflows/zxc-analyze-snap.yaml
+    needs:
+      - wallet-snap-test
+    if: ${{ github.event_name == 'push' || github.event.inputs.enable-unit-tests == 'true' }}
+    with:
+      snap-package-dir: hedera-wallet-snap
+      snap-report-name: "Wallet Snap"
+    secrets:
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
+      codacy-project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
