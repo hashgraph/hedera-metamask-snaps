@@ -51,4 +51,14 @@ export class Utils {
     }
     return result.toLowerCase();
   }
+
+  /**
+   * Capitalizes the first letter of the given string.
+   *
+   * @param string - The string to capitalize.
+   * @returns The string with the first letter capitalized.
+   */
+  public static capitalizeFirstLetter(string: string): string {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 }

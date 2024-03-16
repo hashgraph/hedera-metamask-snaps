@@ -28,12 +28,12 @@ import {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
-  DeleteTokenRequestParams,
   DissociateTokensRequestParams,
   FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
+  PauseOrDeleteTokenRequestParams,
   SignMessageRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
@@ -538,6 +538,68 @@ export const burnToken = async (
 };
 
 /**
+ * Invoke the "pauseToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param pauseTokenRequestParams
+ * @param externalAccountparams
+ */
+export const pauseToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  pauseTokenRequestParams: PauseOrDeleteTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/pauseToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...pauseTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "unpauseToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param unpauseTokenRequestParams
+ * @param externalAccountparams
+ */
+export const unpauseToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  unpauseTokenRequestParams: PauseOrDeleteTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/unpauseToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...unpauseTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "associateTokens" method from the snap.
  *
  * @param network
@@ -610,7 +672,7 @@ export const dissociateTokens = async (
 export const deleteToken = async (
   network: string,
   mirrorNodeUrl: string,
-  deleteTokenRequestParams: DeleteTokenRequestParams,
+  deleteTokenRequestParams: PauseOrDeleteTokenRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({

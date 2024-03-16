@@ -1,14 +1,14 @@
-import { WalletSnapParams, SnapDialogParams } from '../../types/state';
-import { DeleteTokenRequestParams } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
-import { divider, heading, text } from '@metamask/snaps-ui';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import _ from 'lodash';
-import { SnapUtils } from '../../utils/SnapUtils';
+import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
+import { divider, heading, text } from '@metamask/snaps-ui';
+import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTokenCommand } from '../../commands/hts/DeleteTokenCommand';
-import { PrivateKey } from '@hashgraph/sdk';
+import { TxReceipt } from '../../types/hedera';
+import { PauseOrDeleteTokenRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class DeleteTokenFacade {
   /**
@@ -20,7 +20,7 @@ export class DeleteTokenFacade {
    */
   public static async deleteToken(
     walletSnapParams: WalletSnapParams,
-    deleteTokenRequestParams: DeleteTokenRequestParams,
+    deleteTokenRequestParams: PauseOrDeleteTokenRequestParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 

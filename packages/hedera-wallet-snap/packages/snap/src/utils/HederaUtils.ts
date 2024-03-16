@@ -48,13 +48,13 @@ import {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
-  DeleteTokenRequestParams,
   DissociateTokensRequestParams,
   FreezeAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
   MirrorNodeParams,
+  PauseOrDeleteTokenRequestParams,
   ServiceFee,
   SignMessageRequestParams,
   StakeHbarRequestParams,
@@ -1482,25 +1482,30 @@ export class HederaUtils {
   }
 
   /**
-   * Check Validation of deleteToken request.
+   * Check Validation of pauseToken/deleteToken request.
    *
    * @param params - Request params.
    */
-  public static isValidDeleteTokenParams(
+  public static isValidPauseOrDeleteTokenParams(
     params: unknown,
-  ): asserts params is DeleteTokenRequestParams {
+  ): asserts params is PauseOrDeleteTokenRequestParams {
     if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
       console.error(
-        'Invalid deleteToken Params passed. "tokenId" must be passed as a parameter',
+        'Invalid Params passed. "tokenId" must be passed as a parameter',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid deleteToken Params passed. "tokenId" must be passed as a parameter',
+        'Invalid Params passed. "tokenId" must be passed as a parameter',
       );
     }
 
-    const parameter = params as DeleteTokenRequestParams;
+    const parameter = params as PauseOrDeleteTokenRequestParams;
 
-    HederaUtils.checkValidString(parameter, 'deleteToken', 'tokenId', true);
+    HederaUtils.checkValidString(
+      parameter,
+      'pauseOrdeleteToken',
+      'tokenId',
+      true,
+    );
   }
 
   /**

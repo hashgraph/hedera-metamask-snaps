@@ -120,7 +120,7 @@ export type BurnTokenRequestParams = {
   serialNumbers?: number[];
 };
 
-export type DeleteTokenRequestParams = {
+export type PauseOrDeleteTokenRequestParams = {
   tokenId: string;
 };
 
