@@ -132,7 +132,7 @@ export type DissociateTokensRequestParams = {
   tokenIds: string[];
 };
 
-export type FreezeAccountRequestParams = {
+export type FreezeOrEnableKYCAccountRequestParams = {
   tokenId: string;
   accountId: string;
 };

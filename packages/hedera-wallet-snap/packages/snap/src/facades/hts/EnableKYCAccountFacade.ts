@@ -21,87 +21,74 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { WipeTokenCommand } from '../commands/WipeTokenCommand';
-import { TxReceipt } from '../types/hedera';
-import { WipeTokenRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { SnapUtils } from '../utils/SnapUtils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { EnableKYCAccountCommand } from '../../commands/hts/EnableKYCAccountCommand';
+import { TxReceipt } from '../../types/hedera';
+import { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
+import { Utils } from '../../utils/Utils';
 
-export class WipeTokenFacade {
+export class EnableKYCAccountFacade {
   /**
-   * Wipes the provided amount of fungible or non-fungible tokens from the specified
-   * Hedera account. This transaction does not delete tokens from the treasury account.
-   * This transaction must be signed by the token's Wipe Key. Wiping an account's tokens
-   * burns the tokens and decreases the total supply.
+   * Grants KYC to the Hedera accounts for the given Hedera token.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param wipeTokenRequestParams - Parameters for wiping a token.
+   * @param enableKYCAccountRequestParams - Parameters for enabling/disabling KYC to
+   * an account.
+   * @param enableKYC - If true, the account will be granted KYC. If false, the KYC will be
+   * revoked.
    * @returns Receipt of the transaction.
    */
-  public static async wipeToken(
+  public static async enableKYCAccount(
     walletSnapParams: WalletSnapParams,
-    wipeTokenRequestParams: WipeTokenRequestParams,
+    enableKYCAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
+    enableKYC: boolean,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const {
-      assetType,
-      tokenId,
-      accountId,
-      amount,
-      serialNumbers = [],
-    } = wipeTokenRequestParams;
+    const { tokenId, accountId } = enableKYCAccountRequestParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
+    const enableText = enableKYC ? 'grant' : 'revoke';
+
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Wipe token'),
-        text(
-          'Learn more about wiping tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/wipe-a-token)',
+        heading(
+          `${Utils.capitalizeFirstLetter(
+            enableText,
+          )} KYC to the account for the specified token`,
         ),
         text(
-          `You are about to wipe a ${
-            assetType === 'TOKEN' ? 'Fungible Token' : 'Non Fungible Token(NFT)'
-          } with the following details:`,
+          `Learn more about ${
+            enableKYC ? 'granting' : 'revoking'
+          } the KYC account flag [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/${
+            enableKYC ? 'enable' : 'disable'
+          }-kyc-account-flag)`,
+        ),
+        text(
+          `You are about to ${enableText} KYC to an account for the specified token:`,
         ),
         divider(),
         text(`Asset Id: ${tokenId}`),
-        text(`Account Id to wipe from: ${accountId}`),
+        text(`Account Id to ${enableText} KYC for: ${accountId}`),
       ];
-      if (assetType === 'NFT') {
-        panelToShow.push(
-          text(`Amount to wipe: ${serialNumbers.length}`),
-          text(`Serial Numbers: `),
-        );
-        panelToShow.push(divider());
-        for (const serialNumber of serialNumbers) {
-          panelToShow.push(text(`🔥 ${serialNumber}`));
-        }
-        panelToShow.push(divider());
-      } else {
-        panelToShow.push(text(`Amount to wipe: ${amount as number}`));
-      }
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
         console.error(errMessage);
-        if (assetType === 'TOKEN') {
-          throw new Error(errMessage);
-        } else {
-          panelToShow.push(
-            text(
-              `Token Info: Not available. Please proceed only if you know this NFT exists!`,
-            ),
-          );
-        }
+        panelToShow.push(
+          text(
+            `Token Info: Not available. Please proceed only if you know this Token/NFT exists!`,
+          ),
+        );
       }
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
@@ -144,14 +131,10 @@ export class WipeTokenFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const command = new WipeTokenCommand(
-        assetType,
+      const command = new EnableKYCAccountCommand(
+        enableKYC,
         tokenId,
         accountId,
-        serialNumbers,
-        assetType === 'TOKEN'
-          ? Number(amount) * Math.pow(10, Number(tokenInfo.decimals))
-          : amount,
       );
 
       const privateKeyObj = hederaClient.getPrivateKey();
@@ -160,7 +143,9 @@ export class WipeTokenFacade {
       }
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to wipe tokens: ${String(error)}`;
+      const errMessage = `Error while trying to ${enableText} the KYC flag to an account: ${String(
+        error,
+      )}`;
       console.error(errMessage);
       throw providerErrors.unsupportedMethod(errMessage);
     }

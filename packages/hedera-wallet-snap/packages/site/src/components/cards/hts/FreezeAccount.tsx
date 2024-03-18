@@ -24,7 +24,10 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, FreezeAccountRequestParams } from '../../../types/snap';
+import {
+  Account,
+  FreezeOrEnableKYCAccountRequestParams,
+} from '../../../types/snap';
 import { freezeAccount, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import { GetExternalAccountRef } from '../../sections/ExternalAccount';
@@ -57,7 +60,7 @@ const FreezeAccount: FC<Props> = ({
       const freezeAccountParams = {
         tokenId,
         accountId,
-      } as FreezeAccountRequestParams;
+      } as FreezeOrEnableKYCAccountRequestParams;
 
       const response: any = await freezeAccount(
         network,

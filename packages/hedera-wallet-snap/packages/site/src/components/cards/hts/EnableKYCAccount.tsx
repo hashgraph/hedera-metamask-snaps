@@ -28,7 +28,7 @@ import {
   Account,
   FreezeOrEnableKYCAccountRequestParams,
 } from '../../../types/snap';
-import { shouldDisplayReconnectButton, unfreezeAccount } from '../../../utils';
+import { enableKYCAccount, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import { GetExternalAccountRef } from '../../sections/ExternalAccount';
 
@@ -38,7 +38,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const UnfreezeAccount: FC<Props> = ({
+const EnableKYCAccount: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -51,21 +51,21 @@ const UnfreezeAccount: FC<Props> = ({
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleUnfreezeAccountClick = async () => {
+  const handleEnableKYCAccountClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const unfreezeAccountParams = {
+      const enableKYCAccountParams = {
         tokenId,
         accountId,
       } as FreezeOrEnableKYCAccountRequestParams;
 
-      const response: any = await unfreezeAccount(
+      const response: any = await enableKYCAccount(
         network,
         mirrorNodeUrl,
-        unfreezeAccountParams,
+        enableKYCAccountParams,
         externalAccountParams,
       );
 
@@ -88,9 +88,9 @@ const UnfreezeAccount: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'unfreezeAccount',
+        title: 'enableKYCAccount',
         description:
-          'Unfreezes transfers of the specified token for the account.',
+          'Grants KYC to the Hedera accounts for the given Hedera token.',
         form: (
           <>
             <label>
@@ -106,7 +106,7 @@ const UnfreezeAccount: FC<Props> = ({
             <br />
 
             <label>
-              Enter the account Id to unfreeze token transfers
+              Enter the account Id to grant KYC to
               <input
                 type="string"
                 style={{ width: '100%' }}
@@ -120,8 +120,8 @@ const UnfreezeAccount: FC<Props> = ({
         ),
         button: (
           <SendHelloButton
-            buttonText="Unfreeze Account"
-            onClick={handleUnfreezeAccountClick}
+            buttonText="Grant KYC"
+            onClick={handleEnableKYCAccountClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -137,4 +137,4 @@ const UnfreezeAccount: FC<Props> = ({
   );
 };
 
-export { UnfreezeAccount };
+export { EnableKYCAccount };

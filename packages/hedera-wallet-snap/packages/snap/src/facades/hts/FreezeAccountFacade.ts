@@ -21,14 +21,14 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { FreezeAccountCommand } from '../commands/FreezeAccountCommand';
-import { TxReceipt } from '../types/hedera';
-import { FreezeAccountRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { SnapUtils } from '../utils/SnapUtils';
-import { Utils } from '../utils/Utils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { FreezeAccountCommand } from '../../commands/hts/FreezeAccountCommand';
+import { TxReceipt } from '../../types/hedera';
+import { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
+import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
+import { Utils } from '../../utils/Utils';
 
 export class FreezeAccountFacade {
   /**
@@ -42,7 +42,7 @@ export class FreezeAccountFacade {
    */
   public static async freezeAccount(
     walletSnapParams: WalletSnapParams,
-    freezeAccountRequestParams: FreezeAccountRequestParams,
+    freezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
     freeze: boolean,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
@@ -66,7 +66,7 @@ export class FreezeAccountFacade {
           )} account for the specified token`,
         ),
         text(
-          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/${freezeText}-an-account)`,
+          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/${freezeText}-an-account)`,
         ),
         text(
           `You are about to ${freezeText} transfers of the specified token for the given account:`,

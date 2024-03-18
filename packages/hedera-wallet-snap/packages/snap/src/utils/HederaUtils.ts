@@ -49,7 +49,7 @@ import {
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DissociateTokensRequestParams,
-  FreezeAccountRequestParams,
+  FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
@@ -1509,13 +1509,14 @@ export class HederaUtils {
   }
 
   /**
-   * Check Validation of freezeAccount/unfreezeAccount request.
+   * Check Validation of freezeAccount/unfreezeAccount and enableKYCFlag/disableKYCFlag
+   * request.
    *
    * @param params - Request params.
    */
-  public static isValidFreezeAccountParams(
+  public static isValidFreezeOrEnableKYCAccountParams(
     params: unknown,
-  ): asserts params is FreezeAccountRequestParams {
+  ): asserts params is FreezeOrEnableKYCAccountRequestParams {
     if (
       params === null ||
       _.isEmpty(params) ||
@@ -1530,13 +1531,23 @@ export class HederaUtils {
       );
     }
 
-    const parameter = params as FreezeAccountRequestParams;
+    const parameter = params as FreezeOrEnableKYCAccountRequestParams;
 
     // Check if tokenId is valid
-    HederaUtils.checkValidString(parameter, 'wipeToken', 'tokenId', true);
+    HederaUtils.checkValidString(
+      parameter,
+      'freezeOrEnableKYCAccount',
+      'tokenId',
+      true,
+    );
 
     // Check if accountId is valid
-    HederaUtils.checkValidAccountId(parameter, 'wipeToken', 'accountId', true);
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'freezeOrEnableKYCAccount',
+      'accountId',
+      true,
+    );
   }
 
   /**

@@ -40,7 +40,9 @@ import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { DeleteToken } from '../components/cards/hts/DeleteToken';
+import { DisableKYCAccount } from '../components/cards/hts/DisableKYCAccount';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
+import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
 import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
 import { PauseToken } from '../components/cards/hts/PauseToken';
@@ -258,6 +260,18 @@ const Index = () => {
         />
 
         <UnfreezeAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <EnableKYCAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DisableKYCAccount
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
