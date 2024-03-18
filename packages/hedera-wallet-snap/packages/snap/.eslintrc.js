@@ -37,6 +37,7 @@ module.exports = {
   },
   ignorePatterns: [
     '!.eslintrc.js',
+    'coverage/',
     'dist/',
     './postBuild.js',
     'jest.config.js',

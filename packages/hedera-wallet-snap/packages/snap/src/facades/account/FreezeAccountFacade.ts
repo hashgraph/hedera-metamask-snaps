@@ -24,7 +24,7 @@ import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { FreezeAccountCommand } from '../../commands/account/FreezeAccountCommand';
 import { TxReceipt } from '../../types/hedera';
-import { FreezeAccountRequestParams } from '../../types/params';
+import { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -52,7 +52,7 @@ export class FreezeAccountFacade {
    */
   public static async freezeAccount(
     walletSnapParams: WalletSnapParams,
-    freezeAccountRequestParams: FreezeAccountRequestParams,
+    freezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
     freeze: boolean,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
