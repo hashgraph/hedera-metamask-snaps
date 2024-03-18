@@ -18,8 +18,8 @@
  *
  */
 
-import { AccountUpdateTransaction, Client } from '@hashgraph/sdk';
-import { TxReceipt } from '../types/hedera';
+import { AccountUpdateTransaction, type Client } from '@hashgraph/sdk';
+import type { TxReceipt } from '../types/hedera';
 import _ from 'lodash';
 import { Utils } from '../utils/Utils';
 import { CryptoUtils } from '../utils/CryptoUtils';

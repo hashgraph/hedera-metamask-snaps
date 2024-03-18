@@ -18,9 +18,9 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { DeleteAllowanceRequestParams } from '../types/params';
-import { MirrorTokenInfo, TxReceipt } from '../types/hedera';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { DeleteAllowanceRequestParams } from '../types/params';
+import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';

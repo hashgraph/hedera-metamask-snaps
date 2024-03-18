@@ -18,10 +18,10 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { GetAccountInfoRequestParams, ServiceFee } from '../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { GetAccountInfoRequestParams, ServiceFee } from '../types/params';
 import _ from 'lodash';
-import { AccountInfo } from '../types/account';
+import type { AccountInfo } from '../types/account';
 import { AccountInfoQuery } from '@hashgraph/sdk';
 import { FeeUtils } from '../utils/FeeUtils';
 import { divider, heading, text } from '@metamask/snaps-ui';

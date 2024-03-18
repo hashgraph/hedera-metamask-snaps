@@ -21,8 +21,8 @@
 import { PublicKey } from '@hashgraph/sdk';
 import { HDNodeWallet, Mnemonic, assertArgument, ethers } from 'ethers';
 import { DEFAULTCOINTYPE } from '../types/constants';
-import { MirrorNftInfo, MirrorTokenInfo } from '../types/hedera';
-import { FetchResponse, FetchUtils } from './FetchUtils';
+import type { MirrorNftInfo, MirrorTokenInfo } from '../types/hedera';
+import { type FetchResponse, FetchUtils } from './FetchUtils';
 
 export class CryptoUtils {
   /**

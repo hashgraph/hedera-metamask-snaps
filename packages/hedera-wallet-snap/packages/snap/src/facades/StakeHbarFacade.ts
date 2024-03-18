@@ -23,14 +23,14 @@ import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { SnapUtils } from '../utils/SnapUtils';
-import { SnapState } from '../snap/SnapState';
-import { TxReceipt } from '../types/hedera';
-import { StakeHbarRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { Utils } from '../utils/Utils';
-import { HederaUtils } from '../utils/HederaUtils';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
+import { SnapState } from '../snap/SnapState';
+import type { TxReceipt } from '../types/hedera';
+import type { StakeHbarRequestParams } from '../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import { HederaUtils } from '../utils/HederaUtils';
+import { SnapUtils } from '../utils/SnapUtils';
+import { Utils } from '../utils/Utils';
 
 export class StakeHbarFacade {
   /**

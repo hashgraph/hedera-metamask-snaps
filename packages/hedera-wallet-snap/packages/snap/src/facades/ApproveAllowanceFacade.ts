@@ -18,15 +18,15 @@
  *
  */
 
-import {
+import type {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
 } from '../types/params';
-import { MirrorTokenInfo, TxReceipt } from '../types/hedera';
+import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { providerErrors } from '@metamask/rpc-errors';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
 import { SnapUtils } from '../utils/SnapUtils';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';

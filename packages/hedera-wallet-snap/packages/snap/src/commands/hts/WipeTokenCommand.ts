@@ -18,8 +18,8 @@
  *
  */
 
-import { Client, TokenWipeTransaction } from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
+import { type Client, TokenWipeTransaction } from '@hashgraph/sdk';
+import type { TxReceipt } from '../../types/hedera';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { Utils } from '../../utils/Utils';
 

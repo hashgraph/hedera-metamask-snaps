@@ -23,9 +23,9 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { WipeTokenCommand } from '../../commands/hts/WipeTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { WipeTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { WipeTokenRequestParams } from '../../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 

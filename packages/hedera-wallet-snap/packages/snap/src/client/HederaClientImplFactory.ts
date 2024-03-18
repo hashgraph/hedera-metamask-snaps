@@ -28,8 +28,8 @@ import {
 } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import { SimpleHederaClientImpl } from './SimpleHederaClientImpl';
-import { HederaClientFactory } from '../interfaces/HederaClientFactory';
-import { Wallet } from '../domain/wallet/abstract';
+import type { HederaClientFactory } from '../interfaces/HederaClientFactory';
+import type { Wallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
 
 /**

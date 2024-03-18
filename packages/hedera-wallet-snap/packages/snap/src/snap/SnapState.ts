@@ -18,10 +18,10 @@
  *
  */
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
+import type { MetaMaskInpageProvider } from '@metamask/providers';
 
 import _ from 'lodash';
-import { WalletSnapState } from '../types/state';
+import type { WalletSnapState } from '../types/state';
 import { StateUtils } from '../utils/StateUtils';
 
 export class SnapState {

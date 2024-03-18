@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
-import { OnRpcRequestHandler } from '@metamask/snaps-types';
+import type { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
@@ -44,8 +44,8 @@ import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
-import { StakeHbarRequestParams } from './types/params';
-import { WalletSnapParams } from './types/state';
+import type { StakeHbarRequestParams } from './types/params';
+import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
 
 /**

@@ -23,9 +23,9 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { BurnTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { BurnTokenRequestParams } from '../../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 

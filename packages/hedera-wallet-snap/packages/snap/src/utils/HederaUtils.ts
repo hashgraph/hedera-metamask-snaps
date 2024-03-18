@@ -19,11 +19,21 @@
  */
 
 import { AccountId, NftId, TokenId } from '@hashgraph/sdk';
-import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
+import type { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
+import type {
+  AccountInfo,
+  ExternalAccount,
+  NetworkParams,
+} from '../types/account';
 import {
+  DEFAULTHEDERAMIRRORNODES,
+  hederaNetworks,
+  isIn,
+} from '../types/constants';
+import type {
   AccountBalance,
   MirrorAccountInfo,
   MirrorNftInfo,
@@ -34,14 +44,8 @@ import {
   SimpleTransfer,
   Token,
   TokenBalance,
-} from 'src/types/hedera';
-import { AccountInfo, ExternalAccount, NetworkParams } from '../types/account';
-import {
-  DEFAULTHEDERAMIRRORNODES,
-  hederaNetworks,
-  isIn,
-} from '../types/constants';
-import {
+} from '../types/hedera';
+import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
@@ -63,7 +67,7 @@ import {
   WipeTokenRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
-import { FetchResponse, FetchUtils } from './FetchUtils';
+import { FetchUtils, type FetchResponse } from './FetchUtils';
 import { Utils } from './Utils';
 
 export class HederaUtils {

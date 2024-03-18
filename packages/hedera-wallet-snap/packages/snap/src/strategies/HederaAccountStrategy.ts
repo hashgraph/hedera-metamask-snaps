@@ -20,19 +20,19 @@
 
 import {
   AccountBalanceQuery,
-  AccountId,
   AccountInfoQuery,
-  Client,
   Hbar,
   HbarUnit,
   PublicKey,
+  type AccountId,
+  type Client,
 } from '@hashgraph/sdk';
-import {
+import type {
   AccountInfoJson,
   StakingInfoJson,
 } from '@hashgraph/sdk/lib/account/AccountInfo';
+import type { AccountInfo } from '../types/account';
 import { Utils } from '../utils/Utils';
-import { AccountInfo } from '../types/account';
 
 export class HederaAccountStrategy {
   public static async getAccountInfo(

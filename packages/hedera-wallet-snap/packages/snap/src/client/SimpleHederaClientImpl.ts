@@ -18,15 +18,10 @@
  *
  */
 
-import {
-  type AccountId,
-  type Client,
-  type PrivateKey,
-  PublicKey,
-} from '@hashgraph/sdk';
+import type { AccountId, Client, PrivateKey, PublicKey } from '@hashgraph/sdk';
 
-import { AccountInfo } from '../types/account';
-import { SimpleHederaClient } from '../types/hedera';
+import type { AccountInfo } from '../types/account';
+import type { SimpleHederaClient } from '../types/hedera';
 import { HederaAccountStrategy } from '../strategies/HederaAccountStrategy';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {

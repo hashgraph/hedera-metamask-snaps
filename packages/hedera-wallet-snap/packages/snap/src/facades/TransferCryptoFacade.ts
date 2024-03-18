@@ -18,18 +18,18 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { ServiceFee, TransferCryptoRequestParams } from '../types/params';
-import { SimpleTransfer, TxReceipt } from '../types/hedera';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
-import { AccountInfo } from '../types/account';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { providerErrors } from '@metamask/rpc-errors';
-import { SnapUtils } from '../utils/SnapUtils';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
+import type { AccountInfo } from '../types/account';
+import type { SimpleTransfer, TxReceipt } from '../types/hedera';
+import type { ServiceFee, TransferCryptoRequestParams } from '../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
+import { SnapUtils } from '../utils/SnapUtils';
 
 export class TransferCryptoFacade {
   /**

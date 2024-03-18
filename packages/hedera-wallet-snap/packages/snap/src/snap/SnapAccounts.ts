@@ -25,8 +25,12 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { Account, AccountInfo, ExternalAccount } from '../types/account';
-import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
+import type { Account, AccountInfo, ExternalAccount } from '../types/account';
+import type {
+  KeyStore,
+  SnapDialogParams,
+  WalletSnapState,
+} from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
@@ -51,6 +55,7 @@ export class SnapAccounts {
     if (_.isEmpty(state.accountState[evmAddress])) {
       state.accountState[evmAddress] = {};
     }
+
     state.accountState[evmAddress][network] = StateUtils.getEmptyAccountState();
 
     await SnapState.updateState(state);

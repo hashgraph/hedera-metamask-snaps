@@ -18,14 +18,14 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { SignMessageRequestParams } from '../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { SignMessageRequestParams } from '../types/params';
 import { heading, text } from '@metamask/snaps-ui';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { ethers, Wallet } from 'ethers';
+import { ethers, type Wallet } from 'ethers';
 import { PrivateKey } from '@hashgraph/sdk';
-import { Wallet as HederaWallet } from '../domain/wallet/abstract';
+import type { Wallet as HederaWallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
 import { CryptoUtils } from '../utils/CryptoUtils';
 

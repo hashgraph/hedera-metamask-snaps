@@ -18,9 +18,9 @@
  *
  */
 
-import { WalletSnapParams, SnapDialogParams } from '../../types/state';
-import { AssociateTokensRequestParams } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
+import type { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import type { AssociateTokensRequestParams } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';

@@ -18,14 +18,14 @@
  *
  */
 
-import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
-import { SnapDialogParams } from '../types/state';
-import { SimpleTransfer } from '../types/hedera';
+import { divider, heading, panel, text, type Panel } from '@metamask/snaps-ui';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
+import type { SimpleTransfer } from '../types/hedera';
+import type { SnapDialogParams } from '../types/state';
 
 export class SnapUtils {
   /**

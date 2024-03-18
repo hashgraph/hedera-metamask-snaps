@@ -23,9 +23,9 @@ import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { CreateTokenCommand } from '../../commands/hts/CreateTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { CreateTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { CreateTokenRequestParams } from '../../types/params';
+import type { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 
 export class CreateTokenFacade {

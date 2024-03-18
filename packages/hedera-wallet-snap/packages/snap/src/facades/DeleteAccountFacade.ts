@@ -18,14 +18,14 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { DeleteAccountRequestParams } from '../types/params';
-import { TxReceipt, AccountBalance } from '../types/hedera';
+import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { DeleteAccountRequestParams } from '../types/params';
+import type { TxReceipt, AccountBalance } from '../types/hedera';
 import { heading, text } from '@metamask/snaps-ui';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 
-import { AccountInfo, Account } from '../types/account';
+import type { AccountInfo, Account } from '../types/account';
 import { SnapState } from '../snap/SnapState';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { DeleteAccountCommand } from '../commands/DeleteAccountCommand';
