@@ -62,6 +62,7 @@ import { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
 import { DeleteToken } from '../components/cards/hts/DeleteToken';
 import { UpdateToken } from '../components/cards/hts/UpdateToken';
+import { UpdateTokenFeeSchedule } from '../components/cards/hts/UpdateTokenFeeSchedule';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -212,6 +213,12 @@ const Index = () => {
         />
 
         <UpdateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTokenFeeSchedule
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

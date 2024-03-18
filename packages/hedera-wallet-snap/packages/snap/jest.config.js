@@ -28,6 +28,7 @@ module.exports = {
     window: {
       location: {
         hostname: 'hedera-pulse',
+        href: 'http://localhost',
       },
     },
   },
