@@ -22,6 +22,6 @@
   "homepage": "https://github.com/hashgraph/hedera-metamask-snaps#readme",
   "devDependencies": {
     "husky": "^8.0.0",
-    "prettier": "3.0.0"
+    "prettier": "3.2.5"
   }
 }

@@ -9,3 +9,38 @@
 ###############################
 /packages/hedera-wallet-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts @hashgraph/tuum-tech-hedera
 
+#########################
+#####  Core Files  ######
+#########################
+
+# NOTE: Must be placed last to ensure enforcement over all other rules
+
+# Protection Rules for Github Configuration Files and Actions Workflows
+/.github/                                       @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+
+# Top level NPM configuration files
+/package.json                                   @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+/package-lock.json                              @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+
+# Codacy Tool Configurations
+/config/                                        @hashgraph/release-engineering-managers
+.remarkrc                                       @hashgraph/release-engineering-managers
+/.prettierrc                                    @hashgraph/hedera-smart-contracts-managers
+/.eslintrc.js                                   @hashgraph/release-engineering-managers
+
+# Semantic Release Configuration
+.releaserc                                      @hashgraph/release-engineering-managers
+
+# Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
+/CODEOWNERS                                     @hashgraph/release-engineering-managers
+
+# Protect the repository root files
+/README.md                                      @hashgraph/hedera-smart-contracts-managers
+**/LICENSE                                      @hashgraph/hedera-smart-contracts-managers
+
+# CodeCov configuration
+**/codecov.yml                                  @hashgraph/release-engineering-managers
+
+# Git Ignore definitions
+**/.gitignore                                   @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+**/.gitignore.*                                 @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
