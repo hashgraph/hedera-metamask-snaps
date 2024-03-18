@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@metamask/eslint-config": "^11.1.0",
-    "@metamask/eslint-config-jest": "^11.1.0",
+    "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^11.1.0",
     "@metamask/eslint-config-typescript": "^11.1.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
