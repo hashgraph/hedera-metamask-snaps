@@ -22,10 +22,9 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
-import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { TxReceipt } from '../../types/hedera';
-import { UpdateTokenRequestParams } from '../../types/params';
+import { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
@@ -36,14 +35,14 @@ export class UpdateTokenFeeScheduleFacade {
    * Updates the fee schedule for a token.
    *
    * @param walletSnapParams - Wallet snap params.
-   * @param updateTokenRequestParams - Parameters for updating a token.
+   * @param updateTokenFeeScheduleRequestParams - Fee sched request params.
    * @returns Receipt of the transaction.
    */
   public static async updateTokenFeeSchedule(
     walletSnapParams: WalletSnapParams,
-    updateTokenRequestParams: UpdateTokenRequestParams,
+    updateTokenFeeScheduleRequestParams: UpdateTokenFeeScheduleRequestParams,
   ): Promise<TxReceipt> {
-    if (updateTokenRequestParams.customFees === undefined) {
+    if (updateTokenFeeScheduleRequestParams.customFees === undefined) {
       throw new Error('null custom fee schedule given');
     }
 
@@ -52,16 +51,32 @@ export class UpdateTokenFeeScheduleFacade {
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const { privateKey, publicKey, curve } =
+    const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    const { tokenId, name, symbol, feeSchedulePublicKey } =
-      updateTokenRequestParams;
+    const { tokenId, customFees } = updateTokenFeeScheduleRequestParams;
 
     const mirrorTokenInfo = await CryptoUtils.getTokenById(
       tokenId,
       mirrorNodeUrl,
     );
+
+    let feeScheduleDisplayStatements = '';
+
+    for (const fee of customFees) {
+      const {
+        feeCollectorAccountId,
+        hbarAmount,
+        tokenAmount,
+        denominatingTokenId,
+        allCollectorsAreExempt,
+      } = fee;
+
+      feeScheduleDisplayStatements +=
+        `fee collector id:${feeCollectorAccountId}\nhbarAmount: ${hbarAmount}\n` +
+        `tokenAmount: ${tokenAmount}\ndenominatingTokenId: ${denominatingTokenId}\n` +
+        `allCollectorsAreExempt: ${allCollectorsAreExempt}`;
+    }
 
     let txReceipt = {} as TxReceipt;
     try {
@@ -75,21 +90,9 @@ export class UpdateTokenFeeScheduleFacade {
         ),
         divider(),
         text(`Id: ${tokenId}`),
-
-        text(`Name: ${name}`),
-        text(`Symbol: ${symbol}`),
       ];
 
-      panelToShow.push(
-        text(`Admin Key: ${publicKey}`),
-        text(
-          `Fee Schedule Public Key: ${
-            _.isEmpty(feeSchedulePublicKey)
-              ? 'Not set'
-              : (feeSchedulePublicKey as string)
-          }`,
-        ),
-      );
+      panelToShow.push(text(feeScheduleDisplayStatements));
 
       const dialogParams: SnapDialogParams = {
         type: 'confirmation',
@@ -121,7 +124,7 @@ export class UpdateTokenFeeScheduleFacade {
         tokenId,
         privateKeyObj,
         Number(mirrorTokenInfo.decimals),
-        updateTokenRequestParams.customFees,
+        updateTokenFeeScheduleRequestParams.customFees,
       );
 
       txReceipt = await command.execute(hederaClient.getClient());

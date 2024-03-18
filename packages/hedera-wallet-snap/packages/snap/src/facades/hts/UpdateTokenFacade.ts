@@ -32,7 +32,7 @@ import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
 
 export class UpdateTokenFacade {
   /**
-   * Updates prioerties for a token.
+   * Updates priorities for a token.
    *
    * @param walletSnapParams - Wallet snap params.
    * @param updateTokenRequestParams - Parameters for updating a token.
@@ -59,7 +59,6 @@ export class UpdateTokenFacade {
       wipePublicKey,
       supplyPublicKey,
       feeSchedulePublicKey,
-      customFees,
       expirationTime,
       autoRenewAccountId = hederaAccountId,
       tokenMemo = 'Created via Hedera Wallet Snap',
