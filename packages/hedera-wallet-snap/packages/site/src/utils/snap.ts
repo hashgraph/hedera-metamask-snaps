@@ -29,7 +29,7 @@ import {
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DissociateTokensRequestParams,
-  FreezeAccountRequestParams,
+  FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
   MintTokenRequestParams,
@@ -703,7 +703,7 @@ export const deleteToken = async (
 export const freezeAccount = async (
   network: string,
   mirrorNodeUrl: string,
-  freezeAccountRequestParams: FreezeAccountRequestParams,
+  freezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -734,7 +734,7 @@ export const freezeAccount = async (
 export const unfreezeAccount = async (
   network: string,
   mirrorNodeUrl: string,
-  unfreezeAccountRequestParams: FreezeAccountRequestParams,
+  unfreezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -747,6 +747,68 @@ export const unfreezeAccount = async (
           network,
           mirrorNodeUrl,
           ...unfreezeAccountRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "enableKYCAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param enableKYCAccountRequestParams
+ * @param externalAccountparams
+ */
+export const enableKYCAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  enableKYCAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/enableKYCFlag',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...enableKYCAccountRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "disableKYCAccount" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param disableKYCAccountRequestParams
+ * @param externalAccountparams
+ */
+export const disableKYCAccount = async (
+  network: string,
+  mirrorNodeUrl: string,
+  disableKYCAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/disableKYCFlag',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...disableKYCAccountRequestParams,
           ...externalAccountparams,
         },
       },

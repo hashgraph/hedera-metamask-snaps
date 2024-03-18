@@ -18,48 +18,39 @@
  *
  */
 
-import { Client, TokenWipeTransaction } from '@hashgraph/sdk';
-import { TxReceipt } from '../types/hedera';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { Utils } from '../utils/Utils';
+import {
+  Client,
+  TokenGrantKycTransaction,
+  TokenRevokeKycTransaction,
+} from '@hashgraph/sdk';
+import { TxReceipt } from '../../types/hedera';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
-export class WipeTokenCommand {
-  readonly #assetType: 'TOKEN' | 'NFT';
+export class EnableKYCAccountCommand {
+  readonly #enableKYC: boolean;
 
   readonly #tokenId: string;
 
   readonly #accountId: string;
 
-  readonly #serialNumbers: number[];
-
-  readonly #amount: number | undefined;
-
-  constructor(
-    assetType: 'TOKEN' | 'NFT',
-    tokenId: string,
-    accountId: string,
-    serialNumbers: number[],
-    amount?: number,
-  ) {
-    this.#assetType = assetType;
+  constructor(enableKYC: boolean, tokenId: string, accountId: string) {
+    this.#enableKYC = enableKYC;
     this.#tokenId = tokenId;
     this.#accountId = accountId;
-    this.#serialNumbers = serialNumbers;
-    this.#amount = amount;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new TokenWipeTransaction()
-      .setTokenId(this.#tokenId)
-      .setAccountId(this.#accountId);
-
-    if (this.#assetType === 'NFT') {
-      transaction.setSerials(this.#serialNumbers);
+    let transaction: TokenGrantKycTransaction | TokenRevokeKycTransaction;
+    if (this.#enableKYC) {
+      transaction = new TokenGrantKycTransaction();
     } else {
-      transaction.setAmount(this.#amount as number);
+      transaction = new TokenRevokeKycTransaction();
     }
-
-    transaction.freezeWith(client);
+    transaction
+      .setTokenId(this.#tokenId)
+      .setAccountId(this.#accountId)
+      .freezeWith(client);
 
     const txResponse = await transaction.execute(client);
 

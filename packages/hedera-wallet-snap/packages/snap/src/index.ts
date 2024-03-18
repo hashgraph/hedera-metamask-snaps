@@ -27,19 +27,20 @@ import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
 import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
 import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
-import { FreezeAccountFacade } from './facades/FreezeAccountFacade';
 import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
 import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
-import { WipeTokenFacade } from './facades/WipeTokenFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
 import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
+import { EnableKYCAccountFacade } from './facades/hts/EnableKYCAccountFacade';
+import { FreezeAccountFacade } from './facades/hts/FreezeAccountFacade';
 import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
+import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
@@ -295,7 +296,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
     case 'hts/freezeAccount': {
-      HederaUtils.isValidFreezeAccountParams(request.params);
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await FreezeAccountFacade.freezeAccount(
@@ -306,10 +307,32 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
     case 'hts/unfreezeAccount': {
-      HederaUtils.isValidFreezeAccountParams(request.params);
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
       return {
         currentAccount: state.currentAccount,
         receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
+    case 'hts/enableKYCFlag': {
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await EnableKYCAccountFacade.enableKYCAccount(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/disableKYCFlag': {
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await EnableKYCAccountFacade.enableKYCAccount(
           walletSnapParams,
           request.params,
           false,
