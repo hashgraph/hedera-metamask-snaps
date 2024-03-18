@@ -60,6 +60,7 @@ import {
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
+  UpdateTokenFeeScheduleRequestParams,
   UpdateTokenRequestParams,
   WipeTokenRequestParams,
 } from '../types/params';
@@ -1196,6 +1197,26 @@ export class HederaUtils {
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
     }
+  }
+
+  /**
+   * Check Validation of updateToken request.
+   *
+   * @param params - Request params.
+   */
+  public static isValidUpdateTokenFeeScheduleParams(
+    params: unknown,
+  ): asserts params is UpdateTokenFeeScheduleRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
+      console.error(
+        'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
+      );
+    }
+
+    // const parameter = params as UpdateTokenRequestParams;
   }
 
   /**

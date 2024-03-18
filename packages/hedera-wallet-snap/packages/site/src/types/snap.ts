@@ -212,3 +212,8 @@ export type UpdateTokenRequestParams = {
   autoRenewAccountId?: string;
   autoRenewPeriod?: number;
 };
+
+export type UpdateTokenFeeScheduleRequestParams = {
+  tokenId: string;
+  customFees: TokenCustomFee[];
+};

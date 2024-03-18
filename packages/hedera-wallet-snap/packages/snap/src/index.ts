@@ -46,6 +46,7 @@ import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
 import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 import { UpdateTokenFacade } from './facades/hts/UpdateTokenFacade';
+import { UpdateTokenFeeScheduleFacade } from './facades/hts/UpdateTokenFeeScheduleFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -328,10 +329,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'hts/updateTokenFeeSchedule': {
-      HederaUtils.isValidUpdateTokenParams(request.params);
+      HederaUtils.isValidUpdateTokenFeeScheduleParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await UpdateTokenFacade.updateToken(
+        receipt: await UpdateTokenFeeScheduleFacade.updateTokenFeeSchedule(
           walletSnapParams,
           request.params,
         ),
