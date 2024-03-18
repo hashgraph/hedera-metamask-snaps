@@ -28,7 +28,7 @@ import { FreezeAccountRequestParams } from '../../types/params';
 import { SnapDialogParams, WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { Utils } from '../utils/Utils';
+import { Utils } from '../../utils/Utils';
 
 export class FreezeAccountFacade {
   /**
@@ -61,8 +61,8 @@ export class FreezeAccountFacade {
     try {
       const panelToShow = [
         heading(
-          `${Utils.capitalizeFirstLetter(
-            freezeText,
+          `${String(
+            Utils.capitalizeFirstLetter(freezeText),
           )} account for the specified token`,
         ),
         text(
