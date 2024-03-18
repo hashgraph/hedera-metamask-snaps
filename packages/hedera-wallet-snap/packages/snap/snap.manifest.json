@@ -7,10 +7,10 @@
     "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "ejyIsLcVw4BpYgvkg3sKegyiK8KL6FJTctcAcQykfQE=",
+    "shasum": "s7cXGKEr69RuTPgM6QtCSpn91KPp7Wt++5S09+ca8mc=",
     "location": {
       "npm": {
-        "filePath": "dist/snap.js",
+        "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
         "packageName": "@hashgraph/hedera-wallet-snap",
         "registry": "https://registry.npmjs.org/"

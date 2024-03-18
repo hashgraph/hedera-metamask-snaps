@@ -18,11 +18,18 @@
  *
  */
 
-/* eslint-disable */
-module.exports = {
-  cliOptions: {
-    src: './dist/snap.js',
+import type { SnapConfig } from '@metamask/snaps-cli';
+import { resolve } from 'path';
+
+const config: SnapConfig = {
+  bundler: 'webpack',
+  input: resolve(__dirname, 'src/index.ts'),
+  server: {
     port: 9001,
-    transpilationMode: 'localOnly',
+  },
+  polyfills: {
+    buffer: true,
   },
 };
+
+export default config;
