@@ -23,7 +23,7 @@
  * https://jestjs.io/docs/configuration
  *
  * note on the window.location.href global: without this, some tests will fail
- * because of an upstream hashgraph node-forge dependency
+ * because of an upstream hashgraph / node-forge dependency
  */
 module.exports = {
   clearMocks: false,
