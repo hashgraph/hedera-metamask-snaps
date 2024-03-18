@@ -39,7 +39,6 @@ import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
-import { DeleteToken } from '../components/cards/hts/DeleteToken';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
 import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
