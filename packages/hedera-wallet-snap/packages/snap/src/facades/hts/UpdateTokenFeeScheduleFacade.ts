@@ -21,7 +21,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text} from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import type { TxReceipt } from '../../types/hedera';
