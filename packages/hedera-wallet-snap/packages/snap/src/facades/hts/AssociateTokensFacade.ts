@@ -133,14 +133,14 @@ export class AssociateTokensFacade {
       }
       const command = new AssociateTokensCommand(tokenIds);
       txReceipt = await command.execute(hederaClient.getClient());
+
+      return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to associate tokens to the account: ${String(
         error,
       )}`;
       console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      throw new Error(error);
     }
-
-    return txReceipt;
   }
 }
