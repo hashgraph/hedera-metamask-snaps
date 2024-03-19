@@ -44,7 +44,7 @@
     "@metamask/eslint-config-typescript": "^11.1.0",
     "@svgr/webpack": "^6.4.0",
     "@testing-library/dom": "^8.17.1",
-    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/bootstrap": "^5.2.7",
