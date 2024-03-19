@@ -19,14 +19,14 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
 import type { AccountInfo } from '../types/account';
 import type { SimpleTransfer, TxReceipt } from '../types/hedera';
 import type { ServiceFee, TransferCryptoRequestParams } from '../types/params';
-import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { WalletSnapParams } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
@@ -230,7 +230,7 @@ export class TransferCryptoFacade {
         panelToShow.push(divider());
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

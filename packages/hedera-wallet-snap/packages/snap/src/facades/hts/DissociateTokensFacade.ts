@@ -18,10 +18,10 @@
  *
  */
 
-import type { WalletSnapParams, SnapDialogParams } from '../../types/state';
+import type { WalletSnapParams } from '../../types/state';
 import type { DissociateTokensRequestParams } from '../../types/params';
 import type { TxReceipt } from '../../types/hedera';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -110,7 +110,7 @@ export class DissociateTokensFacade {
         panelToShow.push(divider());
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

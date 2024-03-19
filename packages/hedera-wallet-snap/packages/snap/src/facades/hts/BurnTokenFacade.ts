@@ -19,13 +19,13 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
 import type { TxReceipt } from '../../types/hedera';
 import type { BurnTokenRequestParams } from '../../types/params';
-import type { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 
@@ -121,7 +121,7 @@ export class BurnTokenFacade {
         ),
       );
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

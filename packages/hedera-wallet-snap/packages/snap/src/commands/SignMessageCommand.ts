@@ -18,16 +18,16 @@
  *
  */
 
-import type { SnapDialogParams, WalletSnapParams } from '../types/state';
-import type { SignMessageRequestParams } from '../types/params';
-import { heading, text } from '@metamask/snaps-ui';
-import { SnapUtils } from '../utils/SnapUtils';
-import { providerErrors } from '@metamask/rpc-errors';
-import { ethers, type Wallet } from 'ethers';
 import { PrivateKey } from '@hashgraph/sdk';
+import { providerErrors } from '@metamask/rpc-errors';
+import { DialogParams, heading, text } from '@metamask/snaps-sdk';
+import { ethers, type Wallet } from 'ethers';
 import type { Wallet as HederaWallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
+import type { SignMessageRequestParams } from '../types/params';
+import type { WalletSnapParams } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
+import { SnapUtils } from '../utils/SnapUtils';
 
 export class SignMessageCommand {
   readonly #walletSnapParams: WalletSnapParams;
@@ -60,7 +60,7 @@ export class SignMessageCommand {
         text(header),
         text(message),
       ];
-      const dialogParamsForSignMessage: SnapDialogParams = {
+      const dialogParamsForSignMessage: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

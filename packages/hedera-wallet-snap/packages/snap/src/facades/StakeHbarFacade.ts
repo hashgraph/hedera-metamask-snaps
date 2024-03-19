@@ -20,14 +20,14 @@
 
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
 import { SnapState } from '../snap/SnapState';
 import type { TxReceipt } from '../types/hedera';
 import type { StakeHbarRequestParams } from '../types/params';
-import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { WalletSnapParams } from '../types/state';
 import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
 import { Utils } from '../utils/Utils';
@@ -131,7 +131,7 @@ export class StakeHbarFacade {
         declineStakingReward = false;
       }
 
-      const dialogParamsForStakeHbar: SnapDialogParams = {
+      const dialogParamsForStakeHbar: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

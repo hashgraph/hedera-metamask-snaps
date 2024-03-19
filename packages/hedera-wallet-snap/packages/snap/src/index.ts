@@ -18,10 +18,18 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
-import type { OnInstallHandler, OnUpdateHandler } from '@metamask/snaps-sdk';
-import type { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import type {
+  OnInstallHandler,
+  OnRpcRequestHandler,
+  OnUpdateHandler,
+} from '@metamask/snaps-sdk';
+import {
+  MethodNotFoundError,
+  divider,
+  heading,
+  panel,
+  text,
+} from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
@@ -44,7 +52,7 @@ import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
-import type { StakeHbarRequestParams } from './types/params';
+import { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
 
@@ -163,6 +171,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
@@ -173,6 +182,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
+
     case 'stakeHbar': {
       HederaUtils.isValidStakeHbarParams(request.params);
       return {
@@ -362,7 +372,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     default:
-      throw providerErrors.unsupportedMethod();
+      // Throw a known error to avoid crashing the Snap
+      throw new MethodNotFoundError();
   }
 };
 

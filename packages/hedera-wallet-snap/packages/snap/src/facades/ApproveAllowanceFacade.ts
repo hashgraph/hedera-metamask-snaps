@@ -23,10 +23,10 @@ import type {
   ApproveAllowanceRequestParams,
 } from '../types/params';
 import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { providerErrors } from '@metamask/rpc-errors';
-import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { WalletSnapParams } from '../types/state';
 import { SnapUtils } from '../utils/SnapUtils';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -127,7 +127,7 @@ export class ApproveAllowanceFacade {
       );
       panelToShow.push(text(`Approved Amount: ${amount}`));
 
-      const dialogParamsForApproveAllowance: SnapDialogParams = {
+      const dialogParamsForApproveAllowance: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

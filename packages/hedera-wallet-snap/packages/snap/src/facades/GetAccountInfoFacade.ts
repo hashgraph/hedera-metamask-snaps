@@ -18,13 +18,13 @@
  *
  */
 
-import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { WalletSnapParams } from '../types/state';
 import type { GetAccountInfoRequestParams, ServiceFee } from '../types/params';
 import _ from 'lodash';
 import type { AccountInfo } from '../types/account';
 import { AccountInfoQuery } from '@hashgraph/sdk';
 import { FeeUtils } from '../utils/FeeUtils';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { SnapState } from '../snap/SnapState';
@@ -127,7 +127,7 @@ export class GetAccountInfoFacade {
           ],
         );
 
-        const dialogParamsForHederaAccountId: SnapDialogParams = {
+        const dialogParamsForHederaAccountId: DialogParams = {
           type: 'confirmation',
           content: await SnapUtils.generateCommonPanel(origin, panelToShow),
         };

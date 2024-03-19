@@ -21,16 +21,12 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import type { Account, AccountInfo, ExternalAccount } from '../types/account';
-import type {
-  KeyStore,
-  SnapDialogParams,
-  WalletSnapState,
-} from '../types/state';
+import type { KeyStore, WalletSnapState } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
@@ -257,7 +253,7 @@ export class SnapAccounts {
     }
 
     if (_.isEmpty(connectedAddress)) {
-      const dialogParamsForPrivateKey: SnapDialogParams = {
+      const dialogParamsForPrivateKey: DialogParams = {
         type: 'prompt',
         content: await SnapUtils.generateCommonPanel(origin, [
           heading('Connect to EVM Account'),
@@ -354,7 +350,7 @@ export class SnapAccounts {
           result.hederaAccountId = accountInfo.accountId;
           connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
         } else {
-          const dialogParamsForHederaAccountId: SnapDialogParams = {
+          const dialogParamsForHederaAccountId: DialogParams = {
             type: 'alert',
             content: await SnapUtils.generateCommonPanel(origin, [
               heading('Hedera Account Status'),
@@ -432,7 +428,7 @@ export class SnapAccounts {
     }
 
     if (_.isEmpty(connectedAddress)) {
-      const dialogParamsForPrivateKey: SnapDialogParams = {
+      const dialogParamsForPrivateKey: DialogParams = {
         type: 'prompt',
         content: await SnapUtils.generateCommonPanel(origin, [
           heading('Connect to Hedera Account'),
@@ -518,7 +514,7 @@ export class SnapAccounts {
           result.address = Utils.ensure0xPrefix(accountInfo.evmAddress);
           connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
         } else {
-          const dialogParamsForHederaAccountId: SnapDialogParams = {
+          const dialogParamsForHederaAccountId: DialogParams = {
             type: 'alert',
             content: await SnapUtils.generateCommonPanel(origin, [
               heading('Hedera Account Status'),

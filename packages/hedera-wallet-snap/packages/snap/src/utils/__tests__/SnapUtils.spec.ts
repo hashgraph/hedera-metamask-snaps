@@ -20,17 +20,17 @@
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { SnapUtils } from '../SnapUtils';
-import { text, heading } from '@metamask/snaps-ui';
+import { heading, text } from '@metamask/snaps-sdk';
+import { SimpleTransfer } from '../../../../site/src/types/snap';
 import {
-  HBAR_ASSET_STRING,
-  NFT_ASSET_STRING,
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
+  HBAR_ASSET_STRING,
+  NFT_ASSET_STRING,
 } from '../../types/constants';
-import { SimpleTransfer } from '../../../../site/src/types/snap';
+import { SnapUtils } from '../SnapUtils';
 
-jest.mock('@metamask/snaps-ui', () => ({
+jest.mock('@metamask/snaps-sdk', () => ({
   text: jest.fn().mockImplementation((text) => `text-${text}`),
   divider: jest.fn().mockImplementation(() => 'divider'),
   heading: jest.fn().mockImplementation((heading) => `heading-${heading}`),

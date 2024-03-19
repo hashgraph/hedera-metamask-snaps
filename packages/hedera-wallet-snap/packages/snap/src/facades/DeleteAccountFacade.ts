@@ -18,10 +18,10 @@
  *
  */
 
-import type { SnapDialogParams, WalletSnapParams } from '../types/state';
+import type { WalletSnapParams } from '../types/state';
 import type { DeleteAccountRequestParams } from '../types/params';
 import type { TxReceipt, AccountBalance } from '../types/hedera';
-import { heading, text } from '@metamask/snaps-ui';
+import { DialogParams, heading, text } from '@metamask/snaps-sdk';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 
@@ -68,7 +68,7 @@ export class DeleteAccountFacade {
         ),
         text(`NOTE: This action is irreversible.`),
       ];
-      const dialogParamsForDeleteAccount: SnapDialogParams = {
+      const dialogParamsForDeleteAccount: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

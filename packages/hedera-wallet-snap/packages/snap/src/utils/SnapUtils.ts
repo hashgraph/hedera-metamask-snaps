@@ -18,14 +18,20 @@
  *
  */
 
-import { divider, heading, panel, text, type Panel } from '@metamask/snaps-ui';
+import {
+  divider,
+  heading,
+  panel,
+  text,
+  type Panel,
+  DialogParams,
+} from '@metamask/snaps-sdk';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
 import type { SimpleTransfer } from '../types/hedera';
-import type { SnapDialogParams } from '../types/state';
 
 export class SnapUtils {
   /**
@@ -54,7 +60,7 @@ export class SnapUtils {
     publicKey: string,
     address: string,
   ): Promise<string> {
-    const dialogParamsForHederaAccountId: SnapDialogParams = {
+    const dialogParamsForHederaAccountId: DialogParams = {
       type: 'prompt',
       content: await SnapUtils.generateCommonPanel(origin, [
         heading('Connect to Hedera Account'),
@@ -79,7 +85,7 @@ export class SnapUtils {
    * @param params - Snap dialog params.
    */
   public static async snapDialog(
-    params: SnapDialogParams,
+    params: DialogParams,
   ): Promise<string | boolean | null> {
     return (await snap.request({
       method: 'snap_dialog',
