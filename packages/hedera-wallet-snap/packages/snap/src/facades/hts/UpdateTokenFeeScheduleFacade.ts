@@ -21,11 +21,12 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { providerErrors } from '@metamask/rpc-errors';
+import { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { TxReceipt } from '../../types/hedera';
 import { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -94,7 +95,7 @@ export class UpdateTokenFeeScheduleFacade {
 
       panelToShow.push(text(feeScheduleDisplayStatements));
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

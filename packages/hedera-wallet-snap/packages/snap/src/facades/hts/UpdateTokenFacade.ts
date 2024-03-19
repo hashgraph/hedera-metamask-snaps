@@ -23,10 +23,11 @@
 import { providerErrors } from '@metamask/rpc-errors';
 import { divider, heading, text } from '@metamask/snaps-ui';
 import _ from 'lodash';
+import { DialogParams } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { TxReceipt } from '../../types/hedera';
 import { UpdateTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
 
@@ -121,7 +122,7 @@ export class UpdateTokenFacade {
         panelToShow.push(text(`Expiration Time: ${expirationTime}`));
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };
