@@ -1813,7 +1813,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.18.0, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7":
+"@babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.18.0, @babel/runtime@npm:^7.20.13, @babel/runtime@npm:^7.22.5, @babel/runtime@npm:^7.23.2, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7":
   version: 7.24.0
   resolution: "@babel/runtime@npm:7.24.0"
   dependencies:
@@ -4125,7 +4125,7 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     gatsby: ^4.24.4
     gatsby-plugin-manifest: ^4.24.0
-    gatsby-plugin-styled-components: ^5.24.0
+    gatsby-plugin-styled-components: ^6.13.1
     gatsby-plugin-svgr: ^3.0.0-beta.0
     lodash: ^4.17.21
     prettier: ^2.8.7
@@ -14989,18 +14989,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gatsby-plugin-styled-components@npm:^5.24.0":
-  version: 5.25.0
-  resolution: "gatsby-plugin-styled-components@npm:5.25.0"
+"gatsby-plugin-styled-components@npm:^6.13.1":
+  version: 6.13.1
+  resolution: "gatsby-plugin-styled-components@npm:6.13.1"
   dependencies:
-    "@babel/runtime": ^7.15.4
+    "@babel/runtime": ^7.20.13
   peerDependencies:
     babel-plugin-styled-components: ">1.5.0"
-    gatsby: ^4.0.0-next
-    react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^0.0.0
-    react-dom: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^0.0.0
+    gatsby: ^5.0.0-next
+    react: ^18.0.0 || ^0.0.0
+    react-dom: ^18.0.0 || ^0.0.0
     styled-components: ">=2.0.0"
-  checksum: ce47704b1f08d2f4d671ed95ae6dbdc94ef4804cec78277cba3cdf8d3ca1c225820f8cc42c820ad96e4e6140556820181e45e30ddcd5778ec6cf6d27a1400e67
+  checksum: 8b8b595f8122301eb0d526fd6fae10950b5912282b35cb6a52d64bbd7e414af2e9eb35bdca0f781e37a02428f16f95fbcac4d857e2aca9c041286d60fe8a3f32
   languageName: node
   linkType: hard
 
