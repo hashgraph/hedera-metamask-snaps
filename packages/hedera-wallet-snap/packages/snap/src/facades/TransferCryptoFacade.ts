@@ -249,13 +249,11 @@ export class TransferCryptoFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+
+      return txReceipt;
     } catch (error: any) {
       console.error(`Error while trying to transfer crypto: ${String(error)}`);
-      throw providerErrors.unsupportedMethod(
-        `Error while trying to transfer crypto: ${String(error)}`,
-      );
+      throw new Error(error);
     }
-
-    return txReceipt;
   }
 }
