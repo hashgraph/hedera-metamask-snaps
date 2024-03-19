@@ -30,7 +30,6 @@ export type FetchResponse = {
 export class FetchUtils {
   /**
    * Retrieve results using hedera mirror node.
-   *
    * @param url - The URL to use to query.
    * @returns A promise that resolves to the fetch response.
    */

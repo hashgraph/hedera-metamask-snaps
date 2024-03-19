@@ -20,22 +20,22 @@
 
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { SnapUtils } from '../utils/SnapUtils';
-import { SnapState } from '../snap/SnapState';
-import { TxReceipt } from '../types/hedera';
-import { StakeHbarRequestParams } from '../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { Utils } from '../utils/Utils';
-import { HederaUtils } from '../utils/HederaUtils';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
+import { SnapState } from '../snap/SnapState';
+import type { TxReceipt } from '../types/hedera';
+import type { StakeHbarRequestParams } from '../types/params';
+import type { WalletSnapParams } from '../types/state';
+import { HederaUtils } from '../utils/HederaUtils';
+import { SnapUtils } from '../utils/SnapUtils';
+import { Utils } from '../utils/Utils';
 
 export class StakeHbarFacade {
   /**
    * Stake Hbar to either a nodeid or accountId.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param stakeHbarRequestParams - Parameters for staking Hbar.
    * @returns Receipt of the transaction.
@@ -131,7 +131,7 @@ export class StakeHbarFacade {
         declineStakingReward = false;
       }
 
-      const dialogParamsForStakeHbar: SnapDialogParams = {
+      const dialogParamsForStakeHbar: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

@@ -19,11 +19,11 @@
  */
 
 import {
-  Client,
+  type Client,
   TokenPauseTransaction,
   TokenUnpauseTransaction,
 } from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
+import type { TxReceipt } from '../../types/hedera';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { Utils } from '../../utils/Utils';
 

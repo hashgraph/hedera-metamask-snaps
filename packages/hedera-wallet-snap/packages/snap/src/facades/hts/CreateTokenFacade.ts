@@ -19,13 +19,14 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { CreateTokenCommand } from '../../commands/hts/CreateTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { CreateTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { CreateTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 
 export class CreateTokenFacade {
@@ -38,7 +39,6 @@ export class CreateTokenFacade {
    * of that token type. There is currently no limit on the number of token IDs that
    * can be associated with an account (reference HIP-367). Still, you can see
    * TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED responses for pre-HIP-367 transactions.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param createTokenRequestParams - Parameters for creating a token.
    * @returns Receipt of the transaction.
@@ -180,7 +180,7 @@ export class CreateTokenFacade {
         panelToShow.push(divider());
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

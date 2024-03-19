@@ -1,7 +1,28 @@
-import { WalletSnapParams, SnapDialogParams } from '../../types/state';
-import { DissociateTokensRequestParams } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
-import { divider, heading, text } from '@metamask/snaps-ui';
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+import type { WalletSnapParams } from '../../types/state';
+import type { DissociateTokensRequestParams } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -19,7 +40,6 @@ export class DissociateTokensFacade {
    * of that token type. There is currently no limit on the number of token IDs that
    * can be associated with an account (reference HIP-367). Still, you can see
    * TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED responses for pre-HIP-367 transactions.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param dissociateTokensRequestParams - Parameters for associating tokens to the account.
    * @returns Receipt of the transaction.
@@ -90,7 +110,7 @@ export class DissociateTokensFacade {
         panelToShow.push(divider());
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

@@ -19,7 +19,8 @@
  */
 
 /* eslint-disable no-restricted-globals */
-import { FetchUtils, FetchResponse } from '../FetchUtils';
+import type { FetchResponse } from '../FetchUtils';
+import { FetchUtils } from '../FetchUtils';
 
 global.fetch = jest.fn();
 

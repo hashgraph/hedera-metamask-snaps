@@ -18,10 +18,10 @@
  *
  */
 
-import BigNumber from 'bignumber.js';
+import type BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-import { SimpleHederaClient, SimpleTransfer } from '../types/hedera';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
+import type { SimpleHederaClient, SimpleTransfer } from '../types/hedera';
 
 export type QueryCost = {
   serviceFeeToPay: number;

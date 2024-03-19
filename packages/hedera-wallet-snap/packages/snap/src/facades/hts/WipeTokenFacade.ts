@@ -19,13 +19,14 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { WipeTokenCommand } from '../../commands/hts/WipeTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { WipeTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { WipeTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 
@@ -35,7 +36,6 @@ export class WipeTokenFacade {
    * Hedera account. This transaction does not delete tokens from the treasury account.
    * This transaction must be signed by the token's Wipe Key. Wiping an account's tokens
    * burns the tokens and decreases the total supply.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param wipeTokenRequestParams - Parameters for wiping a token.
    * @returns Receipt of the transaction.
@@ -123,7 +123,7 @@ export class WipeTokenFacade {
         ),
       );
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

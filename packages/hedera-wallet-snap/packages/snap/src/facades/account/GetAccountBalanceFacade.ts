@@ -18,7 +18,7 @@
  *
  */
 
-import { WalletSnapParams } from '../../types/state';
+import type { WalletSnapParams } from '../../types/state';
 import { SnapState } from '../../snap/SnapState';
 import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';

@@ -18,8 +18,8 @@
  *
  */
 
-import { StakingInfoJson } from '@hashgraph/sdk/lib/account/AccountInfo';
-import { AccountBalance } from './hedera';
+import type { StakingInfoJson } from '@hashgraph/sdk/lib/account/AccountInfo';
+import type { AccountBalance } from './hedera';
 
 export type ExternalAccount = {
   externalAccount: {

@@ -1,19 +1,39 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTokenCommand } from '../../commands/hts/DeleteTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { PauseOrDeleteTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { PauseOrDeleteTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 
 export class DeleteTokenFacade {
   /**
    * Deletes the provided Hedera token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param deleteTokenRequestParams - Parameters for deleting tokens.
    * @returns Receipt of the transaction.
@@ -70,7 +90,7 @@ export class DeleteTokenFacade {
       panelToShow.push(text(tokenId));
       panelToShow.push(divider());
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

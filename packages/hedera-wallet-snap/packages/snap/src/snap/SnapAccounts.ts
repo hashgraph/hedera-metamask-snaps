@@ -21,12 +21,13 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { Account, AccountInfo, ExternalAccount } from '../types/account';
-import { KeyStore, SnapDialogParams, WalletSnapState } from '../types/state';
+import type { Account, AccountInfo, ExternalAccount } from '../types/account';
+import type { KeyStore, WalletSnapState } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
@@ -37,7 +38,6 @@ import { SnapState } from './SnapState';
 export class SnapAccounts {
   /**
    * Function that creates an empty IdentitySnapState object in the Identity Snap state for the provided address.
-   *
    * @param state - WalletSnapState.
    * @param network - Hedera network.
    * @param evmAddress - The account address.
@@ -51,6 +51,7 @@ export class SnapAccounts {
     if (_.isEmpty(state.accountState[evmAddress])) {
       state.accountState[evmAddress] = {};
     }
+
     state.accountState[evmAddress][network] = StateUtils.getEmptyAccountState();
 
     await SnapState.updateState(state);
@@ -58,7 +59,6 @@ export class SnapAccounts {
 
   /**
    * Check if Hedera account was imported.
-   *
    * @param state - WalletSnapState.
    * @param network - Hedera network.
    * @param evmAddress - Ethereum address.
@@ -90,7 +90,6 @@ export class SnapAccounts {
 
   /**
    * Function that returns account info of the currently selected MetaMask account.
-   *
    * @param origin - Source.
    * @param state - WalletSnapState.
    * @param params - Parameters that were passed by the user.
@@ -211,13 +210,13 @@ export class SnapAccounts {
 
   /**
    * Connect EVM Account.
-   *
    * @param origin - Source.
    * @param state - Wallet state.
    * @param network - Hedera network.
    * @param mirrorNodeUrl - Hedera mirror node URL.
    * @param curve - Public Key curve('ECDSA_SECP256K1' | 'ED25519').
    * @param evmAddress - EVM Account address.
+   * @returns Result.
    */
   public static async connectEVMAccount(
     origin: string,
@@ -252,7 +251,7 @@ export class SnapAccounts {
     }
 
     if (_.isEmpty(connectedAddress)) {
-      const dialogParamsForPrivateKey: SnapDialogParams = {
+      const dialogParamsForPrivateKey: DialogParams = {
         type: 'prompt',
         content: await SnapUtils.generateCommonPanel(origin, [
           heading('Connect to EVM Account'),
@@ -349,7 +348,7 @@ export class SnapAccounts {
           result.hederaAccountId = accountInfo.accountId;
           connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
         } else {
-          const dialogParamsForHederaAccountId: SnapDialogParams = {
+          const dialogParamsForHederaAccountId: DialogParams = {
             type: 'alert',
             content: await SnapUtils.generateCommonPanel(origin, [
               heading('Hedera Account Status'),
@@ -387,13 +386,13 @@ export class SnapAccounts {
 
   /**
    * Connect Hedera Account.
-   *
    * @param origin - Source.
    * @param state - Wallet state.
    * @param network - Hedera network.
    * @param mirrorNodeUrl - Hedera mirror node URL.
    * @param curve - Public Key curve('ECDSA_SECP256K1' | 'ED25519').
    * @param accountId - Hedera Account id.
+   * @returns Result.
    */
   public static async connectHederaAccount(
     origin: string,
@@ -427,7 +426,7 @@ export class SnapAccounts {
     }
 
     if (_.isEmpty(connectedAddress)) {
-      const dialogParamsForPrivateKey: SnapDialogParams = {
+      const dialogParamsForPrivateKey: DialogParams = {
         type: 'prompt',
         content: await SnapUtils.generateCommonPanel(origin, [
           heading('Connect to Hedera Account'),
@@ -513,7 +512,7 @@ export class SnapAccounts {
           result.address = Utils.ensure0xPrefix(accountInfo.evmAddress);
           connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
         } else {
-          const dialogParamsForHederaAccountId: SnapDialogParams = {
+          const dialogParamsForHederaAccountId: DialogParams = {
             type: 'alert',
             content: await SnapUtils.generateCommonPanel(origin, [
               heading('Hedera Account Status'),
@@ -551,7 +550,6 @@ export class SnapAccounts {
 
   /**
    * Veramo Import metamask account.
-   *
    * @param _origin - Source.
    * @param state - HederaWalletSnapState.
    * @param network - Hedera network.

@@ -18,18 +18,18 @@
  *
  */
 
-import { SimpleTransfer, TxReceipt } from '../types/hedera';
 import {
-  AccountId,
-  Client,
+  type AccountId,
+  type Client,
   Hbar,
   NftId,
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import { Utils } from '../utils/Utils';
+import type { SimpleTransfer, TxReceipt } from '../types/hedera';
 import { CryptoUtils } from '../utils/CryptoUtils';
+import { Utils } from '../utils/Utils';
 
 export class TransferCryptoCommand {
   readonly #transfers: SimpleTransfer[];
@@ -42,22 +42,18 @@ export class TransferCryptoCommand {
 
   readonly #serviceFeeToAddress: string | null;
 
-  readonly #onBeforeConfirm?: () => void;
-
   constructor(
     transfers: SimpleTransfer[],
     memo: string | null,
     maxFee: number | null,
     serviceFeesToPay: Record<string, number>,
     serviceFeeToAddress: string | null,
-    onBeforeConfirm?: () => void,
   ) {
     this.#transfers = transfers;
     this.#memo = memo;
     this.#maxFee = maxFee;
     this.#serviceFeesToPay = serviceFeesToPay;
     this.#serviceFeeToAddress = serviceFeeToAddress;
-    this.#onBeforeConfirm = onBeforeConfirm;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
@@ -158,8 +154,6 @@ export class TransferCryptoCommand {
     transaction.freezeWith(client);
 
     const txResponse = await transaction.execute(client);
-
-    this.#onBeforeConfirm?.();
 
     const receipt = await txResponse.getReceipt(client);
 

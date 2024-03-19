@@ -10,7 +10,7 @@
     "shasum": "xsOn2Ftj9rhLkAtN8Ck3MdZ+SRC4a1KgZ8hOLlDT2CA=",
     "location": {
       "npm": {
-        "filePath": "dist/snap.js",
+        "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
         "packageName": "@hashgraph/hedera-wallet-snap",
         "registry": "https://registry.npmjs.org/"

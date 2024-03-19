@@ -25,8 +25,8 @@
     ]
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.38.0",
-    "@metamask/providers": "^9.0.0",
+    "@hashgraph/sdk": "2.38.0",
+    "@metamask/providers": "^16.0.0",
     "bignumber.js": "^9.1.2",
     "bootstrap": "^5.3.2",
     "lodash": "^4.17.21",
@@ -38,10 +38,10 @@
     "styled-components": "5.3.3"
   },
   "devDependencies": {
-    "@metamask/eslint-config": "^11.1.0",
-    "@metamask/eslint-config-jest": "^11.1.0",
-    "@metamask/eslint-config-nodejs": "^11.1.0",
-    "@metamask/eslint-config-typescript": "^11.1.0",
+    "@metamask/eslint-config": "^12.2.0",
+    "@metamask/eslint-config-jest": "^12.1.0",
+    "@metamask/eslint-config-nodejs": "^12.1.0",
+    "@metamask/eslint-config-typescript": "^12.1.0",
     "@svgr/webpack": "^6.4.0",
     "@testing-library/dom": "^8.17.1",
     "@testing-library/jest-dom": "^5.16.4",

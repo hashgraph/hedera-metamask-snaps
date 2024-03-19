@@ -28,13 +28,12 @@ import {
 } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import { SimpleHederaClientImpl } from './SimpleHederaClientImpl';
-import { HederaClientFactory } from '../interfaces/HederaClientFactory';
-import { Wallet } from '../domain/wallet/abstract';
+import type { HederaClientFactory } from '../interfaces/HederaClientFactory';
+import type { Wallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
 
 /**
  * To HederaAccountInfo.
- *
  * @param _curve - Curve that was used to derive the keys('ECDSA_SECP256K1' | 'ED25519').
  * @param _privateKey - Private Key.
  * @param _accountId - Account Id.
@@ -124,8 +123,8 @@ export class HederaClientImplFactory implements HederaClientFactory {
 
   /**
    * Does the operator key belong to the operator account.
-   *
    * @param client - Hedera Client.
+   * @returns True if the operator key belongs to the operator account.
    */
   async testClientOperatorMatch(client: Client) {
     const tx = new TransferTransaction()

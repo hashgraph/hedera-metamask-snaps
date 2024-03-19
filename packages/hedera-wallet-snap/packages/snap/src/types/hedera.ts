@@ -27,10 +27,10 @@ import type {
   PublicKey,
   Timestamp,
 } from '@hashgraph/sdk';
-import { Long } from '@hashgraph/sdk/lib/long';
-import { BigNumber } from 'bignumber.js';
+import type { Long } from '@hashgraph/sdk/lib/long';
+import type { BigNumber } from 'bignumber.js';
 
-import { AccountInfo } from './account';
+import type { AccountInfo } from './account';
 
 export type NetworkInfo = {
   network: string;
@@ -97,30 +97,30 @@ export type TxReceipt = {
   topicRunningHash: string;
   totalSupply: string;
   scheduledTransactionId: string;
-  serials: object;
-  duplicates: object;
-  children: object;
+  serials: any;
+  duplicates: any;
+  children: any;
 };
 
 export type TxRecord = {
-  receipt: object;
+  receipt: any;
   transactionHash: string;
   consensusTimestamp: string;
   transactionId: string;
   transactionMemo: string;
   transactionFee: string;
   transfers: TxRecordTransfer[];
-  contractFunctionResult: object | null;
-  tokenTransfers: object;
-  tokenTransfersList: object;
+  contractFunctionResult: any;
+  tokenTransfers: any;
+  tokenTransfersList: any;
   scheduleRef: string;
-  assessedCustomFees: object;
-  nftTransfers: object;
-  automaticTokenAssociations: object;
+  assessedCustomFees: any;
+  nftTransfers: any;
+  automaticTokenAssociations: any;
   parentConsensusTimestamp: string;
   aliasKey: string;
-  duplicates: object;
-  children: object;
+  duplicates: any;
+  children: any;
   ethereumHash: string;
   paidStakingRewards: TxRecordTransfer[];
   prngBytes: string;

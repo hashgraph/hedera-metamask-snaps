@@ -20,8 +20,12 @@
 
 import cloneDeep from 'lodash.clonedeep';
 
-import { Account, AccountInfo } from '../types/account';
-import { KeyStore, WalletAccountState, WalletSnapState } from '../types/state';
+import type { Account, AccountInfo } from '../types/account';
+import type {
+  KeyStore,
+  WalletAccountState,
+  WalletSnapState,
+} from '../types/state';
 
 export class StateUtils {
   static readonly #emptyAccountState: WalletAccountState = {

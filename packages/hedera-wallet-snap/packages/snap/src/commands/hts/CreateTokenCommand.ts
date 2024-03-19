@@ -18,21 +18,21 @@
  *
  */
 
-import { TokenCustomFee } from '../../types/params';
 import {
-  AccountId,
-  Client,
   CustomFixedFee,
   Hbar,
-  PrivateKey,
   PublicKey,
   TokenCreateTransaction,
   TokenSupplyType,
   TokenType,
+  type AccountId,
+  type Client,
+  type PrivateKey,
 } from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
+import { type TxReceipt } from '../../types/hedera';
+import type { TokenCustomFee } from '../../types/params';
 import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
 export class CreateTokenCommand {
   readonly #assetType: 'TOKEN' | 'NFT';

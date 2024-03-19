@@ -19,13 +19,14 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { PauseTokenCommand } from '../../commands/hts/PauseTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { PauseOrDeleteTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { PauseOrDeleteTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { Utils } from '../../utils/Utils';
@@ -46,7 +47,6 @@ export class PauseTokenFacade {
    * - Enabling or disabling KYC.
    * - Associating or disassociating a token.
    * - Wiping a token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param pauseTokenRequestParams - Parameters for pausing/unpausing a token.
    * @param pause - If true, the account will be paused. If false, the account will be unpased.
@@ -114,7 +114,7 @@ export class PauseTokenFacade {
         ),
       );
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

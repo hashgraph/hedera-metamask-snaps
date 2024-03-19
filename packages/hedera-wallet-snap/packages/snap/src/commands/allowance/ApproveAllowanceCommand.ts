@@ -22,8 +22,8 @@ import { ApproveAllowanceAssetDetail } from '../../types/params';
 import { TxReceipt } from '../../types/hedera';
 import {
   AccountAllowanceApproveTransaction,
-  AccountId,
-  Client,
+  type AccountId,
+  type Client,
   Hbar,
 } from '@hashgraph/sdk';
 import { Utils } from '../../utils/Utils';

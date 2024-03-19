@@ -18,17 +18,17 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import { WalletSnapParams } from '../../types/state';
 import { DeleteAccountRequestParams } from '../../types/params';
 import { TxReceipt, AccountBalance } from '../../types/hedera';
 import { heading, text } from '@metamask/snaps-ui';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-
 import { AccountInfo, Account } from '../../types/account';
 import { SnapState } from '../../snap/SnapState';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAccountCommand } from '../../commands/account/DeleteAccountCommand';
+import { DialogParams } from '@metamask/snaps-sdk';
 
 export class DeleteAccountFacade {
   /**
@@ -68,7 +68,7 @@ export class DeleteAccountFacade {
         ),
         text(`NOTE: This action is irreversible.`),
       ];
-      const dialogParamsForDeleteAccount: SnapDialogParams = {
+      const dialogParamsForDeleteAccount: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };
