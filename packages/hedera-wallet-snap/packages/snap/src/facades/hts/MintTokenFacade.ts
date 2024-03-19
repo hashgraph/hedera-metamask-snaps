@@ -19,13 +19,14 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { MintTokenCommand } from '../../commands/hts/MintTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { MintTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { MintTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 
@@ -34,7 +35,6 @@ export class MintTokenFacade {
    * Minting fungible token allows you to increase the total supply of the token. Minting a
    * non-fungible token creates an NFT with its unique metadata for the class of NFTs defined by
    * the token ID. The Supply Key must sign the transaction.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param mintTokenRequestParams - Parameters for minting a token.
    * @returns Receipt of the transaction.
@@ -123,7 +123,7 @@ export class MintTokenFacade {
         ),
       );
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

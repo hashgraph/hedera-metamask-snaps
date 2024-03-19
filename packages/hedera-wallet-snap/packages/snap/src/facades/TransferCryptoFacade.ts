@@ -18,23 +18,23 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { ServiceFee, TransferCryptoRequestParams } from '../types/params';
-import { SimpleTransfer, TxReceipt } from '../types/hedera';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { divider, heading, text } from '@metamask/snaps-ui';
-import _ from 'lodash';
-import { AccountInfo } from '../types/account';
-import { CryptoUtils } from '../utils/CryptoUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { SnapUtils } from '../utils/SnapUtils';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
+import _ from 'lodash';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
+import type { AccountInfo } from '../types/account';
+import type { SimpleTransfer, TxReceipt } from '../types/hedera';
+import type { ServiceFee, TransferCryptoRequestParams } from '../types/params';
+import type { WalletSnapParams } from '../types/state';
+import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
+import { SnapUtils } from '../utils/SnapUtils';
 
 export class TransferCryptoFacade {
   /**
    * Transfer crypto(hbar or other tokens).
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param transferCryptoParams - Parameters for transferring crypto.
    * @returns Receipt of the transaction.
@@ -230,7 +230,7 @@ export class TransferCryptoFacade {
         panelToShow.push(divider());
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

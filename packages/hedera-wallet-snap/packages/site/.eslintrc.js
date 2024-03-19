@@ -24,6 +24,9 @@ module.exports = {
   overrides: [
     {
       files: ['**/*.{ts,tsx}'],
+      parserOptions: {
+        project: ['./tsconfig.json'],
+      },
       env: {
         browser: true,
       },

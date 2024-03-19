@@ -18,10 +18,11 @@
  *
  */
 
-import { WalletSnapParams, SnapDialogParams } from '../../types/state';
-import { AssociateTokensRequestParams } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { WalletSnapParams } from '../../types/state';
+import type { AssociateTokensRequestParams } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -39,7 +40,6 @@ export class AssociateTokensFacade {
    * of that token type. There is currently no limit on the number of token IDs that
    * can be associated with an account (reference HIP-367). Still, you can see
    * TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED responses for pre-HIP-367 transactions.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param associateTokensRequestParams - Parameters for associating tokens to the account.
    * @returns Receipt of the transaction.
@@ -110,7 +110,7 @@ export class AssociateTokensFacade {
         panelToShow.push(divider());
       }
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

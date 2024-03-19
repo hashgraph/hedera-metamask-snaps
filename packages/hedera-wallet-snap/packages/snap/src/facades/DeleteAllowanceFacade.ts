@@ -18,10 +18,11 @@
  *
  */
 
-import { SnapDialogParams, WalletSnapParams } from '../types/state';
-import { DeleteAllowanceRequestParams } from '../types/params';
-import { MirrorTokenInfo, TxReceipt } from '../types/hedera';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { WalletSnapParams } from '../types/state';
+import type { DeleteAllowanceRequestParams } from '../types/params';
+import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 import { CryptoUtils } from '../utils/CryptoUtils';
@@ -95,7 +96,7 @@ export class DeleteAllowanceFacade {
         );
       }
 
-      const dialogParamsForDeleteAllowance: SnapDialogParams = {
+      const dialogParamsForDeleteAllowance: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

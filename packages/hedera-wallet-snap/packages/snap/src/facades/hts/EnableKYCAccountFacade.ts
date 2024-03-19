@@ -19,13 +19,14 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { EnableKYCAccountCommand } from '../../commands/hts/EnableKYCAccountCommand';
-import { TxReceipt } from '../../types/hedera';
-import { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { Utils } from '../../utils/Utils';
@@ -33,7 +34,6 @@ import { Utils } from '../../utils/Utils';
 export class EnableKYCAccountFacade {
   /**
    * Grants KYC to the Hedera accounts for the given Hedera token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param enableKYCAccountRequestParams - Parameters for enabling/disabling KYC to
    * an account.
@@ -110,7 +110,7 @@ export class EnableKYCAccountFacade {
         ),
       );
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

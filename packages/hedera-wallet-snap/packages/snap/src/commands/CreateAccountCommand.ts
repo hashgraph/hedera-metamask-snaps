@@ -18,19 +18,17 @@
  *
  */
 
-import {
+import type {
   AccountBalance,
   SimpleTransfer,
   TxReceipt,
   TxReceiptExchangeRate,
 } from '../types/hedera';
+import type { AccountId, Client, TransactionReceipt } from '@hashgraph/sdk';
 import {
   AccountCreateTransaction,
-  AccountId,
-  Client,
   Hbar,
   PublicKey,
-  TransactionReceipt,
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { CryptoUtils } from '../utils/CryptoUtils';
@@ -44,20 +42,16 @@ export class CreateAccountCommand {
 
   readonly #maxFee: number | null; // hbar
 
-  readonly #onBeforeConfirm?: () => void;
-
   constructor(
     currentBalance: AccountBalance,
     transfers: SimpleTransfer[],
     memo: string | null,
     maxFee: number | null,
-    onBeforeConfirm?: () => void,
   ) {
     this.#currentBalance = currentBalance;
     this.#transfers = transfers;
     this.#memo = memo;
     this.#maxFee = maxFee;
-    this.#onBeforeConfirm = onBeforeConfirm;
   }
 
   async execute(client: Client): Promise<TxReceipt> {
@@ -85,8 +79,6 @@ export class CreateAccountCommand {
           tx.freezeWith(client);
 
           const txResponse = await tx.execute(client);
-
-          this.#onBeforeConfirm?.();
 
           const receipt = await txResponse.getReceipt(client);
 
@@ -132,8 +124,6 @@ export class CreateAccountCommand {
       transaction.freezeWith(client);
 
       const txResponse = await transaction.execute(client);
-
-      this.#onBeforeConfirm?.();
 
       receipt = await txResponse.getReceipt(client);
     }

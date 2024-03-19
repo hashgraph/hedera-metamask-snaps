@@ -188,7 +188,7 @@ const TransferCrypto: FC<Props> = ({
             )}
             <br />
 
-            {assetType === 'TOKEN' && (
+            {assetType !== 'NFT' && (
               <>
                 <label>
                   Enter an amount to send

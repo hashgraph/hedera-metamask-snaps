@@ -1,23 +1,20 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    /*
-      Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects
-      for all imports. Implies 'allowSyntheticDefaultImports'.
-    */
-    "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-
-    "strict": true,
-    "allowJs": true,
     "esModuleInterop": true,
-
+    "exactOptionalPropertyTypes": true,
     "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
+    "lib": ["ES2020", "DOM"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noErrorTruncation": true,
     "skipLibCheck": true,
+    "strict": true,
+    "target": "es2020",
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
     "incremental": true,
-
     /* Stylize errors and messages using color and context. */
     "pretty": true
   },

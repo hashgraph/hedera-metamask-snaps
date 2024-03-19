@@ -40,7 +40,6 @@ export class Utils {
 
   /**
    * Adds the prefix to the EVM address.
-   *
    * @param address - EVM Account address.
    * @returns EVM address.
    */
@@ -54,7 +53,6 @@ export class Utils {
 
   /**
    * Capitalizes the first letter of the given string.
-   *
    * @param string - The string to capitalize.
    * @returns The string with the first letter capitalized.
    */

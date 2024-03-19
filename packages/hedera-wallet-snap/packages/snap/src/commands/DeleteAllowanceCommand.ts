@@ -21,12 +21,12 @@
 import {
   AccountAllowanceApproveTransaction,
   AccountAllowanceDeleteTransaction,
-  AccountId,
-  Client,
+  type AccountId,
+  type Client,
 } from '@hashgraph/sdk';
-import { TxReceipt } from '../types/hedera';
-import { Utils } from '../utils/Utils';
+import type { TxReceipt } from '../types/hedera';
 import { CryptoUtils } from '../utils/CryptoUtils';
+import { Utils } from '../utils/Utils';
 
 export class DeleteAllowanceCommand {
   readonly #assetType: string;
@@ -38,7 +38,9 @@ export class DeleteAllowanceCommand {
   constructor(assetType: string, assetId: string, spenderAccountId?: string) {
     this.#assetType = assetType;
     this.#assetId = assetId;
-    this.#spenderAccountId = spenderAccountId;
+    if (spenderAccountId) {
+      this.#spenderAccountId = spenderAccountId;
+    }
   }
 
   public async execute(client: Client): Promise<TxReceipt> {

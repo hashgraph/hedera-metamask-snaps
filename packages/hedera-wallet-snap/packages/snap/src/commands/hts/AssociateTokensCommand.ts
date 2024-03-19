@@ -18,8 +18,12 @@
  *
  */
 
-import { AccountId, Client, TokenAssociateTransaction } from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
+import {
+  type AccountId,
+  type Client,
+  TokenAssociateTransaction,
+} from '@hashgraph/sdk';
+import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 

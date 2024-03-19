@@ -19,11 +19,21 @@
  */
 
 import { AccountId, NftId, TokenId } from '@hashgraph/sdk';
-import { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
+import type { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
 import { providerErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
+import type {
+  AccountInfo,
+  ExternalAccount,
+  NetworkParams,
+} from '../types/account';
 import {
+  DEFAULTHEDERAMIRRORNODES,
+  hederaNetworks,
+  isIn,
+} from '../types/constants';
+import type {
   AccountBalance,
   MirrorAccountInfo,
   MirrorNftInfo,
@@ -34,14 +44,8 @@ import {
   SimpleTransfer,
   Token,
   TokenBalance,
-} from 'src/types/hedera';
-import { AccountInfo, ExternalAccount, NetworkParams } from '../types/account';
-import {
-  DEFAULTHEDERAMIRRORNODES,
-  hederaNetworks,
-  isIn,
-} from '../types/constants';
-import {
+} from '../types/hedera';
+import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
@@ -63,13 +67,12 @@ import {
   WipeTokenRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
-import { FetchResponse, FetchUtils } from './FetchUtils';
+import { FetchUtils, type FetchResponse } from './FetchUtils';
 import { Utils } from './Utils';
 
 export class HederaUtils {
   /**
    * Checks if the specified property in the given object is passed.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -95,7 +98,6 @@ export class HederaUtils {
 
   /**
    * Checks if the specified property in the given object is a valid string.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -132,7 +134,6 @@ export class HederaUtils {
 
   /**
    * Checks if the specified property in the given object is a valid Hedera AccountId.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -170,7 +171,6 @@ export class HederaUtils {
 
   /**
    * Checks if the specified property in the given object is a valid boolean.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -206,7 +206,6 @@ export class HederaUtils {
 
   /**
    * Checks if the specified property in the given object is a valid number.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -244,7 +243,6 @@ export class HederaUtils {
 
   /**
    * Checks if the specified property in the given object is a valid timestamp.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -288,7 +286,6 @@ export class HederaUtils {
 
   /**
    * Checks if the specified property in the given object is a valid public key.
-   *
    * @param parameter - The object containing the property to check.
    * @param methodName - The method name.
    * @param propertyName - The name of the property to validate.
@@ -334,7 +331,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of network flag and mirrorNodeUrl flag and return their values.
-   *
    * @param params - Request params.
    * @returns Network and MirrorNodeUrl.
    */
@@ -406,7 +402,6 @@ export class HederaUtils {
 
   /**
    * Check whether the account was imported using private key(external account).
-   *
    * @param params - Request params.
    * @returns Whether to treat it as an external account that was imported using private key.
    */
@@ -460,7 +455,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of serviceFee request.
-   *
    * @param params - Request params.
    */
   public static isValidServiceFee(
@@ -477,7 +471,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of signMessage request.
-   *
    * @param params - Request params.
    */
   public static isValidSignMessageRequest(
@@ -503,7 +496,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of getAccountInfo request.
-   *
    * @param params - Request params.
    */
   public static isValidGetAccountInfoRequest(
@@ -539,7 +531,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of getTransactions request.
-   *
    * @param params - Request params.
    */
 
@@ -559,7 +550,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of transferCrypto request.
-   *
    * @param params - Request params.
    */
   public static isValidTransferCryptoParams(
@@ -693,7 +683,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of stakeHbar request.
-   *
    * @param params - Request params.
    */
   public static isValidStakeHbarParams(
@@ -728,7 +717,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of deleteAccount request.
-   *
    * @param params - Request params.
    */
   public static isValidDeleteAccountParams(
@@ -760,7 +748,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of approveAllowance request.
-   *
    * @param params - Request params.
    */
   public static isValidApproveAllowanceParams(
@@ -879,7 +866,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of deleteAllowance request.
-   *
    * @param params - Request params.
    */
   public static isValidDeleteAllowanceParams(
@@ -950,7 +936,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of createToken request.
-   *
    * @param params - Request params.
    */
   public static isValidCreateTokenParams(
@@ -1199,7 +1184,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of mintToken request.
-   *
    * @param params - Request params.
    */
   public static isValidMintTokenParams(
@@ -1299,7 +1283,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of burnToken request.
-   *
    * @param params - Request params.
    */
   public static isValidBurnTokenParams(
@@ -1399,7 +1382,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of associateTokens request.
-   *
    * @param params - Request params.
    */
   public static isValidAssociateTokensParams(
@@ -1441,7 +1423,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of dissociateTokens request.
-   *
    * @param params - Request params.
    */
   public static isValidDissociateTokensParams(
@@ -1483,7 +1464,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of pauseToken/deleteToken request.
-   *
    * @param params - Request params.
    */
   public static isValidPauseOrDeleteTokenParams(
@@ -1511,7 +1491,6 @@ export class HederaUtils {
   /**
    * Check Validation of freezeAccount/unfreezeAccount and enableKYCFlag/disableKYCFlag
    * request.
-   *
    * @param params - Request params.
    */
   public static isValidFreezeOrEnableKYCAccountParams(
@@ -1552,7 +1531,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of wipeToken request.
-   *
    * @param params - Request params.
    */
   public static isValidWipeTokenParams(
@@ -1844,9 +1822,8 @@ export class HederaUtils {
         const secondUrl = `${mirrorNodeUrl}${
           response.data.links.next as string
         }`;
-        const secondResponse: FetchResponse = await FetchUtils.fetchDataFromUrl(
-          secondUrl,
-        );
+        const secondResponse: FetchResponse =
+          await FetchUtils.fetchDataFromUrl(secondUrl);
         if (secondResponse.success) {
           for (const node of secondResponse.data.nodes) {
             result.push(node);

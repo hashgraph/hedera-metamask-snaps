@@ -18,9 +18,7 @@
  *
  */
 
-import { Panel } from '@metamask/snaps-ui';
-
-import { Account, AccountInfo } from './account';
+import type { Account, AccountInfo } from './account';
 
 export type WalletSnapState = {
   currentAccount: Account;
@@ -67,10 +65,4 @@ export type WalletAccountState = {
 export type WalletSnapParams = {
   origin: string;
   state: WalletSnapState;
-};
-
-export type SnapDialogParams = {
-  type: 'alert' | 'confirmation' | 'prompt';
-  content: Panel;
-  placeholder?: string;
 };

@@ -18,16 +18,15 @@
  *
  */
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
+import type { MetaMaskInpageProvider } from '@metamask/providers';
 
 import _ from 'lodash';
-import { WalletSnapState } from '../types/state';
+import type { WalletSnapState } from '../types/state';
 import { StateUtils } from '../utils/StateUtils';
 
 export class SnapState {
   /**
    * Function for updating WalletSnapState object in the MetaMask state.
-   *
    * @public
    * @param snapState - Object to replace the current object in the MetaMask state.
    */
@@ -43,7 +42,6 @@ export class SnapState {
 
   /**
    * Function to retrieve WalletSnapState object from the MetaMask state.
-   *
    * @public
    * @returns Object from the state.
    */
@@ -62,7 +60,6 @@ export class SnapState {
 
   /**
    * Function to retrieve WalletSnapState object from the MetaMask state.
-   *
    * @public
    * @returns Object from the state.
    */
@@ -77,7 +74,6 @@ export class SnapState {
 
   /**
    * Function to initialize WalletSnapState object.
-   *
    * @public
    * @returns Object.
    */
@@ -89,8 +85,8 @@ export class SnapState {
 
   /**
    * Get current network.
-   *
    * @param metamask - Metamask provider.
+   * @returns Current network.
    */
   public static async getCurrentNetwork(
     metamask: MetaMaskInpageProvider,
@@ -102,7 +98,6 @@ export class SnapState {
 
   /**
    * Function that toggles the disablePopups flag in the config.
-   *
    * @param state - WalletSnapState.
    */
   public static async updatePopups(state: WalletSnapState) {
@@ -112,7 +107,6 @@ export class SnapState {
 
   /**
    * Function that lets you add a friendly dApp.
-   *
    * @param state - WalletSnapState.
    * @param dapp - Dapp.
    */
@@ -123,7 +117,6 @@ export class SnapState {
 
   /**
    * Function that removes a friendly dApp.
-   *
    * @param state - WalletSnapState.
    * @param dapp - Dapp.
    */

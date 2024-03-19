@@ -19,20 +19,20 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
-import { TxReceipt } from '../../types/hedera';
-import { BurnTokenRequestParams } from '../../types/params';
-import { SnapDialogParams, WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { BurnTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
 
 export class BurnTokenFacade {
   /**
    * Burns fungible and non-fungible tokens owned by the Treasury Account.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param burnTokenRequestParams - Parameters for burning a token.
    * @returns Receipt of the transaction.
@@ -121,7 +121,7 @@ export class BurnTokenFacade {
         ),
       );
 
-      const dialogParams: SnapDialogParams = {
+      const dialogParams: DialogParams = {
         type: 'confirmation',
         content: await SnapUtils.generateCommonPanel(origin, panelToShow),
       };

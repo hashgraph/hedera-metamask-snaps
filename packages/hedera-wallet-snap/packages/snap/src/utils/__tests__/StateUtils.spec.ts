@@ -19,7 +19,7 @@
  */
 
 import { StateUtils } from '../StateUtils';
-import { WalletAccountState, WalletSnapState } from '../../types/state';
+import type { WalletAccountState, WalletSnapState } from '../../types/state';
 
 describe('StateUtils', () => {
   describe('getEmptyAccountState', () => {
