@@ -21,7 +21,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { heading, text } from '@metamask/snaps-sdk';
-import { SimpleTransfer } from '../../../../site/src/types/snap';
+import type { SimpleTransfer } from '../../../../site/src/types/snap';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,

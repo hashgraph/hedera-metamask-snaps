@@ -19,7 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { FreezeAccountCommand } from '../../commands/hts/FreezeAccountCommand';
@@ -34,7 +35,6 @@ export class FreezeAccountFacade {
   /**
    * Freezes transfers of the specified token for the account. The transaction must be
    * signed by the token's Freeze Key.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param freezeAccountRequestParams - Parameters for freezing/unfreezing an account.
    * @param freeze - If true, the account will be frozen. If false, the account will be unfrozen.

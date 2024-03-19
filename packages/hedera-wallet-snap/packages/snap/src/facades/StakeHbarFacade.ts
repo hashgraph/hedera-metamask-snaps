@@ -20,7 +20,8 @@
 
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
@@ -35,7 +36,6 @@ import { Utils } from '../utils/Utils';
 export class StakeHbarFacade {
   /**
    * Stake Hbar to either a nodeid or accountId.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param stakeHbarRequestParams - Parameters for staking Hbar.
    * @returns Receipt of the transaction.

@@ -21,7 +21,8 @@
 import type { WalletSnapParams } from '../../types/state';
 import type { DissociateTokensRequestParams } from '../../types/params';
 import type { TxReceipt } from '../../types/hedera';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -39,7 +40,6 @@ export class DissociateTokensFacade {
    * of that token type. There is currently no limit on the number of token IDs that
    * can be associated with an account (reference HIP-367). Still, you can see
    * TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED responses for pre-HIP-367 transactions.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param dissociateTokensRequestParams - Parameters for associating tokens to the account.
    * @returns Receipt of the transaction.

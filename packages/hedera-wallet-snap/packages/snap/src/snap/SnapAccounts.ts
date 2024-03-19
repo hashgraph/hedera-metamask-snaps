@@ -21,7 +21,8 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -37,7 +38,6 @@ import { SnapState } from './SnapState';
 export class SnapAccounts {
   /**
    * Function that creates an empty IdentitySnapState object in the Identity Snap state for the provided address.
-   *
    * @param state - WalletSnapState.
    * @param network - Hedera network.
    * @param evmAddress - The account address.
@@ -59,7 +59,6 @@ export class SnapAccounts {
 
   /**
    * Check if Hedera account was imported.
-   *
    * @param state - WalletSnapState.
    * @param network - Hedera network.
    * @param evmAddress - Ethereum address.
@@ -91,7 +90,6 @@ export class SnapAccounts {
 
   /**
    * Function that returns account info of the currently selected MetaMask account.
-   *
    * @param origin - Source.
    * @param state - WalletSnapState.
    * @param params - Parameters that were passed by the user.
@@ -212,13 +210,13 @@ export class SnapAccounts {
 
   /**
    * Connect EVM Account.
-   *
    * @param origin - Source.
    * @param state - Wallet state.
    * @param network - Hedera network.
    * @param mirrorNodeUrl - Hedera mirror node URL.
    * @param curve - Public Key curve('ECDSA_SECP256K1' | 'ED25519').
    * @param evmAddress - EVM Account address.
+   * @returns Result.
    */
   public static async connectEVMAccount(
     origin: string,
@@ -388,13 +386,13 @@ export class SnapAccounts {
 
   /**
    * Connect Hedera Account.
-   *
    * @param origin - Source.
    * @param state - Wallet state.
    * @param network - Hedera network.
    * @param mirrorNodeUrl - Hedera mirror node URL.
    * @param curve - Public Key curve('ECDSA_SECP256K1' | 'ED25519').
    * @param accountId - Hedera Account id.
+   * @returns Result.
    */
   public static async connectHederaAccount(
     origin: string,
@@ -552,7 +550,6 @@ export class SnapAccounts {
 
   /**
    * Veramo Import metamask account.
-   *
    * @param _origin - Source.
    * @param state - HederaWalletSnapState.
    * @param network - Hedera network.

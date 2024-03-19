@@ -18,14 +18,8 @@
  *
  */
 
-import {
-  divider,
-  heading,
-  panel,
-  text,
-  type Panel,
-  DialogParams,
-} from '@metamask/snaps-sdk';
+import type { DialogParams, Panel } from '@metamask/snaps-sdk';
+import { divider, heading, panel, text } from '@metamask/snaps-sdk';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
@@ -36,9 +30,9 @@ import type { SimpleTransfer } from '../types/hedera';
 export class SnapUtils {
   /**
    * Function to generate snap dialog panel.
-   *
    * @param origin - The origin of where the call is being made from.
    * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
+   * @returns Panel to be displayed in the snap dialog.
    */
   public static async generateCommonPanel(
     origin: string,
@@ -50,10 +44,10 @@ export class SnapUtils {
 
   /**
    * Request Hedera Account Id.
-   *
    * @param origin - Source.
    * @param publicKey - Public key.
    * @param address - EVM address.
+   * @returns Hedera account id.
    */
   public static async requestHederaAccountId(
     origin: string,
@@ -81,8 +75,8 @@ export class SnapUtils {
 
   /**
    * Function that opens snap dialog.
-   *
    * @param params - Snap dialog params.
+   * @returns Response from the snap dialog.
    */
   public static async snapDialog(
     params: DialogParams,

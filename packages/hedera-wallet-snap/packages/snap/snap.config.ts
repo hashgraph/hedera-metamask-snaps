@@ -19,10 +19,12 @@
  */
 
 import type { SnapConfig } from '@metamask/snaps-cli';
+// eslint-disable-next-line import/no-nodejs-modules
 import { resolve } from 'path';
 
 const config: SnapConfig = {
   bundler: 'webpack',
+  // eslint-disable-next-line no-restricted-globals
   input: resolve(__dirname, 'src/index.ts'),
   server: {
     port: 9001,

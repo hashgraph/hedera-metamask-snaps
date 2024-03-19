@@ -23,7 +23,8 @@ import type {
   ApproveAllowanceRequestParams,
 } from '../types/params';
 import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { providerErrors } from '@metamask/rpc-errors';
 import type { WalletSnapParams } from '../types/state';

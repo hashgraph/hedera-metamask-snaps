@@ -19,7 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { PauseTokenCommand } from '../../commands/hts/PauseTokenCommand';
@@ -46,7 +47,6 @@ export class PauseTokenFacade {
    * - Enabling or disabling KYC.
    * - Associating or disassociating a token.
    * - Wiping a token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param pauseTokenRequestParams - Parameters for pausing/unpausing a token.
    * @param pause - If true, the account will be paused. If false, the account will be unpased.

@@ -27,10 +27,10 @@ import type {
   PublicKey,
   Timestamp,
 } from '@hashgraph/sdk';
-import { Long } from '@hashgraph/sdk/lib/long';
-import { BigNumber } from 'bignumber.js';
+import type { Long } from '@hashgraph/sdk/lib/long';
+import type { BigNumber } from 'bignumber.js';
 
-import { AccountInfo } from './account';
+import type { AccountInfo } from './account';
 
 export type NetworkInfo = {
   network: string;

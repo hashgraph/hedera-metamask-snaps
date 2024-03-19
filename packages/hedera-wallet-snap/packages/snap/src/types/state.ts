@@ -18,7 +18,7 @@
  *
  */
 
-import { Account, AccountInfo } from './account';
+import type { Account, AccountInfo } from './account';
 
 export type WalletSnapState = {
   currentAccount: Account;

@@ -20,7 +20,8 @@
 
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTokenCommand } from '../../commands/hts/DeleteTokenCommand';
@@ -33,7 +34,6 @@ import { SnapUtils } from '../../utils/SnapUtils';
 export class DeleteTokenFacade {
   /**
    * Deletes the provided Hedera token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param deleteTokenRequestParams - Parameters for deleting tokens.
    * @returns Receipt of the transaction.

@@ -29,7 +29,6 @@ export class CryptoUtils {
    * Derives a wallet from the provided node using the provided path.
    * NOTE: This method is a copy of the 'derivePath' method from the 'ethers' library as that method
    * changed in the recent version and the new method does not work as expected.
-   *
    * @param node - The node to derive the wallet from.
    * @param path - The path to use for derivation.
    * @returns The derived HDNodeWallet.
@@ -95,7 +94,6 @@ export class CryptoUtils {
 
   /**
    * Generates a wallet using the provided EVM address to generate entropy.
-   *
    * @param evmAddress - The EVM address used as salt for entropy.
    * @returns A promise that resolves to an HDNodeWallet.
    */
@@ -121,7 +119,6 @@ export class CryptoUtils {
 
   /**
    * Checks whether the provided key is a valid Ethereum public key.
-   *
    * @param key - The public key to check.
    * @returns True if the key is valid, false otherwise.
    */
@@ -141,7 +138,6 @@ export class CryptoUtils {
 
   /**
    * Checks whether the provided key is a valid Hedera public key.
-   *
    * @param key - The public key to check.
    * @returns True if the key is valid, false otherwise.
    */
@@ -156,7 +152,6 @@ export class CryptoUtils {
 
   /**
    * Converts a string to a Uint8Array.
-   *
    * @param data - The string to convert.
    * @returns The converted Uint8Array.
    */
@@ -168,7 +163,6 @@ export class CryptoUtils {
 
   /**
    * Converts a Uint8Array to a hexadecimal string.
-   *
    * @param data - The Uint8Array to convert.
    * @returns The hexadecimal string.
    */
@@ -184,7 +178,6 @@ export class CryptoUtils {
 
   /**
    * Converts a hexadecimal string to a Uint8Array.
-   *
    * @param data - The hexadecimal string to convert.
    * @returns The Uint8Array.
    */

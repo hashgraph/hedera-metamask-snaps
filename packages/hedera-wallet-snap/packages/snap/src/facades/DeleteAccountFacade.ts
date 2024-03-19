@@ -21,7 +21,8 @@
 import type { WalletSnapParams } from '../types/state';
 import type { DeleteAccountRequestParams } from '../types/params';
 import type { TxReceipt, AccountBalance } from '../types/hedera';
-import { DialogParams, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { heading, text } from '@metamask/snaps-sdk';
 import { SnapUtils } from '../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
 
@@ -40,7 +41,6 @@ export class DeleteAccountFacade {
    * cannot be made into a deleted account. A record of the deleted account will remain
    * in the ledger until it expires. The expiration of a deleted account can be extended.
    * The account that is being deleted is required to sign the transaction.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param deleteAccountRequestParams - Parameters for deleting an account.
    * @returns Receipt of the transaction.

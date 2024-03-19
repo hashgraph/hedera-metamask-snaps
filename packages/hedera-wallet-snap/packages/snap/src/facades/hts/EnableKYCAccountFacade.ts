@@ -19,7 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { EnableKYCAccountCommand } from '../../commands/hts/EnableKYCAccountCommand';
@@ -33,7 +34,6 @@ import { Utils } from '../../utils/Utils';
 export class EnableKYCAccountFacade {
   /**
    * Grants KYC to the Hedera accounts for the given Hedera token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param enableKYCAccountRequestParams - Parameters for enabling/disabling KYC to
    * an account.

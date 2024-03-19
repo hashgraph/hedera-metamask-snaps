@@ -18,8 +18,8 @@
  *
  */
 
-import { Wallet } from '../domain/wallet/abstract';
-import { SimpleHederaClient } from '../types/hedera';
+import type { Wallet } from '../domain/wallet/abstract';
+import type { SimpleHederaClient } from '../types/hedera';
 
 export type HederaClientFactory = {
   // returns null if the account ID does not match the chosen key

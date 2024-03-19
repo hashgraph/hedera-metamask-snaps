@@ -19,7 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
@@ -34,7 +35,6 @@ import { SnapUtils } from '../utils/SnapUtils';
 export class TransferCryptoFacade {
   /**
    * Transfer crypto(hbar or other tokens).
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param transferCryptoParams - Parameters for transferring crypto.
    * @returns Receipt of the transaction.

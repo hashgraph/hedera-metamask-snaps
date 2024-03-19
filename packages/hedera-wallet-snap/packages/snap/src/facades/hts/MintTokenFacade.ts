@@ -19,7 +19,8 @@
  */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { MintTokenCommand } from '../../commands/hts/MintTokenCommand';
@@ -34,7 +35,6 @@ export class MintTokenFacade {
    * Minting fungible token allows you to increase the total supply of the token. Minting a
    * non-fungible token creates an NFT with its unique metadata for the class of NFTs defined by
    * the token ID. The Supply Key must sign the transaction.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param mintTokenRequestParams - Parameters for minting a token.
    * @returns Receipt of the transaction.

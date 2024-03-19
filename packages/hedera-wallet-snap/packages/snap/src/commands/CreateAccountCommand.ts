@@ -18,19 +18,17 @@
  *
  */
 
-import {
+import type {
   AccountBalance,
   SimpleTransfer,
   TxReceipt,
   TxReceiptExchangeRate,
 } from '../types/hedera';
+import type { AccountId, Client, TransactionReceipt } from '@hashgraph/sdk';
 import {
   AccountCreateTransaction,
-  AccountId,
-  Client,
   Hbar,
   PublicKey,
-  TransactionReceipt,
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { CryptoUtils } from '../utils/CryptoUtils';

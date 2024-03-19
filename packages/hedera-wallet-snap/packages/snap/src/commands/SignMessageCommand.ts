@@ -20,7 +20,8 @@
 
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { heading, text } from '@metamask/snaps-sdk';
 import { ethers, type Wallet } from 'ethers';
 import type { Wallet as HederaWallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
