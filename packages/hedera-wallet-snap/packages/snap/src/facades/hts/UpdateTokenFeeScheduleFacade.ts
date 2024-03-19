@@ -21,12 +21,12 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { divider, heading, text} from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { TxReceipt } from '../../types/hedera';
-import { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
-import { WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -34,7 +34,6 @@ import { CryptoUtils } from '../../utils/CryptoUtils';
 export class UpdateTokenFeeScheduleFacade {
   /**
    * Updates the fee schedule for a token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param updateTokenFeeScheduleRequestParams - Fee sched request params.
    * @returns Receipt of the transaction.

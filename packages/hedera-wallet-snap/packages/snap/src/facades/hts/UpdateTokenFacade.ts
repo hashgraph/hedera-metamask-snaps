@@ -21,20 +21,19 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
-import { DialogParams } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { TxReceipt } from '../../types/hedera';
-import { UpdateTokenRequestParams } from '../../types/params';
-import { WalletSnapParams } from '../../types/state';
+import type { TxReceipt } from '../../types/hedera';
+import type { UpdateTokenRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
 
 export class UpdateTokenFacade {
   /**
    * Updates priorities for a token.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param updateTokenRequestParams - Parameters for updating a token.
    * @returns Receipt of the transaction.

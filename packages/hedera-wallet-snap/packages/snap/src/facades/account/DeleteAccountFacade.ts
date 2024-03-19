@@ -18,17 +18,17 @@
  *
  */
 
-import { WalletSnapParams } from '../../types/state';
-import { DeleteAccountRequestParams } from '../../types/params';
-import { TxReceipt, AccountBalance } from '../../types/hedera';
-import { heading, text } from '@metamask/snaps-ui';
+import type { WalletSnapParams } from '../../types/state';
+import type { DeleteAccountRequestParams } from '../../types/params';
+import type { TxReceipt, AccountBalance } from '../../types/hedera';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { heading, text } from '@metamask/snaps-sdk';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { AccountInfo, Account } from '../../types/account';
+import type { AccountInfo, Account } from '../../types/account';
 import { SnapState } from '../../snap/SnapState';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAccountCommand } from '../../commands/account/DeleteAccountCommand';
-import { DialogParams } from '@metamask/snaps-sdk';
 
 export class DeleteAccountFacade {
   /**
@@ -40,7 +40,6 @@ export class DeleteAccountFacade {
    * cannot be made into a deleted account. A record of the deleted account will remain
    * in the ledger until it expires. The expiration of a deleted account can be extended.
    * The account that is being deleted is required to sign the transaction.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param deleteAccountRequestParams - Parameters for deleting an account.
    * @returns Receipt of the transaction.

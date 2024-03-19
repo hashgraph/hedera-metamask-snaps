@@ -29,23 +29,12 @@ import type { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
+import { Utils } from '../../utils/Utils'
 
 export class FreezeAccountFacade {
   /**
-   * Capitalizes the first letter of the given string.
-   *
-   * @param string - The string to capitalize.
-   * @returns The string with the first letter capitalized.
-   */
-  // eslint-disable-next-line no-restricted-syntax
-  private static readonly capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
-
-  /**
    * Freezes transfers of the specified token for the account. The transaction must be
    * signed by the token's Freeze Key.
-   *
    * @param walletSnapParams - Wallet snap params.
    * @param freezeAccountRequestParams - Parameters for freezing/unfreezing an account.
    * @param freeze - If true, the account will be frozen. If false, the account will be unfrozen.
@@ -72,7 +61,7 @@ export class FreezeAccountFacade {
     try {
       const panelToShow = [
         heading(
-          `${FreezeAccountFacade.capitalizeFirstLetter(
+          `${Utils.capitalizeFirstLetter(
             freezeText,
           )} account for the specified token`,
         ),
