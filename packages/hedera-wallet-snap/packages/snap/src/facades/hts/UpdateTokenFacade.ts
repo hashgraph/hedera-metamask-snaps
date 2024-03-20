@@ -60,7 +60,7 @@ export class UpdateTokenFacade {
       supplyPublicKey,
       feeSchedulePublicKey,
       expirationTime,
-      autoRenewAccountId = hederaAccountId,
+      autoRenewAccountId,
       tokenMemo = 'Created via Hedera Wallet Snap',
     } = updateTokenRequestParams;
 
@@ -84,39 +84,26 @@ export class UpdateTokenFacade {
         text(`Token Memo: ${tokenMemo}`),
         text(`Admin Key: ${publicKey}`),
         text(`Treasury Account: ${hederaAccountId}`),
-        text(
-          `KYC Public Key: ${
-            _.isEmpty(kycPublicKey) ? 'Not set' : (kycPublicKey as string)
-          }`,
-        ),
-        text(
-          `Freeze Public Key: ${
-            _.isEmpty(freezePublicKey) ? 'Not set' : (freezePublicKey as string)
-          }`,
-        ),
-        text(
-          `Pause Public Key:${
-            _.isEmpty(pausePublicKey) ? 'Not set' : (pausePublicKey as string)
-          }`,
-        ),
-        text(
-          `Wipe Public Key: ${
-            _.isEmpty(wipePublicKey) ? 'Not set' : (wipePublicKey as string)
-          }`,
-        ),
-        text(
-          `Supply Public Key: ${
-            _.isEmpty(supplyPublicKey) ? 'Not set' : (supplyPublicKey as string)
-          }`,
-        ),
-        text(
-          `Fee Schedule Public Key: ${
-            _.isEmpty(feeSchedulePublicKey)
-              ? 'Not set'
-              : (feeSchedulePublicKey as string)
-          }`,
-        ),
       );
+
+      if (!_.isEmpty(kycPublicKey)) {
+        panelToShow.push(text(kycPublicKey as string));
+      }
+      if (!_.isEmpty(freezePublicKey)) {
+        panelToShow.push(text(freezePublicKey as string));
+      }
+      if (!_.isEmpty(pausePublicKey)) {
+        panelToShow.push(text(pausePublicKey as string));
+      }
+      if (!_.isEmpty(wipePublicKey)) {
+        panelToShow.push(text(wipePublicKey as string));
+      }
+      if (!_.isEmpty(supplyPublicKey)) {
+        panelToShow.push(text(supplyPublicKey as string));
+      }
+      if (!_.isEmpty(feeSchedulePublicKey)) {
+        panelToShow.push(text(feeSchedulePublicKey as string));
+      }
       if (expirationTime) {
         panelToShow.push(text(`Expiration Time: ${expirationTime}`));
       }
