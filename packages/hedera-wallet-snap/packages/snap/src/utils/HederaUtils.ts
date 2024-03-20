@@ -1204,6 +1204,45 @@ export class HederaUtils {
         'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
       );
     }
+
+    const parameter = params as UpdateTokenFeeScheduleRequestParams;
+
+    for (const customFee of parameter.customFees) {
+      HederaUtils.checkValidString(
+        customFee,
+        'updateTokenFeeSchedule',
+        'feeCollectorAccountId',
+        true,
+      );
+
+      HederaUtils.checkValidNumber(
+        customFee,
+        'updateTokenFeeSchedule',
+        'hbarAmount',
+        false,
+      );
+
+      HederaUtils.checkValidNumber(
+        customFee,
+        'updateTokenFeeSchedule',
+        'tokenAmount',
+        false,
+      );
+
+      HederaUtils.checkValidString(
+        customFee,
+        'updateTokenFeeSchedule',
+        'denominatingTokenId',
+        false,
+      );
+
+      HederaUtils.checkValidBoolean(
+        customFee,
+        'updateTokenFeeSchedule',
+        'allCollectorsAreExempt',
+        false,
+      );
+    }
   }
 
   /**
