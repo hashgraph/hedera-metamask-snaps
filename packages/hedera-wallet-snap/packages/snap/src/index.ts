@@ -131,6 +131,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
       };
+    case 'testingFunctionalTests':
+      return 'hi';
     case 'signMessage': {
       HederaUtils.isValidSignMessageRequest(request.params);
       const signMessageCommand = new SignMessageCommand(
