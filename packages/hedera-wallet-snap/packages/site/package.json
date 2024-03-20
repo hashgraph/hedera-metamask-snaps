@@ -42,7 +42,7 @@
     "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
-    "@svgr/webpack": "^6.4.0",
+    "@svgr/webpack": "^8.1.0",
     "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^13.3.0",
