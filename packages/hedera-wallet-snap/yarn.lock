@@ -3598,7 +3598,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap-site@workspace:packages/site"
   dependencies:
-    "@hashgraph/sdk": 2.38.0
+    "@hashgraph/sdk": ^2.43.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -3652,7 +3652,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap@workspace:packages/snap"
   dependencies:
-    "@hashgraph/sdk": 2.38.0
+    "@hashgraph/sdk": ^2.43.0
     "@jest/globals": ^29.7.0
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -3696,19 +3696,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hashgraph/proto@npm:2.14.0-beta.3":
-  version: 2.14.0-beta.3
-  resolution: "@hashgraph/proto@npm:2.14.0-beta.3"
+"@hashgraph/proto@npm:2.14.0-beta.5":
+  version: 2.14.0-beta.5
+  resolution: "@hashgraph/proto@npm:2.14.0-beta.5"
   dependencies:
     long: ^4.0.0
     protobufjs: ^7.2.5
-  checksum: 4d5a5007a393d9fc87d9ad7d5c2aed571421ed4fa2aa117b180b9788f39eee47e8ee2fd73a2df640fc19f6ed48229d3ee1821a20f8ac9db8e8af3ca150a7e79a
+  checksum: 1c2045934d477a53a029374dff52f1f93f319d9fe993494e917d26d2dd6b65ffa2c8ba5f896a5ec1168e606c63f6bfce7640fa717078de7e9ed5528ffd167a3e
   languageName: node
   linkType: hard
 
-"@hashgraph/sdk@npm:2.38.0":
-  version: 2.41.0
-  resolution: "@hashgraph/sdk@npm:2.38.0"
+"@hashgraph/sdk@npm:^2.43.0":
+  version: 2.43.0
+  resolution: "@hashgraph/sdk@npm:2.43.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
@@ -3716,7 +3716,7 @@ __metadata:
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
     "@hashgraph/cryptography": 1.4.8-beta.5
-    "@hashgraph/proto": 2.14.0-beta.3
+    "@hashgraph/proto": 2.14.0-beta.5
     axios: ^1.6.4
     bignumber.js: ^9.1.1
     bn.js: ^5.1.1
@@ -3733,7 +3733,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 2cf9ae2059ae314e9ba69639480d0de032c2dd156aa40c5411735da287b13f1ee21bf53622a45e23dd326079e6d0056b5386f46680b7b71454b3f21200447055
+  checksum: 8538531fe22e8f2c63197ee3d767f998543ca4a828b7ff9a6cd9cd7b48f06d16d9577358430acbbaeedd7f3f24c5416484a416eaf6fd287af30ebce223a5e9c5
   languageName: node
   linkType: hard
 
