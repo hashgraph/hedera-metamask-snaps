@@ -1191,7 +1191,12 @@ export class HederaUtils {
   public static isValidUpdateTokenFeeScheduleParams(
     params: unknown,
   ): asserts params is UpdateTokenFeeScheduleRequestParams {
-    if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('tokenId' in params) ||
+      !('customFees' in params)
+    ) {
       console.error(
         'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
       );
