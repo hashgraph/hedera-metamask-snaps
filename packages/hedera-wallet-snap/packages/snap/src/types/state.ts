@@ -66,7 +66,3 @@ export type WalletSnapParams = {
   origin: string;
   state: WalletSnapState;
 };
-
-export type SnapDialogParams = {
-  type: 'alert' | 'confirmation' | 'prompt';
-};
