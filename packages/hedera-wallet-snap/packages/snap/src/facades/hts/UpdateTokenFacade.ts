@@ -61,7 +61,7 @@ export class UpdateTokenFacade {
       feeSchedulePublicKey,
       expirationTime,
       autoRenewAccountId,
-      tokenMemo = 'Created via Hedera Wallet Snap',
+      tokenMemo,
     } = updateTokenRequestParams;
 
     let txReceipt = {} as TxReceipt;
