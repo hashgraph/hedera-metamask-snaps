@@ -3666,12 +3666,12 @@ __metadata:
     "@metamask/snaps-jest": ^6.0.1
     "@metamask/snaps-sdk": ^3.1.1
     "@types/jest": ^29.5.12
-    "@types/lodash.clonedeep": ^4.5.7
+    "@types/lodash.clonedeep": ^4.5.9
     "@types/normalize-url": ^4.2.0
     "@typescript-eslint/eslint-plugin": 5.57.1
     "@typescript-eslint/parser": 5.57.1
     bignumber.js: ^9.1.2
-    eslint: ^8.38.0
+    eslint: ^8.57.0
     eslint-config-prettier: ^9.1.0
     eslint-plugin-import: ^2.29.1
     eslint-plugin-jest: ^27.9.0
@@ -3692,7 +3692,7 @@ __metadata:
     rimraf: ^5.0.5
     ts-jest: ^29.1.2
     ts-node: ^10.9.2
-    typescript: ^5.0.4
+    typescript: ^5.4.2
   languageName: unknown
   linkType: soft
 
@@ -6973,7 +6973,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash.clonedeep@npm:^4.5.7, @types/lodash.clonedeep@npm:^4.5.9":
+"@types/lodash.clonedeep@npm:^4.5.9":
   version: 4.5.9
   resolution: "@types/lodash.clonedeep@npm:4.5.9"
   dependencies:
@@ -21745,7 +21745,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.0.4, typescript@npm:^5.2.2":
+"typescript@npm:^5.2.2":
   version: 5.3.3
   resolution: "typescript@npm:5.3.3"
   bin:
@@ -21765,7 +21765,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^5.0.4#~builtin<compat/typescript>, typescript@patch:typescript@^5.2.2#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5.2.2#~builtin<compat/typescript>":
   version: 5.3.3
   resolution: "typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>::version=5.3.3&hash=7ad353"
   bin:
