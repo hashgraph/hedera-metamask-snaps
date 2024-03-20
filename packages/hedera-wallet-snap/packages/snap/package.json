@@ -67,7 +67,7 @@
     "@types/jest": "^29.5.12",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/normalize-url": "^4.2.0",
-    "@typescript-eslint/eslint-plugin": "5.57.1",
+    "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.57.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
