@@ -1204,8 +1204,6 @@ export class HederaUtils {
         'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
       );
     }
-
-    // const parameter = params as UpdateTokenRequestParams;
   }
 
   /**
@@ -1227,7 +1225,7 @@ export class HederaUtils {
     const parameter = params as UpdateTokenRequestParams;
 
     if (parameter.name) {
-      HederaUtils.checkValidString(parameter, 'updateToken', 'name', true);
+      HederaUtils.checkValidString(parameter, 'updateToken', 'name', false);
       if (parameter.name.length > 100) {
         console.error(
           'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
@@ -1239,7 +1237,7 @@ export class HederaUtils {
     }
 
     if (parameter.symbol) {
-      HederaUtils.checkValidString(parameter, 'updateToken', 'symbol', true);
+      HederaUtils.checkValidString(parameter, 'updateToken', 'symbol', false);
       if (parameter.symbol.length > 100) {
         console.error(
           'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
