@@ -18,14 +18,10 @@
  *
  */
 
-import {
-  Client,
-  PrivateKey,
-  PublicKey,
-  TokenUpdateTransaction,
-} from '@hashgraph/sdk';
-import { UpdateTokenRequestParams } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
+import type { Client, PrivateKey } from '@hashgraph/sdk';
+import { PublicKey, TokenUpdateTransaction } from '@hashgraph/sdk';
+import type { UpdateTokenRequestParams } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class UpdateTokenCommand {

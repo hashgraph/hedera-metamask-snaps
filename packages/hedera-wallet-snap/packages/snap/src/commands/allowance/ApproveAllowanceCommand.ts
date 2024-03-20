@@ -18,8 +18,8 @@
  *
  */
 
-import { ApproveAllowanceAssetDetail } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
+import type { ApproveAllowanceAssetDetail } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
 import {
   AccountAllowanceApproveTransaction,
   type AccountId,

@@ -29,7 +29,7 @@ import type { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { Utils } from '../../utils/Utils'
+import { Utils } from '../../utils/Utils';
 
 export class FreezeAccountFacade {
   /**

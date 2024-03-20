@@ -18,8 +18,9 @@
  *
  */
 
-import { AccountDeleteTransaction, Client } from '@hashgraph/sdk';
-import { TxReceipt } from '../../types/hedera';
+import type { Client } from '@hashgraph/sdk';
+import { AccountDeleteTransaction } from '@hashgraph/sdk';
+import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 

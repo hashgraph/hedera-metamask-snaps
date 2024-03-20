@@ -18,15 +18,14 @@
  *
  */
 
+import type { Client, PrivateKey } from '@hashgraph/sdk';
 import {
-  Client,
   CustomFixedFee,
   Hbar,
-  PrivateKey,
   TokenFeeScheduleUpdateTransaction,
 } from '@hashgraph/sdk';
-import { TokenCustomFee } from '../../types/params';
-import { TxReceipt } from '../../types/hedera';
+import type { TokenCustomFee } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class UpdateTokenFeeScheduleCommand {

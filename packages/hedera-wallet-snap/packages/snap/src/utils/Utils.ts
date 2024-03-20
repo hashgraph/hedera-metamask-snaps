@@ -18,8 +18,8 @@
  *
  */
 
-import { TxReceipt } from '../types/hedera';
-import { TransactionReceipt } from '@hashgraph/sdk';
+import type { TxReceipt } from '../types/hedera';
+import type { TransactionReceipt } from '@hashgraph/sdk';
 import { CryptoUtils } from './CryptoUtils';
 
 export class Utils {

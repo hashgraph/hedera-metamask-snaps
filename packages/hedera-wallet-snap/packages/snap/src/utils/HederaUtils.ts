@@ -1186,7 +1186,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of updateToken request.
-   *
    * @param params - Request params.
    */
   public static isValidUpdateTokenFeeScheduleParams(
@@ -1206,7 +1205,6 @@ export class HederaUtils {
 
   /**
    * Check Validation of updateToken request.
-   *
    * @param params - Request params.
    */
   public static isValidUpdateTokenParams(
