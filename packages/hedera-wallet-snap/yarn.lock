@@ -3577,7 +3577,7 @@ __metadata:
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
     "@metamask/eslint-config-typescript": ^12.1.0
-    "@typescript-eslint/eslint-plugin": 5.57.1
+    "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.57.1
     eslint: ^8.38.0
     eslint-config-prettier: ^9.0.0
@@ -3598,7 +3598,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap-site@workspace:packages/site"
   dependencies:
-    "@hashgraph/sdk": 2.38.0
+    "@hashgraph/sdk": ^2.43.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -3617,7 +3617,7 @@ __metadata:
     "@types/react-dom": ^18.2.22
     "@types/react-select": ^5.0.1
     "@types/styled-components": ^5.1.25
-    "@typescript-eslint/eslint-plugin": 5.57.1
+    "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.57.1
     babel-plugin-styled-components: ^2.1.4
     bignumber.js: ^9.1.2
@@ -3652,7 +3652,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap@workspace:packages/snap"
   dependencies:
-    "@hashgraph/sdk": 2.38.0
+    "@hashgraph/sdk": ^2.43.0
     "@jest/globals": ^29.7.0
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -3668,7 +3668,7 @@ __metadata:
     "@types/jest": ^29.5.12
     "@types/lodash.clonedeep": ^4.5.9
     "@types/normalize-url": ^4.2.0
-    "@typescript-eslint/eslint-plugin": 5.57.1
+    "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.57.1
     bignumber.js: ^9.1.2
     eslint: ^8.57.0
@@ -3696,19 +3696,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hashgraph/proto@npm:2.14.0-beta.3":
-  version: 2.14.0-beta.3
-  resolution: "@hashgraph/proto@npm:2.14.0-beta.3"
+"@hashgraph/proto@npm:2.14.0-beta.5":
+  version: 2.14.0-beta.5
+  resolution: "@hashgraph/proto@npm:2.14.0-beta.5"
   dependencies:
     long: ^4.0.0
     protobufjs: ^7.2.5
-  checksum: 4d5a5007a393d9fc87d9ad7d5c2aed571421ed4fa2aa117b180b9788f39eee47e8ee2fd73a2df640fc19f6ed48229d3ee1821a20f8ac9db8e8af3ca150a7e79a
+  checksum: 1c2045934d477a53a029374dff52f1f93f319d9fe993494e917d26d2dd6b65ffa2c8ba5f896a5ec1168e606c63f6bfce7640fa717078de7e9ed5528ffd167a3e
   languageName: node
   linkType: hard
 
-"@hashgraph/sdk@npm:2.38.0":
-  version: 2.41.0
-  resolution: "@hashgraph/sdk@npm:2.38.0"
+"@hashgraph/sdk@npm:^2.43.0":
+  version: 2.43.0
+  resolution: "@hashgraph/sdk@npm:2.43.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
@@ -3716,7 +3716,7 @@ __metadata:
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
     "@hashgraph/cryptography": 1.4.8-beta.5
-    "@hashgraph/proto": 2.14.0-beta.3
+    "@hashgraph/proto": 2.14.0-beta.5
     axios: ^1.6.4
     bignumber.js: ^9.1.1
     bn.js: ^5.1.1
@@ -3733,7 +3733,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 2cf9ae2059ae314e9ba69639480d0de032c2dd156aa40c5411735da287b13f1ee21bf53622a45e23dd326079e6d0056b5386f46680b7b71454b3f21200447055
+  checksum: 8538531fe22e8f2c63197ee3d767f998543ca4a828b7ff9a6cd9cd7b48f06d16d9577358430acbbaeedd7f3f24c5416484a416eaf6fd287af30ebce223a5e9c5
   languageName: node
   linkType: hard
 
@@ -7253,31 +7253,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:5.57.1":
-  version: 5.57.1
-  resolution: "@typescript-eslint/eslint-plugin@npm:5.57.1"
-  dependencies:
-    "@eslint-community/regexpp": ^4.4.0
-    "@typescript-eslint/scope-manager": 5.57.1
-    "@typescript-eslint/type-utils": 5.57.1
-    "@typescript-eslint/utils": 5.57.1
-    debug: ^4.3.4
-    grapheme-splitter: ^1.0.4
-    ignore: ^5.2.0
-    natural-compare-lite: ^1.4.0
-    semver: ^7.3.7
-    tsutils: ^3.21.0
-  peerDependencies:
-    "@typescript-eslint/parser": ^5.0.0
-    eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 3ea842ef9615e298e28c6687c4dc285577ea0995944410553b3ca514ce9d437534b6e89114e9398c1a370324afe7a4a251c8c49540bb3bf13dcadde9ada3ecc2
-  languageName: node
-  linkType: hard
-
-"@typescript-eslint/eslint-plugin@npm:^5.60.1":
+"@typescript-eslint/eslint-plugin@npm:5.62.0, @typescript-eslint/eslint-plugin@npm:^5.60.1":
   version: 5.62.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.62.0"
   dependencies:
@@ -7355,23 +7331,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/type-utils@npm:5.57.1":
-  version: 5.57.1
-  resolution: "@typescript-eslint/type-utils@npm:5.57.1"
-  dependencies:
-    "@typescript-eslint/typescript-estree": 5.57.1
-    "@typescript-eslint/utils": 5.57.1
-    debug: ^4.3.4
-    tsutils: ^3.21.0
-  peerDependencies:
-    eslint: "*"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 06fab95315fc1ffdaaa011e6ec1ae538826ef3d9b422e2c926dbe9b83e55d9e8bdaa07c43317a4c0a59b40a24c5c48a7c8284e6a18780475a65894b1b949fc23
-  languageName: node
-  linkType: hard
-
 "@typescript-eslint/type-utils@npm:5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/type-utils@npm:5.62.0"
@@ -7436,24 +7395,6 @@ __metadata:
     typescript:
       optional: true
   checksum: 3624520abb5807ed8f57b1197e61c7b1ed770c56dfcaca66372d584ff50175225798bccb701f7ef129d62c5989070e1ee3a0aa2d84e56d9524dcf011a2bb1a52
-  languageName: node
-  linkType: hard
-
-"@typescript-eslint/utils@npm:5.57.1":
-  version: 5.57.1
-  resolution: "@typescript-eslint/utils@npm:5.57.1"
-  dependencies:
-    "@eslint-community/eslint-utils": ^4.2.0
-    "@types/json-schema": ^7.0.9
-    "@types/semver": ^7.3.12
-    "@typescript-eslint/scope-manager": 5.57.1
-    "@typescript-eslint/types": 5.57.1
-    "@typescript-eslint/typescript-estree": 5.57.1
-    eslint-scope: ^5.1.1
-    semver: ^7.3.7
-  peerDependencies:
-    eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
-  checksum: 12e55144c8087f4e8f0f22e5693f3901b81bb7899dec42c7bfe540ac672a802028b688884bb43bd67bcf3cd3546a7205d207afcd948c731c19f551ea61267205
   languageName: node
   linkType: hard
 
@@ -13858,13 +13799,6 @@ __metadata:
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: ac85f94da92d8eb6b7f5a8b20ce65e43d66761c55ce85ac96df6865308390da45a8d3f0296dd3a663de65d30ba497bd46c696cc1e248c72b13d6d567138a4fc7
-  languageName: node
-  linkType: hard
-
-"grapheme-splitter@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "grapheme-splitter@npm:1.0.4"
-  checksum: 0c22ec54dee1b05cd480f78cf14f732cb5b108edc073572c4ec205df4cd63f30f8db8025afc5debc8835a8ddeacf648a1c7992fe3dcd6ad38f9a476d84906620
   languageName: node
   linkType: hard
 
