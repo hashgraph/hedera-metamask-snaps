@@ -65,7 +65,7 @@
     "eslint-plugin-jsdoc": "^48.2.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "gatsby": "^4.24.4",
+    "gatsby": "^5.13.3",
     "gatsby-plugin-manifest": "^5.13.1",
     "gatsby-plugin-styled-components": "^6.13.1",
     "gatsby-plugin-svgr": "^3.0.0-beta.0",
