@@ -49,6 +49,7 @@ import { PauseToken } from '../components/cards/hts/PauseToken';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
 import { WipeToken } from '../components/cards/hts/WipeToken';
+import { SwapTokens } from '../components/cards/hts/SwapTokens';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -308,6 +309,12 @@ const Index = () => {
         />
 
         <DeleteAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <SwapTokens
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

@@ -194,3 +194,10 @@ export type ExternalAccountParams = {
     curve?: 'ECDSA_SECP256K1' | 'ED25519';
   };
 };
+
+export type SwapTokensRequestParams = {
+  destinationAccountId: string;
+  tokenId?: string;
+  tokenAmount?: number;
+  hbarAmount?: number;
+}

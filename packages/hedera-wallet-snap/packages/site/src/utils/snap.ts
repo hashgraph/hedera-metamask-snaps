@@ -35,6 +35,7 @@ import {
   MintTokenRequestParams,
   PauseOrDeleteTokenRequestParams,
   SignMessageRequestParams,
+  SwapTokensRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
   WipeTokenRequestParams,
@@ -840,6 +841,37 @@ export const wipeToken = async (
           network,
           mirrorNodeUrl,
           ...wipeTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "swapTokens" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param swapTokensRequestParams
+ * @param externalAccountparams
+ */
+export const swapTokens = async (
+  network: string,
+  mirrorNodeUrl: string,
+  swapTokensRequestParams: SwapTokensRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/swapTokens',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...swapTokensRequestParams,
           ...externalAccountparams,
         },
       },
