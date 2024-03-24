@@ -371,6 +371,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
+    case 'hts/swap': {
+      HederaUtils.isValidSwapParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await SwapFacade.Swap(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
     default:
       // Throw a known error to avoid crashing the Snap
       // eslint-disable-next-line @typescript-eslint/no-throw-literal

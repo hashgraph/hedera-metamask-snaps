@@ -61,11 +61,11 @@ import type {
   PauseOrDeleteTokenRequestParams,
   ServiceFee,
   SignMessageRequestParams,
-  StakeHbarRequestParams,
+  StakeHbarRequestParams, SwapRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
-  WipeTokenRequestParams,
-} from '../types/params';
+  WipeTokenRequestParams
+} from "../types/params";
 import { CryptoUtils } from './CryptoUtils';
 import { FetchUtils, type FetchResponse } from './FetchUtils';
 import { Utils } from './Utils';
@@ -1630,6 +1630,36 @@ export class HederaUtils {
         );
       }
     }
+  }
+
+  /**
+   * Check Validation of swap request.
+   * @param params - Request params.
+   */
+  public static isValidSwapParams(
+    params: unknown,
+  ): asserts params is SwapRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('destinationAccountId' in params)
+    ) {
+      console.error(
+        'Invalid swap Params passed. "destinationAccountId" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid swap Params passed. "destinationAccountId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as SwapRequestParams;
+
+    HederaUtils.checkValidString(
+      parameter,
+      'swap',
+      'destinationAccountId',
+      true,
+    );
   }
 
   public static validHederaNetwork(network: string) {

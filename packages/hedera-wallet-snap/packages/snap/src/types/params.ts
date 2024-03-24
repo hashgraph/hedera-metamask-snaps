@@ -144,3 +144,10 @@ export type WipeTokenRequestParams = {
   amount?: number;
   serialNumbers?: number[];
 };
+
+export type SwapRequestParams = {
+  destinationAccountId: string;
+  tokenId: string;
+  tokenAmount: string;
+  hbarAmount: string;
+};
