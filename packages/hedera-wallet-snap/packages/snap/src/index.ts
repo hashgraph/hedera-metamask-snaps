@@ -373,7 +373,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
-    case 'hts/createSwapRequest': {
+    case 'hts/createSwap': {
       HederaUtils.isValidSwapRequestParams(request.params);
       return {
         currentAccount: state.currentAccount,
@@ -384,7 +384,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
-    case 'hts/acknowledgeSwapRequest': {
+    case 'hts/acknowledgeSwap': {
       HederaUtils.isValidSwapAcknowledgeParams(request.params);
       return {
         currentAccount: state.currentAccount,

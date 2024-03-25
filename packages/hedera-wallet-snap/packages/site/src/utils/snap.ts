@@ -35,11 +35,12 @@ import {
   MintTokenRequestParams,
   PauseOrDeleteTokenRequestParams,
   SignMessageRequestParams,
-  SwapTokensRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
   WipeTokenRequestParams,
-} from '../types/snap';
+  AtomicSwapRequestParams,
+  AtomicSwapAcknowledgeParams,
+} from "../types/snap";
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
   const accounts = (await window.ethereum.request({
@@ -849,17 +850,17 @@ export const wipeToken = async (
 };
 
 /**
- * Invoke the "swapTokens" method from the snap.
+ * Invoke the "createSwapRequest" method from the snap.
  *
  * @param network
  * @param mirrorNodeUrl
- * @param swapTokensRequestParams
+ * @param swapRequestParams
  * @param externalAccountparams
  */
-export const swapTokens = async (
+export const createSwapRequest = async (
   network: string,
   mirrorNodeUrl: string,
-  swapTokensRequestParams: SwapTokensRequestParams,
+  swapRequestParams: AtomicSwapRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -867,11 +868,42 @@ export const swapTokens = async (
     params: {
       snapId: defaultSnapOrigin,
       request: {
-        method: 'hts/swapTokens',
+        method: 'hts/createSwap',
         params: {
           network,
           mirrorNodeUrl,
-          ...swapTokensRequestParams,
+          ...swapRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "createSwapAcknowledgement" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param swapAcknowledgeRequestParams
+ * @param externalAccountparams
+ */
+export const createSwapAcknowledgement = async (
+  network: string,
+  mirrorNodeUrl: string,
+  swapAcknowledgeRequestParams: AtomicSwapAcknowledgeParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/acknowledgeSwap',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...swapAcknowledgeRequestParams,
           ...externalAccountparams,
         },
       },

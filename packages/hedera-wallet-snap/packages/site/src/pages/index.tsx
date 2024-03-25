@@ -49,7 +49,7 @@ import { PauseToken } from '../components/cards/hts/PauseToken';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
 import { WipeToken } from '../components/cards/hts/WipeToken';
-import { SwapTokens } from '../components/cards/hts/SwapTokens';
+import { SwapTokensRequest } from '../components/cards/hts/SwapTokensRequest';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -63,6 +63,7 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
+import { SwapAcknowledge } from "../components/cards/hts/SwapTokensAcknowledge";
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -314,7 +315,13 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <SwapTokens
+        <SwapTokensRequest
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <SwapAcknowledge
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

@@ -25,8 +25,8 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, SwapTokensRequestParams } from '../../../types/snap';
-import { swapTokens, shouldDisplayReconnectButton } from '../../../utils';
+import { Account, AtomicSwapAcknowledgeParams } from '../../../types/snap';
+import { createSwapAcknowledgement, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -38,40 +38,28 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SwapTokens: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const SwapAcknowledge: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [destinationAccountId, setAssetType] = useState('');
-  const [tokenId, setTokenName] = useState('');
-  const [tokenAmount, setTokenSymbol] = useState('');
-  const [hbarAmount, setTokenDecimals] = useState(1);
+  const [scheduleId, setScheduleId] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleCreateTokenClick = async () => {
+  const handleCreateAcknowledgementClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const swapTokenParams = {
-        destinationAccountId,
-        tokenId,
-      } as SwapTokensRequestParams;
+      const swapAcknowledgeParams = {
+        scheduleId,
+      } as AtomicSwapAcknowledgeParams;
 
-      if (Number.isFinite(tokenAmount)) {
-        swapTokenParams.tokenAmount = Number(tokenAmount);
-      }
-
-      if (Number.isFinite(hbarAmount)) {
-        swapTokenParams.hbarAmount = Number(hbarAmount);
-      }
-
-      const response: any = await swapTokens(
+      const response: any = await createSwapAcknowledgement(
         network,
         mirrorNodeUrl,
-        swapTokenParams,
+        swapAcknowledgeParams,
         externalAccountParams,
       );
 
@@ -94,53 +82,20 @@ const SwapTokens: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   return (
     <Card
       content={{
-        title: 'swapTokens',
-        description: 'Swap tokens on Hedera using the Hedera Token Service.',
+        title: 'createSwapAcknowledgement',
+        description: 'Acknowledge a swap request made using the Hedera Token Service.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <br />
             <label>
-              Enter the Account ID to send tokens to
+              Enter the Scheduled Entity ID
               <input
                 type="text"
                 style={{ width: '100%' }}
-                value={destinationAccountId}
+                value={scheduleId}
                 placeholder="0.0.1234"
-                onChange={(e) => setTokenName(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the amount of Hbar to send
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={hbarAmount}
-                placeholder="1"
-                onChange={(e) => setTokenSymbol(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the token ID
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={tokenId}
-                placeholder="0.0"
-                onChange={(e) => setTokenSymbol(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the token amount
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={tokenAmount}
-                placeholder="1"
-                onChange={(e) => setTokenSymbol(e.target.value)}
+                onChange={(e) => setScheduleId(e.target.value)}
               />
             </label>
             <br />
@@ -149,7 +104,7 @@ const SwapTokens: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         button: (
           <SendHelloButton
             buttonText="Create Token"
-            onClick={handleCreateTokenClick}
+            onClick={handleCreateAcknowledgementClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -165,4 +120,4 @@ const SwapTokens: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   );
 };
 
-export { SwapTokens };
+export { SwapAcknowledge };

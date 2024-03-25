@@ -195,9 +195,17 @@ export type ExternalAccountParams = {
   };
 };
 
-export type SwapTokensRequestParams = {
+export type AtomicSwapRequestParams = {
+  sourceAccountId?: string;
   destinationAccountId: string;
-  tokenId?: string;
-  tokenAmount?: number;
-  hbarAmount?: number;
-}
+  sendTokenId?: string;
+  sendTokenAmount?: number;
+  receiveTokenId?: string;
+  receiveTokenAmount?: number;
+  sendHbarAmount?: number;
+  receiveHbarAmount?: number;
+};
+
+export type AtomicSwapAcknowledgeParams = {
+  scheduleId: string;
+};
