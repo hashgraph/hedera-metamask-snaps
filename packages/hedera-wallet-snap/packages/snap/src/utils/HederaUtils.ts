@@ -47,7 +47,7 @@ import type {
 } from '../types/hedera';
 import type {
   ApproveAllowanceRequestParams,
-  AssociateTokensRequestParams,
+  AssociateTokensRequestParams, AtomicSwapRequestParams,
   BurnTokenRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
@@ -1638,7 +1638,7 @@ export class HederaUtils {
    */
   public static isValidSwapParams(
     params: unknown,
-  ): asserts params is SwapRequestParams {
+  ): asserts params is AtomicSwapRequestParams {
     if (
       params === null ||
       _.isEmpty(params) ||
