@@ -76,7 +76,6 @@ export class SwapRequestCommand {
         this.#tokenAmount,
       );
     }
-
     atomicSwap = atomicSwap.freezeWith(client);
     atomicSwap = await atomicSwap.sign(this.#senderPrivateKey);
 
