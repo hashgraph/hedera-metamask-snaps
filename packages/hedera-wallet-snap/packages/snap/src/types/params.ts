@@ -145,9 +145,13 @@ export type WipeTokenRequestParams = {
   serialNumbers?: number[];
 };
 
-export type SwapRequestParams = {
+export type AtomicSwapRequestParams = {
+  sourceAccountId: string;
   destinationAccountId: string;
-  tokenId: string;
-  tokenAmount: string;
-  hbarAmount: string;
+  sourceTokenId?: string;
+  sourceTokenAmount?: number;
+  destinationTokenId?: string;
+  destinationTokenAmount?: number;
+  sourceHbarAmount?: number;
+  destinationHbarAmount?: number;
 };

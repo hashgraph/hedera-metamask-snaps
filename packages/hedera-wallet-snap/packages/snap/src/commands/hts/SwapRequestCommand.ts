@@ -20,62 +20,79 @@
 
 import { Hbar, TransferTransaction } from '@hashgraph/sdk';
 import type { PrivateKey, Client } from '@hashgraph/sdk';
+import type { AtomicSwapRequestParams } from '../../types/params';
 
 export class SwapRequestCommand {
-  readonly #sourceAccountId: string;
-
-  readonly #destinationAccountId: string;
-
-  readonly #tokenId: string | undefined;
-
-  readonly #tokenAmount: number | undefined;
-
-  readonly #hbarAmount: number | undefined;
+  readonly #atomicSwapData: AtomicSwapRequestParams;
 
   readonly #senderPrivateKey: PrivateKey;
 
   constructor(
-    sourceAccountId: string,
-    destinationAccountId: string,
+    atomicSwapData: AtomicSwapRequestParams,
     senderPrivateKey: PrivateKey,
-    tokenId?: string,
-    tokenAmount?: number,
-    hbarAmount?: number,
   ) {
-    this.#sourceAccountId = sourceAccountId;
-    this.#destinationAccountId = destinationAccountId;
-    this.#tokenId = tokenId;
-    this.#tokenAmount = tokenAmount;
-    this.#hbarAmount = hbarAmount;
+    this.#atomicSwapData = atomicSwapData;
     this.#senderPrivateKey = senderPrivateKey;
   }
 
   public async execute(client: Client): Promise<TransferTransaction> {
     let atomicSwap = new TransferTransaction();
 
-    if (this.#hbarAmount !== undefined) {
+    if (this.#atomicSwapData.sourceHbarAmount !== undefined) {
       atomicSwap = atomicSwap.addHbarTransfer(
-        this.#sourceAccountId,
-        new Hbar(this.#hbarAmount),
+        this.#atomicSwapData.sourceAccountId,
+        new Hbar(-this.#atomicSwapData.sourceHbarAmount),
       );
       atomicSwap = atomicSwap.addHbarTransfer(
-        this.#destinationAccountId,
-        new Hbar(this.#hbarAmount),
+        this.#atomicSwapData.destinationAccountId,
+        new Hbar(this.#atomicSwapData.sourceHbarAmount),
       );
     }
 
-    if (this.#tokenId !== undefined && this.#tokenAmount !== undefined) {
-      atomicSwap = atomicSwap.addTokenTransfer(
-        this.#tokenId,
-        this.#sourceAccountId,
-        this.#tokenAmount,
+    if (this.#atomicSwapData.destinationHbarAmount !== undefined) {
+      atomicSwap = atomicSwap.addHbarTransfer(
+        this.#atomicSwapData.destinationAccountId,
+        -this.#atomicSwapData.destinationHbarAmount,
       );
-      atomicSwap = atomicSwap.addTokenTransfer(
-        this.#tokenId,
-        this.#destinationAccountId,
-        this.#tokenAmount,
+
+      atomicSwap = atomicSwap.addHbarTransfer(
+        this.#atomicSwapData.sourceAccountId,
+        this.#atomicSwapData.destinationHbarAmount,
       );
     }
+
+    if (
+      this.#atomicSwapData.sourceTokenId !== undefined &&
+      this.#atomicSwapData.sourceTokenAmount !== undefined
+    ) {
+      atomicSwap = atomicSwap.addTokenTransfer(
+        this.#atomicSwapData.sourceTokenId,
+        this.#atomicSwapData.sourceAccountId,
+        -this.#atomicSwapData.sourceTokenAmount,
+      );
+      atomicSwap = atomicSwap.addTokenTransfer(
+        this.#atomicSwapData.sourceTokenId,
+        this.#atomicSwapData.destinationAccountId,
+        this.#atomicSwapData.sourceTokenAmount,
+      );
+    }
+
+    if (
+      this.#atomicSwapData.destinationTokenId !== undefined &&
+      this.#atomicSwapData.destinationTokenAmount !== undefined
+    ) {
+      atomicSwap = atomicSwap.addTokenTransfer(
+        this.#atomicSwapData.destinationTokenId,
+        this.#atomicSwapData.destinationAccountId,
+        -this.#atomicSwapData.destinationTokenAmount,
+      );
+      atomicSwap = atomicSwap.addTokenTransfer(
+        this.#atomicSwapData.destinationTokenId,
+        this.#atomicSwapData.sourceAccountId,
+        this.#atomicSwapData.destinationTokenAmount,
+      );
+    }
+
     atomicSwap = atomicSwap.freezeWith(client);
     atomicSwap = await atomicSwap.sign(this.#senderPrivateKey);
 
