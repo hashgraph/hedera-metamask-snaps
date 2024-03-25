@@ -26,7 +26,6 @@ import { SwapRequestCommand } from '../../commands/hts/SwapRequestCommand';
 import type { AtomicSwapRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
-import type { TransferTransaction } from '@hashgraph/sdk';
 import { PrivateKey } from '@hashgraph/sdk';
 import { HederaUtils } from '../../utils/HederaUtils';
 
@@ -43,7 +42,7 @@ export class SwapRequestFacade {
   public static async createSwapRequest(
     walletSnapParams: WalletSnapParams,
     swapRequestParams: AtomicSwapRequestParams,
-  ): Promise<TransferTransaction> {
+  ): Promise<string> {
     const { origin, state } = walletSnapParams;
 
     const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =

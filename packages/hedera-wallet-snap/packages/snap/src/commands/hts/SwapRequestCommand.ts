@@ -35,7 +35,7 @@ export class SwapRequestCommand {
     this.#senderPrivateKey = senderPrivateKey;
   }
 
-  public async execute(client: Client): Promise<TransferTransaction> {
+  public async execute(client: Client): Promise<string> {
     let atomicSwap = new TransferTransaction();
 
     if (this.#atomicSwapData.sourceHbarAmount !== undefined) {
@@ -96,6 +96,6 @@ export class SwapRequestCommand {
     atomicSwap = atomicSwap.freezeWith(client);
     atomicSwap = await atomicSwap.sign(this.#senderPrivateKey);
 
-    return atomicSwap;
+    return JSON.stringify(atomicSwap);
   }
 }

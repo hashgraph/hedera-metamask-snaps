@@ -55,7 +55,7 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { SwapRequestFacade } from "./facades/hts/SwapRequestFacade";
+import { SwapRequestFacade } from './facades/hts/SwapRequestFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -372,7 +372,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
-    case 'hts/swap': {
+    case 'hts/createSwapRequest': {
       HederaUtils.isValidSwapParams(request.params);
       return {
         currentAccount: state.currentAccount,
