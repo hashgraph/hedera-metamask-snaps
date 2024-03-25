@@ -22,26 +22,26 @@ import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { SwapRequestCommand } from '../../commands/hts/SwapRequestCommand';
-import type { AtomicSwapRequestParams } from '../../types/params';
+import type { AtomicSwapAcknowledgeParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 import { HederaUtils } from '../../utils/HederaUtils';
 import type { TxReceipt } from '../../types/hedera';
+import { SwapAcknowledgeCommand } from '../../commands/hts/SwapAcknowledgeCommand';
 
-export class SwapRequestFacade {
+export class SwapAcknowledgeFacade {
   /**
    * Wipes the provided amount of fungible or non-fungible tokens from the specified
    * Hedera account. This transaction does not delete tokens from the treasury account.
    * This transaction must be signed by the token's Wipe Key. Wiping an account's tokens
    * burns the tokens and decreases the total supply.
    * @param walletSnapParams - Wallet snap params.
-   * @param swapRequestParams - Parameters for wiping a token.
+   * @param swapAcknowledgeParams - Acknowledgement params.
    * @returns Receipt of the transaction.
    */
-  public static async createSwapRequest(
+  public static async acknowledgeSwapRequest(
     walletSnapParams: WalletSnapParams,
-    swapRequestParams: AtomicSwapRequestParams,
+    swapAcknowledgeParams: AtomicSwapAcknowledgeParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
@@ -66,58 +66,14 @@ export class SwapRequestFacade {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
       const panelToShow = [
-        heading('Create Atomic Swap Request'),
-        text('Are you sure you want to create the following request?'),
+        heading('Acknowledge Atomic Swap Request'),
+        text('Are you sure you want to acknowledge the following request?'),
         divider(),
       ];
 
       panelToShow.push(
-        text(`1st Party Account Id : ${swapRequestParams.sourceAccountId}`),
+        text(`Scheduled Entity Id : ${swapAcknowledgeParams.scheduleId}`),
       );
-
-      panelToShow.push(
-        text(
-          `2nd Party Account Id : ${swapRequestParams.destinationAccountId}`,
-        ),
-      );
-
-      if (swapRequestParams.sourceHbarAmount) {
-        panelToShow.push(
-          text(`1st Party Hbar Amount : ${swapRequestParams.sourceHbarAmount}`),
-        );
-      }
-
-      if (swapRequestParams.destinationHbarAmount) {
-        panelToShow.push(
-          text(
-            `2nd Party Hbar Amount: ${swapRequestParams.destinationHbarAmount}`,
-          ),
-        );
-      }
-
-      if (
-        swapRequestParams.sourceTokenId &&
-        swapRequestParams.sourceTokenAmount
-      ) {
-        panelToShow.push(
-          text(`1st Party Token Id: ${swapRequestParams.sourceTokenId}`),
-          text(
-            `1st Party Token Amount: ${swapRequestParams.sourceTokenAmount}`,
-          ),
-        );
-      }
-
-      if (
-        swapRequestParams.destinationTokenId &&
-        swapRequestParams.destinationTokenAmount
-      ) {
-        panelToShow.push(
-          text(`2nd Party Token Id: ${swapRequestParams.destinationTokenId}`),
-          text(
-            `2nd Party Token Amount: ${swapRequestParams.destinationTokenAmount}`,
-          ),
-        );
-      }
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
@@ -134,7 +90,10 @@ export class SwapRequestFacade {
         throw new Error('client private key was null');
       }
 
-      const command = new SwapRequestCommand(swapRequestParams, privateKeyObj);
+      const command = new SwapAcknowledgeCommand(
+        privateKeyObj,
+        swapAcknowledgeParams.scheduleId,
+      );
 
       return await command.execute(hederaClient.getClient());
     } catch (error: any) {

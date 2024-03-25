@@ -47,7 +47,9 @@ import type {
 } from '../types/hedera';
 import type {
   ApproveAllowanceRequestParams,
-  AssociateTokensRequestParams, AtomicSwapRequestParams,
+  AssociateTokensRequestParams,
+  AtomicSwapAcknowledgeParams,
+  AtomicSwapRequestParams,
   BurnTokenRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
@@ -61,11 +63,11 @@ import type {
   PauseOrDeleteTokenRequestParams,
   ServiceFee,
   SignMessageRequestParams,
-  StakeHbarRequestParams, SwapRequestParams,
+  StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
-  WipeTokenRequestParams
-} from "../types/params";
+  WipeTokenRequestParams,
+} from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
 import { FetchUtils, type FetchResponse } from './FetchUtils';
 import { Utils } from './Utils';
@@ -1636,7 +1638,7 @@ export class HederaUtils {
    * Check Validation of swap request.
    * @param params - Request params.
    */
-  public static isValidSwapParams(
+  public static isValidSwapRequestParams(
     params: unknown,
   ): asserts params is AtomicSwapRequestParams {
     if (
@@ -1652,7 +1654,7 @@ export class HederaUtils {
       );
     }
 
-    const parameter = params as SwapRequestParams;
+    const parameter = params as AtomicSwapRequestParams;
 
     HederaUtils.checkValidString(
       parameter,
@@ -1660,6 +1662,27 @@ export class HederaUtils {
       'destinationAccountId',
       true,
     );
+  }
+
+  /**
+   * Check Validation of swap acknowledgement.
+   * @param params - Request params.
+   */
+  public static isValidSwapAcknowledgeParams(
+    params: unknown,
+  ): asserts params is AtomicSwapAcknowledgeParams {
+    if (params === null || _.isEmpty(params) || !('scheduleId' in params)) {
+      console.error(
+        'Invalid swap Params passed. "scheduleId" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid swap Params passed. "scheduleId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as AtomicSwapAcknowledgeParams;
+
+    HederaUtils.checkValidString(parameter, 'swap', 'scheduleId', true);
   }
 
   public static validHederaNetwork(network: string) {

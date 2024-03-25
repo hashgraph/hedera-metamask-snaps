@@ -155,3 +155,7 @@ export type AtomicSwapRequestParams = {
   sourceHbarAmount?: number;
   destinationHbarAmount?: number;
 };
+
+export type AtomicSwapAcknowledgeParams = {
+  scheduleId: string;
+};

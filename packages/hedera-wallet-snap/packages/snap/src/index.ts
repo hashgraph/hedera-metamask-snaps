@@ -49,6 +49,7 @@ import { FreezeAccountFacade } from './facades/hts/FreezeAccountFacade';
 import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
 import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
+import { SwapAcknowledgeFacade } from './facades/hts/SwapAcknowledgeFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
@@ -373,10 +374,21 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'hts/createSwapRequest': {
-      HederaUtils.isValidSwapParams(request.params);
+      HederaUtils.isValidSwapRequestParams(request.params);
       return {
         currentAccount: state.currentAccount,
         transaction: await SwapRequestFacade.createSwapRequest(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/acknowledgeSwapRequest': {
+      HederaUtils.isValidSwapAcknowledgeParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        transaction: await SwapAcknowledgeFacade.acknowledgeSwapRequest(
           walletSnapParams,
           request.params,
         ),

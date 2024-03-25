@@ -18,32 +18,31 @@
  *
  */
 
-import type { PrivateKey, Client, TransferTransaction } from '@hashgraph/sdk';
+import type { PrivateKey, Client } from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 import { CryptoUtils } from '../../utils/CryptoUtils';
+import { ScheduleSignTransaction } from '@hashgraph/sdk';
 
 export class SwapAcknowledgeCommand {
   readonly #receiverPrivateKey: PrivateKey;
 
-  readonly #transferTransaction: TransferTransaction;
+  readonly #scheduleId: string;
 
-  constructor(
-    receiverPrivateKey: PrivateKey,
-    transferTransaction: TransferTransaction,
-  ) {
+  constructor(receiverPrivateKey: PrivateKey, scheduleId: string) {
     this.#receiverPrivateKey = receiverPrivateKey;
-    this.#transferTransaction = transferTransaction;
+    this.#scheduleId = scheduleId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const atomicSwap = this.#transferTransaction.freezeWith(client);
-
-    const txResponse = await (
-      await atomicSwap.sign(this.#receiverPrivateKey)
+    const signedTx = await (
+      await new ScheduleSignTransaction()
+        .setScheduleId(this.#scheduleId)
+        .freezeWith(client)
+        .sign(this.#receiverPrivateKey)
     ).execute(client);
 
-    const receipt = await txResponse.getReceipt(client);
+    const receipt = await signedTx.getReceipt(client);
 
     let newExchangeRate;
     if (receipt.exchangeRate) {
