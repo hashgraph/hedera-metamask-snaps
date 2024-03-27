@@ -18,92 +18,81 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import _ from 'lodash';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { FreezeAccountCommand } from '../../commands/hts/FreezeAccountCommand';
-import type { TxReceipt } from '../../types/hedera';
-import type { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
-import type { WalletSnapParams } from '../../types/state';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { Utils } from '../../utils/Utils';
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 
-export class FreezeAccountFacade {
+import { providerErrors } from '@metamask/rpc-errors';
+import { divider, heading, text } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import type { TxReceipt } from '../../types/hedera';
+import type { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
+import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+
+export class UpdateTokenFeeScheduleFacade {
   /**
-   * Freezes transfers of the specified token for the account. The transaction must be
-   * signed by the token's Freeze Key.
+   * Updates the fee schedule for a token.
    * @param walletSnapParams - Wallet snap params.
-   * @param freezeAccountRequestParams - Parameters for freezing/unfreezing an account.
-   * @param freeze - If true, the account will be frozen. If false, the account will be unfrozen.
+   * @param updateTokenFeeScheduleRequestParams - Fee sched request params.
    * @returns Receipt of the transaction.
    */
-  public static async freezeAccount(
+  public static async updateTokenFeeSchedule(
     walletSnapParams: WalletSnapParams,
-    freezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
-    freeze: boolean,
+    updateTokenFeeScheduleRequestParams: UpdateTokenFeeScheduleRequestParams,
   ): Promise<TxReceipt> {
+    if (updateTokenFeeScheduleRequestParams.customFees === undefined) {
+      throw new Error('null custom fee schedule given');
+    }
+
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const { tokenId, accountId } = freezeAccountRequestParams;
-
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    const freezeText = freeze ? 'freeze' : 'unfreeze';
+    const { tokenId, customFees } = updateTokenFeeScheduleRequestParams;
+
+    const mirrorTokenInfo = await CryptoUtils.getTokenById(
+      tokenId,
+      mirrorNodeUrl,
+    );
+
+    let feeScheduleDisplayStatements = '';
+
+    for (const fee of customFees) {
+      const {
+        feeCollectorAccountId,
+        hbarAmount,
+        tokenAmount,
+        denominatingTokenId,
+        allCollectorsAreExempt,
+      } = fee;
+
+      feeScheduleDisplayStatements +=
+        `fee collector id:${feeCollectorAccountId}\nhbarAmount: ${hbarAmount}\n` +
+        `tokenAmount: ${tokenAmount}\ndenominatingTokenId: ${denominatingTokenId}\n` +
+        `allCollectorsAreExempt: ${allCollectorsAreExempt}`;
+    }
 
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading(
-          `${Utils.capitalizeFirstLetter(
-            freezeText,
-          )} account for the specified token`,
+        heading('Update a token'),
+        text(
+          'Learn more about updating a token fee schedule [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/update-a-fee-schedule)',
         ),
         text(
-          `Learn more about ${freezeText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/${freezeText}-an-account)`,
-        ),
-        text(
-          `You are about to ${freezeText} transfers of the specified token for the given account:`,
+          `You are about to modify a token's fee schedule with the following details:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
-        text(`Account Id to ${freezeText} transfers for: ${accountId}`),
+        text(`Id: ${tokenId}`),
       ];
-      const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
-      if (_.isEmpty(tokenInfo)) {
-        const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
-        console.error(errMessage);
-        panelToShow.push(
-          text(
-            `Token Info: Not available. Please proceed only if you know this Token/NFT exists!`,
-          ),
-        );
-      }
-      panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
-      panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-      panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
-      panelToShow.push(
-        text(
-          `Total Supply: ${(
-            Number(tokenInfo.total_supply) /
-            Math.pow(10, Number(tokenInfo.decimals))
-          ).toString()}`,
-        ),
-      );
-      panelToShow.push(
-        text(
-          `Max Supply: ${(
-            Number(tokenInfo.max_supply) /
-            Math.pow(10, Number(tokenInfo.decimals))
-          ).toString()}`,
-        ),
-      );
+
+      panelToShow.push(text(feeScheduleDisplayStatements));
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
@@ -126,15 +115,21 @@ export class FreezeAccountFacade {
       if (hederaClient === null) {
         throw new Error('hedera client returned null');
       }
-      const command = new FreezeAccountCommand(freeze, tokenId, accountId);
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
         throw new Error('private key object returned null');
       }
+      const command = new UpdateTokenFeeScheduleCommand(
+        tokenId,
+        privateKeyObj,
+        Number(mirrorTokenInfo.decimals),
+        updateTokenFeeScheduleRequestParams.customFees,
+      );
+
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to ${freezeText} an account: ${String(
+      const errMessage = `Error while trying to update a token: ${String(
         error,
       )}`;
       console.error(errMessage);

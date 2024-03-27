@@ -24,9 +24,9 @@ import {
   type AccountId,
   type Client,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../types/hedera';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { Utils } from '../utils/Utils';
+import type { TxReceipt } from '../../types/hedera';
+import { Utils } from '../../utils/Utils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 
 export class DeleteAllowanceCommand {
   readonly #assetType: string;

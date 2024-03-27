@@ -37,6 +37,8 @@ import {
   SignMessageRequestParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
+  UpdateTokenRequestParams,
+  UpdateTokenFeeScheduleRequestParams,
   WipeTokenRequestParams,
 } from '../types/snap';
 
@@ -468,6 +470,68 @@ export const createToken = async (
           network,
           mirrorNodeUrl,
           ...createTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "updateToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param updateTokenRequestParams
+ * @param externalAccountparams
+ */
+export const updateToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  updateTokenRequestParams: UpdateTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/updateToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...updateTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "updateTokenFeeSchedule" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param updateTokenFeeScheduleRequestParams
+ * @param externalAccountparams
+ */
+export const updateTokenFeeSchedule = async (
+  network: string,
+  mirrorNodeUrl: string,
+  updateTokenFeeScheduleRequestParams: UpdateTokenFeeScheduleRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/updateTokenFeeSchedule',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...updateTokenFeeScheduleRequestParams,
           ...externalAccountparams,
         },
       },
