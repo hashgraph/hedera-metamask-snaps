@@ -21,17 +21,17 @@
 import type {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
-} from '../types/params';
-import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
+} from '../../types/params';
+import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { providerErrors } from '@metamask/rpc-errors';
-import type { WalletSnapParams } from '../types/state';
-import { SnapUtils } from '../utils/SnapUtils';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { ApproveAllowanceCommand } from '../commands/ApproveAllowanceCommand';
+import type { WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { ApproveAllowanceCommand } from '../../commands/allowance/ApproveAllowanceCommand';
 
 export class ApproveAllowanceFacade {
   public static async approveAllowance(

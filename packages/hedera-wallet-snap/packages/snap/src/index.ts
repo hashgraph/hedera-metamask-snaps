@@ -32,11 +32,11 @@ import {
 } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
-import { ApproveAllowanceFacade } from './facades/ApproveAllowanceFacade';
-import { DeleteAccountFacade } from './facades/DeleteAccountFacade';
-import { DeleteAllowanceFacade } from './facades/DeleteAllowanceFacade';
-import { GetAccountBalanceFacade } from './facades/GetAccountBalanceFacade';
-import { GetAccountInfoFacade } from './facades/GetAccountInfoFacade';
+import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
+import { DeleteAccountFacade } from './facades/account/DeleteAccountFacade';
+import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
+import { GetAccountBalanceFacade } from './facades/account/GetAccountBalanceFacade';
+import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
@@ -45,7 +45,7 @@ import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
 import { EnableKYCAccountFacade } from './facades/hts/EnableKYCAccountFacade';
-import { FreezeAccountFacade } from './facades/hts/FreezeAccountFacade';
+import { FreezeAccountFacade } from './facades/account/FreezeAccountFacade';
 import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
 import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
@@ -55,6 +55,8 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
+import { UpdateTokenFacade } from './facades/hts/UpdateTokenFacade';
+import { UpdateTokenFeeScheduleFacade } from './facades/hts/UpdateTokenFeeScheduleFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -365,6 +367,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await DeleteTokenFacade.deleteToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/updateToken': {
+      HederaUtils.isValidUpdateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTokenFacade.updateToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/updateTokenFeeSchedule': {
+      HederaUtils.isValidUpdateTokenFeeScheduleParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTokenFeeScheduleFacade.updateTokenFeeSchedule(
           walletSnapParams,
           request.params,
         ),
