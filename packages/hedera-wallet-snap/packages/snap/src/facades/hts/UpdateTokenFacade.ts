@@ -25,11 +25,12 @@ import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
 import type { TxReceipt } from '../../types/hedera';
 import type { UpdateTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
 
 export class UpdateTokenFacade {
   /**
@@ -44,24 +45,28 @@ export class UpdateTokenFacade {
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
-    const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+    const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+      state.currentAccount;
 
-    const { privateKey, publicKey, curve } =
+    const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
     const {
       tokenId,
       name,
       symbol,
+      treasuryAccountId,
+      adminPublicKey,
       kycPublicKey,
       freezePublicKey,
+      feeSchedulePublicKey,
       pausePublicKey,
       wipePublicKey,
       supplyPublicKey,
-      feeSchedulePublicKey,
       expirationTime,
-      autoRenewAccountId,
       tokenMemo,
+      autoRenewAccountId,
+      autoRenewPeriod,
     } = updateTokenRequestParams;
 
     let txReceipt = {} as TxReceipt;
@@ -71,41 +76,94 @@ export class UpdateTokenFacade {
         text(
           'Learn more about updating tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/update-a-token)',
         ),
-        text(`You are about to modify a token with the following details:`),
+        text(`You are about to modify the following token:`),
         divider(),
-        text(`Id: ${tokenId}`),
-
-        text(`Name: ${name}`),
-        text(`Symbol: ${symbol}`),
+        text(`Asset Id: ${tokenId}`),
       ];
 
+      const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
+      if (_.isEmpty(tokenInfo)) {
+        const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
+        console.error(errMessage);
+        panelToShow.push(text(errMessage));
+        panelToShow.push(
+          text(`Proceed only if you are sure this asset ID exists`),
+        );
+      } else {
+        panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
+        panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
+        panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
+        panelToShow.push(
+          text(
+            `Total Supply: ${(
+              Number(tokenInfo.total_supply) /
+              Math.pow(10, Number(tokenInfo.decimals))
+            ).toString()}`,
+          ),
+        );
+        panelToShow.push(
+          text(
+            `Max Supply: ${(
+              Number(tokenInfo.max_supply) /
+              Math.pow(10, Number(tokenInfo.decimals))
+            ).toString()}`,
+          ),
+        );
+      }
+      panelToShow.push(divider());
+
       panelToShow.push(
-        text(`Auto Renew Account ID: ${autoRenewAccountId}`),
-        text(`Token Memo: ${tokenMemo}`),
-        text(`Admin Key: ${publicKey}`),
-        text(`Treasury Account: ${hederaAccountId}`),
+        text(
+          `You are about to modify the following properties for this token:`,
+        ),
       );
 
+      if (!_.isEmpty(name)) {
+        panelToShow.push(text(`New Token Name: ${name}`));
+      }
+      if (!_.isEmpty(symbol)) {
+        panelToShow.push(text(`New Token Symbol: ${symbol}`));
+      }
+      if (!_.isEmpty(tokenMemo)) {
+        panelToShow.push(text(`New Token Memo: ${tokenMemo}`));
+      }
+      if (!_.isEmpty(treasuryAccountId)) {
+        panelToShow.push(text(`New Treasury Account Id: ${treasuryAccountId}`));
+      }
+      if (!_.isEmpty(autoRenewAccountId)) {
+        panelToShow.push(
+          text(`New Auto Renew Account ID: ${autoRenewAccountId}`),
+        );
+      }
+      if (!_.isEmpty(expirationTime)) {
+        panelToShow.push(text(`New Expiration Time: ${expirationTime}`));
+      }
+      if (autoRenewPeriod) {
+        panelToShow.push(text(`New Auto Renew Period: ${autoRenewPeriod}`));
+      }
+
+      if (!_.isEmpty(adminPublicKey)) {
+        panelToShow.push(text(`New Admin Public Key: ${adminPublicKey}`));
+      }
       if (!_.isEmpty(kycPublicKey)) {
-        panelToShow.push(text(kycPublicKey as string));
+        panelToShow.push(text(`New KYC Public Key: ${kycPublicKey}`));
       }
       if (!_.isEmpty(freezePublicKey)) {
-        panelToShow.push(text(freezePublicKey as string));
-      }
-      if (!_.isEmpty(pausePublicKey)) {
-        panelToShow.push(text(pausePublicKey as string));
-      }
-      if (!_.isEmpty(wipePublicKey)) {
-        panelToShow.push(text(wipePublicKey as string));
-      }
-      if (!_.isEmpty(supplyPublicKey)) {
-        panelToShow.push(text(supplyPublicKey as string));
+        panelToShow.push(text(`New Freeze Public Key: ${freezePublicKey}`));
       }
       if (!_.isEmpty(feeSchedulePublicKey)) {
-        panelToShow.push(text(feeSchedulePublicKey as string));
+        panelToShow.push(
+          text(`New Fee Schedule Public Key: ${feeSchedulePublicKey}`),
+        );
       }
-      if (expirationTime) {
-        panelToShow.push(text(`Expiration Time: ${expirationTime}`));
+      if (!_.isEmpty(pausePublicKey)) {
+        panelToShow.push(text(`New Pause Public Key: ${pausePublicKey}`));
+      }
+      if (!_.isEmpty(wipePublicKey)) {
+        panelToShow.push(text(`New Wipe Public Key: ${wipePublicKey}`));
+      }
+      if (!_.isEmpty(supplyPublicKey)) {
+        panelToShow.push(text(`New Supply Public Key: ${supplyPublicKey}`));
       }
 
       const dialogParams: DialogParams = {

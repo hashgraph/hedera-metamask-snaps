@@ -1263,6 +1263,32 @@ export class HederaUtils {
 
     const parameter = params as UpdateTokenRequestParams;
 
+    if (
+      !(
+        parameter.name ||
+        parameter.symbol ||
+        parameter.treasuryAccountId ||
+        parameter.adminPublicKey ||
+        parameter.kycPublicKey ||
+        parameter.freezePublicKey ||
+        parameter.feeSchedulePublicKey ||
+        parameter.pausePublicKey ||
+        parameter.wipePublicKey ||
+        parameter.supplyPublicKey ||
+        parameter.expirationTime ||
+        parameter.tokenMemo ||
+        parameter.autoRenewAccountId ||
+        parameter.autoRenewPeriod
+      )
+    ) {
+      console.error(
+        'Invalid updateToken Params passed. At least one of the following must be included: "name", "symbol", "treasuryAccountId", "adminPublicKey", "kycPublicKey", "freezePublicKey", "feeSchedulePublicKey", "pausePublicKey", "wipePublicKey", "supplyPublicKey", "expirationTime", "tokenMemo", "autoRenewAccountId", "autoRenewPeriod"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid updateToken Params passed. At least one of the following must be included: "name", "symbol", "treasuryAccountId", "adminPublicKey", "kycPublicKey", "freezePublicKey", "feeSchedulePublicKey", "pausePublicKey", "wipePublicKey", "supplyPublicKey", "expirationTime", "tokenMemo", "autoRenewAccountId", "autoRenewPeriod"',
+      );
+    }
+
     if (parameter.name) {
       HederaUtils.checkValidString(parameter, 'updateToken', 'name', false);
       if (parameter.name.length > 100) {
@@ -1287,86 +1313,77 @@ export class HederaUtils {
       }
     }
 
-    if (parameter.kycPublicKey) {
-      HederaUtils.checkValidPublicKey(
-        parameter,
-        'updateToken',
-        'kycPublicKey',
-        false,
-      );
-    }
+    HederaUtils.checkValidString(parameter, 'updateToken', 'tokenMemo', false);
 
-    if (parameter.freezePublicKey) {
-      HederaUtils.checkValidPublicKey(
-        parameter,
-        'updateToken',
-        'freezePublicKey',
-        false,
-      );
-    }
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'updateToken',
+      'treasuryAccountId',
+      false,
+    );
 
-    if (parameter.pausePublicKey) {
-      HederaUtils.checkValidPublicKey(
-        parameter,
-        'updateToken',
-        'pausePublicKey',
-        false,
-      );
-    }
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'updateToken',
+      'autoRenewAccountId',
+      false,
+    );
 
-    if (parameter.wipePublicKey) {
-      HederaUtils.checkValidPublicKey(
-        parameter,
-        'updateToken',
-        'wipePublicKey',
-        false,
-      );
-    }
+    HederaUtils.checkValidTimestamp(
+      parameter,
+      'updateToken',
+      'expirationTime',
+      false,
+    );
 
-    if (parameter.supplyPublicKey) {
-      HederaUtils.checkValidPublicKey(
-        parameter,
-        'updateToken',
-        'supplyPublicKey',
-        false,
-      );
-    }
+    HederaUtils.checkValidNumber(
+      parameter,
+      'updateToken',
+      'autoRenewPeriod',
+      false,
+    );
 
-    if (parameter.feeSchedulePublicKey) {
-      HederaUtils.checkValidPublicKey(
-        parameter,
-        'updateToken',
-        'feeSchedulePublicKey',
-        false,
-      );
-    }
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'kycPublicKey',
+      false,
+    );
 
-    if (parameter.expirationTime) {
-      HederaUtils.checkValidTimestamp(
-        parameter,
-        'updateToken',
-        'expirationTime',
-        false,
-      );
-    }
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'freezePublicKey',
+      false,
+    );
 
-    if (parameter.autoRenewAccountId) {
-      HederaUtils.checkValidString(
-        parameter,
-        'updateToken',
-        'autoRenewAccountId',
-        false,
-      );
-    }
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'feeSchedulePublicKey',
+      false,
+    );
 
-    if (parameter.tokenMemo) {
-      HederaUtils.checkValidString(
-        parameter,
-        'updateToken',
-        'tokenMemo',
-        false,
-      );
-    }
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'pausePublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'wipePublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'supplyPublicKey',
+      false,
+    );
   }
 
   /**
