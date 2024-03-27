@@ -18,18 +18,17 @@
  *
  */
 
-import type { WalletSnapParams } from '../types/state';
-import type { DeleteAccountRequestParams } from '../types/params';
-import type { TxReceipt, AccountBalance } from '../types/hedera';
+import type { WalletSnapParams } from '../../types/state';
+import type { DeleteAccountRequestParams } from '../../types/params';
+import type { TxReceipt, AccountBalance } from '../../types/hedera';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../utils/SnapUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-
-import type { AccountInfo, Account } from '../types/account';
-import { SnapState } from '../snap/SnapState';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { DeleteAccountCommand } from '../commands/DeleteAccountCommand';
+import type { AccountInfo, Account } from '../../types/account';
+import { SnapState } from '../../snap/SnapState';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { DeleteAccountCommand } from '../../commands/account/DeleteAccountCommand';
 
 export class DeleteAccountFacade {
   /**

@@ -1,3 +1,4 @@
 dist
+coverage
 postBuild.js
 node_modules

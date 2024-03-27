@@ -18,17 +18,17 @@
  *
  */
 
-import type { ApproveAllowanceAssetDetail } from '../types/params';
-import type { TxReceipt } from '../types/hedera';
+import type { ApproveAllowanceAssetDetail } from '../../types/params';
+import type { TxReceipt } from '../../types/hedera';
 import {
   AccountAllowanceApproveTransaction,
   type AccountId,
   type Client,
   Hbar,
 } from '@hashgraph/sdk';
-import { Utils } from '../utils/Utils';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { EMPTY_STRING } from '../types/constants';
+import { Utils } from '../../utils/Utils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { EMPTY_STRING } from '../../types/constants';
 
 export class ApproveAllowanceCommand {
   readonly #spenderAccountId: string;
