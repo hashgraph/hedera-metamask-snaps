@@ -25,6 +25,7 @@ import type {
 } from '@metamask/snaps-sdk';
 import {
   MethodNotFoundError,
+  copyable,
   divider,
   heading,
   panel,
@@ -32,22 +33,24 @@ import {
 } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
-import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
-import { DeleteAccountFacade } from './facades/account/DeleteAccountFacade';
-import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
-import { GetAccountBalanceFacade } from './facades/account/GetAccountBalanceFacade';
-import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { DeleteAccountFacade } from './facades/account/DeleteAccountFacade';
+import { FreezeAccountFacade } from './facades/account/FreezeAccountFacade';
+import { GetAccountBalanceFacade } from './facades/account/GetAccountBalanceFacade';
+import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
+import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
+import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
 import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
 import { EnableKYCAccountFacade } from './facades/hts/EnableKYCAccountFacade';
-import { FreezeAccountFacade } from './facades/account/FreezeAccountFacade';
 import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
+import { UpdateTokenFacade } from './facades/hts/UpdateTokenFacade';
+import { UpdateTokenFeeScheduleFacade } from './facades/hts/UpdateTokenFeeScheduleFacade';
 import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
@@ -55,8 +58,6 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { UpdateTokenFacade } from './facades/hts/UpdateTokenFacade';
-import { UpdateTokenFeeScheduleFacade } from './facades/hts/UpdateTokenFeeScheduleFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -117,7 +118,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       await snap.request({
         method: 'snap_dialog',
         params: {
-          type: 'confirmation',
+          type: 'alert',
           content: panel([
             text(`Hello, **${origin}**!`),
             text(
@@ -130,6 +131,27 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         currentAccount: state.currentAccount,
       };
     case 'getCurrentAccount':
+      return {
+        currentAccount: state.currentAccount,
+      };
+    case 'showAccountPrivateKey':
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: panel([
+            text(`Request from: **${origin}**`),
+            text(
+              'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
+            ),
+            copyable(
+              state.accountState[state.currentAccount.hederaEvmAddress][
+                state.currentAccount.network
+              ].keyStore.privateKey,
+            ),
+          ]),
+        },
+      });
       return {
         currentAccount: state.currentAccount,
       };
@@ -158,9 +180,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         // eslint-disable-next-line prettier/prettier
-        accountBalance: await GetAccountBalanceFacade.getAccountBalance(
-          walletSnapParams,
-        ),
+        accountBalance:
+          await GetAccountBalanceFacade.getAccountBalance(walletSnapParams),
       };
     }
     case 'getTransactions': {

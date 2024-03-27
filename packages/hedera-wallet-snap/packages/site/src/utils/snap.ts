@@ -911,4 +911,32 @@ export const wipeToken = async (
   });
 };
 
+/**
+ * Invoke the "showAccountPrivateKey" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param externalAccountparams
+ */
+export const showAccountPrivateKey = async (
+  network: string,
+  mirrorNodeUrl: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'showAccountPrivateKey',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
