@@ -64,6 +64,8 @@ import type {
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
+  UpdateTokenFeeScheduleRequestParams,
+  UpdateTokenRequestParams,
   WipeTokenRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
@@ -1180,6 +1182,208 @@ export class HederaUtils {
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
     }
+  }
+
+  /**
+   * Check Validation of updateToken request.
+   * @param params - Request params.
+   */
+  public static isValidUpdateTokenFeeScheduleParams(
+    params: unknown,
+  ): asserts params is UpdateTokenFeeScheduleRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('tokenId' in params) ||
+      !('customFees' in params)
+    ) {
+      console.error(
+        'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
+      );
+    }
+
+    const parameter = params as UpdateTokenFeeScheduleRequestParams;
+
+    for (const customFee of parameter.customFees) {
+      HederaUtils.checkValidString(
+        customFee,
+        'updateTokenFeeSchedule',
+        'feeCollectorAccountId',
+        true,
+      );
+
+      HederaUtils.checkValidNumber(
+        customFee,
+        'updateTokenFeeSchedule',
+        'hbarAmount',
+        false,
+      );
+
+      HederaUtils.checkValidNumber(
+        customFee,
+        'updateTokenFeeSchedule',
+        'tokenAmount',
+        false,
+      );
+
+      HederaUtils.checkValidString(
+        customFee,
+        'updateTokenFeeSchedule',
+        'denominatingTokenId',
+        false,
+      );
+
+      HederaUtils.checkValidBoolean(
+        customFee,
+        'updateTokenFeeSchedule',
+        'allCollectorsAreExempt',
+        false,
+      );
+    }
+  }
+
+  /**
+   * Check Validation of updateToken request.
+   * @param params - Request params.
+   */
+  public static isValidUpdateTokenParams(
+    params: unknown,
+  ): asserts params is UpdateTokenRequestParams {
+    if (params === null || _.isEmpty(params) || !('tokenId' in params)) {
+      console.error(
+        'Invalid updateToken Params passed. "tokenId" must be included.',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid updateToken Params passed. "tokenId" must be included.',
+      );
+    }
+
+    const parameter = params as UpdateTokenRequestParams;
+
+    if (
+      !(
+        parameter.name ||
+        parameter.symbol ||
+        parameter.treasuryAccountId ||
+        parameter.adminPublicKey ||
+        parameter.kycPublicKey ||
+        parameter.freezePublicKey ||
+        parameter.feeSchedulePublicKey ||
+        parameter.pausePublicKey ||
+        parameter.wipePublicKey ||
+        parameter.supplyPublicKey ||
+        parameter.expirationTime ||
+        parameter.tokenMemo ||
+        parameter.autoRenewAccountId ||
+        parameter.autoRenewPeriod
+      )
+    ) {
+      console.error(
+        'Invalid updateToken Params passed. At least one of the following must be included: "name", "symbol", "treasuryAccountId", "adminPublicKey", "kycPublicKey", "freezePublicKey", "feeSchedulePublicKey", "pausePublicKey", "wipePublicKey", "supplyPublicKey", "expirationTime", "tokenMemo", "autoRenewAccountId", "autoRenewPeriod"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid updateToken Params passed. At least one of the following must be included: "name", "symbol", "treasuryAccountId", "adminPublicKey", "kycPublicKey", "freezePublicKey", "feeSchedulePublicKey", "pausePublicKey", "wipePublicKey", "supplyPublicKey", "expirationTime", "tokenMemo", "autoRenewAccountId", "autoRenewPeriod"',
+      );
+    }
+
+    if (parameter.name) {
+      HederaUtils.checkValidString(parameter, 'updateToken', 'name', false);
+      if (parameter.name.length > 100) {
+        console.error(
+          'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
+        );
+      }
+    }
+
+    if (parameter.symbol) {
+      HederaUtils.checkValidString(parameter, 'updateToken', 'symbol', false);
+      if (parameter.symbol.length > 100) {
+        console.error(
+          'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
+        );
+      }
+    }
+
+    HederaUtils.checkValidString(parameter, 'updateToken', 'tokenMemo', false);
+
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'updateToken',
+      'treasuryAccountId',
+      false,
+    );
+
+    HederaUtils.checkValidAccountId(
+      parameter,
+      'updateToken',
+      'autoRenewAccountId',
+      false,
+    );
+
+    HederaUtils.checkValidTimestamp(
+      parameter,
+      'updateToken',
+      'expirationTime',
+      false,
+    );
+
+    HederaUtils.checkValidNumber(
+      parameter,
+      'updateToken',
+      'autoRenewPeriod',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'kycPublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'freezePublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'feeSchedulePublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'pausePublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'wipePublicKey',
+      false,
+    );
+
+    HederaUtils.checkValidPublicKey(
+      parameter,
+      'updateToken',
+      'supplyPublicKey',
+      false,
+    );
   }
 
   /**

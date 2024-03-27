@@ -30,6 +30,7 @@ import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
+import { ShowAccountPrivateKey } from '../components/cards/ShowAccountPrivateKey';
 import { SignMessage } from '../components/cards/SignMessage';
 import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
@@ -48,6 +49,8 @@ import { MintToken } from '../components/cards/hts/MintToken';
 import { PauseToken } from '../components/cards/hts/PauseToken';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
+import { UpdateToken } from '../components/cards/hts/UpdateToken';
+import { UpdateTokenFeeSchedule } from '../components/cards/hts/UpdateTokenFeeSchedule';
 import { WipeToken } from '../components/cards/hts/WipeToken';
 import { networkOptions } from '../config/constants';
 import {
@@ -211,6 +214,18 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
+        <UpdateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTokenFeeSchedule
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
         <DeleteToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
@@ -308,6 +323,12 @@ const Index = () => {
         />
 
         <DeleteAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <ShowAccountPrivateKey
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
