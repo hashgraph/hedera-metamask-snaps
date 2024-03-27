@@ -19,95 +19,64 @@
  */
 
 import {
+  type AccountId,
+  type Client,
   Hbar,
-  ScheduleCreateTransaction,
+  NftId,
   TransferTransaction,
 } from '@hashgraph/sdk';
-import type { PrivateKey, Client } from '@hashgraph/sdk';
-import type { AtomicSwapRequestParams } from '../../types/params';
-import type { TxReceipt } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
+import { ethers } from 'ethers';
+import _ from 'lodash';
+import type { AtomicSwap, TxReceipt } from '../../types/hedera';
+import { AssetType } from '../../types/hedera';
 import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
 export class SwapRequestCommand {
-  readonly #atomicSwapData: AtomicSwapRequestParams;
+  readonly #swaps: AtomicSwap[];
 
-  readonly #senderPrivateKey: PrivateKey;
+  readonly #memo: string | null;
+
+  readonly #maxFee: number | null;
+
+  readonly #serviceFeesToPay: Record<string, number>;
+
+  readonly #serviceFeeToAddress: string | null;
 
   constructor(
-    atomicSwapData: AtomicSwapRequestParams,
-    senderPrivateKey: PrivateKey,
+    swaps: AtomicSwap[],
+    memo: string | null,
+    maxFee: number | null,
+    serviceFeesToPay: Record<string, number>,
+    serviceFeeToAddress: string | null,
   ) {
-    this.#atomicSwapData = atomicSwapData;
-    this.#senderPrivateKey = senderPrivateKey;
+    this.#swaps = swaps;
+    this.#memo = memo;
+    this.#maxFee = maxFee;
+    this.#serviceFeesToPay = serviceFeesToPay;
+    this.#serviceFeeToAddress = serviceFeeToAddress;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    let atomicSwap = new TransferTransaction();
+    const serviceFeeToAddr: string = this.#serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
-    if (this.#atomicSwapData.sourceHbarAmount !== undefined) {
-      atomicSwap = atomicSwap.addHbarTransfer(
-        this.#atomicSwapData.sourceAccountId,
-        new Hbar(-this.#atomicSwapData.sourceHbarAmount),
-      );
-      atomicSwap = atomicSwap.addHbarTransfer(
-        this.#atomicSwapData.destinationAccountId,
-        new Hbar(this.#atomicSwapData.sourceHbarAmount),
-      );
+    const transaction = new TransferTransaction().setTransactionMemo(
+      this.#memo ?? '',
+    );
+
+    if (this.#maxFee) {
+      transaction.setMaxTransactionFee(new Hbar(this.#maxFee.toFixed(8)));
     }
 
-    if (this.#atomicSwapData.destinationHbarAmount !== undefined) {
-      atomicSwap = atomicSwap.addHbarTransfer(
-        this.#atomicSwapData.destinationAccountId,
-        -this.#atomicSwapData.destinationHbarAmount,
-      );
-
-      atomicSwap = atomicSwap.addHbarTransfer(
-        this.#atomicSwapData.sourceAccountId,
-        this.#atomicSwapData.destinationHbarAmount,
-      );
+    for (const swap of this.#swaps) {
+      this.#processSwap(transaction, swap, client, serviceFeeToAddr);
     }
 
-    if (
-      this.#atomicSwapData.sourceTokenId !== undefined &&
-      this.#atomicSwapData.sourceTokenAmount !== undefined
-    ) {
-      atomicSwap = atomicSwap.addTokenTransfer(
-        this.#atomicSwapData.sourceTokenId,
-        this.#atomicSwapData.sourceAccountId,
-        -this.#atomicSwapData.sourceTokenAmount,
-      );
-      atomicSwap = atomicSwap.addTokenTransfer(
-        this.#atomicSwapData.sourceTokenId,
-        this.#atomicSwapData.destinationAccountId,
-        this.#atomicSwapData.sourceTokenAmount,
-      );
-    }
+    transaction.freezeWith(client);
 
-    if (
-      this.#atomicSwapData.destinationTokenId !== undefined &&
-      this.#atomicSwapData.destinationTokenAmount !== undefined
-    ) {
-      atomicSwap = atomicSwap.addTokenTransfer(
-        this.#atomicSwapData.destinationTokenId,
-        this.#atomicSwapData.destinationAccountId,
-        -this.#atomicSwapData.destinationTokenAmount,
-      );
-      atomicSwap = atomicSwap.addTokenTransfer(
-        this.#atomicSwapData.destinationTokenId,
-        this.#atomicSwapData.sourceAccountId,
-        this.#atomicSwapData.destinationTokenAmount,
-      );
-    }
+    const txResponse = await transaction.execute(client);
 
-    atomicSwap = atomicSwap.freezeWith(client);
-    atomicSwap = await atomicSwap.sign(this.#senderPrivateKey);
-
-    const scheduleTransaction = await new ScheduleCreateTransaction()
-      .setScheduledTransaction(atomicSwap)
-      .execute(client);
-
-    const receipt = await scheduleTransaction.getReceipt(client);
+    const receipt = await txResponse.getReceipt(client);
 
     let newExchangeRate;
     if (receipt.exchangeRate) {
@@ -140,5 +109,204 @@ export class SwapRequestCommand {
       duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
       children: JSON.parse(JSON.stringify(receipt.children)),
     } as TxReceipt;
+  }
+
+  #processSwap(
+    transaction: TransferTransaction,
+    swap: AtomicSwap,
+    client: Client,
+    serviceFeeToAddr: string,
+  ) {
+    this.#processSwapReceiverData(transaction, swap, client, serviceFeeToAddr);
+    // this.#processSwapSenderData(transaction, swap, client, serviceFeeToAddr);
+  }
+
+  #processSwapReceiverData(
+    transaction: TransferTransaction,
+    swap: AtomicSwap,
+    client: Client,
+    serviceFeeToAddr: string,
+  ) {
+    if (swap.receiver.assetType === AssetType.HBAR) {
+      if (ethers.isAddress(swap.receiver.accountId)) {
+        swap.receiver.accountId = `0.0.${swap.receiver.accountId.slice(2)}`;
+      }
+      if (ethers.isAddress(swap.sender.accountId)) {
+        swap.sender.accountId = `0.0.${swap.sender.accountId.slice(2)}`;
+      }
+
+      transaction.addHbarTransfer(
+        swap.receiver.accountId,
+        swap.receiver.amount,
+      );
+
+      if (_.isEmpty(swap.sender.accountId)) {
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -swap.receiver.amount,
+        );
+      } else {
+        transaction.addApprovedHbarTransfer(
+          swap.sender.accountId,
+          -swap.receiver.amount,
+        );
+      }
+
+      // Service Fee
+      if (this.#serviceFeesToPay[swap.receiver.assetType] > 0) {
+        transaction.addHbarTransfer(
+          serviceFeeToAddr,
+          this.#serviceFeesToPay[swap.receiver.assetType],
+        );
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -this.#serviceFeesToPay[swap.receiver.assetType],
+        );
+      }
+    } else if (swap.receiver.assetType === 'TOKEN') {
+      const assetId = swap.receiver.assetId as string;
+      const multiplier = Math.pow(10, swap.receiver.decimals as number);
+
+      transaction.addTokenTransfer(
+        assetId,
+        swap.receiver.accountId,
+        swap.receiver.amount * multiplier,
+      );
+      if (_.isEmpty(swap.sender.accountId)) {
+        transaction.addTokenTransfer(
+          assetId,
+          client.operatorAccountId as AccountId,
+          -(swap.receiver.amount * multiplier),
+        );
+      } else {
+        transaction.addApprovedTokenTransfer(
+          assetId,
+          swap.sender.accountId,
+          -(swap.receiver.amount * multiplier),
+        );
+      }
+
+      // Service Fee
+      if (this.#serviceFeesToPay[assetId] > 0) {
+        transaction.addTokenTransfer(
+          assetId,
+          serviceFeeToAddr,
+          this.#serviceFeesToPay[assetId] * multiplier,
+        );
+        transaction.addTokenTransfer(
+          assetId,
+          client.operatorAccountId as AccountId,
+          -(this.#serviceFeesToPay[assetId] * multiplier),
+        );
+      }
+    } else if (swap.receiver.assetType === AssetType.NFT) {
+      const assetId = NftId.fromString(swap.receiver.assetId as string);
+      if (_.isEmpty(swap.sender.accountId)) {
+        transaction.addNftTransfer(
+          assetId,
+          client.operatorAccountId as AccountId,
+          swap.receiver.accountId,
+        );
+      } else {
+        transaction.addApprovedNftTransfer(
+          assetId,
+          swap.sender.accountId,
+          swap.receiver.accountId,
+        );
+      }
+    }
+  }
+
+  #processSwapSenderData(
+    transaction: TransferTransaction,
+    swap: AtomicSwap,
+    client: Client,
+    serviceFeeToAddr: string,
+  ) {
+    if (swap.sender.assetType === AssetType.HBAR) {
+      if (ethers.isAddress(swap.sender.accountId)) {
+        swap.sender.accountId = `0.0.${swap.sender.accountId.slice(2)}`;
+      }
+      if (ethers.isAddress(swap.receiver.accountId)) {
+        swap.receiver.accountId = `0.0.${swap.receiver.accountId.slice(2)}`;
+      }
+
+      transaction.addHbarTransfer(swap.sender.accountId, swap.sender.amount);
+
+      if (_.isEmpty(swap.receiver.accountId)) {
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -swap.sender.amount,
+        );
+      } else {
+        transaction.addApprovedHbarTransfer(
+          swap.receiver.accountId,
+          -swap.sender.amount,
+        );
+      }
+
+      // Service Fee
+      if (this.#serviceFeesToPay[swap.sender.assetType] > 0) {
+        transaction.addHbarTransfer(
+          serviceFeeToAddr,
+          this.#serviceFeesToPay[swap.sender.assetType],
+        );
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -this.#serviceFeesToPay[swap.sender.assetType],
+        );
+      }
+    } else if (swap.sender.assetType === 'TOKEN') {
+      const assetId = swap.sender.assetId as string;
+      const multiplier = Math.pow(10, swap.sender.decimals as number);
+
+      transaction.addTokenTransfer(
+        assetId,
+        swap.sender.accountId,
+        swap.sender.amount * multiplier,
+      );
+      if (_.isEmpty(swap.receiver.accountId)) {
+        transaction.addTokenTransfer(
+          assetId,
+          client.operatorAccountId as AccountId,
+          -(swap.sender.amount * multiplier),
+        );
+      } else {
+        transaction.addApprovedTokenTransfer(
+          assetId,
+          swap.receiver.accountId,
+          -(swap.sender.amount * multiplier),
+        );
+      }
+
+      // Service Fee
+      if (this.#serviceFeesToPay[assetId] > 0) {
+        transaction.addTokenTransfer(
+          assetId,
+          serviceFeeToAddr,
+          this.#serviceFeesToPay[assetId] * multiplier,
+        );
+        transaction.addTokenTransfer(
+          assetId,
+          client.operatorAccountId as AccountId,
+          -(this.#serviceFeesToPay[assetId] * multiplier),
+        );
+      }
+    } else if (swap.sender.assetType === AssetType.NFT) {
+      const assetId = NftId.fromString(swap.sender.assetId as string);
+      if (_.isEmpty(swap.receiver.accountId)) {
+        transaction.addNftTransfer(
+          assetId,
+          client.operatorAccountId as AccountId,
+          swap.sender.accountId,
+        );
+      } else {
+        transaction.addApprovedNftTransfer(
+          assetId,
+          swap.receiver.accountId,
+          swap.sender.accountId,
+        );
+      }
+    }
   }
 }

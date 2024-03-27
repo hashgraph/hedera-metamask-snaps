@@ -26,7 +26,10 @@ import {
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
 import { Account, AtomicSwapRequestParams } from '../../../types/snap';
-import { createSwapRequest, shouldDisplayReconnectButton } from '../../../utils';
+import {
+  createSwapRequest,
+  shouldDisplayReconnectButton,
+} from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -38,17 +41,21 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const SwapTokensRequest: FC<Props> = ({
+  network,
+  mirrorNodeUrl,
+  setAccountInfo,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [destinationAccountId, setDestinationAccountId] = useState('');
   const [sendTokenId, setSendTokenId] = useState('');
-  const [sendTokenAmount, setSendTokenAmount] = useState(1);
-  const [sendHbarAmount, setSendHbarAmount] = useState(1);
+  const [sendTokenAmount, setSendTokenAmount] = useState<number>();
+  const [sendHbarAmount, setSendHbarAmount] = useState<number>();
   const [receiveTokenId, setReceiveTokenId] = useState('');
-  const [receiveTokenAmount, setReceiveTokenAmount] = useState(1);
-  const [receiveHbarAmount, setReceiveHbarAmount] = useState(1);
+  const [receiveTokenAmount, setReceiveTokenAmount] = useState<number>();
+  const [receiveHbarAmount, setReceiveHbarAmount] = useState<number>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
@@ -68,6 +75,9 @@ const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }
         receiveHbarAmount,
       } as AtomicSwapRequestParams;
 
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`send hbar : ${swapTokenParams.sendHbarAmount}`);
+
       const response: any = await createSwapRequest(
         network,
         mirrorNodeUrl,
@@ -76,9 +86,13 @@ const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }
       );
 
       const { receipt, currentAccount } = response;
-
       setAccountInfo(currentAccount);
-      console.log('receipt: ', receipt);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`receipt: ${receipt}`);
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      console.log(`current account: ${currentAccount}`);
+
+      console.log(`response: ${JSON.stringify(response)}`);
 
       showModal({
         title: 'Transaction Receipt',
@@ -95,7 +109,8 @@ const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }
     <Card
       content={{
         title: 'createSwapRequest',
-        description: 'Creates an atomic swap request using the Hedera Token Service.',
+        description:
+          'Creates an atomic swap request using the Hedera Token Service.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -117,8 +132,10 @@ const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }
                 type="number"
                 style={{ width: '100%' }}
                 value={sendHbarAmount}
-                placeholder="1"
-                onChange={(e) => setSendHbarAmount(parseFloat(e.target.value))}
+                placeholder="0"
+                onChange={(e) =>
+                  setSendHbarAmount(parseInt(e.target.value, 10))
+                }
               />
             </label>
             <br />
@@ -128,8 +145,10 @@ const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }
                 type="number"
                 style={{ width: '100%' }}
                 value={receiveHbarAmount}
-                placeholder="1"
-                onChange={(e) => setReceiveHbarAmount(parseFloat(e.target.value))}
+                placeholder="0"
+                onChange={(e) =>
+                  setReceiveHbarAmount(parseFloat(e.target.value))
+                }
               />
             </label>
             <br />
@@ -173,7 +192,9 @@ const SwapTokensRequest: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }
                 style={{ width: '100%' }}
                 value={receiveTokenAmount}
                 placeholder="1"
-                onChange={(e) => setReceiveTokenAmount(parseFloat(e.target.value))}
+                onChange={(e) =>
+                  setReceiveTokenAmount(parseFloat(e.target.value))
+                }
               />
             </label>
             <br />

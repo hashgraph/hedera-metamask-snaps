@@ -146,14 +146,14 @@ export type WipeTokenRequestParams = {
 };
 
 export type AtomicSwapRequestParams = {
-  sourceAccountId: string;
+  sourceAccountId?: string;
   destinationAccountId: string;
-  sourceTokenId?: string;
-  sourceTokenAmount?: number;
-  destinationTokenId?: string;
-  destinationTokenAmount?: number;
-  sourceHbarAmount?: number;
-  destinationHbarAmount?: number;
+  sendTokenId?: string;
+  sendTokenAmount?: number;
+  receiveTokenId?: string;
+  receiveTokenAmount?: number;
+  sendHbarAmount?: number;
+  receiveHbarAmount?: number;
 };
 
 export type AtomicSwapAcknowledgeParams = {

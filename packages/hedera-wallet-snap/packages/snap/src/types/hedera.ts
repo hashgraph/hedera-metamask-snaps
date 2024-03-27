@@ -46,6 +46,25 @@ export type SimpleTransfer = {
   decimals?: number; // Only for Token/NFT transfers
 };
 
+export enum AssetType {
+  HBAR = 'HBAR',
+  TOKEN = 'TOKEN',
+  NFT = 'NFT',
+}
+
+export type TransferData = {
+  accountId: string;
+  amount: number;
+  assetType: AssetType;
+  assetId?: string;
+  decimals?: number;
+};
+
+export type AtomicSwap = {
+  sender: TransferData;
+  receiver: TransferData;
+};
+
 export type Token = {
   token_id: string;
   balance: number;

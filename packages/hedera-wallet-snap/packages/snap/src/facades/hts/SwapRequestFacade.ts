@@ -50,6 +50,8 @@ export class SwapRequestFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
+    swapRequestParams.sourceAccountId = hederaAccountId;
+
     const hederaClientFactory = new HederaClientImplFactory(
       hederaAccountId,
       network,
@@ -81,40 +83,33 @@ export class SwapRequestFacade {
         ),
       );
 
-      if (swapRequestParams.sourceHbarAmount) {
+      if (swapRequestParams.sendHbarAmount) {
         panelToShow.push(
-          text(`1st Party Hbar Amount : ${swapRequestParams.sourceHbarAmount}`),
+          text(`1st Party Hbar Amount : ${swapRequestParams.sendHbarAmount}`),
         );
       }
 
-      if (swapRequestParams.destinationHbarAmount) {
+      if (swapRequestParams.receiveHbarAmount) {
         panelToShow.push(
-          text(
-            `2nd Party Hbar Amount: ${swapRequestParams.destinationHbarAmount}`,
-          ),
+          text(`2nd Party Hbar Amount: ${swapRequestParams.receiveHbarAmount}`),
         );
       }
 
-      if (
-        swapRequestParams.sourceTokenId &&
-        swapRequestParams.sourceTokenAmount
-      ) {
+      if (swapRequestParams.sendTokenId && swapRequestParams.sendTokenAmount) {
         panelToShow.push(
-          text(`1st Party Token Id: ${swapRequestParams.sourceTokenId}`),
-          text(
-            `1st Party Token Amount: ${swapRequestParams.sourceTokenAmount}`,
-          ),
+          text(`1st Party Token Id: ${swapRequestParams.sendTokenId}`),
+          text(`1st Party Token Amount: ${swapRequestParams.sendTokenAmount}`),
         );
       }
 
       if (
-        swapRequestParams.destinationTokenId &&
-        swapRequestParams.destinationTokenAmount
+        swapRequestParams.receiveTokenId &&
+        swapRequestParams.receiveTokenAmount
       ) {
         panelToShow.push(
-          text(`2nd Party Token Id: ${swapRequestParams.destinationTokenId}`),
+          text(`2nd Party Token Id: ${swapRequestParams.receiveTokenId}`),
           text(
-            `2nd Party Token Amount: ${swapRequestParams.destinationTokenAmount}`,
+            `2nd Party Token Amount: ${swapRequestParams.receiveTokenAmount}`,
           ),
         );
       }
@@ -129,19 +124,20 @@ export class SwapRequestFacade {
         throw providerErrors.userRejectedRequest();
       }
 
-      const privateKeyObj = hederaClient.getPrivateKey();
-      if (privateKeyObj === null) {
-        throw new Error('client private key was null');
-      }
+      const command = new SwapRequestCommand(swapRequestParams);
 
-      const command = new SwapRequestCommand(swapRequestParams, privateKeyObj);
+      let txReceipt = {} as TxReceipt;
 
-      return await command.execute(hederaClient.getClient());
+      txReceipt = await command.execute(hederaClient.getClient());
+
+      return txReceipt;
     } catch (error: any) {
       console.error(
         `Error while trying to perform atomic swap: ${String(error)}`,
       );
-      throw new Error(error);
+      throw new Error(
+        `Error while trying to perform atomic swap: ${String(error)}`,
+      );
     }
   }
 }
