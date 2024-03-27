@@ -23,7 +23,7 @@ import type {
   SimpleTransfer,
   TxReceipt,
   TxReceiptExchangeRate,
-} from '../types/hedera';
+} from '../../types/hedera';
 import type { AccountId, Client, TransactionReceipt } from '@hashgraph/sdk';
 import {
   AccountCreateTransaction,
@@ -31,7 +31,7 @@ import {
   PublicKey,
   TransferTransaction,
 } from '@hashgraph/sdk';
-import { CryptoUtils } from '../utils/CryptoUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 
 export class CreateAccountCommand {
   readonly #currentBalance: AccountBalance;
