@@ -25,7 +25,8 @@ import {
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
-import type { SimpleTransfer } from '../types/hedera';
+import type { AtomicSwap, SimpleTransfer } from '../types/hedera';
+import { AssetType } from '../types/hedera';
 
 export class SnapUtils {
   /**
@@ -98,6 +99,18 @@ export class SnapUtils {
         transfer.assetType === HBAR_ASSET_STRING
           ? HBAR_ASSET_STRING
           : (transfer.assetId as string)
+      }`,
+    );
+  }
+
+  public static formatSwapFeeDisplay(feeToDisplay: number, swap: AtomicSwap) {
+    return text(
+      `Service Fee: ${feeToDisplay
+        .toFixed(FEE_DIGIT_LENGTH)
+        .replace(FEE_DISPLAY_REGEX, '$1')} ${
+        swap.sender.assetType === AssetType.HBAR
+          ? HBAR_ASSET_STRING
+          : (swap.sender.assetId as string)
       }`,
     );
   }

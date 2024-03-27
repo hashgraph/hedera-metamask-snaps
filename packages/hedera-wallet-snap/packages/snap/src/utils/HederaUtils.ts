@@ -1641,27 +1641,14 @@ export class HederaUtils {
   public static isValidSwapRequestParams(
     params: unknown,
   ): asserts params is AtomicSwapRequestParams {
-    if (
-      params === null ||
-      _.isEmpty(params) ||
-      !('destinationAccountId' in params)
-    ) {
+    if (params === null || _.isEmpty(params) || !('atomicSwaps' in params)) {
       console.error(
-        'Invalid swap Params passed. "destinationAccountId" must be passed as a parameter',
+        'Invalid swap Params passed. "atomicSwaps" must be passed as a parameter',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid swap Params passed. "destinationAccountId" must be passed as a parameter',
+        'Invalid swap Params passed. "atomicSwaps" must be passed as a parameter',
       );
     }
-
-    const parameter = params as AtomicSwapRequestParams;
-
-    HederaUtils.checkValidString(
-      parameter,
-      'swap',
-      'destinationAccountId',
-      true,
-    );
   }
 
   /**
