@@ -30,6 +30,7 @@ import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
+import { ShowAccountPrivateKey } from '../components/cards/ShowAccountPrivateKey';
 import { SignMessage } from '../components/cards/SignMessage';
 import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
@@ -39,6 +40,7 @@ import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
+import { DeleteToken } from '../components/cards/hts/DeleteToken';
 import { DisableKYCAccount } from '../components/cards/hts/DisableKYCAccount';
 import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
 import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
@@ -47,6 +49,8 @@ import { MintToken } from '../components/cards/hts/MintToken';
 import { PauseToken } from '../components/cards/hts/PauseToken';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
+import { UpdateToken } from '../components/cards/hts/UpdateToken';
+import { UpdateTokenFeeSchedule } from '../components/cards/hts/UpdateTokenFeeSchedule';
 import { WipeToken } from '../components/cards/hts/WipeToken';
 import { networkOptions } from '../config/constants';
 import {
@@ -61,9 +65,6 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
-import { DeleteToken } from '../components/cards/hts/DeleteToken';
-import { UpdateToken } from '../components/cards/hts/UpdateToken';
-import { UpdateTokenFeeSchedule } from '../components/cards/hts/UpdateTokenFeeSchedule';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -322,6 +323,12 @@ const Index = () => {
         />
 
         <DeleteAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <ShowAccountPrivateKey
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
