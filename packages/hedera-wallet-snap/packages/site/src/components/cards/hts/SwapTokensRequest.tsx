@@ -18,22 +18,27 @@
  *
  */
 
-import _ from 'lodash';
-import { FC, useContext, useRef, useState } from 'react';
+import type { FC } from 'react';
+import { useContext, useRef, useState } from 'react';
 import {
-  MetaMaskContext,
   MetamaskActions,
+  MetaMaskContext,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, AtomicSwapRequestParams } from '../../../types/snap';
+import type {
+  Account,
+  AtomicSwap,
+  AtomicSwapRequestParams,
+  TransferData,
+} from '../../../types/snap';
+import { AssetType } from '../../../types/snap';
 import {
   createSwapRequest,
   shouldDisplayReconnectButton,
 } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
-import ExternalAccount, {
-  GetExternalAccountRef,
-} from '../../sections/ExternalAccount';
+import type { GetExternalAccountRef } from '../../sections/ExternalAccount';
+import ExternalAccount from '../../sections/ExternalAccount';
 
 type Props = {
   network: string;
@@ -50,12 +55,7 @@ const SwapTokensRequest: FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [destinationAccountId, setDestinationAccountId] = useState('');
-  const [sendTokenId, setSendTokenId] = useState('');
-  const [sendTokenAmount, setSendTokenAmount] = useState<number>();
   const [sendHbarAmount, setSendHbarAmount] = useState<number>();
-  const [receiveTokenId, setReceiveTokenId] = useState('');
-  const [receiveTokenAmount, setReceiveTokenAmount] = useState<number>();
-  const [receiveHbarAmount, setReceiveHbarAmount] = useState<number>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
@@ -65,18 +65,32 @@ const SwapTokensRequest: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const swapTokenParams = {
-        destinationAccountId,
-        sendTokenId,
-        sendTokenAmount,
-        receiveTokenId,
-        receiveTokenAmount,
-        sendHbarAmount,
-        receiveHbarAmount,
-      } as AtomicSwapRequestParams;
+      if (externalAccountParams === undefined) {
+        throw new Error('undefined external account params');
+      }
 
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`send hbar : ${swapTokenParams.sendHbarAmount}`);
+      const senderData = {
+        accountId: externalAccountParams.externalAccount.accountIdOrEvmAddress,
+        amount: sendHbarAmount,
+        assetType: AssetType.HBAR,
+      } as TransferData;
+
+      const receiverData = {
+        accountId: destinationAccountId,
+        amount: 0,
+        assetType: AssetType.HBAR,
+      } as TransferData;
+
+      const swap = {
+        sender: senderData,
+        receiver: receiverData,
+      } as AtomicSwap;
+
+      const swaps = [swap];
+
+      const swapTokenParams = {
+        atomicSwaps: swaps,
+      } as AtomicSwapRequestParams;
 
       const response: any = await createSwapRequest(
         network,
@@ -135,65 +149,6 @@ const SwapTokensRequest: FC<Props> = ({
                 placeholder="0"
                 onChange={(e) =>
                   setSendHbarAmount(parseInt(e.target.value, 10))
-                }
-              />
-            </label>
-            <br />
-            <label>
-              Enter the amount of Hbar to receive
-              <input
-                type="number"
-                style={{ width: '100%' }}
-                value={receiveHbarAmount}
-                placeholder="0"
-                onChange={(e) =>
-                  setReceiveHbarAmount(parseFloat(e.target.value))
-                }
-              />
-            </label>
-            <br />
-            <label>
-              Enter the token ID to send
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={sendTokenId}
-                placeholder="0.0"
-                onChange={(e) => setSendTokenId(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the token ID to receive
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={receiveTokenId}
-                placeholder="0.0"
-                onChange={(e) => setReceiveTokenId(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the token amount to send
-              <input
-                type="number"
-                style={{ width: '100%' }}
-                value={sendTokenAmount}
-                placeholder="1"
-                onChange={(e) => setSendTokenAmount(parseFloat(e.target.value))}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the token amount to receive
-              <input
-                type="number"
-                style={{ width: '100%' }}
-                value={receiveTokenAmount}
-                placeholder="1"
-                onChange={(e) =>
-                  setReceiveTokenAmount(parseFloat(e.target.value))
                 }
               />
             </label>

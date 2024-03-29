@@ -152,10 +152,13 @@ export class TransferCryptoCommand {
     }
 
     transaction.freezeWith(client);
+    console.log(JSON.stringify(transaction));
 
     const txResponse = await transaction.execute(client);
 
     const receipt = await txResponse.getReceipt(client);
+
+
 
     let newExchangeRate;
     if (receipt.exchangeRate) {

@@ -196,14 +196,29 @@ export type ExternalAccountParams = {
 };
 
 export type AtomicSwapRequestParams = {
-  sourceAccountId?: string;
-  destinationAccountId: string;
-  sendTokenId?: string;
-  sendTokenAmount?: number;
-  receiveTokenId?: string;
-  receiveTokenAmount?: number;
-  sendHbarAmount?: number;
-  receiveHbarAmount?: number;
+  atomicSwaps: AtomicSwap[];
+  memo?: string;
+  maxFee?: number; // hbars
+  serviceFee?: ServiceFee;
+};
+
+export enum AssetType {
+  HBAR = 'HBAR',
+  TOKEN = 'TOKEN',
+  NFT = 'NFT',
+}
+
+export type TransferData = {
+  accountId: string;
+  amount: number;
+  assetType: AssetType;
+  assetId?: string;
+  decimals?: number;
+};
+
+export type AtomicSwap = {
+  sender: TransferData;
+  receiver: TransferData;
 };
 
 export type AtomicSwapAcknowledgeParams = {

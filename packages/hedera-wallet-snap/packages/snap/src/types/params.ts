@@ -18,7 +18,7 @@
  *
  */
 
-import type { AtomicSwap, SimpleTransfer } from "./hedera";
+import type { AtomicSwap, SimpleTransfer } from './hedera';
 
 export type MirrorNodeParams = { mirrorNodeUrl?: string };
 
