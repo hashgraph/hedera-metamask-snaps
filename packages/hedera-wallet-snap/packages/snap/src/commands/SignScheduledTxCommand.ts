@@ -19,30 +19,29 @@
  */
 
 import type { PrivateKey, Client } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import type { TxReceipt } from '../types/hedera';
+import { Utils } from '../utils/Utils';
+import { CryptoUtils } from '../utils/CryptoUtils';
 import { ScheduleSignTransaction } from '@hashgraph/sdk';
 
-export class SwapAcknowledgeCommand {
-  readonly #receiverPrivateKey: PrivateKey;
+export class SignScheduledTxCommand {
+  readonly #privateKey: PrivateKey;
 
   readonly #scheduleId: string;
 
-  constructor(receiverPrivateKey: PrivateKey, scheduleId: string) {
-    this.#receiverPrivateKey = receiverPrivateKey;
+  constructor(privateKey: PrivateKey, scheduleId: string) {
+    this.#privateKey = privateKey;
     this.#scheduleId = scheduleId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const signedTx = await (
-      await new ScheduleSignTransaction()
-        .setScheduleId(this.#scheduleId)
-        .freezeWith(client)
-        .sign(this.#receiverPrivateKey)
-    ).execute(client);
+    const scheduleSignTx = new ScheduleSignTransaction()
+      .setScheduleId(this.#scheduleId)
+      .freezeWith(client);
 
-    const receipt = await signedTx.getReceipt(client);
+    const signedTx = await scheduleSignTx.sign(this.#privateKey);
+    const completedTx = await signedTx.execute(client);
+    const receipt = await completedTx.getReceipt(client);
 
     let newExchangeRate;
     if (receipt.exchangeRate) {

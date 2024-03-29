@@ -57,6 +57,7 @@ import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
 import { SwapRequestFacade } from './facades/hts/SwapRequestFacade';
+import { SignScheduledTxFacade } from "./facades/SignScheduledTxFacade";
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -384,11 +385,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
-    case 'hts/acknowledgeSwap': {
-      HederaUtils.isValidSwapAcknowledgeParams(request.params);
+    case 'signScheduledTx': {
+      HederaUtils.isValidSignScheduledTxParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        transaction: await SwapAcknowledgeFacade.acknowledgeSwapRequest(
+        transaction: await SignScheduledTxFacade.signScheduledTx(
           walletSnapParams,
           request.params,
         ),

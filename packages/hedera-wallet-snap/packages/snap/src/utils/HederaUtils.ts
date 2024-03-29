@@ -48,7 +48,6 @@ import type {
 import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
-  AtomicSwapAcknowledgeParams,
   AtomicSwapRequestParams,
   BurnTokenRequestParams,
   CreateTokenRequestParams,
@@ -63,6 +62,7 @@ import type {
   PauseOrDeleteTokenRequestParams,
   ServiceFee,
   SignMessageRequestParams,
+  SignScheduledTxParams,
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
@@ -1652,24 +1652,29 @@ export class HederaUtils {
   }
 
   /**
-   * Check Validation of swap acknowledgement.
+   * Check Validation of signScheduledTx request.
    * @param params - Request params.
    */
-  public static isValidSwapAcknowledgeParams(
+  public static isValidSignScheduledTxParams(
     params: unknown,
-  ): asserts params is AtomicSwapAcknowledgeParams {
+  ): asserts params is SignScheduledTxParams {
     if (params === null || _.isEmpty(params) || !('scheduleId' in params)) {
       console.error(
-        'Invalid swap Params passed. "scheduleId" must be passed as a parameter',
+        'Invalid signScheduledTx Params passed. "scheduleId" must be passed as a parameter',
       );
       throw providerErrors.unsupportedMethod(
-        'Invalid swap Params passed. "scheduleId" must be passed as a parameter',
+        'Invalid signScheduledTx Params passed. "scheduleId" must be passed as a parameter',
       );
     }
 
-    const parameter = params as AtomicSwapAcknowledgeParams;
+    const parameter = params as SignScheduledTxParams;
 
-    HederaUtils.checkValidString(parameter, 'swap', 'scheduleId', true);
+    HederaUtils.checkValidString(
+      parameter,
+      'signScheduledTx',
+      'scheduleId',
+      true,
+    );
   }
 
   public static validHederaNetwork(network: string) {

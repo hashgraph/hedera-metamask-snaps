@@ -18,37 +18,29 @@
  *
  */
 
+import type { WalletSnapParams } from '../types/state';
+import type { SignScheduledTxParams } from '../types/params';
 import { providerErrors } from '@metamask/rpc-errors';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import type { TxReceipt } from '../types/hedera';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import type { AtomicSwapAcknowledgeParams } from '../../types/params';
-import type { WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { HederaUtils } from '../../utils/HederaUtils';
-import type { TxReceipt } from '../../types/hedera';
-import { SwapAcknowledgeCommand } from '../../commands/hts/SwapAcknowledgeCommand';
+import { SnapUtils } from '../utils/SnapUtils';
+import { SignScheduledTxCommand } from '../commands/SignScheduledTxCommand';
 
-export class SwapAcknowledgeFacade {
-  /**
-   * Wipes the provided amount of fungible or non-fungible tokens from the specified
-   * Hedera account. This transaction does not delete tokens from the treasury account.
-   * This transaction must be signed by the token's Wipe Key. Wiping an account's tokens
-   * burns the tokens and decreases the total supply.
-   * @param walletSnapParams - Wallet snap params.
-   * @param swapAcknowledgeParams - Acknowledgement params.
-   * @returns Receipt of the transaction.
-   */
-  public static async acknowledgeSwapRequest(
+export class SignScheduledTxFacade {
+  public static async signScheduledTx(
     walletSnapParams: WalletSnapParams,
-    swapAcknowledgeParams: AtomicSwapAcknowledgeParams,
+    signScheduledTxParams: SignScheduledTxParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
+    const { scheduleId } = signScheduledTxParams;
 
-    const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
-      state.currentAccount;
+    const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
+
+    let txReceipt = {} as TxReceipt;
 
     const hederaClientFactory = new HederaClientImplFactory(
       hederaAccountId,
@@ -63,17 +55,14 @@ export class SwapAcknowledgeFacade {
     }
 
     try {
-      await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
-
       const panelToShow = [
-        heading('Acknowledge Atomic Swap Request'),
-        text('Are you sure you want to acknowledge the following request?'),
+        heading('Sign Scheduled Transaction'),
+        text('Are you sure you want sign the following transaction?'),
         divider(),
       ];
 
-      panelToShow.push(
-        text(`Scheduled Entity Id : ${swapAcknowledgeParams.scheduleId}`),
-      );
+      panelToShow.push(text(`Schedule ID : ${scheduleId}`));
+      panelToShow.push(divider());
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
@@ -86,19 +75,18 @@ export class SwapAcknowledgeFacade {
       }
 
       const privateKeyObj = hederaClient.getPrivateKey();
+
       if (privateKeyObj === null) {
-        throw new Error('client private key was null');
+        throw new Error('private key was null');
       }
+      const command = new SignScheduledTxCommand(privateKeyObj, scheduleId);
 
-      const command = new SwapAcknowledgeCommand(
-        privateKeyObj,
-        swapAcknowledgeParams.scheduleId,
-      );
+      txReceipt = await command.execute(hederaClient.getClient());
 
-      return await command.execute(hederaClient.getClient());
+      return txReceipt;
     } catch (error: any) {
       console.error(
-        `Error while trying to perform atomic swap: ${String(error)}`,
+        `Error while trying to sign scheduled transaction: ${String(error)}`,
       );
       throw new Error(error);
     }

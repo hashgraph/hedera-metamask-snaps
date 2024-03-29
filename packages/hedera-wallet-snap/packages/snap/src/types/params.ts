@@ -152,6 +152,6 @@ export type AtomicSwapRequestParams = {
   serviceFee?: ServiceFee;
 };
 
-export type AtomicSwapAcknowledgeParams = {
+export type SignScheduledTxParams = {
   scheduleId: string;
 };
