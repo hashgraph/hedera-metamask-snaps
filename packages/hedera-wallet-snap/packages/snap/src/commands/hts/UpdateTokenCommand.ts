@@ -20,8 +20,8 @@
 
 import type { Client, PrivateKey } from '@hashgraph/sdk';
 import { PublicKey, TokenUpdateTransaction } from '@hashgraph/sdk';
-import type { UpdateTokenRequestParams } from '../../types/params';
 import type { TxReceipt } from '../../types/hedera';
+import type { UpdateTokenRequestParams } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
 export class UpdateTokenCommand {
@@ -38,20 +38,14 @@ export class UpdateTokenCommand {
     client: Client,
     updateParams: UpdateTokenRequestParams,
   ): Promise<TxReceipt> {
-    const updateTransaction = this.#createTransaction(updateParams);
+    const updateTransaction = this.#updateTransaction(updateParams);
 
-    const signTx = await updateTransaction
-      .freezeWith(client)
-      .sign(this.#adminKey);
+    const transaction = await updateTransaction.sign(this.#adminKey);
 
-    const txResponse = await signTx.execute(client);
-
-    const receipt = await txResponse.getReceipt(client);
-
-    return Utils.formatTransactionReceipt(receipt);
+    return await Utils.executeTransaction(client, transaction);
   }
 
-  #createTransaction(
+  #updateTransaction(
     updateParams: UpdateTokenRequestParams,
   ): TokenUpdateTransaction {
     const transaction = new TokenUpdateTransaction().setTokenId(this.#tokenId);

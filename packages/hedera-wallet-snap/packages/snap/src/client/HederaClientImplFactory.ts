@@ -27,10 +27,10 @@ import {
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
-import { SimpleHederaClientImpl } from './SimpleHederaClientImpl';
-import type { HederaClientFactory } from '../interfaces/HederaClientFactory';
 import type { Wallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
+import type { HederaClientFactory } from '../snap/interfaces/HederaClientFactory';
+import { SimpleHederaClientImpl } from './SimpleHederaClientImpl';
 
 /**
  * To HederaAccountInfo.
