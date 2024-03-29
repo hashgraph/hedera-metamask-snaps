@@ -24,8 +24,8 @@ import {
   Hbar,
   TokenFeeScheduleUpdateTransaction,
 } from '@hashgraph/sdk';
-import type { TokenCustomFee } from '../../types/params';
 import type { TxReceipt } from '../../types/hedera';
+import type { TokenCustomFee } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
 export class UpdateTokenFeeScheduleCommand {
@@ -50,16 +50,13 @@ export class UpdateTokenFeeScheduleCommand {
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new TokenFeeScheduleUpdateTransaction()
+    const scheduleTransaction = new TokenFeeScheduleUpdateTransaction()
       .setTokenId(this.#tokenId)
-      .setCustomFees(this.#convertCustomFees(this.#customFees, this.#decimals))
-      .freezeWith(client);
+      .setCustomFees(this.#convertCustomFees(this.#customFees, this.#decimals));
 
-    const signedTx = await transaction.sign(this.#feeScheduleKey);
-    const txResponse = await signedTx.execute(client);
-    const receipt = await txResponse.getReceipt(client);
+    const transaction = await scheduleTransaction.sign(this.#feeScheduleKey);
 
-    return Utils.formatTransactionReceipt(receipt);
+    return await Utils.executeTransaction(client, transaction);
   }
 
   #convertCustomFees(
