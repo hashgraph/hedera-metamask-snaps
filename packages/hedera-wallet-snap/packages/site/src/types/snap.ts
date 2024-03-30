@@ -224,3 +224,7 @@ export type AtomicSwap = {
 export type AtomicSwapAcknowledgeParams = {
   scheduleId: string;
 };
+
+export type SignScheduledTxParams = {
+  scheduleId: string;
+};

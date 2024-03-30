@@ -18,19 +18,18 @@
  *
  */
 
-import _ from 'lodash';
-import { FC, useContext, useRef, useState } from 'react';
+import type { FC } from 'react';
+import { useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, AtomicSwapAcknowledgeParams } from '../../../types/snap';
-import { createSwapAcknowledgement, shouldDisplayReconnectButton } from '../../../utils';
+import type { Account, SignScheduledTxParams } from '../../../types/snap';
+import { shouldDisplayReconnectButton, signScheduledTx } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
-import ExternalAccount, {
-  GetExternalAccountRef,
-} from '../../sections/ExternalAccount';
+import type { GetExternalAccountRef } from '../../sections/ExternalAccount';
+import ExternalAccount from '../../sections/ExternalAccount';
 
 type Props = {
   network: string;
@@ -38,7 +37,11 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SwapAcknowledge: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
+const SignScheduledTx: FC<Props> = ({
+  network,
+  mirrorNodeUrl,
+  setAccountInfo,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
@@ -46,20 +49,20 @@ const SwapAcknowledge: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) 
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleCreateAcknowledgementClick = async () => {
+  const handleSignScheduledTransactionClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const swapAcknowledgeParams = {
+      const signScheduledTxParams = {
         scheduleId,
-      } as AtomicSwapAcknowledgeParams;
+      } as SignScheduledTxParams;
 
-      const response: any = await createSwapAcknowledgement(
+      const response: any = await signScheduledTx(
         network,
         mirrorNodeUrl,
-        swapAcknowledgeParams,
+        signScheduledTxParams,
         externalAccountParams,
       );
 
@@ -82,19 +85,18 @@ const SwapAcknowledge: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) 
   return (
     <Card
       content={{
-        title: 'createSwapAcknowledgement',
-        description: 'Acknowledge a swap request made using the Hedera Token Service.',
+        title: 'signScheduledTx',
+        description: 'Sign a scheduled transaction.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
-            <br />
             <label>
-              Enter the Scheduled Entity ID
+              Enter the schedule id
               <input
-                type="text"
+                type="string"
                 style={{ width: '100%' }}
                 value={scheduleId}
-                placeholder="0.0.1234"
+                placeholder=""
                 onChange={(e) => setScheduleId(e.target.value)}
               />
             </label>
@@ -103,8 +105,8 @@ const SwapAcknowledge: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) 
         ),
         button: (
           <SendHelloButton
-            buttonText="Create Token"
-            onClick={handleCreateAcknowledgementClick}
+            buttonText="Sign"
+            onClick={handleSignScheduledTransactionClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -120,4 +122,4 @@ const SwapAcknowledge: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) 
   );
 };
 
-export { SwapAcknowledge };
+export { SignScheduledTx };

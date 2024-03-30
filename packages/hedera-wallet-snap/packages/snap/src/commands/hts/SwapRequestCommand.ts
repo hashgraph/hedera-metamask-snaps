@@ -25,9 +25,9 @@ import {
   ScheduleCreateTransaction,
   TransferTransaction,
   KeyList,
-  PrivateKey,
 } from '@hashgraph/sdk';
-import type { PublicKey, AccountId, Client } from '@hashgraph/sdk';
+import type { PublicKey, AccountId, Client ,
+  PrivateKey} from '@hashgraph/sdk';
 
 import { ethers } from 'ethers';
 import _ from 'lodash';
@@ -223,8 +223,9 @@ export class SwapRequestCommand {
       fileId: receipt.fileId ? receipt.fileId : '',
       contractId: receipt.contractId ? receipt.contractId : '',
       topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
+      tokenId: receipt.tokenId ? receipt.tokenId : '',*/
+      scheduleId: receipt.scheduleId ? receipt.scheduleId.toString() : '',
+      /*
       exchangeRate: newExchangeRate,
       topicSequenceNumber: receipt.topicSequenceNumber
         ? String(receipt.topicSequenceNumber)

@@ -40,7 +40,8 @@ import {
   WipeTokenRequestParams,
   AtomicSwapRequestParams,
   AtomicSwapAcknowledgeParams,
-} from "../types/snap";
+  SignScheduledTxParams,
+} from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
   const accounts = (await window.ethereum.request({
@@ -904,6 +905,37 @@ export const createSwapAcknowledgement = async (
           network,
           mirrorNodeUrl,
           ...swapAcknowledgeRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "signScheduledTx" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param signScheduledTxRequestParams
+ * @param externalAccountparams
+ */
+export const signScheduledTx = async (
+  network: string,
+  mirrorNodeUrl: string,
+  signScheduledTxRequestParams: SignScheduledTxParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'signScheduledTx',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...signScheduledTxRequestParams,
           ...externalAccountparams,
         },
       },

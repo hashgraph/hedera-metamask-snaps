@@ -61,9 +61,9 @@ import {
   Subtitle,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
-import { Account } from '../types/snap';
+import type { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
-import { SwapAcknowledge } from "../components/cards/hts/SwapTokensAcknowledge";
+import { SignScheduledTx } from '../components/cards/hts/SignScheduledTx';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -321,7 +321,7 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <SwapAcknowledge
+        <SignScheduledTx
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
