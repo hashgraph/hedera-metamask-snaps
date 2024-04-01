@@ -208,14 +208,6 @@ export enum AssetType {
   NFT = 'NFT',
 }
 
-export type TransferData = {
-  accountId: string;
-  amount: number;
-  assetType: AssetType;
-  assetId?: string;
-  decimals?: number;
-};
-
 export type AtomicSwap = {
   sender: SimpleTransfer;
   receiver: SimpleTransfer;
