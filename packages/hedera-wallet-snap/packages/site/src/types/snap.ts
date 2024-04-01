@@ -217,12 +217,8 @@ export type TransferData = {
 };
 
 export type AtomicSwap = {
-  sender: TransferData;
-  receiver: TransferData;
-};
-
-export type AtomicSwapAcknowledgeParams = {
-  scheduleId: string;
+  sender: SimpleTransfer;
+  receiver: SimpleTransfer;
 };
 
 export type SignScheduledTxParams = {
