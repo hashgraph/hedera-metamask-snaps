@@ -35,6 +35,7 @@ import {
 } from '../types/constants';
 import type {
   AccountBalance,
+  AtomicSwap,
   MirrorAccountInfo,
   MirrorNftInfo,
   MirrorStakingInfo,
@@ -48,8 +49,8 @@ import type {
 import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
-  AtomicSwapRequestParams,
   BurnTokenRequestParams,
+  CreateSwapRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -681,6 +682,134 @@ export class HederaUtils {
         );
       });
     }
+  }
+
+  /**
+   * Check Validation of createSwap request.
+   * @param params - Request params.
+   */
+  public static isValidCreateSwapParams(
+    params: unknown,
+  ): asserts params is CreateSwapRequestParams {
+    if (params === null || _.isEmpty(params) || !('atomicSwaps' in params)) {
+      console.error(
+        'Invalid createSwap Params passed. "atomicSwaps" must be passed as a parameter',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createSwap Params passed. "atomicSwaps" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as CreateSwapRequestParams;
+
+    // Check if memo is valid
+    HederaUtils.checkValidString(parameter, 'createSwap', 'memo', false);
+
+    // Check if maxFee is valid
+    HederaUtils.checkValidNumber(parameter, 'createSwap', 'maxFee', false);
+
+    // Check if serviceFee is valid
+    if (
+      'serviceFee' in parameter &&
+      !_.isNull(parameter.serviceFee) &&
+      parameter.serviceFee !== undefined
+    ) {
+      HederaUtils.isValidServiceFee(parameter.serviceFee);
+    }
+
+    // Check if atomic swaps are valid
+    if ('atomicSwaps' in parameter) {
+      if (
+        _.isEmpty(parameter.atomicSwaps) ||
+        !Array.isArray(parameter.atomicSwaps)
+      ) {
+        console.error(
+          'Invalid createSwap Params passed. "atomicSwaps" must be passed as an array',
+        );
+        throw providerErrors.unsupportedMethod(
+          'Invalid createSwap Params passed. "atomicSwaps" must be passed as an array',
+        );
+      }
+      parameter.atomicSwaps.forEach((swap: AtomicSwap) => {
+        this.checkAtomicSwapTransfers(swap.sender);
+        this.checkAtomicSwapTransfers(swap.receiver);
+      });
+    }
+  }
+
+  static checkAtomicSwapTransfers(transfer: SimpleTransfer) {
+    // Check if assetType is valid
+    HederaUtils.checkValidString(transfer, 'createSwap', 'assetType', true);
+    if (
+      !(
+        transfer.assetType === 'HBAR' ||
+        transfer.assetType === 'TOKEN' ||
+        transfer.assetType === 'NFT'
+      )
+    ) {
+      console.error(
+        'Invalid createSwap Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createSwap Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
+      );
+    }
+    if (transfer.assetType === 'HBAR' && 'assetId' in transfer) {
+      console.error(
+        'Invalid createSwap Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createSwap Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
+      );
+    } else if (
+      (transfer.assetType === 'TOKEN' || transfer.assetType === 'NFT') &&
+      !('assetId' in transfer)
+    ) {
+      console.error(
+        'Invalid createSwap Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createSwap Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
+      );
+    }
+
+    // Check if to is valid
+    HederaUtils.checkValidString(transfer, 'transfers[].to', 'to', true);
+
+    // Check if amount is valid
+    HederaUtils.checkValidNumber(
+      transfer,
+      'transfers[].amount',
+      'amount',
+      true,
+    );
+
+    // Check if assetId is valid
+    if (transfer.assetType !== 'HBAR') {
+      HederaUtils.checkValidString(transfer, 'transfers[].to', 'assetId', true);
+    }
+    // Check if assetId is valid for NFT
+    // Regular expression to match the "substring/substring" format
+    const regex = /^[^\s/]+\/[^\s/]+$/u;
+    if (
+      transfer.assetType === 'NFT' &&
+      !regex.test(transfer.assetId as string)
+    ) {
+      console.error(
+        'Invalid createSwap Params passed. "transfers[].assetId" must be in the format "tokenId/serialNumber"',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid createSwap Params passed. "transfers[].assetId" must be in the format "tokenId/serialNumber"',
+      );
+    }
+
+    // Check if from is valid
+    HederaUtils.checkValidAccountId(
+      transfer,
+      'transfers[].from',
+      'from',
+      false,
+    );
   }
 
   /**
@@ -1631,23 +1760,6 @@ export class HederaUtils {
           'Invalid wipeToken Params passed. "serialNumbers" can only be passed to NFTs',
         );
       }
-    }
-  }
-
-  /**
-   * Check Validation of swap request.
-   * @param params - Request params.
-   */
-  public static isValidSwapRequestParams(
-    params: unknown,
-  ): asserts params is AtomicSwapRequestParams {
-    if (params === null || _.isEmpty(params) || !('atomicSwaps' in params)) {
-      console.error(
-        'Invalid swap Params passed. "atomicSwaps" must be passed as a parameter',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid swap Params passed. "atomicSwaps" must be passed as a parameter',
-      );
     }
   }
 
