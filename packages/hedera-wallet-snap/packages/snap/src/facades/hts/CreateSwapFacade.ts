@@ -23,26 +23,26 @@ import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
 import type { AccountInfo } from '../../types/account';
-import type { AtomicSwap, TxReceipt } from '../../types/hedera';
-import { AssetType } from '../../types/hedera';
-import type { AtomicSwapRequestParams, ServiceFee } from '../../types/params';
+import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
+import type { CreateSwapRequestParams, ServiceFee } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { HederaUtils } from '../../utils/HederaUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { SwapRequestCommand } from '../../commands/hts/SwapRequestCommand';
+import { CreateSwapCommand } from "../../commands/hts/CreateSwapCommand";
 
-export class SwapRequestFacade {
+export class CreateSwapFacade {
   /**
-   * Transfer crypto(hbar or other tokens).
+   * Swap tokens for Hbar or other tokens.
    * @param walletSnapParams - Wallet snap params.
-   * @param atomicSwapParams - Parameters for atomic swap.
+   * @param createSwapRequestParams - Parameters for creating an atomic swap.
    * @returns Receipt of the transaction.
    */
-  public static async createSwapRequest(
+  public static async createSwap(
     walletSnapParams: WalletSnapParams,
-    atomicSwapParams: AtomicSwapRequestParams,
+    createSwapRequestParams: CreateSwapRequestParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
@@ -54,36 +54,43 @@ export class SwapRequestFacade {
         percentageCut: 0,
         toAddress: '0.0.98', // Hedera Fee collection account
       } as ServiceFee,
-    } = atomicSwapParams;
+    } = createSwapRequestParams;
 
     const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
       state.currentAccount;
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    const serviceFeesToPay: Record<string, number> = atomicSwaps.reduce<
+    const transfers: SimpleTransfer[] = [];
+
+    for (const swap of atomicSwaps) {
+      transfers.push(swap.sender);
+      transfers.push(swap.receiver);
+    }
+
+    const serviceFeesToPay: Record<string, number> = transfers.reduce<
       Record<string, number>
-    >((acc, swap) => {
-      if (!acc[swap.sender.assetType]) {
-        if (swap.sender.assetType === 'HBAR') {
-          acc[swap.sender.assetType] = 0;
+    >((acc, transfer) => {
+      if (!acc[transfer.assetType]) {
+        if (transfer.assetType === 'HBAR') {
+          acc[transfer.assetType] = 0;
         } else {
-          acc[swap.sender.assetId as string] = 0;
+          acc[transfer.assetId as string] = 0;
         }
       }
       // Calculate the service fee based on the total amount
       const fee = Number(
-        (swap.sender.amount * (serviceFee.percentageCut / 100.0)).toFixed(2),
+        (transfer.amount * (serviceFee.percentageCut / 100.0)).toFixed(2),
       );
 
       // Deduct the service fee from the total amount to find the new transfer amount
-      swap.sender.amount -= fee;
+      transfer.amount -= fee;
 
       // Record the service fee
-      if (swap.sender.assetType === AssetType.HBAR) {
-        acc[swap.sender.assetType] += fee;
+      if (transfer.assetType === 'HBAR') {
+        acc[transfer.assetType] += fee;
       } else {
-        acc[swap.sender.assetId as string] += fee;
+        acc[transfer.assetId as string] += fee;
       }
 
       return acc;
@@ -107,7 +114,7 @@ export class SwapRequestFacade {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
       const panelToShow = [
-        heading('Perform Atomic Swap'),
+        heading('Transfer Crypto'),
         text('Are you sure you want to execute the following transaction(s)?'),
         divider(),
       ];
@@ -119,9 +126,9 @@ export class SwapRequestFacade {
         panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
       }
 
-      for (const swap of atomicSwaps) {
-        const txNumber = atomicSwaps.indexOf(swap) + 1;
-        panelToShow.push(text(`Swap #${txNumber}`));
+      for (const transfer of transfers) {
+        const txNumber = transfers.indexOf(transfer) + 1;
+        panelToShow.push(text(`Transaction #${txNumber}`));
         panelToShow.push(divider());
 
         let asset = '';
@@ -129,27 +136,19 @@ export class SwapRequestFacade {
         let walletBalance =
           state.accountState[hederaEvmAddress][network].accountInfo.balance;
 
-        if (
-          swap.sender.accountId !== undefined &&
-          !_.isEmpty(swap.sender.accountId)
-        ) {
+        if (transfer.from !== undefined && !_.isEmpty(transfer.from)) {
           const ownerAccountInfo: AccountInfo =
             await HederaUtils.getMirrorAccountInfo(
-              swap.sender.accountId,
+              transfer.from,
               mirrorNodeUrl,
             );
           walletBalance = ownerAccountInfo.balance;
-          panelToShow.push(text(`Owner Account Id: ${swap.sender.accountId}`));
+          panelToShow.push(text(`Transaction Type: Delegated Transfer`));
+          panelToShow.push(text(`Owner Account Id: ${transfer.from}`));
         }
-        panelToShow.push(text(`Sender Asset Type: ${swap.sender.assetType}`));
-        panelToShow.push(
-          text(`Receiver Asset Type: ${swap.receiver.assetType}`),
-        );
-        if (swap.sender.assetType === AssetType.HBAR) {
-          if (
-            walletBalance.hbars <
-            swap.sender.amount + serviceFeesToPay.HBAR
-          ) {
+        panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
+        if (transfer.assetType === 'HBAR') {
+          if (walletBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
             const errMessage = `There is not enough Hbar in the wallet to transfer the requested amount`;
             console.error(errMessage);
             panelToShow.push(text(errMessage));
@@ -161,18 +160,16 @@ export class SwapRequestFacade {
           }
           asset = 'HBAR';
         } else {
-          swap.sender.decimals = walletBalance.tokens[
-            swap.sender.assetId as string
-          ]
-            ? walletBalance.tokens[swap.sender.assetId as string].decimals
+          transfer.decimals = walletBalance.tokens[transfer.assetId as string]
+            ? walletBalance.tokens[transfer.assetId as string].decimals
             : NaN;
           if (
-            !walletBalance.tokens[swap.sender.assetId as string] ||
-            walletBalance.tokens[swap.sender.assetId as string].balance <
-              swap.sender.amount
+            !walletBalance.tokens[transfer.assetId as string] ||
+            walletBalance.tokens[transfer.assetId as string].balance <
+              transfer.amount
           ) {
             const errMessage = `This wallet either does not own  ${
-              swap.sender.assetId as string
+              transfer.assetId as string
             } or there is not enough balance to transfer the requested amount`;
             console.error(errMessage);
             panelToShow.push(text(errMessage));
@@ -183,14 +180,14 @@ export class SwapRequestFacade {
             );
           }
 
-          let assetId = swap.sender.assetId as string;
+          let assetId = transfer.assetId as string;
           let nftSerialNumber = '';
-          if (swap.sender.assetType === AssetType.NFT) {
+          if (transfer.assetType === 'NFT') {
             const assetIdSplit = assetId.split('/');
             assetId = assetIdSplit[0];
             nftSerialNumber = assetIdSplit[1];
           }
-          panelToShow.push(text(`Asset Id: ${swap.sender.assetId as string}`));
+          panelToShow.push(text(`Asset Id: ${transfer.assetId as string}`));
           const tokenInfo = await CryptoUtils.getTokenById(
             assetId,
             mirrorNodeUrl,
@@ -209,32 +206,32 @@ export class SwapRequestFacade {
             panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
             panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
             panelToShow.push(text(`Symbol: ${asset}`));
-            swap.sender.decimals = Number(tokenInfo.decimals);
+            transfer.decimals = Number(tokenInfo.decimals);
           }
-          if (!Number.isFinite(swap.sender.decimals)) {
+          if (!Number.isFinite(transfer.decimals)) {
             const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
             console.error(errMessage);
             throw providerErrors.unsupportedMethod(errMessage);
           }
 
-          if (swap.sender.assetType === AssetType.NFT) {
+          if (transfer.assetType === 'NFT') {
             panelToShow.push(text(`NFT Serial Number: ${nftSerialNumber}`));
           }
 
-          if (serviceFeesToPay[swap.sender.assetType] > 0) {
-            feeToDisplay = serviceFeesToPay[swap.sender.assetType];
+          if (serviceFeesToPay[transfer.assetType] > 0) {
+            feeToDisplay = serviceFeesToPay[transfer.assetType];
           } else {
-            feeToDisplay = serviceFeesToPay[swap.sender.assetId as string];
+            feeToDisplay = serviceFeesToPay[transfer.assetId as string];
           }
         }
-        panelToShow.push(text(`To: ${swap.sender.accountId}`));
-        panelToShow.push(text(`Amount: ${swap.sender.amount} ${asset}`));
+        panelToShow.push(text(`To: ${transfer.to}`));
+        panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
         if (feeToDisplay > 0) {
           panelToShow.push(
-            SnapUtils.formatSwapFeeDisplay(feeToDisplay, swap),
-            SnapUtils.formatSwapFeeDisplay(
-              swap.sender.amount + feeToDisplay,
-              swap,
+            SnapUtils.formatFeeDisplay(feeToDisplay, transfer),
+            SnapUtils.formatFeeDisplay(
+              transfer.amount + feeToDisplay,
+              transfer,
             ),
           );
         }
@@ -251,7 +248,7 @@ export class SwapRequestFacade {
         throw providerErrors.userRejectedRequest();
       }
 
-      const command = new SwapRequestCommand(
+      const command = new CreateSwapCommand(
         atomicSwaps,
         memo,
         maxFee,
