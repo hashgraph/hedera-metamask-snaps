@@ -31,8 +31,6 @@ import type { WalletSnapParams } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
 import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
-import { SwapRequestCommand } from '../commands/hts/SwapRequestCommand';
-import { PrivateKey, PublicKey } from "@hashgraph/sdk";
 
 export class TransferCryptoFacade {
   /**
@@ -242,19 +240,12 @@ export class TransferCryptoFacade {
         throw providerErrors.userRejectedRequest();
       }
 
-      const recipientPublicKey = PublicKey.fromStringECDSA(
-        '0x0294c0b1a664f260aa6310521dd5684713aa11f0ff45edaa215a17c0dc993e7f7d',
-      );
-
-      const command = new SwapRequestCommand(
+      const command = new TransferCryptoCommand(
         transfers,
         memo,
         maxFee,
         serviceFeesToPay,
         serviceFee.toAddress as string,
-        recipientPublicKey,
-        PrivateKey.fromStringECDSA(privateKey).publicKey,
-        PrivateKey.fromStringECDSA(privateKey),
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
