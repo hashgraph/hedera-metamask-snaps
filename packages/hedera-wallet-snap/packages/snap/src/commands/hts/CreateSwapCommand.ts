@@ -18,45 +18,156 @@
  *
  */
 
-import { TransferTransaction } from '@hashgraph/sdk';
-import type { Client, PrivateKey } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import {
+  type AccountId,
+  type Client,
+  Hbar,
+  NftId,
+  ScheduleCreateTransaction,
+  TransferTransaction,
+} from '@hashgraph/sdk';
+import { ethers } from 'ethers';
+import _ from 'lodash';
+import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
 export class CreateSwapCommand {
-  readonly #senderPrivateKey: PrivateKey;
+  readonly #atomicSwaps: AtomicSwap[];
 
-  readonly #recipientPrivateKey: PrivateKey;
+  readonly #memo: string | null;
 
-  constructor(senderPrivateKey: PrivateKey, recipientPrivateKey: PrivateKey) {
-    this.#recipientPrivateKey = recipientPrivateKey;
-    this.#senderPrivateKey = senderPrivateKey;
+  readonly #maxFee: number | null;
+
+  readonly #serviceFeesToPay: Record<string, number>;
+
+  readonly #serviceFeeToAddress: string | null;
+
+  constructor(
+    atomicSwaps: AtomicSwap[],
+    memo: string | null,
+    maxFee: number | null,
+    serviceFeesToPay: Record<string, number>,
+    serviceFeeToAddress: string | null,
+  ) {
+    this.#atomicSwaps = atomicSwaps;
+    this.#memo = memo;
+    this.#maxFee = maxFee;
+    this.#serviceFeesToPay = serviceFeesToPay;
+    this.#serviceFeeToAddress = serviceFeeToAddress;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transferFromAddr = `0.0.1847`;
-    const transferToAddr = `0.0.546905`;
+    const serviceFeeToAddr: string = this.#serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
-    const tokenId = `0.0.3711622`;
+    const transfers: SimpleTransfer[] = [];
 
-    const transaction = new TransferTransaction();
+    for (const swap of this.#atomicSwaps) {
+      transfers.push(swap.sender);
+      transfers.push(swap.receiver);
+    }
 
-    transaction.addTokenTransfer(tokenId, transferToAddr, 10);
-    transaction.addTokenTransfer(tokenId, transferFromAddr, -10);
+    const transaction = new TransferTransaction().setTransactionMemo(
+      this.#memo ?? '',
+    );
 
-    transaction.addHbarTransfer(transferToAddr, -159);
-    transaction.addHbarTransfer(transferFromAddr, 159);
+    if (this.#maxFee) {
+      transaction.setMaxTransactionFee(new Hbar(this.#maxFee.toFixed(8)));
+    }
+
+    for (const transfer of transfers) {
+      if (transfer.assetType === 'HBAR') {
+        if (ethers.isAddress(transfer.to)) {
+          transfer.to = `0.0.${transfer.to.slice(2)}`;
+        }
+
+        transaction.addHbarTransfer(transfer.to, transfer.amount);
+        if (_.isEmpty(transfer.from)) {
+          transaction.addHbarTransfer(
+            client.operatorAccountId as AccountId,
+            -transfer.amount,
+          );
+        } else {
+          transaction.addApprovedHbarTransfer(
+            transfer.from as string,
+            -transfer.amount,
+          );
+        }
+
+        // Service Fee
+        if (this.#serviceFeesToPay[transfer.assetType] > 0) {
+          transaction.addHbarTransfer(
+            serviceFeeToAddr,
+            this.#serviceFeesToPay[transfer.assetType],
+          );
+          transaction.addHbarTransfer(
+            client.operatorAccountId as AccountId,
+            -this.#serviceFeesToPay[transfer.assetType],
+          );
+        }
+      } else if (transfer.assetType === 'TOKEN') {
+        const assetid = transfer.assetId as string;
+        const multiplier = Math.pow(10, transfer.decimals as number);
+
+        transaction.addTokenTransfer(
+          assetid,
+          transfer.to,
+          transfer.amount * multiplier,
+        );
+        if (_.isEmpty(transfer.from)) {
+          transaction.addTokenTransfer(
+            assetid,
+            client.operatorAccountId as AccountId,
+            -(transfer.amount * multiplier),
+          );
+        } else {
+          transaction.addApprovedTokenTransfer(
+            assetid,
+            transfer.from as string,
+            -(transfer.amount * multiplier),
+          );
+        }
+
+        // Service Fee
+        if (this.#serviceFeesToPay[assetid] > 0) {
+          transaction.addTokenTransfer(
+            assetid,
+            serviceFeeToAddr,
+            this.#serviceFeesToPay[assetid] * multiplier,
+          );
+          transaction.addTokenTransfer(
+            assetid,
+            client.operatorAccountId as AccountId,
+            -(this.#serviceFeesToPay[assetid] * multiplier),
+          );
+        }
+      } else if (transfer.assetType === 'NFT') {
+        const assetid = NftId.fromString(transfer.assetId as string);
+        if (_.isEmpty(transfer.from)) {
+          transaction.addNftTransfer(
+            assetid,
+            client.operatorAccountId as AccountId,
+            transfer.to,
+          );
+        } else {
+          transaction.addApprovedNftTransfer(
+            assetid,
+            transfer.from as string,
+            transfer.to,
+          );
+        }
+      }
+    }
 
     transaction.freezeWith(client);
 
-    const txResponse = await (
-      await (
-        await transaction.sign(this.#senderPrivateKey)
-      ).sign(this.#recipientPrivateKey)
-    ).execute(client);
+    const scheduleTxResponse = await new ScheduleCreateTransaction()
+      .setScheduledTransaction(transaction)
+      .execute(client);
 
-    const receipt = await txResponse.getReceipt(client);
+    const receipt = await scheduleTxResponse.getReceipt(client);
 
-    /* let newExchangeRate;
+    let newExchangeRate;
     if (receipt.exchangeRate) {
       newExchangeRate = {
         ...receipt.exchangeRate,
@@ -64,30 +175,30 @@ export class CreateSwapCommand {
           receipt.exchangeRate.expirationTime,
         ),
       };
-    }*/
+    }
 
     return {
       status: receipt.status ? receipt.status.toString() : '',
       accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      /*
       fileId: receipt.fileId ? receipt.fileId : '',
       contractId: receipt.contractId ? receipt.contractId : '',
       topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',*/
-      // scheduleId: receipt.scheduleId ? receipt.scheduleId.toString() : '',
-      /*
+      tokenId: receipt.tokenId ? receipt.tokenId : '',
+      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
       exchangeRate: newExchangeRate,
       topicSequenceNumber: receipt.topicSequenceNumber
         ? String(receipt.topicSequenceNumber)
         : '',
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',*/
-      // scheduledTransactionId: receipt.scheduledTransactionId
-      // ? receipt.scheduledTransactionId.toString()
-      // : ''
-      /* serials: JSON.parse(JSON.stringify(receipt.serials)),
+      topicRunningHash: receipt.topicRunningHash
+        ? CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash)
+        : '',
+      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
+      scheduledTransactionId: receipt.scheduledTransactionId
+        ? receipt.scheduledTransactionId.toString()
+        : '',
+      serials: JSON.parse(JSON.stringify(receipt.serials)),
       duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),*/
+      children: JSON.parse(JSON.stringify(receipt.children)),
     } as TxReceipt;
   }
 }

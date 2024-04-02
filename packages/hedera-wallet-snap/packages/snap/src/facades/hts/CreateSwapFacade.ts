@@ -23,7 +23,6 @@ import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
 import type { AccountInfo } from '../../types/account';
 import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
 import type { CreateSwapRequestParams, ServiceFee } from '../../types/params';
@@ -31,7 +30,7 @@ import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { HederaUtils } from '../../utils/HederaUtils';
 import { SnapUtils } from '../../utils/SnapUtils';
-import { CreateSwapCommand } from "../../commands/hts/CreateSwapCommand";
+import { CreateSwapCommand } from '../../commands/hts/CreateSwapCommand';
 
 export class CreateSwapFacade {
   /**
