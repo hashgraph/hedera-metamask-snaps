@@ -49,7 +49,6 @@ import { FreezeAccountFacade } from './facades/hts/FreezeAccountFacade';
 import { MintTokenFacade } from './facades/hts/MintTokenFacade';
 import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
 import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
-import { SwapAcknowledgeFacade } from './facades/hts/SwapAcknowledgeFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
@@ -57,7 +56,7 @@ import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
 import { SwapRequestFacade } from './facades/hts/SwapRequestFacade';
-import { SignScheduledTxFacade } from "./facades/SignScheduledTxFacade";
+import { SignScheduledTxFacade } from './facades/SignScheduledTxFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -375,10 +374,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'hts/createSwap': {
-      HederaUtils.isValidSwapRequestParams(request.params);
+      HederaUtils.isValidCreateSwapParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        transaction: await SwapRequestFacade.createSwapRequest(
+        receipt: await SwapRequestFacade.createSwapRequest(
           walletSnapParams,
           request.params,
         ),
