@@ -18,10 +18,10 @@
  *
  */
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
+import type { MetaMaskInpageProvider } from '@metamask/providers';
 import { defaultSnapOrigin } from '../config';
-import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
-import {
+import type { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
+import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
@@ -38,9 +38,8 @@ import {
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
   WipeTokenRequestParams,
-  AtomicSwapRequestParams,
-  AtomicSwapAcknowledgeParams,
   SignScheduledTxParams,
+  CreateSwapRequestParams,
 } from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
@@ -58,7 +57,6 @@ export const getCurrentNetwork = async (): Promise<string> => {
 
 /**
  * Get the installed snaps in MetaMask.
- *
  * @param provider - The MetaMask inpage provider.
  * @returns The snaps installed in MetaMask.
  */
@@ -70,7 +68,6 @@ export const getSnaps = async (
   })) as unknown as GetSnapsResponse;
 /**
  * Connect a snap to MetaMask.
- *
  * @param snapId - The ID of the snap.
  * @param params - The params to pass with the snap to connect.
  */
@@ -100,7 +97,6 @@ export const connectSnap = async (
 
 /**
  * Get the snap from MetaMask.
- *
  * @param version - The version of the snap to install (optional).
  * @returns The snap object returned by the extension.
  */
@@ -137,7 +133,6 @@ export const sendHello = async (network: string, mirrorNodeUrl: string) => {
 
 /**
  * Invoke the "getCurrentAccount" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param externalAccountparams
@@ -266,7 +261,6 @@ export const transferCrypto = async (
 
 /**
  * Invoke the "signMessage" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param signMessageRequestParams
@@ -297,7 +291,6 @@ export const signMessage = async (
 
 /**
  * Invoke the "stakeHbar" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param stakeHbarParams
@@ -328,7 +321,6 @@ export const stakeHbar = async (
 
 /**
  * Invoke the "unstakeHbar" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param externalAccountparams
@@ -356,7 +348,6 @@ export const unstakeHbar = async (
 
 /**
  * Invoke the "approveAllowance" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param approveAllowanceParams
@@ -387,7 +378,6 @@ export const approveAllowance = async (
 
 /**
  * Invoke the "deleteAllowance" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param deleteAllowanceParams
@@ -418,7 +408,6 @@ export const deleteAllowance = async (
 
 /**
  * Invoke the "deleteAccount" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param deleteAccountParams
@@ -449,7 +438,6 @@ export const deleteAccount = async (
 
 /**
  * Invoke the "createToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param createTokenRequestParams
@@ -480,7 +468,6 @@ export const createToken = async (
 
 /**
  * Invoke the "mintToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param mintTokenRequestParams
@@ -511,7 +498,6 @@ export const mintToken = async (
 
 /**
  * Invoke the "burnToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param burnTokenRequestParams
@@ -542,7 +528,6 @@ export const burnToken = async (
 
 /**
  * Invoke the "pauseToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param pauseTokenRequestParams
@@ -573,7 +558,6 @@ export const pauseToken = async (
 
 /**
  * Invoke the "unpauseToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param unpauseTokenRequestParams
@@ -604,7 +588,6 @@ export const unpauseToken = async (
 
 /**
  * Invoke the "associateTokens" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param associateTokensRequestParams
@@ -635,7 +618,6 @@ export const associateTokens = async (
 
 /**
  * Invoke the "dissociateTokens" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param dissociateTokensRequestParams
@@ -666,7 +648,6 @@ export const dissociateTokens = async (
 
 /**
  * Invoke the "deleteToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param deleteTokenRequestParams
@@ -697,7 +678,6 @@ export const deleteToken = async (
 
 /**
  * Invoke the "freezeAccount" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param freezeAccountRequestParams
@@ -728,7 +708,6 @@ export const freezeAccount = async (
 
 /**
  * Invoke the "unfreezeAccount" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param unfreezeAccountRequestParams
@@ -759,7 +738,6 @@ export const unfreezeAccount = async (
 
 /**
  * Invoke the "enableKYCAccount" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param enableKYCAccountRequestParams
@@ -790,7 +768,6 @@ export const enableKYCAccount = async (
 
 /**
  * Invoke the "disableKYCAccount" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param disableKYCAccountRequestParams
@@ -821,7 +798,6 @@ export const disableKYCAccount = async (
 
 /**
  * Invoke the "wipeToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param wipeTokenRequestParams
@@ -852,16 +828,15 @@ export const wipeToken = async (
 
 /**
  * Invoke the "createSwapRequest" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
- * @param swapRequestParams
+ * @param createSwapRequestParams
  * @param externalAccountparams
  */
 export const createSwapRequest = async (
   network: string,
   mirrorNodeUrl: string,
-  swapRequestParams: AtomicSwapRequestParams,
+  createSwapRequestParams: CreateSwapRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -873,38 +848,7 @@ export const createSwapRequest = async (
         params: {
           network,
           mirrorNodeUrl,
-          ...swapRequestParams,
-          ...externalAccountparams,
-        },
-      },
-    },
-  });
-};
-
-/**
- * Invoke the "createSwapAcknowledgement" method from the snap.
- *
- * @param network
- * @param mirrorNodeUrl
- * @param swapAcknowledgeRequestParams
- * @param externalAccountparams
- */
-export const createSwapAcknowledgement = async (
-  network: string,
-  mirrorNodeUrl: string,
-  swapAcknowledgeRequestParams: AtomicSwapAcknowledgeParams,
-  externalAccountparams?: ExternalAccountParams,
-) => {
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapOrigin,
-      request: {
-        method: 'hts/acknowledgeSwap',
-        params: {
-          network,
-          mirrorNodeUrl,
-          ...swapAcknowledgeRequestParams,
+          ...createSwapRequestParams,
           ...externalAccountparams,
         },
       },
@@ -914,7 +858,6 @@ export const createSwapAcknowledgement = async (
 
 /**
  * Invoke the "signScheduledTx" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param signScheduledTxRequestParams
