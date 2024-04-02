@@ -259,7 +259,7 @@ export class CreateSwapFacade {
 
       return txReceipt;
     } catch (error: any) {
-      console.error(`Error while trying to transfer crypto: ${String(error)}`);
+      console.error(`Error while trying to create atomic swap: ${String(error)}`);
       throw new Error(error);
     }
   }
