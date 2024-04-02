@@ -63,7 +63,7 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import type { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
-import { SignScheduledTx } from '../components/cards/hts/SignScheduledTx';
+import { SignScheduledTx } from '../components/cards/SignScheduledTx';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);

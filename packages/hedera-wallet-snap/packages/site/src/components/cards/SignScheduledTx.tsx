@@ -23,13 +23,13 @@ import { useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
-} from '../../../contexts/MetamaskContext';
-import useModal from '../../../hooks/useModal';
-import type { Account, SignScheduledTxParams } from '../../../types/snap';
-import { shouldDisplayReconnectButton, signScheduledTx } from '../../../utils';
-import { Card, SendHelloButton } from '../../base';
-import type { GetExternalAccountRef } from '../../sections/ExternalAccount';
-import ExternalAccount from '../../sections/ExternalAccount';
+} from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
+import type { Account, SignScheduledTxParams } from '../../types/snap';
+import { shouldDisplayReconnectButton, signScheduledTx } from '../../utils';
+import { Card, SendHelloButton } from '../base';
+import type { GetExternalAccountRef } from '../sections/ExternalAccount';
+import ExternalAccount from '../sections/ExternalAccount';
 
 type Props = {
   network: string;
