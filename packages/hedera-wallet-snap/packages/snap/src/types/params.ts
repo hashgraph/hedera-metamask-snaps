@@ -145,7 +145,7 @@ export type WipeTokenRequestParams = {
   serialNumbers?: number[];
 };
 
-export type AtomicSwapRequestParams = {
+export type CreateSwapRequestParams = {
   atomicSwaps: AtomicSwap[];
   memo?: string;
   maxFee?: number; // hbars
