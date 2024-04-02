@@ -28,10 +28,9 @@ import useModal from '../../../hooks/useModal';
 import type {
   Account,
   AtomicSwap,
-  AtomicSwapRequestParams,
-  TransferData,
+  CreateSwapRequestParams,
+  SimpleTransfer,
 } from '../../../types/snap';
-import { AssetType } from '../../../types/snap';
 import {
   createSwapRequest,
   shouldDisplayReconnectButton,
@@ -54,8 +53,10 @@ const SwapTokensRequest: FC<Props> = ({
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [destinationAccountId, setDestinationAccountId] = useState('');
-  const [sendHbarAmount, setSendHbarAmount] = useState<number>();
+  const [sendToAddress, setSendToAddress] = useState('');
+  const [sendHbarAmount, setSendHbarAmount] = useState(0);
+  const [receiveTokenId, setReceiveTokenId] = useState('');
+  const [receiveTokenAmount, setReceiveTokenAmount] = useState(0);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
@@ -69,33 +70,34 @@ const SwapTokensRequest: FC<Props> = ({
         throw new Error('undefined external account params');
       }
 
-      const senderData = {
-        accountId: externalAccountParams.externalAccount.accountIdOrEvmAddress,
+      const toTransfer: SimpleTransfer = {
+        assetType: 'HBAR',
+        to: sendToAddress,
         amount: sendHbarAmount,
-        assetType: AssetType.HBAR,
-      } as TransferData;
+      } as SimpleTransfer;
 
-      const receiverData = {
-        accountId: destinationAccountId,
-        amount: 0,
-        assetType: AssetType.HBAR,
-      } as TransferData;
+      const fromTransfer: SimpleTransfer = {
+        assetType = 'TOKEN',
+        to: '', //todo - get sender address
+        amount: receiveTokenAmount,
+        assetId: receiveTokenId,
+      } as SimpleTransfer;
 
-      const swap = {
-        sender: senderData,
-        receiver: receiverData,
+      const atomicSwap = {
+        sender: toTransfer,
+        receiver: fromTransfer,
       } as AtomicSwap;
 
-      const swaps = [swap];
+      const atomicSwaps = [atomicSwap];
 
-      const swapTokenParams = {
-        atomicSwaps: swaps,
-      } as AtomicSwapRequestParams;
+      const createSwapRequestParams = {
+        atomicSwaps,
+      } as CreateSwapRequestParams;
 
       const response: any = await createSwapRequest(
         network,
         mirrorNodeUrl,
-        swapTokenParams,
+        createSwapRequestParams,
         externalAccountParams,
       );
 
@@ -130,25 +132,50 @@ const SwapTokensRequest: FC<Props> = ({
             <ExternalAccount ref={externalAccountRef} />
             <br />
             <label>
-              Enter the destination Account ID
+              Enter the address for the other party
               <input
-                type="text"
+                type="string"
                 style={{ width: '100%' }}
-                value={destinationAccountId}
-                placeholder="0.0.1234"
-                onChange={(e) => setDestinationAccountId(e.target.value)}
+                value={sendToAddress}
+                placeholder=""
+                onChange={(e) => setSendToAddress(e.target.value)}
               />
             </label>
             <br />
+
             <label>
-              Enter the amount of Hbar to send
+              Enter the amount of Hbar for the sender to send
               <input
                 type="number"
                 style={{ width: '100%' }}
                 value={sendHbarAmount}
-                placeholder="0"
+                placeholder=""
                 onChange={(e) =>
                   setSendHbarAmount(parseInt(e.target.value, 10))
+                }
+              />
+            </label>
+            <br />
+            <label>
+              Enter the token id for the receiver to send
+              <input
+                type="string"
+                style={{ width: '100%' }}
+                value={receiveTokenId}
+                placeholder=""
+                onChange={(e) => setReceiveTokenId(e.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the token amount for the receiver to send
+              <input
+                type="number"
+                style={{ width: '100%' }}
+                value={receiveTokenAmount}
+                placeholder=""
+                onChange={(e) =>
+                  setReceiveTokenAmount(parseInt(e.target.value, 10))
                 }
               />
             </label>
