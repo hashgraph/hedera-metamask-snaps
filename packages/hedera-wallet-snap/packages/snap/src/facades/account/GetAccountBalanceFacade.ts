@@ -18,10 +18,10 @@
  *
  */
 
-import type { WalletSnapParams } from '../types/state';
-import { SnapState } from '../snap/SnapState';
+import type { WalletSnapParams } from '../../types/state';
+import { SnapState } from '../../snap/SnapState';
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 
 export class GetAccountBalanceFacade {
   public static async getAccountBalance(walletSnapParams: WalletSnapParams) {

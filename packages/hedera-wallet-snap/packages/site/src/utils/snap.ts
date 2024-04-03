@@ -25,6 +25,7 @@ import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
+  CreateSwapRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -35,11 +36,12 @@ import type {
   MintTokenRequestParams,
   PauseOrDeleteTokenRequestParams,
   SignMessageRequestParams,
+  SignScheduledTxParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
+  UpdateTokenFeeScheduleRequestParams,
+  UpdateTokenRequestParams,
   WipeTokenRequestParams,
-  SignScheduledTxParams,
-  CreateSwapRequestParams,
 } from '../types/snap';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
@@ -467,6 +469,68 @@ export const createToken = async (
 };
 
 /**
+ * Invoke the "updateToken" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param updateTokenRequestParams
+ * @param externalAccountparams
+ */
+export const updateToken = async (
+  network: string,
+  mirrorNodeUrl: string,
+  updateTokenRequestParams: UpdateTokenRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/updateToken',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...updateTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "updateTokenFeeSchedule" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param updateTokenFeeScheduleRequestParams
+ * @param externalAccountparams
+ */
+export const updateTokenFeeSchedule = async (
+  network: string,
+  mirrorNodeUrl: string,
+  updateTokenFeeScheduleRequestParams: UpdateTokenFeeScheduleRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hts/updateTokenFeeSchedule',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...updateTokenFeeScheduleRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "mintToken" method from the snap.
  * @param network
  * @param mirrorNodeUrl
@@ -819,6 +883,34 @@ export const wipeToken = async (
           network,
           mirrorNodeUrl,
           ...wipeTokenRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "showAccountPrivateKey" method from the snap.
+ *
+ * @param network
+ * @param mirrorNodeUrl
+ * @param externalAccountparams
+ */
+export const showAccountPrivateKey = async (
+  network: string,
+  mirrorNodeUrl: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'showAccountPrivateKey',
+        params: {
+          network,
+          mirrorNodeUrl,
           ...externalAccountparams,
         },
       },

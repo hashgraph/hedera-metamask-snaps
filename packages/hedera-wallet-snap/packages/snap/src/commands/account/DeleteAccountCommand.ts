@@ -18,25 +18,25 @@
  *
  */
 
-import {
-  TokenDissociateTransaction,
-  type AccountId,
-  type Client,
-} from '@hashgraph/sdk';
+import type { Client } from '@hashgraph/sdk';
+import { AccountDeleteTransaction } from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
-export class DissociateTokensCommand {
-  readonly #tokenIds: string[];
+export class DeleteAccountCommand {
+  readonly #transferAccountId: string;
 
-  constructor(tokenIds: string[]) {
-    this.#tokenIds = tokenIds;
+  constructor(transferAccountId: string) {
+    this.#transferAccountId = transferAccountId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new TokenDissociateTransaction()
-      .setAccountId(client.operatorAccountId as AccountId)
-      .setTokenIds(this.#tokenIds);
+    const transaction = new AccountDeleteTransaction()
+      .setAccountId(
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        client.operatorAccountId!,
+      )
+      .setTransferAccountId(this.#transferAccountId);
 
     return await Utils.executeTransaction(client, transaction);
   }

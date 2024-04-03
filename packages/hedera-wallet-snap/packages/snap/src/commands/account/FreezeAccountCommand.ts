@@ -19,24 +19,34 @@
  */
 
 import {
-  TokenDissociateTransaction,
-  type AccountId,
+  TokenFreezeTransaction,
+  TokenUnfreezeTransaction,
   type Client,
 } from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
-export class DissociateTokensCommand {
-  readonly #tokenIds: string[];
+export class FreezeAccountCommand {
+  readonly #freeze: boolean;
 
-  constructor(tokenIds: string[]) {
-    this.#tokenIds = tokenIds;
+  readonly #tokenId: string;
+
+  readonly #accountId: string;
+
+  constructor(freeze: boolean, tokenId: string, accountId: string) {
+    this.#freeze = freeze;
+    this.#tokenId = tokenId;
+    this.#accountId = accountId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new TokenDissociateTransaction()
-      .setAccountId(client.operatorAccountId as AccountId)
-      .setTokenIds(this.#tokenIds);
+    let transaction: TokenFreezeTransaction | TokenUnfreezeTransaction;
+    if (this.#freeze) {
+      transaction = new TokenFreezeTransaction();
+    } else {
+      transaction = new TokenUnfreezeTransaction();
+    }
+    transaction.setTokenId(this.#tokenId).setAccountId(this.#accountId);
 
     return await Utils.executeTransaction(client, transaction);
   }

@@ -31,6 +31,7 @@ import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
 import { SignMessage } from '../components/cards/SignMessage';
+import { SignScheduledTx } from '../components/cards/SignScheduledTx';
 import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
@@ -46,10 +47,12 @@ import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
 import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
 import { PauseToken } from '../components/cards/hts/PauseToken';
+import { SwapTokensRequest } from '../components/cards/hts/SwapTokensRequest';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
+import { UpdateToken } from '../components/cards/hts/UpdateToken';
+import { UpdateTokenFeeSchedule } from '../components/cards/hts/UpdateTokenFeeSchedule';
 import { WipeToken } from '../components/cards/hts/WipeToken';
-import { SwapTokensRequest } from '../components/cards/hts/SwapTokensRequest';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -63,7 +66,6 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import type { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
-import { SignScheduledTx } from '../components/cards/SignScheduledTx';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -208,6 +210,18 @@ const Index = () => {
         />
 
         <CreateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTokenFeeSchedule
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

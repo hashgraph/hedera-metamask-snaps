@@ -18,16 +18,16 @@
  *
  */
 
-import type { WalletSnapParams } from '../types/state';
-import type { DeleteAllowanceRequestParams } from '../types/params';
-import type { MirrorTokenInfo, TxReceipt } from '../types/hedera';
+import type { WalletSnapParams } from '../../types/state';
+import type { DeleteAllowanceRequestParams } from '../../types/params';
+import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../utils/SnapUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import { DeleteAllowanceCommand } from '../commands/DeleteAllowanceCommand';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { DeleteAllowanceCommand } from '../../commands/allowance/DeleteAllowanceCommand';
 
 /**
  *

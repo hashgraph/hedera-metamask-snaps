@@ -21,8 +21,8 @@
 import type { FC } from 'react';
 import { useContext, useRef, useState } from 'react';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
 import type {
@@ -77,7 +77,7 @@ const SwapTokensRequest: FC<Props> = ({
       } as SimpleTransfer;
 
       const fromTransfer: SimpleTransfer = {
-        assetType = 'TOKEN',
+        assetType: 'TOKEN',
         to: '', //todo - get sender address
         amount: receiveTokenAmount,
         assetId: receiveTokenId,

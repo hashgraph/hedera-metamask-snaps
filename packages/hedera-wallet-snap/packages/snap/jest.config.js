@@ -21,6 +21,9 @@
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
+ *
+ * note on the window.location.href global: without this, some tests will fail
+ * because of an upstream hashgraph / node-forge dependency
  */
 module.exports = {
   clearMocks: false,
@@ -28,6 +31,7 @@ module.exports = {
     window: {
       location: {
         hostname: 'hedera-pulse',
+        href: 'http://localhost',
       },
     },
   },

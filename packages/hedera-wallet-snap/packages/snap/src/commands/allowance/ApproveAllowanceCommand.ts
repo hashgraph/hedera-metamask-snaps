@@ -18,17 +18,15 @@
  *
  */
 
-import type { ApproveAllowanceAssetDetail } from '../types/params';
-import type { TxReceipt } from '../types/hedera';
 import {
   AccountAllowanceApproveTransaction,
+  Hbar,
   type AccountId,
   type Client,
-  Hbar,
 } from '@hashgraph/sdk';
-import { Utils } from '../utils/Utils';
-import { CryptoUtils } from '../utils/CryptoUtils';
-import { EMPTY_STRING } from '../types/constants';
+import type { TxReceipt } from '../../types/hedera';
+import type { ApproveAllowanceAssetDetail } from '../../types/params';
+import { Utils } from '../../utils/Utils';
 
 export class ApproveAllowanceCommand {
   readonly #spenderAccountId: string;
@@ -87,46 +85,6 @@ export class ApproveAllowanceCommand {
       }
     }
 
-    transaction.freezeWith(client);
-
-    const txResponse = await transaction.execute(client);
-
-    const receipt = await txResponse.getReceipt(client);
-
-    let newExchangeRate;
-    if (receipt.exchangeRate) {
-      newExchangeRate = {
-        ...receipt.exchangeRate,
-        expirationTime: Utils.timestampToString(
-          receipt.exchangeRate.expirationTime,
-        ),
-      };
-    }
-
-    return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId
-        ? receipt.accountId.toString()
-        : EMPTY_STRING,
-      fileId: receipt.fileId ? receipt.fileId : EMPTY_STRING,
-      contractId: receipt.contractId ? receipt.contractId : EMPTY_STRING,
-      topicId: receipt.topicId ? receipt.topicId : EMPTY_STRING,
-      tokenId: receipt.tokenId ? receipt.tokenId : EMPTY_STRING,
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : EMPTY_STRING,
-      exchangeRate: newExchangeRate,
-      topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
-        : EMPTY_STRING,
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply
-        ? String(receipt.totalSupply)
-        : EMPTY_STRING,
-      scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
-        : EMPTY_STRING,
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
-    } as TxReceipt;
+    return await Utils.executeTransaction(client, transaction);
   }
 }

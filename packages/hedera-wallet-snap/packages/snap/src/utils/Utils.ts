@@ -18,6 +18,11 @@
  *
  */
 
+import type { Client, TransactionReceipt } from '@hashgraph/sdk';
+import { EMPTY_STRING, MAX_RETRIES } from '../types/constants';
+import type { TxReceipt } from '../types/hedera';
+import { CryptoUtils } from './CryptoUtils';
+
 export class Utils {
   public static timestampToString(
     data: string | number | Date | null | undefined,
@@ -58,5 +63,72 @@ export class Utils {
    */
   public static capitalizeFirstLetter(string: string): string {
     return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  public static formatTransactionReceipt(
+    receipt: TransactionReceipt,
+  ): TxReceipt {
+    let newExchangeRate;
+    if (receipt.exchangeRate) {
+      newExchangeRate = {
+        ...receipt.exchangeRate,
+        expirationTime: Utils.timestampToString(
+          receipt.exchangeRate.expirationTime,
+        ),
+      };
+    }
+
+    return {
+      status: receipt.status.toString(),
+      accountId: receipt.accountId
+        ? receipt.accountId.toString()
+        : EMPTY_STRING,
+      fileId: receipt.fileId ? receipt.fileId : EMPTY_STRING,
+      contractId: receipt.contractId ? receipt.contractId : EMPTY_STRING,
+      topicId: receipt.topicId ? receipt.topicId : EMPTY_STRING,
+      tokenId: receipt.tokenId ? receipt.tokenId : EMPTY_STRING,
+      scheduleId: receipt.scheduleId ? receipt.scheduleId : EMPTY_STRING,
+      exchangeRate: newExchangeRate,
+      topicSequenceNumber: receipt.topicSequenceNumber
+        ? String(receipt.topicSequenceNumber)
+        : EMPTY_STRING,
+      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
+      totalSupply: receipt.totalSupply
+        ? String(receipt.totalSupply)
+        : EMPTY_STRING,
+      scheduledTransactionId: receipt.scheduledTransactionId
+        ? receipt.scheduledTransactionId.toString()
+        : EMPTY_STRING,
+      serials: JSON.parse(JSON.stringify(receipt.serials)),
+      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
+      children: JSON.parse(JSON.stringify(receipt.children)),
+    } as TxReceipt;
+  }
+
+  public static async executeTransaction(
+    client: Client,
+    transaction: any,
+  ): Promise<TxReceipt> {
+    transaction.freezeWith(client);
+    let retries = 0;
+    while (retries < MAX_RETRIES) {
+      try {
+        const txResponse = await transaction.execute(client);
+        const receipt = await txResponse.getReceipt(client);
+
+        // If the transaction succeeded, return the receipt
+        return Utils.formatTransactionReceipt(receipt);
+      } catch (error: any) {
+        // If the error is BUSY, retry the transaction
+        if (error.toString().includes('BUSY')) {
+          retries += 1;
+          console.log(`Retry attempt: ${retries}`);
+        } else {
+          // if the error is not BUSY, throw the error
+          throw error;
+        }
+      }
+    }
+    throw new Error(`Transaction failed after ${MAX_RETRIES} attempts`);
   }
 }
