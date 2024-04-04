@@ -25,7 +25,6 @@ import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
-  CreateSwapRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -33,6 +32,7 @@ import type {
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
   GetTransactionsRequestParams,
+  InitiateSwapRequestParams,
   MintTokenRequestParams,
   PauseOrDeleteTokenRequestParams,
   SignMessageRequestParams,
@@ -919,16 +919,16 @@ export const showAccountPrivateKey = async (
 };
 
 /**
- * Invoke the "createSwapRequest" method from the snap.
+ * Invoke the "initiateSwap" method from the snap.
  * @param network
  * @param mirrorNodeUrl
- * @param createSwapRequestParams
+ * @param initiateSwapRequestParams
  * @param externalAccountparams
  */
-export const createSwapRequest = async (
+export const initiateSwap = async (
   network: string,
   mirrorNodeUrl: string,
-  createSwapRequestParams: CreateSwapRequestParams,
+  initiateSwapRequestParams: InitiateSwapRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -936,11 +936,11 @@ export const createSwapRequest = async (
     params: {
       snapId: defaultSnapOrigin,
       request: {
-        method: 'hts/createSwap',
+        method: 'hts/initiateSwap',
         params: {
           network,
           mirrorNodeUrl,
-          ...createSwapRequestParams,
+          ...initiateSwapRequestParams,
           ...externalAccountparams,
         },
       },

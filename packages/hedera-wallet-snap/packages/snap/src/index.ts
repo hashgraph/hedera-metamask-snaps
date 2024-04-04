@@ -43,8 +43,8 @@ import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { AtomicSwapFacade } from './facades/hts/AtomicSwapFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
-import { CreateSwapFacade } from './facades/hts/CreateSwapFacade';
 import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
 import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
@@ -105,9 +105,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     network,
     mirrorNodeUrl,
     isExternalAccount,
-  );
-  console.log(
-    `Current account: ${JSON.stringify(state.currentAccount, null, 4)}`,
   );
 
   const walletSnapParams: WalletSnapParams = {
@@ -418,11 +415,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
-    case 'hts/createSwap': {
-      HederaUtils.isValidCreateSwapParams(request.params);
+    case 'hts/initiateSwap': {
+      HederaUtils.isValidInitiateSwapParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await CreateSwapFacade.createSwap(
+        receipt: await AtomicSwapFacade.initiateSwap(
           walletSnapParams,
           request.params,
         ),

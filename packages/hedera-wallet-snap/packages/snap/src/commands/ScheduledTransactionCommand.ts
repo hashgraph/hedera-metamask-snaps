@@ -19,21 +19,23 @@
  */
 
 import {
-  type AccountId,
-  type Client,
   Hbar,
   NftId,
   ScheduleCreateTransaction,
+  ScheduleSignTransaction,
+  Timestamp,
   TransferTransaction,
+  type AccountId,
+  type Client,
+  type PublicKey,
 } from '@hashgraph/sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import { Utils } from '../../utils/Utils';
+import type { SimpleTransfer, TxReceipt } from '../types/hedera';
+import { Utils } from '../utils/Utils';
 
-export class CreateSwapCommand {
-  readonly #atomicSwaps: AtomicSwap[];
+export class ScheduledTransactionCommand {
+  readonly #transfers: SimpleTransfer[];
 
   readonly #memo: string | null;
 
@@ -44,38 +46,29 @@ export class CreateSwapCommand {
   readonly #serviceFeeToAddress: string | null;
 
   constructor(
-    atomicSwaps: AtomicSwap[],
+    transfers: SimpleTransfer[],
     memo: string | null,
     maxFee: number | null,
     serviceFeesToPay: Record<string, number>,
     serviceFeeToAddress: string | null,
   ) {
-    this.#atomicSwaps = atomicSwaps;
+    this.#transfers = transfers;
     this.#memo = memo;
     this.#maxFee = maxFee;
     this.#serviceFeesToPay = serviceFeesToPay;
     this.#serviceFeeToAddress = serviceFeeToAddress;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async createScheduledTransaction(client: Client): Promise<TxReceipt> {
     const serviceFeeToAddr: string = this.#serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
-    const transfers: SimpleTransfer[] = [];
-
-    for (const swap of this.#atomicSwaps) {
-      transfers.push(swap.sender);
-      transfers.push(swap.receiver);
-    }
-
-    const transaction = new TransferTransaction().setTransactionMemo(
-      this.#memo ?? '',
-    );
+    const transaction = new TransferTransaction();
 
     if (this.#maxFee) {
       transaction.setMaxTransactionFee(new Hbar(this.#maxFee.toFixed(8)));
     }
 
-    for (const transfer of transfers) {
+    for (const transfer of this.#transfers) {
       if (transfer.assetType === 'HBAR') {
         if (ethers.isAddress(transfer.to)) {
           transfer.to = `0.0.${transfer.to.slice(2)}`;
@@ -159,14 +152,28 @@ export class CreateSwapCommand {
       }
     }
 
-    const scheduleTxResponse = await new ScheduleCreateTransaction()
+    // Set the time to 30 minutes from now
+    // Note: getTime() returns time in milliseconds, so 30 minutes = 30 * 60 * 1000 milliseconds
+    const expirationTime = Timestamp.fromDate(
+      new Date(new Date().getTime() + 30 * 60 * 1000),
+    );
+
+    const scheduledTransaction = new ScheduleCreateTransaction()
       .setScheduledTransaction(transaction)
-      .execute(client);
+      .setAdminKey(client.operatorPublicKey as PublicKey)
+      .setPayerAccountId(client.operatorAccountId as AccountId)
+      .setScheduleMemo(this.#memo ?? '')
+      .setExpirationTime(expirationTime);
 
-    const receipt = await scheduleTxResponse.getReceipt(client);
+    return await Utils.executeTransaction(client, scheduledTransaction);
+  }
 
-    return {
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-    } as TxReceipt;
+  public async signScheduledTransaction(
+    client: Client,
+    scheduleId: string,
+  ): Promise<TxReceipt> {
+    const transaction = new ScheduleSignTransaction().setScheduleId(scheduleId);
+
+    return await Utils.executeTransaction(client, transaction);
   }
 }

@@ -31,10 +31,7 @@ import type {
   CreateSwapRequestParams,
   SimpleTransfer,
 } from '../../../types/snap';
-import {
-  createSwapRequest,
-  shouldDisplayReconnectButton,
-} from '../../../utils';
+import { initiateSwap, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import type { GetExternalAccountRef } from '../../sections/ExternalAccount';
 import ExternalAccount from '../../sections/ExternalAccount';
@@ -70,22 +67,21 @@ const SwapTokensRequest: FC<Props> = ({
         throw new Error('undefined external account params');
       }
 
-      const toTransfer: SimpleTransfer = {
+      const requester: SimpleTransfer = {
         assetType: 'HBAR',
         to: sendToAddress,
         amount: sendHbarAmount,
       } as SimpleTransfer;
 
-      const fromTransfer: SimpleTransfer = {
+      const responder: SimpleTransfer = {
         assetType: 'TOKEN',
-        to: '', //todo - get sender address
         amount: receiveTokenAmount,
         assetId: receiveTokenId,
       } as SimpleTransfer;
 
       const atomicSwap = {
-        sender: toTransfer,
-        receiver: fromTransfer,
+        requester,
+        responder,
       } as AtomicSwap;
 
       const atomicSwaps = [atomicSwap];
@@ -94,7 +90,7 @@ const SwapTokensRequest: FC<Props> = ({
         atomicSwaps,
       } as CreateSwapRequestParams;
 
-      const response: any = await createSwapRequest(
+      const response: any = await initiateSwap(
         network,
         mirrorNodeUrl,
         createSwapRequestParams,

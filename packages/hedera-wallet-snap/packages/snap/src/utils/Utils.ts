@@ -129,6 +129,7 @@ export class Utils {
         }
       }
     }
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     throw new Error(`Transaction failed after ${MAX_RETRIES} attempts`);
   }
 }

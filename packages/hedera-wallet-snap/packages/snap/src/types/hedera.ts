@@ -53,8 +53,8 @@ export enum AssetType {
 }
 
 export type AtomicSwap = {
-  sender: SimpleTransfer;
-  receiver: SimpleTransfer;
+  requester: SimpleTransfer;
+  responder: SimpleTransfer;
 };
 
 export type Token = {

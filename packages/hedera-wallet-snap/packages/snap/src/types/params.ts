@@ -168,7 +168,7 @@ export type UpdateTokenFeeScheduleRequestParams = {
   customFees: TokenCustomFee[];
 };
 
-export type CreateSwapRequestParams = {
+export type InitiateSwapRequestParams = {
   atomicSwaps: AtomicSwap[];
   memo?: string;
   maxFee?: number; // hbars
