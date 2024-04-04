@@ -46,7 +46,10 @@ export class FreezeAccountCommand {
     } else {
       transaction = new TokenUnfreezeTransaction();
     }
-    transaction.setTokenId(this.#tokenId).setAccountId(this.#accountId);
+    transaction
+      .setTokenId(this.#tokenId)
+      .setAccountId(this.#accountId)
+      .freezeWith(client);
 
     return await Utils.executeTransaction(client, transaction);
   }

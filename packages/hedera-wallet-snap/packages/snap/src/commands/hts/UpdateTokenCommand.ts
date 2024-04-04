@@ -42,6 +42,8 @@ export class UpdateTokenCommand {
 
     const transaction = await updateTransaction.sign(this.#adminKey);
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 

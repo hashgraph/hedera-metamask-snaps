@@ -52,6 +52,8 @@ export class BurnTokenCommand {
       transaction.setAmount(this.#amount as number);
     }
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }

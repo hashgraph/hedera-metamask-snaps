@@ -67,16 +67,17 @@ const SwapTokensRequest: FC<Props> = ({
         throw new Error('undefined external account params');
       }
 
-      const requester: SimpleTransfer = {
+      const responder: SimpleTransfer = {
         assetType: 'HBAR',
-        to: sendToAddress,
+
         amount: sendHbarAmount,
       } as SimpleTransfer;
 
-      const responder: SimpleTransfer = {
-        assetType: 'TOKEN',
+      const requester: SimpleTransfer = {
+        assetType: 'NFT',
         amount: receiveTokenAmount,
         assetId: receiveTokenId,
+        to: sendToAddress,
       } as SimpleTransfer;
 
       const atomicSwap = {

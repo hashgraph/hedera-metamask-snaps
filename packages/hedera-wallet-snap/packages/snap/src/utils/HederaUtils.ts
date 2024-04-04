@@ -734,6 +734,15 @@ export class HederaUtils {
       );
     }
 
+    if (!isRequester && transfer.assetType === 'NFT') {
+      console.error(
+        'Invalid atomicSwap Params passed. NFT cannot be passed for responder',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid atomicSwap Params passed. NFT cannot be passed for responder',
+      );
+    }
+
     // Check if to is valid
     this.checkValidString(transfer, 'atomicSwap', 'to', isRequester);
     // Responder detail cannot have 'to' field

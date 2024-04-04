@@ -41,6 +41,8 @@ export class DeleteTokenCommand {
       .setTokenId(this.#tokenId)
       .sign(this.#adminKey);
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }

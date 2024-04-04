@@ -18,6 +18,7 @@
  *
  */
 
+import type { AccountId, Client, PublicKey } from '@hashgraph/sdk';
 import {
   Hbar,
   NftId,
@@ -25,17 +26,13 @@ import {
   ScheduleSignTransaction,
   Timestamp,
   TransferTransaction,
-  type AccountId,
-  type Client,
-  type PublicKey,
 } from '@hashgraph/sdk';
 import { ethers } from 'ethers';
-import _ from 'lodash';
-import type { SimpleTransfer, TxReceipt } from '../types/hedera';
-import { Utils } from '../utils/Utils';
+import type { AtomicSwap, TxReceipt } from '../../types/hedera';
+import { Utils } from '../../utils/Utils';
 
-export class ScheduledTransactionCommand {
-  readonly #transfers: SimpleTransfer[];
+export class AtomicSwapCommand {
+  readonly #atomicSwaps: AtomicSwap[];
 
   readonly #memo: string | null;
 
@@ -46,13 +43,13 @@ export class ScheduledTransactionCommand {
   readonly #serviceFeeToAddress: string | null;
 
   constructor(
-    transfers: SimpleTransfer[],
+    atomicSwaps: AtomicSwap[],
     memo: string | null,
     maxFee: number | null,
     serviceFeesToPay: Record<string, number>,
     serviceFeeToAddress: string | null,
   ) {
-    this.#transfers = transfers;
+    this.#atomicSwaps = atomicSwaps;
     this.#memo = memo;
     this.#maxFee = maxFee;
     this.#serviceFeesToPay = serviceFeesToPay;
@@ -68,58 +65,43 @@ export class ScheduledTransactionCommand {
       transaction.setMaxTransactionFee(new Hbar(this.#maxFee.toFixed(8)));
     }
 
-    for (const transfer of this.#transfers) {
-      if (transfer.assetType === 'HBAR') {
-        if (ethers.isAddress(transfer.to)) {
-          transfer.to = `0.0.${transfer.to.slice(2)}`;
+    for (const swap of this.#atomicSwaps) {
+      if (swap.requester.assetType === 'HBAR') {
+        if (ethers.isAddress(swap.requester.to)) {
+          swap.requester.to = `0.0.${swap.requester.to.slice(2)}`;
         }
 
-        transaction.addHbarTransfer(transfer.to, transfer.amount);
-        if (_.isEmpty(transfer.from)) {
-          transaction.addHbarTransfer(
-            client.operatorAccountId as AccountId,
-            -transfer.amount,
-          );
-        } else {
-          transaction.addApprovedHbarTransfer(
-            transfer.from as string,
-            -transfer.amount,
-          );
-        }
+        transaction.addHbarTransfer(swap.requester.to, swap.requester.amount);
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          -swap.requester.amount,
+        );
 
         // Service Fee
-        if (this.#serviceFeesToPay[transfer.assetType] > 0) {
+        if (this.#serviceFeesToPay[swap.requester.assetType] > 0) {
           transaction.addHbarTransfer(
             serviceFeeToAddr,
-            this.#serviceFeesToPay[transfer.assetType],
+            this.#serviceFeesToPay[swap.requester.assetType],
           );
           transaction.addHbarTransfer(
             client.operatorAccountId as AccountId,
-            -this.#serviceFeesToPay[transfer.assetType],
+            -this.#serviceFeesToPay[swap.requester.assetType],
           );
         }
-      } else if (transfer.assetType === 'TOKEN') {
-        const assetid = transfer.assetId as string;
-        const multiplier = Math.pow(10, transfer.decimals as number);
+      } else if (swap.requester.assetType === 'TOKEN') {
+        const assetid = swap.requester.assetId as string;
+        const multiplier = Math.pow(10, swap.requester.decimals as number);
 
         transaction.addTokenTransfer(
           assetid,
-          transfer.to,
-          transfer.amount * multiplier,
+          swap.requester.to,
+          swap.requester.amount * multiplier,
         );
-        if (_.isEmpty(transfer.from)) {
-          transaction.addTokenTransfer(
-            assetid,
-            client.operatorAccountId as AccountId,
-            -(transfer.amount * multiplier),
-          );
-        } else {
-          transaction.addApprovedTokenTransfer(
-            assetid,
-            transfer.from as string,
-            -(transfer.amount * multiplier),
-          );
-        }
+        transaction.addTokenTransfer(
+          assetid,
+          client.operatorAccountId as AccountId,
+          -(swap.requester.amount * multiplier),
+        );
 
         // Service Fee
         if (this.#serviceFeesToPay[assetid] > 0) {
@@ -134,21 +116,43 @@ export class ScheduledTransactionCommand {
             -(this.#serviceFeesToPay[assetid] * multiplier),
           );
         }
-      } else if (transfer.assetType === 'NFT') {
-        const assetid = NftId.fromString(transfer.assetId as string);
-        if (_.isEmpty(transfer.from)) {
-          transaction.addNftTransfer(
-            assetid,
-            client.operatorAccountId as AccountId,
-            transfer.to,
-          );
-        } else {
-          transaction.addApprovedNftTransfer(
-            assetid,
-            transfer.from as string,
-            transfer.to,
-          );
+      } else if (swap.requester.assetType === 'NFT') {
+        const assetid = NftId.fromString(swap.requester.assetId as string);
+        transaction.addNftTransfer(
+          assetid,
+          client.operatorAccountId as AccountId,
+          swap.requester.to,
+        );
+      }
+
+      if (swap.responder.assetType === 'HBAR') {
+        if (ethers.isAddress(swap.responder.to)) {
+          swap.responder.to = `0.0.${swap.responder.to.slice(2)}`;
         }
+
+        transaction.addHbarTransfer(
+          client.operatorAccountId as AccountId,
+          swap.responder.amount,
+        );
+
+        transaction.addHbarTransfer(swap.requester.to, -swap.responder.amount);
+      } else if (swap.responder.assetType === 'TOKEN') {
+        const assetid = swap.responder.assetId as string;
+        const multiplier = Math.pow(10, swap.responder.decimals as number);
+
+        transaction.addTokenTransfer(
+          assetid,
+          client.operatorAccountId as AccountId,
+          swap.responder.amount * multiplier,
+        );
+
+        transaction.addTokenTransfer(
+          assetid,
+          swap.requester.to,
+          -swap.responder.amount * multiplier,
+        );
+      } else if (swap.responder.assetType === 'NFT') {
+        // This will never happen as NFTs are not supported as responder
       }
     }
 
@@ -163,7 +167,8 @@ export class ScheduledTransactionCommand {
       .setAdminKey(client.operatorPublicKey as PublicKey)
       .setPayerAccountId(client.operatorAccountId as AccountId)
       .setScheduleMemo(this.#memo ?? '')
-      .setExpirationTime(expirationTime);
+      .setExpirationTime(expirationTime)
+      .freezeWith(client);
 
     return await Utils.executeTransaction(client, scheduledTransaction);
   }

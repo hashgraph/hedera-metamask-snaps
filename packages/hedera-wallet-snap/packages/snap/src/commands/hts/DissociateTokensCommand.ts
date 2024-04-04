@@ -36,7 +36,8 @@ export class DissociateTokensCommand {
   public async execute(client: Client): Promise<TxReceipt> {
     const transaction = new TokenDissociateTransaction()
       .setAccountId(client.operatorAccountId as AccountId)
-      .setTokenIds(this.#tokenIds);
+      .setTokenIds(this.#tokenIds)
+      .freezeWith(client);
 
     return await Utils.executeTransaction(client, transaction);
   }

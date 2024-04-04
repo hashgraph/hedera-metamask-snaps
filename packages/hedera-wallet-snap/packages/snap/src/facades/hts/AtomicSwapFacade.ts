@@ -22,14 +22,10 @@ import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
+import type { AccountInfo } from 'src/types/account';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { ScheduledTransactionCommand } from '../../commands/ScheduledTransactionCommand';
-import type {
-  AccountBalance,
-  AtomicSwap,
-  SimpleTransfer,
-  TxReceipt,
-} from '../../types/hedera';
+import { AtomicSwapCommand } from '../../commands/hts/AtomicSwapCommand';
+import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
 import type { InitiateSwapRequestParams, ServiceFee } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -132,7 +128,6 @@ export class AtomicSwapFacade {
         panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
       }
 
-      const transfersToExecute: SimpleTransfer[] = [];
       for (const swap of atomicSwaps) {
         const txNumber = atomicSwaps.indexOf(swap) + 1;
         panelToShow.push(text(`Swap #${txNumber}`));
@@ -141,14 +136,12 @@ export class AtomicSwapFacade {
         let accountIdToSendFrom = hederaAccountId;
         swap.requester = await this.createTxDialog(
           accountIdToSendFrom,
-          state.accountState[hederaEvmAddress][network].accountInfo.balance,
           swap.requester,
           mirrorNodeUrl,
           panelToShow,
           serviceFeesToPay,
           true,
         );
-        transfersToExecute.push(swap.requester);
 
         panelToShow.push(divider());
 
@@ -156,14 +149,12 @@ export class AtomicSwapFacade {
         swap.responder.to = hederaAccountId;
         swap.responder = await this.createTxDialog(
           accountIdToSendFrom,
-          state.accountState[hederaEvmAddress][network].accountInfo.balance,
           swap.responder,
           mirrorNodeUrl,
           panelToShow,
           serviceFeesToPay,
           false,
         );
-        transfersToExecute.push(swap.responder);
       }
 
       const dialogParams: DialogParams = {
@@ -176,8 +167,8 @@ export class AtomicSwapFacade {
         throw providerErrors.userRejectedRequest();
       }
 
-      const command = new ScheduledTransactionCommand(
-        transfersToExecute,
+      const command = new AtomicSwapCommand(
+        atomicSwaps,
         memo,
         maxFee,
         serviceFeesToPay,
@@ -187,8 +178,6 @@ export class AtomicSwapFacade {
       txReceipt = await command.createScheduledTransaction(
         hederaClient.getClient(),
       );
-
-      console.log('txReceipt: ', JSON.stringify(txReceipt, null, 4));
 
       return txReceipt;
     } catch (error: any) {
@@ -202,7 +191,6 @@ export class AtomicSwapFacade {
   /**
    * Create a transaction dialog for atomic swap.
    * @param accountIdToSendFrom - Hedera account ID to send from.
-   * @param walletBalance - Account balance.
    * @param transfer - Simple transfer.
    * @param mirrorNodeUrl - Mirror node URL.
    * @param panelToShow - Panel to show.
@@ -213,7 +201,6 @@ export class AtomicSwapFacade {
   // eslint-disable-next-line no-restricted-syntax
   private static async createTxDialog(
     accountIdToSendFrom: string,
-    walletBalance: AccountBalance,
     transfer: SimpleTransfer,
     mirrorNodeUrl: string,
     panelToShow: any[],
@@ -235,9 +222,16 @@ export class AtomicSwapFacade {
       ),
     );
 
+    const ownerAccountInfo: AccountInfo =
+      await HederaUtils.getMirrorAccountInfo(
+        accountIdToSendFrom,
+        mirrorNodeUrl,
+      );
+    const walletBalance = ownerAccountInfo.balance;
+
     panelToShow.push(text(`Asset Type: ${newTransfer.assetType}`));
     if (newTransfer.assetType === 'HBAR') {
-      if (walletBalance.hbars < newTransfer.amount + serviceFeesToPay.HBAR) {
+      if (walletBalance.hbars < transfer.amount + serviceFeesToPay.HBAR) {
         const errMessage = `There is not enough Hbar in the wallet to transfer the requested amount`;
         console.error(errMessage);
         panelToShow.push(text(errMessage));
@@ -249,16 +243,16 @@ export class AtomicSwapFacade {
       }
       asset = 'HBAR';
     } else {
-      newTransfer.decimals = walletBalance.tokens[newTransfer.assetId as string]
-        ? walletBalance.tokens[newTransfer.assetId as string].decimals
+      transfer.decimals = walletBalance.tokens[transfer.assetId as string]
+        ? walletBalance.tokens[transfer.assetId as string].decimals
         : NaN;
       if (
-        !walletBalance.tokens[newTransfer.assetId as string] ||
-        walletBalance.tokens[newTransfer.assetId as string].balance <
-          newTransfer.amount
+        !walletBalance.tokens[transfer.assetId as string] ||
+        walletBalance.tokens[transfer.assetId as string].balance <
+          transfer.amount
       ) {
         const errMessage = `This wallet either does not own  ${
-          newTransfer.assetId as string
+          transfer.assetId as string
         } or there is not enough balance to transfer the requested amount`;
         console.error(errMessage);
         panelToShow.push(text(errMessage));

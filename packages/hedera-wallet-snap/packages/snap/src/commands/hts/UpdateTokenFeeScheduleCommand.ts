@@ -52,7 +52,8 @@ export class UpdateTokenFeeScheduleCommand {
   public async execute(client: Client): Promise<TxReceipt> {
     const scheduleTransaction = new TokenFeeScheduleUpdateTransaction()
       .setTokenId(this.#tokenId)
-      .setCustomFees(this.#convertCustomFees(this.#customFees, this.#decimals));
+      .setCustomFees(this.#convertCustomFees(this.#customFees, this.#decimals))
+      .freezeWith(client);
 
     const transaction = await scheduleTransaction.sign(this.#feeScheduleKey);
 

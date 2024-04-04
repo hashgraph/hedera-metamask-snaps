@@ -150,6 +150,8 @@ export class TransferCryptoCommand {
       }
     }
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }

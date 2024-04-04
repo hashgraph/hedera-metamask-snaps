@@ -430,7 +430,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidSignScheduledTxParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        transaction: await SignScheduledTxFacade.signScheduledTx(
+        receipt: await SignScheduledTxFacade.signScheduledTx(
           walletSnapParams,
           request.params,
         ),

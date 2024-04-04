@@ -18,15 +18,15 @@
  *
  */
 
-import type { WalletSnapParams } from '../types/state';
-import type { SignScheduledTxParams } from '../types/params';
 import { providerErrors } from '@metamask/rpc-errors';
-import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
-import type { TxReceipt } from '../types/hedera';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../utils/SnapUtils';
+import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { SignScheduledTxCommand } from '../commands/SignScheduledTxCommand';
+import type { TxReceipt } from '../types/hedera';
+import type { SignScheduledTxParams } from '../types/params';
+import type { WalletSnapParams } from '../types/state';
+import { SnapUtils } from '../utils/SnapUtils';
 
 export class SignScheduledTxFacade {
   public static async signScheduledTx(
@@ -74,14 +74,11 @@ export class SignScheduledTxFacade {
         throw providerErrors.userRejectedRequest();
       }
 
-      const privateKeyObj = hederaClient.getPrivateKey();
-
-      if (privateKeyObj === null) {
-        throw new Error('private key was null');
-      }
-      const command = new SignScheduledTxCommand(privateKeyObj, scheduleId);
+      const command = new SignScheduledTxCommand(scheduleId);
 
       txReceipt = await command.execute(hederaClient.getClient());
+
+      console.log('txReceipt: ', JSON.stringify(txReceipt, null, 4));
 
       return txReceipt;
     } catch (error: any) {
