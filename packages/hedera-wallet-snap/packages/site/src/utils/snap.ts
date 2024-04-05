@@ -949,16 +949,16 @@ export const initiateSwap = async (
 };
 
 /**
- * Invoke the "signScheduledTx" method from the snap.
+ * Invoke the "completeSwap" method from the snap.
  * @param network
  * @param mirrorNodeUrl
- * @param signScheduledTxRequestParams
+ * @param atomicSwapCompleteParams
  * @param externalAccountparams
  */
-export const signScheduledTx = async (
+export const completeSwap = async (
   network: string,
   mirrorNodeUrl: string,
-  signScheduledTxRequestParams: SignScheduledTxParams,
+  completeSwapRequestParams: SignScheduledTxParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -966,11 +966,11 @@ export const signScheduledTx = async (
     params: {
       snapId: defaultSnapOrigin,
       request: {
-        method: 'signScheduledTx',
+        method: 'hts/completeSwap',
         params: {
           network,
           mirrorNodeUrl,
-          ...signScheduledTxRequestParams,
+          ...completeSwapRequestParams,
           ...externalAccountparams,
         },
       },

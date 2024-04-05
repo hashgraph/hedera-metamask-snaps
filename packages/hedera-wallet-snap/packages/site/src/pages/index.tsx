@@ -31,13 +31,13 @@ import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
 import { SignMessage } from '../components/cards/SignMessage';
-import { SignScheduledTx } from '../components/cards/SignScheduledTx';
 import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
+import { AtomicSwapComplete } from '../components/cards/hts/AtomicSwapComplete';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { DeleteToken } from '../components/cards/hts/DeleteToken';
@@ -47,7 +47,10 @@ import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
 import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
 import { PauseToken } from '../components/cards/hts/PauseToken';
-import { SwapTokensRequest } from '../components/cards/hts/SwapTokensRequest';
+import {
+  AtomicSwapInitiate,
+  SwapTokensRequest,
+} from '../components/cards/hts/AtomicSwapInitiate';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
 import { UpdateToken } from '../components/cards/hts/UpdateToken';
@@ -329,13 +332,13 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <SwapTokensRequest
+        <AtomicSwapInitiate
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
         />
 
-        <SignScheduledTx
+        <AtomicSwapComplete
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

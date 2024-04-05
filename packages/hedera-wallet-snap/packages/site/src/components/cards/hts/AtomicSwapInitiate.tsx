@@ -28,7 +28,8 @@ import useModal from '../../../hooks/useModal';
 import type {
   Account,
   AtomicSwap,
-  CreateSwapRequestParams,
+  InitiateSwapRequestParams,
+  ServiceFee,
   SimpleTransfer,
 } from '../../../types/snap';
 import { initiateSwap, shouldDisplayReconnectButton } from '../../../utils';
@@ -42,7 +43,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SwapTokensRequest: FC<Props> = ({
+const AtomicSwapInitiate: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -67,17 +68,16 @@ const SwapTokensRequest: FC<Props> = ({
         throw new Error('undefined external account params');
       }
 
-      const responder: SimpleTransfer = {
+      const requester: SimpleTransfer = {
         assetType: 'HBAR',
-
+        to: sendToAddress,
         amount: sendHbarAmount,
       } as SimpleTransfer;
 
-      const requester: SimpleTransfer = {
-        assetType: 'NFT',
+      const responder: SimpleTransfer = {
+        assetType: 'TOKEN',
         amount: receiveTokenAmount,
         assetId: receiveTokenId,
-        to: sendToAddress,
       } as SimpleTransfer;
 
       const atomicSwap = {
@@ -87,9 +87,17 @@ const SwapTokensRequest: FC<Props> = ({
 
       const atomicSwaps = [atomicSwap];
 
+      const TUUMESERVICEADDRESS = '0.0.98'; // Hedera Fee collection account
+      const serviceFee = {
+        percentageCut: 0, // Change this if you want to charge a service fee
+        toAddress: TUUMESERVICEADDRESS,
+      } as ServiceFee;
+
       const createSwapRequestParams = {
         atomicSwaps,
-      } as CreateSwapRequestParams;
+        memo: 'Atomic Swap',
+        serviceFee,
+      } as InitiateSwapRequestParams;
 
       const response: any = await initiateSwap(
         network,
@@ -99,13 +107,9 @@ const SwapTokensRequest: FC<Props> = ({
       );
 
       const { receipt, currentAccount } = response;
-      setAccountInfo(currentAccount);
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`receipt: ${receipt}`);
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      console.log(`current account: ${currentAccount}`);
 
-      console.log(`response: ${JSON.stringify(response)}`);
+      setAccountInfo(currentAccount);
+      console.log(`receipt: ${receipt}`);
 
       showModal({
         title: 'Transaction Receipt',
@@ -122,8 +126,7 @@ const SwapTokensRequest: FC<Props> = ({
     <Card
       content={{
         title: 'createSwapRequest',
-        description:
-          'Creates an atomic swap request using the Hedera Token Service.',
+        description: 'Creates an atomic swap request.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -198,4 +201,4 @@ const SwapTokensRequest: FC<Props> = ({
   );
 };
 
-export { SwapTokensRequest };
+export { AtomicSwapInitiate };

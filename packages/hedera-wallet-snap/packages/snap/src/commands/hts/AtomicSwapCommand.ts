@@ -56,7 +56,7 @@ export class AtomicSwapCommand {
     this.#serviceFeeToAddress = serviceFeeToAddress;
   }
 
-  public async createScheduledTransaction(client: Client): Promise<TxReceipt> {
+  public async initiateSwap(client: Client): Promise<TxReceipt> {
     const serviceFeeToAddr: string = this.#serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
     const transaction = new TransferTransaction();
@@ -152,7 +152,12 @@ export class AtomicSwapCommand {
           -swap.responder.amount * multiplier,
         );
       } else if (swap.responder.assetType === 'NFT') {
-        // This will never happen as NFTs are not supported as responder
+        const assetid = NftId.fromString(swap.responder.assetId as string);
+        transaction.addNftTransfer(
+          assetid,
+          swap.requester.to,
+          client.operatorAccountId as AccountId,
+        );
       }
     }
 
@@ -173,7 +178,7 @@ export class AtomicSwapCommand {
     return await Utils.executeTransaction(client, scheduledTransaction);
   }
 
-  public async signScheduledTransaction(
+  public async completeSwap(
     client: Client,
     scheduleId: string,
   ): Promise<TxReceipt> {

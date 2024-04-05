@@ -22,11 +22,15 @@ import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
-import type { AccountInfo } from 'src/types/account';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { AtomicSwapCommand } from '../../commands/hts/AtomicSwapCommand';
+import type { AccountInfo } from '../../types/account';
 import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
-import type { InitiateSwapRequestParams, ServiceFee } from '../../types/params';
+import type {
+  InitiateSwapRequestParams,
+  ServiceFee,
+  SignScheduledTxParams,
+} from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { HederaUtils } from '../../utils/HederaUtils';
@@ -113,11 +117,13 @@ export class AtomicSwapFacade {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
       const panelToShow = [
-        heading('Atomic Swap'),
+        heading('Initiate Atomic Swap'),
         text(
           'Learn more about atomic swap [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/atomic-swaps)',
         ),
-        text('Are you sure you want to execute the following swap?'),
+        text(
+          'Are you sure you want to execute the following swap? Note that the responder will also need to approve the swap by calling "hts/completeSwap" API within 30 minutes from now or the transaction will fail.',
+        ),
         divider(),
       ];
       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
@@ -130,8 +136,8 @@ export class AtomicSwapFacade {
 
       for (const swap of atomicSwaps) {
         const txNumber = atomicSwaps.indexOf(swap) + 1;
-        panelToShow.push(text(`Swap #${txNumber}`));
-        panelToShow.push(divider());
+
+        panelToShow.push(divider(), text(`Swap #${txNumber}`), divider());
 
         let accountIdToSendFrom = hederaAccountId;
         swap.requester = await this.createTxDialog(
@@ -175,14 +181,80 @@ export class AtomicSwapFacade {
         serviceFee.toAddress as string,
       );
 
-      txReceipt = await command.createScheduledTransaction(
+      txReceipt = await command.initiateSwap(hederaClient.getClient());
+
+      return txReceipt;
+    } catch (error: any) {
+      console.error(
+        `Error while trying to initiate atomic swap: ${String(error)}`,
+      );
+      throw new Error(error);
+    }
+  }
+
+  public static async completeSwap(
+    walletSnapParams: WalletSnapParams,
+    signScheduledTxParams: SignScheduledTxParams,
+  ): Promise<TxReceipt> {
+    const { origin, state } = walletSnapParams;
+    const { scheduleId } = signScheduledTxParams;
+
+    const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+    const { privateKey, curve } =
+      state.accountState[hederaEvmAddress][network].keyStore;
+
+    let txReceipt = {} as TxReceipt;
+
+    const hederaClientFactory = new HederaClientImplFactory(
+      hederaAccountId,
+      network,
+      curve,
+      privateKey,
+    );
+
+    const hederaClient = await hederaClientFactory.createClient();
+    if (hederaClient === null) {
+      throw new Error('hederaClient is null');
+    }
+
+    try {
+      const panelToShow = [
+        heading('Complete Atomic Swap'),
+        text(
+          'Learn more about atomic swap [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/atomic-swaps)',
+        ),
+        text(
+          'Are you sure you want to execute the following swap? Note that all the parties involved in the swap must approve the swap within 30 minutes from now or the transaction will fail.',
+        ),
+        divider(),
+      ];
+
+      panelToShow.push(
+        text(`Atomic Swap Scheduled Transaction ID : ${scheduleId}`),
+      );
+      panelToShow.push(divider());
+
+      const dialogParams: DialogParams = {
+        type: 'confirmation',
+        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+      };
+      const confirmed = await SnapUtils.snapDialog(dialogParams);
+      if (!confirmed) {
+        console.error(`User rejected the transaction`);
+        throw providerErrors.userRejectedRequest();
+      }
+
+      const command = new AtomicSwapCommand([], null, null, {}, null);
+
+      txReceipt = await command.completeSwap(
         hederaClient.getClient(),
+        scheduleId,
       );
 
       return txReceipt;
     } catch (error: any) {
       console.error(
-        `Error while trying to create atomic swap: ${String(error)}`,
+        `Error while trying to complete atomic swap: ${String(error)}`,
       );
       throw new Error(error);
     }
@@ -270,7 +342,7 @@ export class AtomicSwapFacade {
         assetId = assetIdSplit[0];
         nftSerialNumber = assetIdSplit[1];
       }
-      panelToShow.push(text(`Asset Id: ${newTransfer.assetId as string}`));
+      panelToShow.push(text(`Asset Id: ${assetId}`));
       const tokenInfo = await CryptoUtils.getTokenById(assetId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;

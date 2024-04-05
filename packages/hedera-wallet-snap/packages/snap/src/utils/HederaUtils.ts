@@ -573,7 +573,8 @@ export class HederaUtils {
           throw providerErrors.unsupportedMethod(
             'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
           );
-        } else if (
+        }
+        if (
           (transfer.assetType === 'TOKEN' || transfer.assetType === 'NFT') &&
           !('assetId' in transfer)
         ) {
@@ -590,6 +591,15 @@ export class HederaUtils {
 
         // Check if amount is valid
         this.checkValidNumber(transfer, 'transfers[].amount', 'amount', true);
+
+        if (transfer.assetType === 'NFT' && transfer.amount !== 1) {
+          console.error(
+            'Invalid transferCrypto Params passed. "transfers[].amount" must be 1 for "NFT" assetType',
+          );
+          throw providerErrors.unsupportedMethod(
+            'Invalid transferCrypto Params passed. "transfers[].amount" must be 1 for "NFT" assetType',
+          );
+        }
 
         // Check if assetId is valid
         if (transfer.assetType !== 'HBAR') {
@@ -722,7 +732,8 @@ export class HederaUtils {
       throw providerErrors.unsupportedMethod(
         'Invalid atomicSwap Params passed. "assetId" cannot be passed for "HBAR" assetType',
       );
-    } else if (
+    }
+    if (
       (transfer.assetType === 'TOKEN' || transfer.assetType === 'NFT') &&
       !('assetId' in transfer)
     ) {
@@ -731,15 +742,6 @@ export class HederaUtils {
       );
       throw providerErrors.unsupportedMethod(
         'Invalid atomicSwap Params passed. "assetId" must be passed for "TOKEN/NFT" assetType',
-      );
-    }
-
-    if (!isRequester && transfer.assetType === 'NFT') {
-      console.error(
-        'Invalid atomicSwap Params passed. NFT cannot be passed for responder',
-      );
-      throw providerErrors.unsupportedMethod(
-        'Invalid atomicSwap Params passed. NFT cannot be passed for responder',
       );
     }
 
@@ -757,6 +759,15 @@ export class HederaUtils {
 
     // Check if amount is valid
     this.checkValidNumber(transfer, 'atomicSwap', 'amount', true);
+
+    if (transfer.assetType === 'NFT' && transfer.amount !== 1) {
+      console.error(
+        'Invalid atomicSwap Params passed. "amount" must be 1 for "NFT" assetType',
+      );
+      throw providerErrors.unsupportedMethod(
+        'Invalid atomicSwap Params passed. "amount" must be 1 for "NFT" assetType',
+      );
+    }
 
     // Check if assetId is valid
     if (transfer.assetType !== 'HBAR') {

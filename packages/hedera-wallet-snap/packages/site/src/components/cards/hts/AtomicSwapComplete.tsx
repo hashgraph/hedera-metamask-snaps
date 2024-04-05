@@ -23,13 +23,13 @@ import { useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
-} from '../../contexts/MetamaskContext';
-import useModal from '../../hooks/useModal';
-import type { Account, SignScheduledTxParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, signScheduledTx } from '../../utils';
-import { Card, SendHelloButton } from '../base';
-import type { GetExternalAccountRef } from '../sections/ExternalAccount';
-import ExternalAccount from '../sections/ExternalAccount';
+} from '../../../contexts/MetamaskContext';
+import useModal from '../../../hooks/useModal';
+import type { Account, SignScheduledTxParams } from '../../../types/snap';
+import { completeSwap, shouldDisplayReconnectButton } from '../../../utils';
+import { Card, SendHelloButton } from '../../base';
+import type { GetExternalAccountRef } from '../../sections/ExternalAccount';
+import ExternalAccount from '../../sections/ExternalAccount';
 
 type Props = {
   network: string;
@@ -37,7 +37,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SignScheduledTx: FC<Props> = ({
+const AtomicSwapComplete: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -49,20 +49,20 @@ const SignScheduledTx: FC<Props> = ({
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSignScheduledTransactionClick = async () => {
+  const handleAtomicSwapCompleteTransactionClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const signScheduledTxParams = {
+      const completeSwapRequestParams = {
         scheduleId,
       } as SignScheduledTxParams;
 
-      const response: any = await signScheduledTx(
+      const response: any = await completeSwap(
         network,
         mirrorNodeUrl,
-        signScheduledTxParams,
+        completeSwapRequestParams,
         externalAccountParams,
       );
 
@@ -85,13 +85,13 @@ const SignScheduledTx: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'signScheduledTx',
-        description: 'Sign a scheduled transaction.',
+        title: 'completeSwap',
+        description: 'Completes an atomic swap using scheduled transaction Id.',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter the schedule id
+              Enter the schedule id for the atomic swap transaction
               <input
                 type="string"
                 style={{ width: '100%' }}
@@ -105,8 +105,8 @@ const SignScheduledTx: FC<Props> = ({
         ),
         button: (
           <SendHelloButton
-            buttonText="Sign"
-            onClick={handleSignScheduledTransactionClick}
+            buttonText="Complete Swap"
+            onClick={handleAtomicSwapCompleteTransactionClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -122,4 +122,4 @@ const SignScheduledTx: FC<Props> = ({
   );
 };
 
-export { SignScheduledTx };
+export { AtomicSwapComplete };

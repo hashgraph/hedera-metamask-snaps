@@ -179,7 +179,7 @@ export class TransferCryptoFacade {
             assetId = assetIdSplit[0];
             nftSerialNumber = assetIdSplit[1];
           }
-          panelToShow.push(text(`Asset Id: ${transfer.assetId as string}`));
+          panelToShow.push(text(`Asset Id: ${assetId}`));
           const tokenInfo = await CryptoUtils.getTokenById(
             assetId,
             mirrorNodeUrl,
