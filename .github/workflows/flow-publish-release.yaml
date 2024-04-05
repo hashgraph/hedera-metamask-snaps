@@ -57,6 +57,7 @@ jobs:
 
       - name: Extract NPM Package Information
         id: npm-package
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}"
         run: echo "version=$(jq -r '.version' package.json)" >>"${GITHUB_OUTPUT}"
 
       - name: Extract Tag Information
