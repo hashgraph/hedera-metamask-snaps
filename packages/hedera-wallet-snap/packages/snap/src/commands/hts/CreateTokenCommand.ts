@@ -191,6 +191,9 @@ export class CreateTokenCommand {
       transaction.setCustomFees(customFees);
     }
 
+    // Freeze the transaction
+    transaction.freezeWith(client);
+
     // Sign the transaction with the token adminKey and the token treasury account private key
     const signTx = await (await transaction.sign(privateKey)).sign(privateKey);
 

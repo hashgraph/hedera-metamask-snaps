@@ -53,6 +53,8 @@ export class StakeHbarCommand {
       transaction.setDeclineStakingReward(false);
     }
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }

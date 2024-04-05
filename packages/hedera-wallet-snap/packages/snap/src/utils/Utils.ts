@@ -83,11 +83,15 @@ export class Utils {
       accountId: receipt.accountId
         ? receipt.accountId.toString()
         : EMPTY_STRING,
-      fileId: receipt.fileId ? receipt.fileId : EMPTY_STRING,
-      contractId: receipt.contractId ? receipt.contractId : EMPTY_STRING,
-      topicId: receipt.topicId ? receipt.topicId : EMPTY_STRING,
-      tokenId: receipt.tokenId ? receipt.tokenId : EMPTY_STRING,
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : EMPTY_STRING,
+      fileId: receipt.fileId ? receipt.fileId.toString() : EMPTY_STRING,
+      contractId: receipt.contractId
+        ? receipt.contractId.toString()
+        : EMPTY_STRING,
+      topicId: receipt.topicId ? receipt.topicId.toString() : EMPTY_STRING,
+      tokenId: receipt.tokenId ? receipt.tokenId.toString() : EMPTY_STRING,
+      scheduleId: receipt.scheduleId
+        ? receipt.scheduleId.toString()
+        : EMPTY_STRING,
       exchangeRate: newExchangeRate,
       topicSequenceNumber: receipt.topicSequenceNumber
         ? String(receipt.topicSequenceNumber)
@@ -109,7 +113,6 @@ export class Utils {
     client: Client,
     transaction: any,
   ): Promise<TxReceipt> {
-    transaction.freezeWith(client);
     let retries = 0;
     while (retries < MAX_RETRIES) {
       try {
@@ -129,6 +132,7 @@ export class Utils {
         }
       }
     }
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     throw new Error(`Transaction failed after ${MAX_RETRIES} attempts`);
   }
 }

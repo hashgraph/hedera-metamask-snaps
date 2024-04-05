@@ -36,7 +36,8 @@ export class DeleteAccountCommand {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         client.operatorAccountId!,
       )
-      .setTransferAccountId(this.#transferAccountId);
+      .setTransferAccountId(this.#transferAccountId)
+      .freezeWith(client);
 
     return await Utils.executeTransaction(client, transaction);
   }

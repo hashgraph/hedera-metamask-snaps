@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.3.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.3.0...v0.3.0) (2024-04-05)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- Upgraded @hashgraph/sdk to >=2.41.0
+- [Added new APIs to perform atomic swap between any two accounts. This uses scheduled transaction to send the transaction to the ledger and to complete the swap.)](https://github.com/hashgraph/hedera-metamask-snaps/issues/102)
+- [Added a new API to update the properties of an existing token such as name, symbol, treasury account, etc.](https://github.com/hashgraph/hedera-metamask-snaps/issues/91)
+- [Added a new API to delete a token](https://github.com/hashgraph/hedera-metamask-snaps/issues/92)
+- [Added new APIs to mint/burn fungible and non-fungible tokens](https://github.com/hashgraph/hedera-metamask-snaps/issues/93)
+- [Added new APIs grant/revoke KYC to/from any account for a given token provided KYC key was set during its creation](https://github.com/hashgraph/hedera-metamask-snaps/issues/98)
+- [Added new APIs pause/unpause provided Pause key was set during token its creation](https://github.com/hashgraph/hedera-metamask-snaps/issues/100)
+- [Added new APIs to wipe a token from any accounts provided Wipe key was set during its creation](Added new APIs to wipe a token from any accounts provided Wipe key was set during its creation)
+- [Added a new API to show private key for the snap account within Metamask dialog box](https://github.com/hashgraph/hedera-metamask-snaps/issues/264)
+- Added a retry mechanism when sending transactions to the network to make it more robust
+- Update Github Action workflows to report on JUnit results
+- Augment Node/Yarn configuration to produce JUnit test data
+- Enable support for CodeCov & Codacy Code Coverage
+- Augment Node/Yarn configuration to produce code coverage data
+- More optimizations
+
+### :bug: Bug Fixes
+
 ## [0.2.5](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.2.5...v0.2.5) (2024-02-26)
 
 ### :page_with_curl: Documentation

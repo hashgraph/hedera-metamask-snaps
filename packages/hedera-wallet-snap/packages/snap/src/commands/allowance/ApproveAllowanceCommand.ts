@@ -85,6 +85,8 @@ export class ApproveAllowanceCommand {
       }
     }
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }
