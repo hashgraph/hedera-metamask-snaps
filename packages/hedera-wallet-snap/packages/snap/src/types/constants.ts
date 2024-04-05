@@ -38,3 +38,5 @@ export const FEE_DISPLAY_REGEX = /(\.\d*?[1-9])0+$|\.0*$/u;
 export const FEE_DIGIT_LENGTH = 8;
 export const HBAR_ASSET_STRING = 'HBAR';
 export const NFT_ASSET_STRING = 'NFT';
+
+export const MAX_RETRIES = 3;
