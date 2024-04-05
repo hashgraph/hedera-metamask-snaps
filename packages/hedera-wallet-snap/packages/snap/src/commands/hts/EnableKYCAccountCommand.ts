@@ -48,6 +48,8 @@ export class EnableKYCAccountCommand {
     }
     transaction.setTokenId(this.#tokenId).setAccountId(this.#accountId);
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }

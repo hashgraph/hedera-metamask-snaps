@@ -72,7 +72,7 @@ export class UpdateTokenFacade {
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Update a token'),
+        heading('Update token'),
         text(
           'Learn more about updating tokens [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/update-a-token)',
         ),

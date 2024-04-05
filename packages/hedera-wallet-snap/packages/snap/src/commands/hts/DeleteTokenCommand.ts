@@ -39,9 +39,8 @@ export class DeleteTokenCommand {
   public async execute(client: Client): Promise<TxReceipt> {
     const transaction = await new TokenDeleteTransaction()
       .setTokenId(this.#tokenId)
+      .freezeWith(client)
       .sign(this.#adminKey);
-
-    transaction.freezeWith(client);
 
     return await Utils.executeTransaction(client, transaction);
   }

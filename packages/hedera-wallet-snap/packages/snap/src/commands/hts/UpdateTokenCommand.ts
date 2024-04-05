@@ -38,11 +38,10 @@ export class UpdateTokenCommand {
     client: Client,
     updateParams: UpdateTokenRequestParams,
   ): Promise<TxReceipt> {
-    const updateTransaction = this.#updateTransaction(updateParams);
+    const updateTransaction =
+      this.#updateTransaction(updateParams).freezeWith(client);
 
     const transaction = await updateTransaction.sign(this.#adminKey);
-
-    transaction.freezeWith(client);
 
     return await Utils.executeTransaction(client, transaction);
   }
