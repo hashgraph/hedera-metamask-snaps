@@ -195,6 +195,28 @@ export type ExternalAccountParams = {
   };
 };
 
+export type InitiateSwapRequestParams = {
+  atomicSwaps: AtomicSwap[];
+  memo?: string;
+  maxFee?: number; // hbars
+  serviceFee?: ServiceFee;
+};
+
+export enum AssetType {
+  HBAR = 'HBAR',
+  TOKEN = 'TOKEN',
+  NFT = 'NFT',
+}
+
+export type AtomicSwap = {
+  requester: SimpleTransfer;
+  responder: SimpleTransfer;
+};
+
+export type SignScheduledTxParams = {
+  scheduleId: string;
+};
+
 export type UpdateTokenRequestParams = {
   tokenId: string;
   name?: string;

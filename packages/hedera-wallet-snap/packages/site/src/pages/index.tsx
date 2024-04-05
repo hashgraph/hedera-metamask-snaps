@@ -38,6 +38,8 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
+import { AtomicSwapComplete } from '../components/cards/hts/AtomicSwapComplete';
+import { AtomicSwapInitiate } from '../components/cards/hts/AtomicSwapInitiate';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { DeleteToken } from '../components/cards/hts/DeleteToken';
@@ -63,7 +65,7 @@ import {
   Subtitle,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
-import { Account } from '../types/snap';
+import type { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
 
 const Index = () => {
@@ -185,6 +187,12 @@ const Index = () => {
         />
 
         <GetAccountInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <ShowAccountPrivateKey
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
@@ -328,7 +336,13 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <ShowAccountPrivateKey
+        <AtomicSwapInitiate
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <AtomicSwapComplete
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

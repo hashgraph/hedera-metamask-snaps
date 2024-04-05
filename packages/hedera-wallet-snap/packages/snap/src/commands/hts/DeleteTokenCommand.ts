@@ -19,12 +19,11 @@
  */
 
 import {
+  TokenDeleteTransaction,
   type Client,
   type PrivateKey,
-  TokenDeleteTransaction,
 } from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
-import { CryptoUtils } from '../../utils/CryptoUtils';
 import { Utils } from '../../utils/Utils';
 
 export class DeleteTokenCommand {
@@ -40,43 +39,10 @@ export class DeleteTokenCommand {
   public async execute(client: Client): Promise<TxReceipt> {
     const transaction = await new TokenDeleteTransaction()
       .setTokenId(this.#tokenId)
-      .freezeWith(client)
       .sign(this.#adminKey);
 
-    const txResponse = await transaction.execute(client);
+    transaction.freezeWith(client);
 
-    const receipt = await txResponse.getReceipt(client);
-
-    let newExchangeRate;
-    if (receipt.exchangeRate) {
-      newExchangeRate = {
-        ...receipt.exchangeRate,
-        expirationTime: Utils.timestampToString(
-          receipt.exchangeRate.expirationTime,
-        ),
-      };
-    }
-
-    return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      fileId: receipt.fileId ? receipt.fileId : '',
-      contractId: receipt.contractId ? receipt.contractId : '',
-      topicId: receipt.topicId ? receipt.topicId : '',
-      tokenId: receipt.tokenId ? receipt.tokenId : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId : '',
-      exchangeRate: newExchangeRate,
-      topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
-        : '',
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
-      scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
-        : '',
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
-    } as TxReceipt;
+    return await Utils.executeTransaction(client, transaction);
   }
 }

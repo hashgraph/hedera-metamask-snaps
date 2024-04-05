@@ -18,7 +18,7 @@
  *
  */
 
-import type { SimpleTransfer } from './hedera';
+import type { AtomicSwap, SimpleTransfer } from './hedera';
 
 export type MirrorNodeParams = { mirrorNodeUrl?: string };
 
@@ -166,4 +166,15 @@ export type UpdateTokenRequestParams = {
 export type UpdateTokenFeeScheduleRequestParams = {
   tokenId: string;
   customFees: TokenCustomFee[];
+};
+
+export type InitiateSwapRequestParams = {
+  atomicSwaps: AtomicSwap[];
+  memo?: string;
+  maxFee?: number; // hbars
+  serviceFee?: ServiceFee;
+};
+
+export type SignScheduledTxParams = {
+  scheduleId: string;
 };

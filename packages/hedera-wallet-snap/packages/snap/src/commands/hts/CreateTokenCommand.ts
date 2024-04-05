@@ -31,7 +31,6 @@ import {
 } from '@hashgraph/sdk';
 import { type TxReceipt } from '../../types/hedera';
 import type { TokenCustomFee } from '../../types/params';
-import { CryptoUtils } from '../../utils/CryptoUtils';
 import { Utils } from '../../utils/Utils';
 
 export class CreateTokenCommand {
@@ -192,46 +191,13 @@ export class CreateTokenCommand {
       transaction.setCustomFees(customFees);
     }
 
+    // Freeze the transaction
     transaction.freezeWith(client);
 
     // Sign the transaction with the token adminKey and the token treasury account private key
     const signTx = await (await transaction.sign(privateKey)).sign(privateKey);
 
     // Sign the transaction with the client operator private key and submit to a Hedera network
-    const txResponse = await signTx.execute(client);
-
-    const receipt = await txResponse.getReceipt(client);
-
-    let newExchangeRate;
-    if (receipt.exchangeRate) {
-      newExchangeRate = {
-        ...receipt.exchangeRate,
-        expirationTime: Utils.timestampToString(
-          receipt.exchangeRate.expirationTime,
-        ),
-      };
-    }
-
-    return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId ? receipt.accountId.toString() : '',
-      fileId: receipt.fileId ? receipt.fileId.toString() : '',
-      contractId: receipt.contractId ? receipt.contractId.toString() : '',
-      topicId: receipt.topicId ? receipt.topicId.toString() : '',
-      tokenId: receipt.tokenId ? receipt.tokenId.toString() : '',
-      scheduleId: receipt.scheduleId ? receipt.scheduleId.toString() : '',
-      exchangeRate: newExchangeRate,
-      topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
-        : '',
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
-      totalSupply: receipt.totalSupply ? String(receipt.totalSupply) : '',
-      scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
-        : '',
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
-    } as TxReceipt;
+    return await Utils.executeTransaction(client, signTx);
   }
 }

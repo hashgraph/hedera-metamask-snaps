@@ -42,6 +42,7 @@ import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { AtomicSwapFacade } from './facades/hts/AtomicSwapFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
 import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
 import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
@@ -103,9 +104,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     network,
     mirrorNodeUrl,
     isExternalAccount,
-  );
-  console.log(
-    `Current account: ${JSON.stringify(state.currentAccount, null, 4)}`,
   );
 
   const walletSnapParams: WalletSnapParams = {
@@ -416,6 +414,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       };
     }
 
+    case 'hts/initiateSwap': {
+      HederaUtils.isValidInitiateSwapParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await AtomicSwapFacade.initiateSwap(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/completeSwap': {
+      HederaUtils.isValidSignScheduledTxParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await AtomicSwapFacade.completeSwap(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
     default:
       // Throw a known error to avoid crashing the Snap
       // eslint-disable-next-line @typescript-eslint/no-throw-literal
@@ -447,7 +467,7 @@ export const onInstall: OnInstallHandler = async () => {
         ),
         divider(),
         text(
-          '😭 If you add a new account in MetaMask after you have already approved existing accounts, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
+          '😭 If you add a new account in MetaMask after you have already approved existing accounts on your application, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
         ),
       ]),
     },
@@ -469,16 +489,25 @@ export const onUpdate: OnUpdateHandler = async () => {
           '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
         ),
         text(
-          '🚀 Added a new API to mint/burn fungible and non-fungible tokens',
+          '🚀 Added new APIs to perform atomic swap between any two accounts. This uses scheduled transaction to send the transaction to the ledger and to complete the swap.',
         ),
         text(
-          '🚀 Added a new API to associate/dissociate fungible/non-fungible tokens to an account',
+          '🚀 Added a new API to update the properties of an existing token such as name, symbol, treasury account, etc.',
+        ),
+        text('🚀 Added new APIs to associate/dissociate tokens to an account'),
+        text('🚀 Added a new API to delete a token'),
+        text('🚀 Added new APIs to mint/burn fungible and non-fungible tokens'),
+        text(
+          '🚀 Added new APIs grant/revoke KYC to/from any account for a given token provided KYC key was set during its creation',
         ),
         text(
-          '🚀 Added a new API to freeze/unfreeze account for a given fungible/non-fungible token',
+          '🚀 Added new APIs to freeze/unfreeze account for a given token provided Freeze key was set during its creation',
         ),
         text(
-          '🚀 Added a new API to wipe fungible/non-fungible tokens from an account',
+          '🚀 Added new APIs pause/unpause provided Pause key was set during token its creation',
+        ),
+        text(
+          '🚀 Added new APIs to wipe a token from any accounts provided Wipe key was set during its creation',
         ),
       ]),
     },
