@@ -56,9 +56,7 @@ export class DeleteTokenFacade {
     try {
       const panelToShow = [
         heading('Delete Token'),
-        text(
-          'Are you sure you want to dissociate the following tokens from your account?',
-        ),
+        text('Are you sure you want to delete the following token?'),
         divider(),
       ];
 
@@ -117,7 +115,7 @@ export class DeleteTokenFacade {
       );
       txReceipt = await deleteTokensCommand.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to delete token ${tokenId} from the account: ${String(
+      const errMessage = `Error while trying to delete token ${tokenId}: ${String(
         error,
       )}`;
       console.error(errMessage);

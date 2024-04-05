@@ -38,6 +38,8 @@ export class DissociateTokensCommand {
       .setAccountId(client.operatorAccountId as AccountId)
       .setTokenIds(this.#tokenIds);
 
+    transaction.freezeWith(client);
+
     return await Utils.executeTransaction(client, transaction);
   }
 }

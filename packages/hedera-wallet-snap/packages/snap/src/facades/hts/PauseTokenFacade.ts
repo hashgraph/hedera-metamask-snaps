@@ -72,11 +72,7 @@ export class PauseTokenFacade {
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading(
-          `${Utils.capitalizeFirstLetter(
-            pauseText,
-          )} account for the specified token`,
-        ),
+        heading(`${Utils.capitalizeFirstLetter(pauseText)} token`),
         text(
           `Learn more about ${pauseText}ing accounts [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/${pauseText}-a-token)`,
         ),

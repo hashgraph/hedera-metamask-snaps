@@ -21,15 +21,15 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
 import { providerErrors } from '@metamask/rpc-errors';
-import { divider, heading, text } from '@metamask/snaps-sdk';
 import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
 import type { TxReceipt } from '../../types/hedera';
 import type { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
 import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class UpdateTokenFeeScheduleFacade {
   /**
@@ -81,7 +81,7 @@ export class UpdateTokenFeeScheduleFacade {
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
-        heading('Update a token'),
+        heading('Update token fee schedule'),
         text(
           'Learn more about updating a token fee schedule [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/readme-1/update-a-fee-schedule)',
         ),
