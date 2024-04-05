@@ -30,6 +30,7 @@ import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
 import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
+import { ShowAccountPrivateKey } from '../components/cards/ShowAccountPrivateKey';
 import { SignMessage } from '../components/cards/SignMessage';
 import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
@@ -186,6 +187,12 @@ const Index = () => {
         />
 
         <GetAccountInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <ShowAccountPrivateKey
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

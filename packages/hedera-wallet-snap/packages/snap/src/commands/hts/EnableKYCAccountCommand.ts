@@ -46,10 +46,7 @@ export class EnableKYCAccountCommand {
     } else {
       transaction = new TokenRevokeKycTransaction();
     }
-    transaction
-      .setTokenId(this.#tokenId)
-      .setAccountId(this.#accountId)
-      .freezeWith(client);
+    transaction.setTokenId(this.#tokenId).setAccountId(this.#accountId);
 
     return await Utils.executeTransaction(client, transaction);
   }

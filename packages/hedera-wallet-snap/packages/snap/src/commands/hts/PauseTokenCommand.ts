@@ -44,7 +44,7 @@ export class PauseTokenCommand {
       transaction = new TokenUnpauseTransaction();
     }
 
-    transaction.setTokenId(this.#tokenId).freezeWith(client);
+    transaction.setTokenId(this.#tokenId);
 
     return await Utils.executeTransaction(client, transaction);
   }
