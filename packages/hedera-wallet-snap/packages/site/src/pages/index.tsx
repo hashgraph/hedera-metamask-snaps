@@ -38,6 +38,7 @@ import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { AtomicSwapComplete } from '../components/cards/hts/AtomicSwapComplete';
+import { AtomicSwapInitiate } from '../components/cards/hts/AtomicSwapInitiate';
 import { BurnToken } from '../components/cards/hts/BurnToken';
 import { CreateToken } from '../components/cards/hts/CreateToken';
 import { DeleteToken } from '../components/cards/hts/DeleteToken';
@@ -47,10 +48,6 @@ import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
 import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
 import { MintToken } from '../components/cards/hts/MintToken';
 import { PauseToken } from '../components/cards/hts/PauseToken';
-import {
-  AtomicSwapInitiate,
-  SwapTokensRequest,
-} from '../components/cards/hts/AtomicSwapInitiate';
 import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
 import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
 import { UpdateToken } from '../components/cards/hts/UpdateToken';
