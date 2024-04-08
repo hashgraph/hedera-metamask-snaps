@@ -98,7 +98,7 @@ jobs:
     runs-on: [self-hosted, Linux, medium, ephemeral]
     defaults:
       run:
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/"
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
     steps:
       - name: Checkout Code
         uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
@@ -120,12 +120,15 @@ jobs:
         run: yarn run build
 
   publish-release:
-    if: github.actor == 'NanaEC' || github.actor == 'nathanklick' || github.actor == 'kpachhai'
     name: Publish Release
     runs-on: [self-hosted, Linux, medium, ephemeral]
+    defaults:
+      run:
+        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
     needs:
       - validate-release
       - run-safety-checks
+    if: ${{ github.actor == 'NanaEC' || github.actor == 'nathanklick' || github.actor == 'kpachhai' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
@@ -146,14 +149,12 @@ jobs:
         run: pnpm install -g yarn
 
       - name: Yarn Build
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}"
         run: |
           yarn install
           yarn run build
 
       - name: Calculate Publish Arguments
         id: publish
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
         run: |
           PUBLISH_ARGS="--access public --no-git-checks"
           [[ "${{ github.event.inputs.dry-run-enabled }}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
@@ -166,7 +167,6 @@ jobs:
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
         run: pnpm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
