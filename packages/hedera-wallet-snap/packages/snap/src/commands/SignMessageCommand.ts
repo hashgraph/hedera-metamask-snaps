@@ -19,7 +19,7 @@
  */
 
 import { PrivateKey } from '@hashgraph/sdk';
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, heading, text } from '@metamask/snaps-sdk';
 import { ethers, type Wallet } from 'ethers';
@@ -71,8 +71,9 @@ export class SignMessageCommand {
       };
       const confirmed = await SnapUtils.snapDialog(dialogParamsForSignMessage);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       if (curve === 'ECDSA_SECP256K1') {
@@ -91,9 +92,9 @@ export class SignMessageCommand {
         signature = `0x${signature}`;
       }
     } catch (error: any) {
-      const errMessage = `Error while trying to sign message: ${String(error)}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to sign message`;
+      console.error(errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return signature;

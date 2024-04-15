@@ -18,7 +18,7 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
@@ -96,14 +96,14 @@ export class ApproveAllowanceFacade {
         } else {
           panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
           panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-          panelToShow.push(text(`Id: ${assetDetail.assetId}`));
+          panelToShow.push(text(`Id: ${tokenInfo.token_id}`));
           panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
           assetDetail.assetDecimals = Number(tokenInfo.decimals);
         }
         if (!Number.isFinite(assetDetail.assetDecimals)) {
-          const errMessage = `Error while trying to get token info for ${assetDetail.assetId} from Hedera Mirror Nodes at this time`;
+          const errMessage = `assetDetail.assetDecimal is not a finite number`;
           console.error(errMessage);
-          throw providerErrors.unsupportedMethod(errMessage);
+          throw rpcErrors.invalidParams(errMessage);
         }
 
         panelToShow.push(
@@ -143,8 +143,9 @@ export class ApproveAllowanceFacade {
         dialogParamsForApproveAllowance,
       );
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientImplFactory = new HederaClientImplFactory(
@@ -157,7 +158,7 @@ export class ApproveAllowanceFacade {
       const hederaClient = await hederaClientImplFactory.createClient();
 
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
 
       const command = new ApproveAllowanceCommand(
@@ -169,11 +170,9 @@ export class ApproveAllowanceFacade {
 
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to approve an allowance: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to approve an allowance`;
+      console.error(errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

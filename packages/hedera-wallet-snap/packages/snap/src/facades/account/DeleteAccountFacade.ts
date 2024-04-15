@@ -18,7 +18,7 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
@@ -82,8 +82,9 @@ export class DeleteAccountFacade {
         dialogParamsForDeleteAccount,
       );
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -95,7 +96,7 @@ export class DeleteAccountFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new DeleteAccountCommand(transferAccountId);
       txReceipt = await command.execute(hederaClient.getClient());
@@ -116,11 +117,9 @@ export class DeleteAccountFacade {
         {} as AccountInfo;
       await SnapState.updateState(state);
     } catch (error: any) {
-      const errMessage = `Error while trying to delete account: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to delete account`;
+      console.error(errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

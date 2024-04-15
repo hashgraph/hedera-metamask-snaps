@@ -11,6 +11,7 @@
 - Removed the `header` parameter from `signMessage` API
 - Utilized the `copyable` method to display text passed from Dapps as recommended by MetaMask which ignores Markdown and other special characters
 - Now showing the current network and mirror node URL at the top of all the Snap dialog boxes
+- Now throwing custom error messages whenever an error occurs in order to avoid throwing stack traces as part of the error messages
 
 ### :bug: Bug Fixes
 

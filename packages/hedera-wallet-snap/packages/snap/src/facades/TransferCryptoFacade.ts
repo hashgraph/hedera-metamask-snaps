@@ -18,7 +18,7 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
@@ -99,7 +99,7 @@ export class TransferCryptoFacade {
 
     const hederaClient = await hederaClientFactory.createClient();
     if (hederaClient === null) {
-      throw new Error('hederaClient is null');
+      throw rpcErrors.resourceUnavailable('hedera client returned null');
     }
 
     try {
@@ -202,9 +202,9 @@ export class TransferCryptoFacade {
             transfer.decimals = Number(tokenInfo.decimals);
           }
           if (!Number.isFinite(transfer.decimals)) {
-            const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
+            const errMessage = `transfer.decimals is not a finite number`;
             console.error(errMessage);
-            throw providerErrors.unsupportedMethod(errMessage);
+            throw rpcErrors.invalidParams(errMessage);
           }
 
           if (transfer.assetType === 'NFT') {
@@ -242,8 +242,9 @@ export class TransferCryptoFacade {
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const command = new TransferCryptoCommand(
@@ -258,8 +259,9 @@ export class TransferCryptoFacade {
 
       return txReceipt;
     } catch (error: any) {
-      console.error(`Error while trying to transfer crypto: ${String(error)}`);
-      throw new Error(error);
+      const errMessage = `Error while trying to transfer crypto`;
+      console.error(errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
   }
 }

@@ -18,19 +18,13 @@
  *
  */
 
+import { rpcErrors } from '@metamask/rpc-errors';
 import type {
   OnInstallHandler,
   OnRpcRequestHandler,
   OnUpdateHandler,
 } from '@metamask/snaps-sdk';
-import {
-  MethodNotFoundError,
-  copyable,
-  divider,
-  heading,
-  panel,
-  text,
-} from '@metamask/snaps-sdk';
+import { copyable, divider, heading, panel, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
@@ -442,8 +436,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     default:
       // Throw a known error to avoid crashing the Snap
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal
-      throw new MethodNotFoundError();
+      throw rpcErrors.methodNotFound(request.method);
   }
 };
 

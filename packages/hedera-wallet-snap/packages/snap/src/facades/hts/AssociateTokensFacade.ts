@@ -18,17 +18,17 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import type { AssociateTokensRequestParams } from '../../types/params';
-import type { TxReceipt } from '../../types/hedera';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
-import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { AssociateTokensCommand } from '../../commands/hts/AssociateTokensCommand';
+import type { TxReceipt } from '../../types/hedera';
+import type { AssociateTokensRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class AssociateTokensFacade {
   /**
@@ -121,8 +121,9 @@ export class AssociateTokensFacade {
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -134,18 +135,16 @@ export class AssociateTokensFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new AssociateTokensCommand(tokenIds);
       txReceipt = await command.execute(hederaClient.getClient());
 
       return txReceipt;
     } catch (error: any) {
-      const errMessage = `Error while trying to associate tokens to the account: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw new Error(error);
+      const errMessage = `Error while trying to associate tokens to the account`;
+      console.error(errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
   }
 }

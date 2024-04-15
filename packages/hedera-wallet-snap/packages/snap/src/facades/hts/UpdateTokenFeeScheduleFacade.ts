@@ -20,7 +20,7 @@
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
@@ -43,7 +43,9 @@ export class UpdateTokenFeeScheduleFacade {
     updateTokenFeeScheduleRequestParams: UpdateTokenFeeScheduleRequestParams,
   ): Promise<TxReceipt> {
     if (updateTokenFeeScheduleRequestParams.customFees === undefined) {
-      throw new Error('null custom fee schedule given');
+      const errMessage = 'null custom fee schedule given';
+      console.error(errMessage);
+      throw rpcErrors.invalidParams(errMessage);
     }
 
     const { origin, state } = walletSnapParams;
@@ -107,8 +109,9 @@ export class UpdateTokenFeeScheduleFacade {
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -120,12 +123,12 @@ export class UpdateTokenFeeScheduleFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
-        throw new Error('private key object returned null');
+        throw rpcErrors.resourceUnavailable('private key object returned null');
       }
       const command = new UpdateTokenFeeScheduleCommand(
         tokenId,
@@ -136,11 +139,9 @@ export class UpdateTokenFeeScheduleFacade {
 
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to update a token: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to update a token fee schedule`;
+      console.error(errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

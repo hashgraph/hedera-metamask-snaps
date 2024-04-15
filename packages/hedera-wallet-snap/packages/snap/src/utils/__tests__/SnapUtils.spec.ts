@@ -41,9 +41,16 @@ describe('SnapUtils', () => {
   describe('generateCommonPanel', () => {
     it('should generate a common panel with provided origin and prompt', async () => {
       const origin = 'testOrigin';
+      const network = 'testnet';
+      const mirrorNodeUrl = 'https://test.mirrornode.com';
       const prompts = [heading('Test Heading'), text('Test Text')];
 
-      const result = await SnapUtils.generateCommonPanel(origin, prompts);
+      const result = await SnapUtils.generateCommonPanel(
+        origin,
+        network,
+        mirrorNodeUrl,
+        prompts,
+      );
 
       expect(result).toEqual({
         content: [
