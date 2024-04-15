@@ -54,7 +54,9 @@ describe('SnapUtils', () => {
 
       expect(result).toEqual({
         content: [
-          'text-Origin: testOrigin',
+          'text-Origin: **testOrigin**',
+          'text-Network: **testnet**',
+          'text-Mirror Node: **https://test.mirrornode.com**',
           'divider',
           'heading-Test Heading',
           'text-Test Text',

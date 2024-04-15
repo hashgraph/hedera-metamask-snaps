@@ -138,9 +138,8 @@ export class FreezeAccountFacade {
 
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to ${freezeText} an account
-      )}`;
-      console.error(errMessage, String(error));
+      const errMessage = `Error while trying to ${freezeText} an account`;
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 

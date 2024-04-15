@@ -193,7 +193,7 @@ export class AtomicSwapFacade {
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to initiate atomic swap`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
   }
@@ -269,7 +269,7 @@ export class AtomicSwapFacade {
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to complete atomic swap`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
   }

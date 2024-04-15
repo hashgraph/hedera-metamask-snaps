@@ -174,7 +174,7 @@ export class StakeHbarFacade {
       await SnapState.updateState(state);
     } catch (error: any) {
       const errMessage = `Error while trying to stake Hbar`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 

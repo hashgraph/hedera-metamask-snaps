@@ -143,7 +143,7 @@ export class AssociateTokensFacade {
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to associate tokens to the account`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
   }

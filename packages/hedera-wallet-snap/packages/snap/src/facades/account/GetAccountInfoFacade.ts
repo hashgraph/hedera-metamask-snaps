@@ -187,7 +187,7 @@ export class GetAccountInfoFacade {
       }
     } catch (error: any) {
       const errMessage = 'Error while trying to get account info';
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 

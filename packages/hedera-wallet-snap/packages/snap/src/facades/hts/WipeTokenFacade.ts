@@ -165,7 +165,7 @@ export class WipeTokenFacade {
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to wipe tokens`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 

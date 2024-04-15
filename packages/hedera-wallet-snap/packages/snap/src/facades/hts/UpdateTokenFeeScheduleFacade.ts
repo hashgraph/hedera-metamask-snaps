@@ -140,7 +140,7 @@ export class UpdateTokenFeeScheduleFacade {
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to update a token fee schedule`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 

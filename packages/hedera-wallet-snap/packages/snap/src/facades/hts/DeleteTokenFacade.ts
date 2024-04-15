@@ -119,7 +119,7 @@ export class DeleteTokenFacade {
       txReceipt = await deleteTokensCommand.execute(hederaClient.getClient());
     } catch (error: any) {
       const errMessage = `Error while trying to delete token`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 

@@ -60,7 +60,7 @@ export class GetAccountBalanceFacade {
       await SnapState.updateState(state);
     } catch (error: any) {
       const errMessage = 'Error while trying to get account balance';
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }
 
