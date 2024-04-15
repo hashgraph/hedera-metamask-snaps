@@ -143,7 +143,7 @@ export class SnapAccounts {
         } catch (error: any) {
           const address = accountIdOrEvmAddress as string;
           const errMessage = `Could not connect to the Hedera account ${address} on ${network}`;
-          console.error(errMessage, String(error));
+          console.error('Error occurred: %s', errMessage, String(error));
           throw rpcErrors.resourceNotFound({
             message: errMessage,
             data: address,
@@ -359,7 +359,7 @@ export class SnapAccounts {
         }
       } catch (error: any) {
         const errMessage = `Could not setup a Hedera client. Please try again`;
-        console.error(errMessage, String(error));
+        console.error('Error occurred: %s', errMessage, String(error));
         throw rpcErrors.transactionRejected(errMessage);
       }
     }
@@ -518,7 +518,7 @@ export class SnapAccounts {
         }
       } catch (error: any) {
         const errMessage = `Could not setup a Hedera client. Please try again`;
-        console.error(errMessage, String(error));
+        console.error('Error occurred: %s', errMessage, String(error));
         throw rpcErrors.transactionRejected(errMessage);
       }
     }

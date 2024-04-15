@@ -46,7 +46,7 @@ export class HederaTransactionsStrategy {
       );
     } catch (error: any) {
       const errMessage = `Error while trying to get transaction history`;
-      console.error(errMessage, String(error));
+      console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.resourceUnavailable(errMessage);
     }
 
