@@ -7,7 +7,7 @@
     "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "5hnpA+a7GbpOFVB2UNjPSFGMS/k2861AFhtcPAfr7PU=",
+    "shasum": "+OP0pUi77BWXHFO78Abf4bsPnIFuQytg6qAGJuwYwnc=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

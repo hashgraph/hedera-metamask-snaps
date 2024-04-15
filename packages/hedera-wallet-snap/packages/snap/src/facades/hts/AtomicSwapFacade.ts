@@ -166,7 +166,12 @@ export class AtomicSwapFacade {
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
@@ -200,7 +205,8 @@ export class AtomicSwapFacade {
     const { origin, state } = walletSnapParams;
     const { scheduleId } = signScheduledTxParams;
 
-    const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
+    const { hederaAccountId, hederaEvmAddress, network, mirrorNodeUrl } =
+      state.currentAccount;
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
@@ -239,7 +245,12 @@ export class AtomicSwapFacade {
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {

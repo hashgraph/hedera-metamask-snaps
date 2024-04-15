@@ -52,7 +52,8 @@ export class DeleteAccountFacade {
 
     const { transferAccountId } = deleteAccountRequestParams;
 
-    const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+    const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+      state.currentAccount;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -70,7 +71,12 @@ export class DeleteAccountFacade {
       ];
       const dialogParamsForDeleteAccount: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(
         dialogParamsForDeleteAccount,

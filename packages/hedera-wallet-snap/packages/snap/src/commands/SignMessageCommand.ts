@@ -48,7 +48,7 @@ export class SignMessageCommand {
 
     const { message } = this.#signMessageRequestParams;
 
-    const { hederaEvmAddress, network } = state.currentAccount;
+    const { hederaEvmAddress, network, mirrorNodeUrl } = state.currentAccount;
 
     const { privateKey: pk, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -62,7 +62,12 @@ export class SignMessageCommand {
       ];
       const dialogParamsForSignMessage: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParamsForSignMessage);
       if (!confirmed) {

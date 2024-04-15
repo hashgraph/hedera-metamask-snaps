@@ -119,6 +119,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           type: 'alert',
           content: panel([
             text(`Hello, **${origin}**!`),
+            text(`Network: **${network}**`),
+            text(`Mirror Node: **${mirrorNodeUrl}**`),
             text(
               "You are seeing this because you interacted with the 'hello' method",
             ),
@@ -139,6 +141,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           type: 'alert',
           content: panel([
             text(`Request from: **${origin}**`),
+            text(`Network: **${network}**`),
+            text(`Mirror Node: **${mirrorNodeUrl}**`),
             text(
               'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
             ),
