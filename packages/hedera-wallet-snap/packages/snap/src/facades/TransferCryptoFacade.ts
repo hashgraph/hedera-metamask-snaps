@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
@@ -109,10 +109,11 @@ export class TransferCryptoFacade {
         heading('Transfer Crypto'),
         text('Are you sure you want to execute the following transaction(s)?'),
         divider(),
+        copyable(),
       ];
       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
       if (strippedMemo) {
-        panelToShow.push(text(`Memo: ${strippedMemo}`));
+        panelToShow.push(text(`Memo:`), copyable(strippedMemo));
       }
       if (maxFee) {
         panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
@@ -136,7 +137,7 @@ export class TransferCryptoFacade {
             );
           walletBalance = ownerAccountInfo.balance;
           panelToShow.push(text(`Transaction Type: Delegated Transfer`));
-          panelToShow.push(text(`Owner Account Id: ${transfer.from}`));
+          panelToShow.push(text(`Owner Account Id:`), copyable(transfer.from));
         }
         panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
         if (transfer.assetType === 'HBAR') {
@@ -197,7 +198,7 @@ export class TransferCryptoFacade {
             asset = tokenInfo.symbol;
             panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
             panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-            panelToShow.push(text(`Symbol: ${asset}`));
+            panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
             transfer.decimals = Number(tokenInfo.decimals);
           }
           if (!Number.isFinite(transfer.decimals)) {
@@ -216,7 +217,7 @@ export class TransferCryptoFacade {
             feeToDisplay = serviceFeesToPay[transfer.assetId as string];
           }
         }
-        panelToShow.push(text(`To: ${transfer.to}`));
+        panelToShow.push(text(`To:`), copyable(transfer.to));
         panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
         if (feeToDisplay > 0) {
           panelToShow.push(

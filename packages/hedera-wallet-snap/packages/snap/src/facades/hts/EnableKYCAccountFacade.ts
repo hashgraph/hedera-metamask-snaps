@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { EnableKYCAccountCommand } from '../../commands/hts/EnableKYCAccountCommand';
@@ -77,8 +77,10 @@ export class EnableKYCAccountFacade {
           `You are about to ${enableText} KYC to an account for the specified token:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
-        text(`Account Id to ${enableText} KYC for: ${accountId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
+        text(`Account Id to ${enableText} KYC for:`),
+        copyable(accountId),
       ];
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {

@@ -21,7 +21,7 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTokenCommand } from '../../commands/hts/DeleteTokenCommand';
@@ -58,12 +58,10 @@ export class DeleteTokenFacade {
         heading('Delete Token'),
         text('Are you sure you want to delete the following token?'),
         divider(),
+        copyable(),
       ];
 
-      panelToShow.push(text(`Token ID: ${tokenId}`));
-      panelToShow.push(divider());
-
-      panelToShow.push(text(`Asset Id: ${tokenId}`));
+      panelToShow.push(text(`Asset ID:`), copyable(tokenId));
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
@@ -85,7 +83,6 @@ export class DeleteTokenFacade {
           ),
         );
       }
-      panelToShow.push(text(tokenId));
       panelToShow.push(divider());
 
       const dialogParams: DialogParams = {

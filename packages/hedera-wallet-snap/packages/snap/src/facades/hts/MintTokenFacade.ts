@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { MintTokenCommand } from '../../commands/hts/MintTokenCommand';
@@ -71,7 +71,8 @@ export class MintTokenFacade {
           } with the following details:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
       ];
       if (assetType === 'NFT') {
         panelToShow.push(
@@ -80,7 +81,7 @@ export class MintTokenFacade {
         );
         panelToShow.push(divider());
         for (const data of metadata) {
-          panelToShow.push(text(`🚀 ${data}`));
+          panelToShow.push(copyable(`${data}`));
         }
         panelToShow.push(divider());
       } else {

@@ -21,7 +21,7 @@
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
@@ -67,6 +67,7 @@ export class StakeHbarFacade {
           'Refer to this [guide](https://docs.hedera.com/hedera/core-concepts/staking) for more information on staking HBAR',
         ),
         divider(),
+        copyable(),
       ];
 
       // Handle unstaking Hbar
@@ -124,7 +125,7 @@ export class StakeHbarFacade {
           stakedNodeId = String(nodeId);
         }
         if (!_.isEmpty(accountId)) {
-          panelToShow.push(text(`Account ID: ${String(accountId)}`));
+          panelToShow.push(text(`Account ID:`), copyable(accountId as string));
           stakedAccountId = accountId;
         }
         panelToShow.push(divider());

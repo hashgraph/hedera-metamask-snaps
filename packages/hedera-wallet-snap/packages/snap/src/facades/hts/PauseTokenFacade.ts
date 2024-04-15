@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { PauseTokenCommand } from '../../commands/hts/PauseTokenCommand';
@@ -78,7 +78,8 @@ export class PauseTokenFacade {
         ),
         text(`You are about to ${pauseText} the following token:`),
         divider(),
-        text(`Asset Id: ${tokenId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
       ];
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {

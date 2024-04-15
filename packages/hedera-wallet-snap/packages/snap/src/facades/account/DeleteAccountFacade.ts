@@ -18,17 +18,17 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import type { DeleteAccountRequestParams } from '../../types/params';
-import type { TxReceipt, AccountBalance } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import type { AccountInfo, Account } from '../../types/account';
-import { SnapState } from '../../snap/SnapState';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { copyable, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAccountCommand } from '../../commands/account/DeleteAccountCommand';
+import { SnapState } from '../../snap/SnapState';
+import type { Account, AccountInfo } from '../../types/account';
+import type { AccountBalance, TxReceipt } from '../../types/hedera';
+import type { DeleteAccountRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class DeleteAccountFacade {
   /**
@@ -62,10 +62,11 @@ export class DeleteAccountFacade {
       const panelToShow = [
         heading('Delete Account'),
         text('Are you sure you want to delete your account?'),
-        text(
-          `All your HBAR will be transferred to ${transferAccountId} and your account will be deleted.`,
-        ),
         text(`NOTE: This action is irreversible.`),
+        text(
+          `All your HBAR will be transferred to the following account and your account will be deleted.`,
+        ),
+        copyable(transferAccountId),
       ];
       const dialogParamsForDeleteAccount: DialogParams = {
         type: 'confirmation',

@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { AtomicSwapCommand } from '../../commands/hts/AtomicSwapCommand';
@@ -125,10 +125,11 @@ export class AtomicSwapFacade {
           'Are you sure you want to execute the following swap? Note that the responder will also need to approve the swap by calling "hts/completeSwap" API within 30 minutes from now or the transaction will fail.',
         ),
         divider(),
+        copyable(),
       ];
       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
       if (strippedMemo) {
-        panelToShow.push(text(`Memo: ${strippedMemo}`));
+        panelToShow.push(text(`Memo:`), copyable(strippedMemo));
       }
       if (maxFee) {
         panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
@@ -227,10 +228,12 @@ export class AtomicSwapFacade {
           'Are you sure you want to execute the following swap? Note that all the parties involved in the swap must approve the swap within 30 minutes from now or the transaction will fail.',
         ),
         divider(),
+        copyable(),
       ];
 
       panelToShow.push(
-        text(`Atomic Swap Scheduled Transaction ID : ${scheduleId}`),
+        text(`Atomic Swap Scheduled Transaction ID:`),
+        copyable(scheduleId),
       );
       panelToShow.push(divider());
 
@@ -289,9 +292,8 @@ export class AtomicSwapFacade {
       throw providerErrors.unsupportedMethod(errMessage);
     }
     panelToShow.push(
-      text(
-        `Swap ${isRequester ? 'Requester' : 'Responder'} : ${accountIdToSendFrom}`,
-      ),
+      text(`Swap ${isRequester ? 'Requester' : 'Responder'}`),
+      copyable(accountIdToSendFrom),
     );
 
     const ownerAccountInfo: AccountInfo =
@@ -342,7 +344,7 @@ export class AtomicSwapFacade {
         assetId = assetIdSplit[0];
         nftSerialNumber = assetIdSplit[1];
       }
-      panelToShow.push(text(`Asset Id: ${assetId}`));
+      panelToShow.push(text(`Asset Id:`), copyable(assetId));
       const tokenInfo = await CryptoUtils.getTokenById(assetId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
@@ -357,7 +359,7 @@ export class AtomicSwapFacade {
         asset = tokenInfo.symbol;
         panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
         panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-        panelToShow.push(text(`Symbol: ${asset}`));
+        panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
         newTransfer.decimals = Number(tokenInfo.decimals);
       }
       if (!Number.isFinite(newTransfer.decimals)) {
@@ -376,7 +378,7 @@ export class AtomicSwapFacade {
         feeToDisplay = serviceFeesToPay[newTransfer.assetId as string];
       }
     }
-    panelToShow.push(text(`To: ${newTransfer.to}`));
+    panelToShow.push(text(`To:`), copyable(newTransfer.to));
     panelToShow.push(text(`Amount: ${newTransfer.amount} ${asset}`));
     if (feeToDisplay > 0) {
       panelToShow.push(

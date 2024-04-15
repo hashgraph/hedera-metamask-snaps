@@ -28,7 +28,6 @@ export type ServiceFee = {
 };
 
 export type SignMessageRequestParams = {
-  header?: string;
   message: string;
 };
 

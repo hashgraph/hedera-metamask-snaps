@@ -18,17 +18,17 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import type { DissociateTokensRequestParams } from '../../types/params';
-import type { TxReceipt } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import _ from 'lodash';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
+import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DissociateTokensCommand } from '../../commands/hts/DissociateTokensCommand';
+import type { TxReceipt } from '../../types/hedera';
+import type { DissociateTokensRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class DissociateTokensFacade {
   /**
@@ -66,6 +66,7 @@ export class DissociateTokensFacade {
           'Are you sure you want to dissociate the following tokens from your account?',
         ),
         divider(),
+        copyable(),
       ];
 
       for (const tokenId of tokenIds) {
@@ -73,7 +74,7 @@ export class DissociateTokensFacade {
         panelToShow.push(text(`Token #${tokenNumber}`));
         panelToShow.push(divider());
 
-        panelToShow.push(text(`Asset Id: ${tokenId}`));
+        panelToShow.push(text(`Asset Id:`), copyable(tokenId));
         const tokenInfo = await CryptoUtils.getTokenById(
           tokenId,
           mirrorNodeUrl,
@@ -106,7 +107,6 @@ export class DissociateTokensFacade {
             ),
           );
         }
-        panelToShow.push(text(tokenId));
         panelToShow.push(divider());
       }
 

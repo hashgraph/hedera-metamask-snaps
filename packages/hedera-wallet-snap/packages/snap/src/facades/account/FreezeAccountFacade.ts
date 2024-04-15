@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { FreezeAccountCommand } from '../../commands/account/FreezeAccountCommand';
@@ -72,8 +72,10 @@ export class FreezeAccountFacade {
           `You are about to ${freezeText} transfers of the specified token for the given account:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
-        text(`Account Id to ${freezeText} transfers for: ${accountId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
+        text(`Account Id to ${freezeText} transfers for:`),
+        copyable(accountId),
       ];
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {

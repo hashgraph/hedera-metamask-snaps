@@ -18,20 +18,20 @@
  *
  */
 
+import { providerErrors } from '@metamask/rpc-errors';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
+import _ from 'lodash';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { ApproveAllowanceCommand } from '../../commands/allowance/ApproveAllowanceCommand';
+import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import type {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
 } from '../../types/params';
-import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import _ from 'lodash';
-import { providerErrors } from '@metamask/rpc-errors';
 import type { WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { CryptoUtils } from '../../utils/CryptoUtils';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { ApproveAllowanceCommand } from '../../commands/allowance/ApproveAllowanceCommand';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class ApproveAllowanceFacade {
   public static async approveAllowance(
@@ -60,11 +60,12 @@ export class ApproveAllowanceFacade {
         text(
           'Are you sure you want to allow the following account to spend your tokens?',
         ),
+        copyable(),
         divider(),
       ];
 
       if (assetType === 'HBAR') {
-        panelToShow.push(text(`Asset: ${assetType}`));
+        panelToShow.push(text(`Asset: HBAR`));
       } else {
         const walletBalance =
           state.accountState[hederaEvmAddress][network].accountInfo.balance;
@@ -124,7 +125,8 @@ export class ApproveAllowanceFacade {
       }
       panelToShow.push(
         divider(),
-        text(`Spender Account ID: ${spenderAccountId}`),
+        text(`Spender Account ID:`),
+        copyable(spenderAccountId),
       );
       panelToShow.push(text(`Approved Amount: ${amount}`));
 

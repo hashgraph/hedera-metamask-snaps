@@ -453,10 +453,7 @@ export class HederaUtils {
     const parameter = params as SignMessageRequestParams;
 
     // Check if message is valid
-    this.checkValidString(parameter, 'signMessage', 'header', false);
-
-    // Check if message is valid
-    this.checkValidString(parameter, 'signMessage', 'message', false);
+    this.checkValidString(parameter, 'signMessage', 'message', true);
   }
 
   /**

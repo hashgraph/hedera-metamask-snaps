@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { WipeTokenCommand } from '../../commands/hts/WipeTokenCommand';
@@ -73,8 +73,10 @@ export class WipeTokenFacade {
           } with the following details:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
-        text(`Account Id to wipe from: ${accountId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
+        text(`Account Id to wipe from:`),
+        copyable(accountId),
       ];
       if (assetType === 'NFT') {
         panelToShow.push(

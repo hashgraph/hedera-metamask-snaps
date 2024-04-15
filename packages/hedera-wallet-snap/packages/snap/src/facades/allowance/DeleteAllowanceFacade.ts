@@ -18,16 +18,16 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import type { DeleteAllowanceRequestParams } from '../../types/params';
-import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { providerErrors } from '@metamask/rpc-errors';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAllowanceCommand } from '../../commands/allowance/DeleteAllowanceCommand';
+import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
+import type { DeleteAllowanceRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  *
@@ -56,18 +56,20 @@ export class DeleteAllowanceFacade {
         heading('Approve an allowance'),
         text('Are you sure you want to delete allowances for your tokens?'),
         divider(),
+        copyable(),
       ];
 
       if (assetType === 'HBAR' || assetType === 'TOKEN') {
         panelToShow.push(
           divider(),
-          text(`Spender Account ID: ${spenderAccountId as string}`),
+          text(`Spender Account ID:`),
+          copyable(spenderAccountId as string),
           divider(),
         );
       }
 
       if (assetType === 'HBAR') {
-        panelToShow.push(text(`Asset: ${assetType}`));
+        panelToShow.push(text(`Asset: HBAR`));
       } else {
         const tokenInfo: MirrorTokenInfo = await CryptoUtils.getTokenById(
           assetId as string,
@@ -76,7 +78,7 @@ export class DeleteAllowanceFacade {
 
         panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
         panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-        panelToShow.push(text(`Id: ${assetId as string}`));
+        panelToShow.push(text(`Asset Id:`), copyable(assetId as string));
         panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
         panelToShow.push(
           text(

@@ -20,7 +20,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
@@ -69,7 +69,8 @@ export class BurnTokenFacade {
           } with the following details:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
       ];
       if (assetType === 'NFT') {
         panelToShow.push(

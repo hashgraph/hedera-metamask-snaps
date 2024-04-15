@@ -22,7 +22,7 @@ import type { WalletSnapParams } from '../../types/state';
 import type { AssociateTokensRequestParams } from '../../types/params';
 import type { TxReceipt } from '../../types/hedera';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import _ from 'lodash';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -66,6 +66,7 @@ export class AssociateTokensFacade {
           'Are you sure you want to associate the following tokens to your account?',
         ),
         divider(),
+        copyable(),
       ];
 
       for (const tokenId of tokenIds) {
@@ -73,7 +74,7 @@ export class AssociateTokensFacade {
         panelToShow.push(text(`Token #${tokenNumber}`));
         panelToShow.push(divider());
 
-        panelToShow.push(text(`Asset Id: ${tokenId}`));
+        panelToShow.push(text(`Asset Id:`), copyable(tokenId));
         const tokenInfo = await CryptoUtils.getTokenById(
           tokenId,
           mirrorNodeUrl,
@@ -106,7 +107,6 @@ export class AssociateTokensFacade {
             ),
           );
         }
-        panelToShow.push(text(tokenId));
         panelToShow.push(divider());
       }
 

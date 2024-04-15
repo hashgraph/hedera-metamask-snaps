@@ -22,7 +22,7 @@
 
 import { providerErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
 import type { TxReceipt } from '../../types/hedera';
@@ -61,23 +61,6 @@ export class UpdateTokenFeeScheduleFacade {
       mirrorNodeUrl,
     );
 
-    let feeScheduleDisplayStatements = '';
-
-    for (const fee of customFees) {
-      const {
-        feeCollectorAccountId,
-        hbarAmount,
-        tokenAmount,
-        denominatingTokenId,
-        allCollectorsAreExempt,
-      } = fee;
-
-      feeScheduleDisplayStatements +=
-        `fee collector id:${feeCollectorAccountId}\nhbarAmount: ${hbarAmount}\n` +
-        `tokenAmount: ${tokenAmount}\ndenominatingTokenId: ${denominatingTokenId}\n` +
-        `allCollectorsAreExempt: ${allCollectorsAreExempt}`;
-    }
-
     let txReceipt = {} as TxReceipt;
     try {
       const panelToShow = [
@@ -89,10 +72,29 @@ export class UpdateTokenFeeScheduleFacade {
           `You are about to modify a token's fee schedule with the following details:`,
         ),
         divider(),
-        text(`Id: ${tokenId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
       ];
 
-      panelToShow.push(text(feeScheduleDisplayStatements));
+      for (const fee of customFees) {
+        const {
+          feeCollectorAccountId,
+          hbarAmount,
+          tokenAmount,
+          denominatingTokenId,
+          allCollectorsAreExempt,
+        } = fee;
+
+        panelToShow.push(
+          text('Fee Collection Id:'),
+          copyable(feeCollectorAccountId),
+          text(`Hbar Amount: ${hbarAmount}`),
+          text(`Token Amount: ${tokenAmount}`),
+          text('Denominating Token Id:'),
+          copyable(denominatingTokenId),
+          text(`All Collectors Are Exempt: ${allCollectorsAreExempt}`),
+        );
+      }
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
