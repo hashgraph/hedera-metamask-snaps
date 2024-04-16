@@ -19,10 +19,10 @@
  */
 
 import { PrivateKey } from '@hashgraph/sdk';
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -142,16 +142,10 @@ export class SnapAccounts {
           keyStore = _keyStore;
         } catch (error: any) {
           const address = accountIdOrEvmAddress as string;
-          console.error(
-            `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
-              error,
-            )}`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `Could not connect to the Hedera account ${address} on ${network}. Please try again: ${String(
-              error,
-            )}`,
+          const errMessage = `Could not connect to the Hedera account ${address} on ${network}`;
+          console.error('Error occurred: %s', errMessage, String(error));
+          throw rpcErrors.resourceNotFound({
+            message: errMessage,
             data: address,
           });
         }
@@ -165,10 +159,9 @@ export class SnapAccounts {
       // Generate a new wallet according to the Hedera Wallet's entrophy combined with the currently connected EVM address
       const res = await CryptoUtils.generateWallet(connectedAddress);
       if (!res) {
-        console.log('Failed to generate snap wallet for DID operations');
-        throw providerErrors.unsupportedMethod(
-          'Failed to generate snap wallet for DID operations',
-        );
+        const errMessage = `Failed to generate snap wallet for ${connectedAddress}`;
+        console.log(errMessage);
+        throw rpcErrors.internal(errMessage);
       }
       keyStore.curve = 'ECDSA_SECP256K1';
       keyStore.privateKey = res.privateKey;
@@ -234,12 +227,10 @@ export class SnapAccounts {
 
         if (evmAddress === keyStore.address) {
           if (keyStore.curve !== curve) {
-            console.error(
-              `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
-            );
-            throw providerErrors.custom({
-              code: 4200,
-              message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
+            const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`;
+            console.log(errMessage);
+            throw rpcErrors.invalidRequest({
+              message: errMessage,
               data: { network, curve, evmAddress },
             });
           }
@@ -253,12 +244,17 @@ export class SnapAccounts {
     if (_.isEmpty(connectedAddress)) {
       const dialogParamsForPrivateKey: DialogParams = {
         type: 'prompt',
-        content: await SnapUtils.generateCommonPanel(origin, [
-          heading('Connect to EVM Account'),
-          text('Enter private key for the following account'),
-          divider(),
-          text(`EVM Address: ${evmAddress}`),
-        ]),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          [
+            heading('Connect to EVM Account'),
+            divider(),
+            text(`EVM Address:`),
+            copyable(evmAddress),
+          ],
+        ),
         placeholder: '2386d1d21644dc65d...',
       };
       const privateKey = (await SnapUtils.snapDialog(
@@ -274,12 +270,10 @@ export class SnapAccounts {
         const publicKey =
           PrivateKey.fromStringECDSA(privateKey).publicKey.toStringRaw();
         if (_.isEmpty(accountInfo)) {
-          console.error(
-            `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Address: ${evmAddress} Public Key: ${publicKey}`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Address: ${evmAddress} Public Key: ${publicKey}`,
+          const errMessage = `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Address: ${evmAddress} Public Key: ${publicKey}`;
+          console.error(errMessage);
+          throw rpcErrors.resourceNotFound({
+            message: errMessage,
             data: { network, curve, address: evmAddress, publicKey },
           });
         }
@@ -288,12 +282,10 @@ export class SnapAccounts {
           accountInfo.key.type === 'ProtobufEncoded' &&
           curve !== 'ECDSA_SECP256K1'
         ) {
-          console.error(
-            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, address: evmAddress, publicKey },
           });
         }
@@ -302,14 +294,12 @@ export class SnapAccounts {
           accountInfo.key.type !== 'ProtobufEncoded' &&
           accountInfo.key.type !== curve
         ) {
-          console.error(
-            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
-              accountInfo.key.type ?? ''
-            }' on '${network}'. Please make sure to pass in the correct value for "curve".`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${accountInfo.key.type}' on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
+            accountInfo.key.type ?? ''
+          }' on '${network}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, address: evmAddress, publicKey },
           });
         }
@@ -318,16 +308,12 @@ export class SnapAccounts {
           accountInfo.key.type !== 'ProtobufEncoded' &&
           accountInfo.key.type !== curve
         ) {
-          console.error(
-            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
-              accountInfo.key.type ?? ''
-            }' on '${network}'. Please make sure to pass in the correct value for "curve".`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
-              accountInfo.key.type ?? ''
-            }' on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
+            accountInfo.key.type ?? ''
+          }' on '${network}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, address: evmAddress, publicKey },
           });
         }
@@ -350,31 +336,31 @@ export class SnapAccounts {
         } else {
           const dialogParamsForHederaAccountId: DialogParams = {
             type: 'alert',
-            content: await SnapUtils.generateCommonPanel(origin, [
-              heading('Hedera Account Status'),
-              text(
-                `The private key you passed is not associated with the Hedera account '${evmAddress}' on '${network}' that uses the elliptic curve '${curve}'`,
-              ),
-            ]),
+            content: await SnapUtils.generateCommonPanel(
+              origin,
+              network,
+              mirrorNodeUrl,
+              [
+                heading('Hedera Account Status'),
+                text(
+                  `The private key you passed is not associated with the Hedera account '${evmAddress}' on '${network}' that uses the elliptic curve '${curve}'`,
+                ),
+              ],
+            ),
           };
           await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
 
-          console.error(
-            `The private key you passed is not associated with the Hedera account '${result.address}' on '${network}' that uses the elliptic curve '${curve}'`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `The private key you passed is not associated with the Hedera account '${result.address}' on '${network}' that uses the elliptic curve '${curve}'`,
+          const errMessage = `The private key you passed is not associated with the Hedera account '${result.address}' on '${network}' that uses the elliptic curve '${curve}'`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, address: evmAddress, publicKey },
           });
         }
       } catch (error: any) {
-        console.error(
-          `Could not setup a Hedera client. Please try again: ${String(error)}`,
-        );
-        throw providerErrors.unsupportedMethod(
-          `Could not setup a Hedera client. Please try again: ${String(error)}`,
-        );
+        const errMessage = `Could not setup a Hedera client. Please try again`;
+        console.error('Error occurred: %s', errMessage, String(error));
+        throw rpcErrors.transactionRejected(errMessage);
       }
     }
 
@@ -409,12 +395,10 @@ export class SnapAccounts {
         const { keyStore } = state.accountState[addr][network];
         if (keyStore.hederaAccountId === accountId) {
           if (keyStore.curve !== curve) {
-            console.error(
-              `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
-            );
-            throw providerErrors.custom({
-              code: 4200,
-              message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`,
+            const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using ${keyStore.curve} on '${network}'. Please make sure to pass in the correct value for "curve".`;
+            console.error(errMessage);
+            throw rpcErrors.invalidRequest({
+              message: errMessage,
               data: { network, curve, accountId },
             });
           }
@@ -428,12 +412,18 @@ export class SnapAccounts {
     if (_.isEmpty(connectedAddress)) {
       const dialogParamsForPrivateKey: DialogParams = {
         type: 'prompt',
-        content: await SnapUtils.generateCommonPanel(origin, [
-          heading('Connect to Hedera Account'),
-          text('Enter private key for the following account'),
-          divider(),
-          text(`Account Id: ${accountId}`),
-        ]),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          [
+            heading('Connect to Hedera Account'),
+            text('Enter private key for the following account'),
+            divider(),
+            text(`Account Id:`),
+            copyable(accountId),
+          ],
+        ),
         placeholder: '2386d1d21644dc65d...',
       };
       const privateKey = (await SnapUtils.snapDialog(
@@ -454,12 +444,10 @@ export class SnapAccounts {
             PrivateKey.fromStringED25519(privateKey).publicKey.toStringRaw();
         }
         if (_.isEmpty(accountInfo)) {
-          console.error(
-            `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Account Id: ${accountId} Public Key: ${publicKey}`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Account Id: ${accountId} Public Key: ${publicKey}`,
+          const errMessage = `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Account Id: ${accountId} Public Key: ${publicKey}`;
+          console.error(errMessage);
+          throw rpcErrors.resourceNotFound({
+            message: errMessage,
             data: { network, curve, accountId, publicKey },
           });
         }
@@ -468,12 +456,10 @@ export class SnapAccounts {
           accountInfo.key.type === 'ProtobufEncoded' &&
           curve !== 'ECDSA_SECP256K1'
         ) {
-          console.error(
-            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, accountId, publicKey },
           });
         }
@@ -482,14 +468,10 @@ export class SnapAccounts {
           accountInfo.key.type !== 'ProtobufEncoded' &&
           accountInfo.key.type !== curve
         ) {
-          console.error(
-            `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${accountInfo.key.type}' on '${network}'. Please make sure to pass in the correct value for "curve".`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
-              accountInfo.key.type ?? ''
-            }' on '${network}'. Please make sure to pass in the correct value for "curve".`,
+          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${accountInfo.key.type}' on '${network}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, accountId, publicKey },
           });
         }
@@ -514,31 +496,31 @@ export class SnapAccounts {
         } else {
           const dialogParamsForHederaAccountId: DialogParams = {
             type: 'alert',
-            content: await SnapUtils.generateCommonPanel(origin, [
-              heading('Hedera Account Status'),
-              text(
-                `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
-              ),
-            ]),
+            content: await SnapUtils.generateCommonPanel(
+              origin,
+              network,
+              mirrorNodeUrl,
+              [
+                heading('Hedera Account Status'),
+                text(
+                  `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
+                ),
+              ],
+            ),
           };
           await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
 
-          console.error(
-            `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`,
-          );
-          throw providerErrors.custom({
-            code: 4200,
-            message: `The private key you passed is not associated with this Hedera account on '${network}' that uses the elliptic curve '${curve}'`,
+          const errMessage = `The private key you passed is not associated with the Hedera account '${accountId}' on '${network}' that uses the elliptic curve '${curve}'`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
             data: { network, curve, accountId, publicKey },
           });
         }
       } catch (error: any) {
-        console.error(
-          `Could not setup a Hedera client. Please try again: ${String(error)}`,
-        );
-        throw providerErrors.unsupportedMethod(
-          `Could not setup a Hedera client. Please try again: ${String(error)}`,
-        );
+        const errMessage = `Could not setup a Hedera client. Please try again`;
+        console.error('Error occurred: %s', errMessage, String(error));
+        throw rpcErrors.transactionRejected(errMessage);
       }
     }
 
@@ -577,12 +559,10 @@ export class SnapAccounts {
       mirrorNode,
     );
     if (_.isEmpty(accountInfo)) {
-      console.error(
-        `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`,
-      );
-      throw providerErrors.custom({
-        code: 4200,
-        message: `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`,
+      const errMessage = `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`;
+      console.error(errMessage);
+      throw rpcErrors.resourceNotFound({
+        message: errMessage,
         data: address,
       });
     }

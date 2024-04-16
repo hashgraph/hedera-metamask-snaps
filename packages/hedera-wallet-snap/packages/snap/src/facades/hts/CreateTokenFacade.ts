@@ -18,9 +18,9 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { CreateTokenCommand } from '../../commands/hts/CreateTokenCommand';
@@ -49,7 +49,8 @@ export class CreateTokenFacade {
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
-    const { hederaEvmAddress, hederaAccountId, network } = state.currentAccount;
+    const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
+      state.currentAccount;
 
     const { privateKey, publicKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -88,8 +89,10 @@ export class CreateTokenFacade {
           } with the following details:`,
         ),
         divider(),
-        text(`Name: ${name}`),
-        text(`Symbol: ${symbol}`),
+        text(`Name:`),
+        copyable(name),
+        text(`Symbol`),
+        copyable(symbol),
         text(`Supply Type: ${supplyType}`),
       ];
       if (assetType === 'TOKEN') {
@@ -102,38 +105,44 @@ export class CreateTokenFacade {
         text(
           `Max Supply: ${supplyType === 'INFINITE' ? 'Infinite' : maxSupply}`,
         ),
-        text(`Auto Renew Account ID: ${autoRenewAccountId}`),
-        text(`Token Memo: ${tokenMemo}`),
+        text(`Auto Renew Account ID:`),
+        copyable(autoRenewAccountId),
+        text(`Token Memo:`),
+        copyable(tokenMemo),
         text(`Freeze Default: ${freezeDefault}`),
-        text(`Admin Key: ${publicKey}`),
-        text(`Treasury Account: ${hederaAccountId}`),
-        text(
-          `KYC Public Key: ${
-            _.isEmpty(kycPublicKey) ? 'Not set' : (kycPublicKey as string)
-          }`,
+        text(`Admin Key:`),
+        copyable(publicKey),
+        text(`Treasury Account:`),
+        copyable(hederaAccountId),
+        text(`KYC Public Key:`),
+        copyable(
+          `${_.isEmpty(kycPublicKey) ? 'Not set' : (kycPublicKey as string)}`,
         ),
-        text(
-          `Freeze Public Key: ${
+        text(`Freeze Public Key:`),
+        copyable(
+          ` ${
             _.isEmpty(freezePublicKey) ? 'Not set' : (freezePublicKey as string)
           }`,
         ),
-        text(
-          `Pause Public Key:${
+        text(`Pause Public Key:`),
+        copyable(
+          `${
             _.isEmpty(pausePublicKey) ? 'Not set' : (pausePublicKey as string)
           }`,
         ),
-        text(
-          `Wipe Public Key: ${
-            _.isEmpty(wipePublicKey) ? 'Not set' : (wipePublicKey as string)
-          }`,
+        text(`Wipe Public Key:`),
+        copyable(
+          `${_.isEmpty(wipePublicKey) ? 'Not set' : (wipePublicKey as string)}`,
         ),
-        text(
-          `Supply Public Key: ${
+        text(`Supply Public Key:`),
+        copyable(
+          ` ${
             _.isEmpty(supplyPublicKey) ? 'Not set' : (supplyPublicKey as string)
           }`,
         ),
-        text(
-          `Fee Schedule Public Key: ${
+        text(`Fee Schedule Public Key:`),
+        copyable(
+          `${
             _.isEmpty(feeSchedulePublicKey)
               ? 'Not set'
               : (feeSchedulePublicKey as string)
@@ -152,9 +161,8 @@ export class CreateTokenFacade {
         panelToShow.push(divider());
         for (const customFee of customFees) {
           panelToShow.push(
-            text(
-              `Fee Collector Account ID: ${customFee.feeCollectorAccountId}`,
-            ),
+            text(`Fee Collector Account ID:`),
+            copyable(customFee.feeCollectorAccountId),
           );
           if (customFee.hbarAmount) {
             panelToShow.push(text(`HBAR Amount: ${customFee.hbarAmount}`));
@@ -164,7 +172,8 @@ export class CreateTokenFacade {
           }
           if (customFee.denominatingTokenId) {
             panelToShow.push(
-              text(`Denominating Token ID: ${customFee.denominatingTokenId}`),
+              text(`Denominating Token ID:`),
+              copyable(customFee.denominatingTokenId),
             );
           }
           if (customFee.allCollectorsAreExempt) {
@@ -182,12 +191,18 @@ export class CreateTokenFacade {
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -199,7 +214,7 @@ export class CreateTokenFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new CreateTokenCommand(
         assetType,
@@ -224,18 +239,16 @@ export class CreateTokenFacade {
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
-        throw new Error('private key object returned null');
+        throw rpcErrors.resourceUnavailable('private key object returned null');
       }
       txReceipt = await command.execute(
         hederaClient.getClient(),
         privateKeyObj,
       );
     } catch (error: any) {
-      const errMessage = `Error while trying to create a token: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to create a token`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

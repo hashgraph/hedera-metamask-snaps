@@ -18,9 +18,9 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { MintTokenCommand } from '../../commands/hts/MintTokenCommand';
@@ -71,7 +71,8 @@ export class MintTokenFacade {
           } with the following details:`,
         ),
         divider(),
-        text(`Asset Id: ${tokenId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
       ];
       if (assetType === 'NFT') {
         panelToShow.push(
@@ -80,7 +81,7 @@ export class MintTokenFacade {
         );
         panelToShow.push(divider());
         for (const data of metadata) {
-          panelToShow.push(text(`🚀 ${data}`));
+          panelToShow.push(copyable(`${data}`));
         }
         panelToShow.push(divider());
       } else {
@@ -91,7 +92,7 @@ export class MintTokenFacade {
         const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
         console.error(errMessage);
         if (assetType === 'TOKEN') {
-          throw new Error(errMessage);
+          throw rpcErrors.resourceUnavailable(errMessage);
         } else {
           panelToShow.push(
             text(
@@ -101,7 +102,8 @@ export class MintTokenFacade {
         }
       }
       panelToShow.push(
-        text(`Mint to Treasury account: ${tokenInfo.treasury_account_id}`),
+        text(`Mint to Treasury account:`),
+        copyable(tokenInfo.treasury_account_id),
       );
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
@@ -125,12 +127,18 @@ export class MintTokenFacade {
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -142,7 +150,7 @@ export class MintTokenFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new MintTokenCommand(
         assetType,
@@ -153,15 +161,11 @@ export class MintTokenFacade {
           : amount,
       );
 
-      const privateKeyObj = hederaClient.getPrivateKey();
-      if (privateKeyObj === null) {
-        throw new Error('private key object returned null');
-      }
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to mint tokens: ${String(error)}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to mint tokens`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

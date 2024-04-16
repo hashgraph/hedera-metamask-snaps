@@ -20,7 +20,7 @@
 
 import { AccountId, NftId, TokenId } from '@hashgraph/sdk';
 import type { StakingInfoJson } from '@hashgraph/sdk/lib/StakingInfo';
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import normalizeUrl from 'normalize-url';
 import type {
@@ -95,7 +95,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be passed`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be passed`,
       );
     }
@@ -126,7 +126,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
       );
     }
@@ -158,7 +158,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a string and a valid Hedera Account Id`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a string and a valid Hedera Account Id`,
       );
     }
@@ -188,7 +188,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a boolean`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a boolean`,
       );
     }
@@ -220,7 +220,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a number`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a number`,
       );
     }
@@ -258,7 +258,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
       );
     }
@@ -293,7 +293,7 @@ export class HederaUtils {
       console.error(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a valid public key`,
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         `Invalid ${methodName} Params passed. "${propertyName}" must be a public key`,
       );
     }
@@ -321,7 +321,7 @@ export class HederaUtils {
             }'. Valid networks are '${hederaNetworks.join(', ')}'`,
           );
 
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             `Invalid Hedera network '${
               parameter.network
             }'. Valid networks are '${hederaNetworks.join(', ')}'`,
@@ -354,7 +354,7 @@ export class HederaUtils {
             `Invalid mirrorNodeUrl '${mirrorNodeUrl}'. Error: ${String(error)}`,
           );
 
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             `Invalid mirrorNodeUrl '${mirrorNodeUrl}'. Error: ${String(error)}`,
           );
         }
@@ -390,7 +390,7 @@ export class HederaUtils {
             console.error(
               'Invalid externalAccount Params passed. "accountIdOrEvmAddress" must not be empty',
             );
-            throw providerErrors.unsupportedMethod(
+            throw rpcErrors.invalidParams(
               'Invalid externalAccount Params passed. "accountIdOrEvmAddress" must not be empty',
             );
           }
@@ -406,7 +406,7 @@ export class HederaUtils {
               console.error(
                 'Invalid externalAccount Params passed. "curve" must be a string and must be either "ECDSA_SECP256K1" or "ED25519"',
               );
-              throw providerErrors.unsupportedMethod(
+              throw rpcErrors.invalidParams(
                 'Invalid externalAccount Params passed. "curve" must be a string and must be either "ECDSA_SECP256K1" or "ED25519"',
               );
             }
@@ -445,7 +445,7 @@ export class HederaUtils {
       console.error(
         'Invalid signMessage Params passed. "message" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid signMessage Params passed. "message" must be passed as a parameter',
       );
     }
@@ -453,10 +453,7 @@ export class HederaUtils {
     const parameter = params as SignMessageRequestParams;
 
     // Check if message is valid
-    this.checkValidString(parameter, 'signMessage', 'header', false);
-
-    // Check if message is valid
-    this.checkValidString(parameter, 'signMessage', 'message', false);
+    this.checkValidString(parameter, 'signMessage', 'message', true);
   }
 
   /**
@@ -514,7 +511,7 @@ export class HederaUtils {
       console.error(
         'Invalid transferCrypto Params passed. "transfers" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid transferCrypto Params passed. "transfers" must be passed as a parameter',
       );
     }
@@ -545,7 +542,7 @@ export class HederaUtils {
         console.error(
           'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid transferCrypto Params passed. "transfers" must be passed as an array',
         );
       }
@@ -562,7 +559,7 @@ export class HederaUtils {
           console.error(
             'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid transferCrypto Params passed. "transfers[].assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
           );
         }
@@ -570,7 +567,7 @@ export class HederaUtils {
           console.error(
             'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid transferCrypto Params passed. "transfers[].assetId" cannot be passed for "HBAR" assetType',
           );
         }
@@ -581,7 +578,7 @@ export class HederaUtils {
           console.error(
             'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid transferCrypto Params passed. "transfers[].assetId" must be passed for "TOKEN/NFT" assetType',
           );
         }
@@ -596,7 +593,7 @@ export class HederaUtils {
           console.error(
             'Invalid transferCrypto Params passed. "transfers[].amount" must be 1 for "NFT" assetType',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid transferCrypto Params passed. "transfers[].amount" must be 1 for "NFT" assetType',
           );
         }
@@ -615,7 +612,7 @@ export class HederaUtils {
           console.error(
             'Invalid transferCrypto Params passed. "transfers[].assetId" must be in the format "tokenId/serialNumber"',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid transferCrypto Params passed. "transfers[].assetId" must be in the format "tokenId/serialNumber"',
           );
         }
@@ -637,7 +634,7 @@ export class HederaUtils {
       console.error(
         'Invalid initiateSwap Params passed. "atomicSwaps" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid initiateSwap Params passed. "atomicSwaps" must be passed as a parameter',
       );
     }
@@ -668,7 +665,7 @@ export class HederaUtils {
         console.error(
           'Invalid initiateSwap Params passed. "atomicSwaps" must be passed as an array and each swap must contain two fields "requester" and "responder"',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid initiateSwap Params passed. "atomicSwaps" must be passed as an array and each swap must contain two fields "requester" and "responder"',
         );
       }
@@ -682,7 +679,7 @@ export class HederaUtils {
           console.error(
             'Invalid initiateSwap Params passed. "atomicSwaps" must contain two fields "requester" and "responder"',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid initiateSwap Params passed. "atomicSwaps" must contain two fields "requester" and "responder"',
           );
         }
@@ -695,7 +692,7 @@ export class HederaUtils {
           console.error(
             'Invalid initiateSwap Params passed. Swap cannot be initiated with the same token',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid initiateSwap Params passed. Swap cannot be initiated with the same token',
           );
         }
@@ -721,7 +718,7 @@ export class HederaUtils {
       console.error(
         'Invalid atomicSwap Params passed. "assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid atomicSwap Params passed. "assetType" is not a valid string. It can be one of the following: "HBAR", "TOKEN", "NFT"',
       );
     }
@@ -729,7 +726,7 @@ export class HederaUtils {
       console.error(
         'Invalid atomicSwap Params passed. "assetId" cannot be passed for "HBAR" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid atomicSwap Params passed. "assetId" cannot be passed for "HBAR" assetType',
       );
     }
@@ -740,7 +737,7 @@ export class HederaUtils {
       console.error(
         'Invalid atomicSwap Params passed. "assetId" must be passed for "TOKEN/NFT" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid atomicSwap Params passed. "assetId" must be passed for "TOKEN/NFT" assetType',
       );
     }
@@ -752,7 +749,7 @@ export class HederaUtils {
       console.error(
         'Invalid atomicSwap Params passed. "to" cannot be passed for responder',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid atomicSwap Params passed. "to" cannot be passed for responder',
       );
     }
@@ -764,7 +761,7 @@ export class HederaUtils {
       console.error(
         'Invalid atomicSwap Params passed. "amount" must be 1 for "NFT" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid atomicSwap Params passed. "amount" must be 1 for "NFT" assetType',
       );
     }
@@ -783,7 +780,7 @@ export class HederaUtils {
       console.error(
         'Invalid atomicSwap Params passed. "assetId" must be in the format "tokenId/serialNumber"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid atomicSwap Params passed. "assetId" must be in the format "tokenId/serialNumber"',
       );
     }
@@ -807,7 +804,7 @@ export class HederaUtils {
       const errMessage =
         'Invalid stakeHbar Params passed. Pass either "nodeId" or "accountId" as a parameter';
       console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      throw rpcErrors.invalidParams(errMessage);
     }
 
     const parameter = params as StakeHbarRequestParams;
@@ -836,7 +833,7 @@ export class HederaUtils {
       console.error(
         'Invalid deleteAccount Params passed. "transferAccountId" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid deleteAccount Params passed. "transferAccountId" must be passed as a parameter',
       );
     }
@@ -869,7 +866,7 @@ export class HederaUtils {
       console.error(
         'Invalid approveAllowance Params passed. "spenderAccountId", "amount" and "assetType" must be passed as parameters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid approveAllowance Params passed. "spenderAccountId", "amount" and "assetType" must be passed as parameters',
       );
     }
@@ -899,7 +896,7 @@ export class HederaUtils {
       console.error(
         'Invalid approveAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid approveAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
     }
@@ -907,7 +904,7 @@ export class HederaUtils {
       console.error(
         'Invalid approveAllowance Params passed. "assetDetail" cannot be passed for "HBAR" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid approveAllowance Params passed. "assetDetail" cannot be passed for "HBAR" assetType',
       );
     }
@@ -918,7 +915,7 @@ export class HederaUtils {
       console.error(
         'Invalid approveAllowance Params passed. "assetDetail" must be passed for "TOKEN" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid approveAllowance Params passed. "assetDetail" must be passed for "TOKEN" assetType',
       );
     }
@@ -926,7 +923,7 @@ export class HederaUtils {
       console.error(
         'Invalid approveAllowance Params passed. "assetDetail" must be passed for "TOKEN/NFT" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid approveAllowance Params passed. "assetDetail" must be passed for "TOKEN/NFT" assetType',
       );
     }
@@ -937,7 +934,7 @@ export class HederaUtils {
         console.error(
           'Invalid approveAllowance Params passed. "assetDetail" is not valid',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid approveAllowance Params passed. "assetDetail" is not valid',
         );
       }
@@ -976,7 +973,7 @@ export class HederaUtils {
       console.error(
         'Invalid deleteAllowance Params passed. "assetType" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid deleteAllowance Params passed. "assetType" must be passed as a parameter',
       );
     }
@@ -995,7 +992,7 @@ export class HederaUtils {
       console.error(
         'Invalid deleteAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid deleteAllowance Params passed. "assetType" must be of the following: "HBAR", "TOKEN", "NFT"',
       );
     }
@@ -1004,7 +1001,7 @@ export class HederaUtils {
       console.error(
         'Invalid approveAllowance Params passed. "assetId" cannot be passed for "HBAR" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid approveAllowance Params passed. "assetId" cannot be passed for "HBAR" assetType',
       );
     }
@@ -1044,7 +1041,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "assetType", "name", "symbol", "decimals" and "supplyType" must be passed as parameters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "assetType", "name", "symbol", "decimals" and "supplyType" must be passed as parameters',
       );
     }
@@ -1057,7 +1054,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
     }
@@ -1068,7 +1065,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "name" must not be greater than 100 characters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "name" must not be greater than 100 characters',
       );
     }
@@ -1079,7 +1076,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "symbol" must not be greater than 100 characters',
       );
     }
@@ -1090,7 +1087,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "decimals" must be 0 for "NFT" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "decimals" must be 0 for "NFT" assetType',
       );
     }
@@ -1101,7 +1098,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "initialSupply" must be 0 for "NFT" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "initialSupply" must be 0 for "NFT" assetType',
       );
     }
@@ -1134,7 +1131,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "supplyPublicKey" must be passed for "NFT" assetType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "supplyPublicKey" must be passed for "NFT" assetType',
       );
     }
@@ -1173,7 +1170,7 @@ export class HederaUtils {
         console.error(
           'Invalid createToken Params passed. "customFees" must be passed as an array',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid createToken Params passed. "customFees" must be passed as an array',
         );
       }
@@ -1216,7 +1213,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "supplyType" must be of the following: "FINITE", "INFINITE"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "supplyType" must be of the following: "FINITE", "INFINITE"',
       );
     }
@@ -1227,7 +1224,7 @@ export class HederaUtils {
       console.error(
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid createToken Params passed. "maxSupply" cannot be passed for "INFINITE" supplyType',
       );
     }
@@ -1249,7 +1246,7 @@ export class HederaUtils {
       console.error(
         'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid updateTokenFeeSchedule Params passed. "tokenId" must be included.',
       );
     }
@@ -1305,7 +1302,7 @@ export class HederaUtils {
       console.error(
         'Invalid updateToken Params passed. "tokenId" must be included.',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid updateToken Params passed. "tokenId" must be included.',
       );
     }
@@ -1333,7 +1330,7 @@ export class HederaUtils {
       console.error(
         'Invalid updateToken Params passed. At least one of the following must be included: "name", "symbol", "treasuryAccountId", "adminPublicKey", "kycPublicKey", "freezePublicKey", "feeSchedulePublicKey", "pausePublicKey", "wipePublicKey", "supplyPublicKey", "expirationTime", "tokenMemo", "autoRenewAccountId", "autoRenewPeriod"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid updateToken Params passed. At least one of the following must be included: "name", "symbol", "treasuryAccountId", "adminPublicKey", "kycPublicKey", "freezePublicKey", "feeSchedulePublicKey", "pausePublicKey", "wipePublicKey", "supplyPublicKey", "expirationTime", "tokenMemo", "autoRenewAccountId", "autoRenewPeriod"',
       );
     }
@@ -1344,7 +1341,7 @@ export class HederaUtils {
         console.error(
           'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid updateToken Params passed. "name" must not be greater than 100 characters',
         );
       }
@@ -1356,7 +1353,7 @@ export class HederaUtils {
         console.error(
           'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid updateToken Params passed. "symbol" must not be greater than 100 characters',
         );
       }
@@ -1426,7 +1423,7 @@ export class HederaUtils {
       console.error(
         'Invalid mintToken Params passed. "assetType", and "tokenId" must be passed as parameters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid mintToken Params passed. "assetType", and "tokenId" must be passed as parameters',
       );
     }
@@ -1439,7 +1436,7 @@ export class HederaUtils {
       console.error(
         'Invalid mintToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid mintToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
     }
@@ -1453,7 +1450,7 @@ export class HederaUtils {
         console.error(
           'Invalid mintToken Params passed. "amount" can only be passed to fungible tokens',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid mintToken Params passed. "amount" can only be passed to fungible tokens',
         );
       }
@@ -1466,7 +1463,7 @@ export class HederaUtils {
           console.error(
             'Invalid mintToken Params passed. "tokenIds" must be passed as an array of strings',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid mintToken Params passed. "tokenIds" must be passed as an array of strings',
           );
         }
@@ -1475,7 +1472,7 @@ export class HederaUtils {
             console.error(
               'Invalid mintToken Params passed. "metadata" must be passed as an array of strings',
             );
-            throw providerErrors.unsupportedMethod(
+            throw rpcErrors.invalidParams(
               'Invalid mintToken Params passed. "metadata" must be passed as an array of strings',
             );
           }
@@ -1484,7 +1481,7 @@ export class HederaUtils {
         console.error(
           'Invalid mintToken Params passed. "metadata" must be passed for NFTs',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid mintToken Params passed. "metadata" must be passed for NFTs',
         );
       }
@@ -1494,7 +1491,7 @@ export class HederaUtils {
         console.error(
           'Invalid mintToken Params passed. "amount" must be greater than 0',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid mintToken Params passed. "amount" must be greater than 0',
         );
       }
@@ -1502,7 +1499,7 @@ export class HederaUtils {
         console.error(
           'Invalid mintToken Params passed. "metadata" can only be passed to NFTs',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid mintToken Params passed. "metadata" can only be passed to NFTs',
         );
       }
@@ -1525,7 +1522,7 @@ export class HederaUtils {
       console.error(
         'Invalid burnToken Params passed. "assetType", and "tokenId" must be passed as parameters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid burnToken Params passed. "assetType", and "tokenId" must be passed as parameters',
       );
     }
@@ -1538,7 +1535,7 @@ export class HederaUtils {
       console.error(
         'Invalid burnToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid burnToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
     }
@@ -1552,7 +1549,7 @@ export class HederaUtils {
         console.error(
           'Invalid burnToken Params passed. "amount" can only be passed to fungible tokens',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid burnToken Params passed. "amount" can only be passed to fungible tokens',
         );
       }
@@ -1565,7 +1562,7 @@ export class HederaUtils {
           console.error(
             'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
           );
         }
@@ -1574,7 +1571,7 @@ export class HederaUtils {
             console.error(
               'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
             );
-            throw providerErrors.unsupportedMethod(
+            throw rpcErrors.invalidParams(
               'Invalid burnToken Params passed. "serialNumbers" must be passed as an array of numbers',
             );
           }
@@ -1583,7 +1580,7 @@ export class HederaUtils {
         console.error(
           'Invalid burnToken Params passed. "serialNumbers" must be passed for NFTs',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid burnToken Params passed. "serialNumbers" must be passed for NFTs',
         );
       }
@@ -1593,7 +1590,7 @@ export class HederaUtils {
         console.error(
           'Invalid burnToken Params passed. "amount" must be greater than 0',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid burnToken Params passed. "amount" must be greater than 0',
         );
       }
@@ -1601,7 +1598,7 @@ export class HederaUtils {
         console.error(
           'Invalid burnToken Params passed. "serialNumbers" can only be passed to NFTs',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid burnToken Params passed. "serialNumbers" can only be passed to NFTs',
         );
       }
@@ -1619,7 +1616,7 @@ export class HederaUtils {
       console.error(
         'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid associateTokens Params passed. "tokenIds" must be passed as a parameter',
       );
     }
@@ -1632,7 +1629,7 @@ export class HederaUtils {
         console.error(
           'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
         );
       }
@@ -1641,7 +1638,7 @@ export class HederaUtils {
           console.error(
             'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid associateTokens Params passed. "tokenIds" must be passed as an array of strings',
           );
         }
@@ -1660,7 +1657,7 @@ export class HederaUtils {
       console.error(
         'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid dissociateTokens Params passed. "tokenIds" must be passed as a parameter',
       );
     }
@@ -1673,7 +1670,7 @@ export class HederaUtils {
         console.error(
           'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
         );
       }
@@ -1682,7 +1679,7 @@ export class HederaUtils {
           console.error(
             'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid dissociateTokens Params passed. "tokenIds" must be passed as an array of strings',
           );
         }
@@ -1701,7 +1698,7 @@ export class HederaUtils {
       console.error(
         'Invalid Params passed. "tokenId" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid Params passed. "tokenId" must be passed as a parameter',
       );
     }
@@ -1728,7 +1725,7 @@ export class HederaUtils {
       console.error(
         'Invalid Params passed. "tokenId" and "accountId" must be passed as parameters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid Params passed. "tokenId" and "accountId" must be passed as parameters',
       );
     }
@@ -1769,7 +1766,7 @@ export class HederaUtils {
       console.error(
         'Invalid wipeToken Params passed. "assetType", "tokenId" and "accountId" must be passed as parameters',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid wipeToken Params passed. "assetType", "tokenId" and "accountId" must be passed as parameters',
       );
     }
@@ -1782,7 +1779,7 @@ export class HederaUtils {
       console.error(
         'Invalid wipeToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid wipeToken Params passed. "assetType" must be of the following: "TOKEN", "NFT"',
       );
     }
@@ -1799,7 +1796,7 @@ export class HederaUtils {
         console.error(
           'Invalid wipeToken Params passed. "amount" can only be passed to fungible tokens',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid wipeToken Params passed. "amount" can only be passed to fungible tokens',
         );
       }
@@ -1812,7 +1809,7 @@ export class HederaUtils {
           console.error(
             'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
           );
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.invalidParams(
             'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
           );
         }
@@ -1821,7 +1818,7 @@ export class HederaUtils {
             console.error(
               'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
             );
-            throw providerErrors.unsupportedMethod(
+            throw rpcErrors.invalidParams(
               'Invalid wipeToken Params passed. "serialNumbers" must be passed as an array of numbers',
             );
           }
@@ -1830,7 +1827,7 @@ export class HederaUtils {
         console.error(
           'Invalid wipeToken Params passed. "serialNumbers" must be passed for NFTs',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid wipeToken Params passed. "serialNumbers" must be passed for NFTs',
         );
       }
@@ -1840,7 +1837,7 @@ export class HederaUtils {
         console.error(
           'Invalid wipeToken Params passed. "amount" must be greater than 0',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid wipeToken Params passed. "amount" must be greater than 0',
         );
       }
@@ -1848,7 +1845,7 @@ export class HederaUtils {
         console.error(
           'Invalid wipeToken Params passed. "serialNumbers" can only be passed to NFTs',
         );
-        throw providerErrors.unsupportedMethod(
+        throw rpcErrors.invalidParams(
           'Invalid wipeToken Params passed. "serialNumbers" can only be passed to NFTs',
         );
       }
@@ -1866,7 +1863,7 @@ export class HederaUtils {
       console.error(
         'Invalid signScheduledTx Params passed. "scheduleId" must be passed as a parameter',
       );
-      throw providerErrors.unsupportedMethod(
+      throw rpcErrors.invalidParams(
         'Invalid signScheduledTx Params passed. "scheduleId" must be passed as a parameter',
       );
     }
@@ -1888,9 +1885,9 @@ export class HederaUtils {
     let result = [] as MirrorTransactionInfo[];
     let url = `${mirrorNodeUrl}/api/v1/transactions/`;
     if (_.isEmpty(transactionId)) {
-      url = `${url}?account.id=${accountId}&limit=50&order=desc`;
+      url = `${url}?account.id=${encodeURIComponent(accountId)}&limit=50&order=desc`;
     } else {
-      url = `${url}${transactionId}`;
+      url = `${url}${encodeURIComponent(transactionId)}`;
     }
 
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
@@ -1924,7 +1921,7 @@ export class HederaUtils {
     mirrorNodeUrl: string,
   ): Promise<AccountInfo> {
     const result = {} as AccountInfo;
-    const url = `${mirrorNodeUrl}/api/v1/accounts/${idOrAliasOrEvmAddress}`;
+    const url = `${mirrorNodeUrl}/api/v1/accounts/${encodeURIComponent(idOrAliasOrEvmAddress)}`;
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (!response.success) {
       return result;

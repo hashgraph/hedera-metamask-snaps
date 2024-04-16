@@ -18,10 +18,10 @@
  *
  */
 
-import type { WalletSnapParams } from '../types/state';
-import type { GetTransactionsRequestParams } from '../types/params';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { MirrorTransactionInfo } from '../types/hedera';
-import { providerErrors } from '@metamask/rpc-errors';
+import type { GetTransactionsRequestParams } from '../types/params';
+import type { WalletSnapParams } from '../types/state';
 import { HederaUtils } from '../utils/HederaUtils';
 
 export class HederaTransactionsStrategy {
@@ -45,11 +45,9 @@ export class HederaTransactionsStrategy {
         mirrorNodeUrl,
       );
     } catch (error: any) {
-      const errMessage = `Error while trying to get transaction history: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to get transaction history`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.resourceUnavailable(errMessage);
     }
 
     return transactionsHistory;

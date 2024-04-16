@@ -18,19 +18,13 @@
  *
  */
 
+import { rpcErrors } from '@metamask/rpc-errors';
 import type {
   OnInstallHandler,
   OnRpcRequestHandler,
   OnUpdateHandler,
 } from '@metamask/snaps-sdk';
-import {
-  MethodNotFoundError,
-  copyable,
-  divider,
-  heading,
-  panel,
-  text,
-} from '@metamask/snaps-sdk';
+import { copyable, divider, heading, panel, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
@@ -119,6 +113,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           type: 'alert',
           content: panel([
             text(`Hello, **${origin}**!`),
+            text(`Network: **${network}**`),
+            text(`Mirror Node: **${mirrorNodeUrl}**`),
             text(
               "You are seeing this because you interacted with the 'hello' method",
             ),
@@ -139,6 +135,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           type: 'alert',
           content: panel([
             text(`Request from: **${origin}**`),
+            text(`Network: **${network}**`),
+            text(`Mirror Node: **${mirrorNodeUrl}**`),
             text(
               'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
             ),
@@ -438,8 +436,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     default:
       // Throw a known error to avoid crashing the Snap
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal
-      throw new MethodNotFoundError();
+      throw rpcErrors.methodNotFound(request.method);
   }
 };
 

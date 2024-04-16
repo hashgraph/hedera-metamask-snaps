@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.3.1...v0.3.1) (2024-04-15)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- Removed the `header` parameter from `signMessage` API
+- Utilized the `copyable` method to display text passed from Dapps as recommended by MetaMask which ignores Markdown and other special characters
+- Now showing the current network and mirror node URL at the top of all the Snap dialog boxes
+- Now throwing custom error messages whenever an error occurs in order to avoid throwing stack traces as part of the error messages
+- Encoded all user input that is placed into the path or query parameters with encodeURIComponent
+
+### :bug: Bug Fixes
+
 ## [0.3.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.3.0...v0.3.0) (2024-04-05)
 
 ### :page_with_curl: Documentation

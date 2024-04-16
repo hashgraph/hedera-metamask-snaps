@@ -18,22 +18,22 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
+import { AccountInfoQuery } from '@hashgraph/sdk';
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams } from '@metamask/snaps-sdk';
+import { divider, heading, text } from '@metamask/snaps-sdk';
+import _ from 'lodash';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { SnapState } from '../../snap/SnapState';
+import type { AccountInfo } from '../../types/account';
 import type {
   GetAccountInfoRequestParams,
   ServiceFee,
 } from '../../types/params';
-import _ from 'lodash';
-import type { AccountInfo } from '../../types/account';
-import { AccountInfoQuery } from '@hashgraph/sdk';
+import type { WalletSnapParams } from '../../types/state';
 import { FeeUtils } from '../../utils/FeeUtils';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { providerErrors } from '@metamask/rpc-errors';
-import { SnapState } from '../../snap/SnapState';
 import { HederaUtils } from '../../utils/HederaUtils';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class GetAccountInfoFacade {
   public static async getAccountInfo(
@@ -87,7 +87,7 @@ export class GetAccountInfoFacade {
         // Create the account info query
         const query = new AccountInfoQuery({ accountId: accountIdToQuery });
         if (hederaClient === null) {
-          throw new Error('hedera client returned null');
+          throw rpcErrors.resourceUnavailable('hedera client returned null');
         }
         const queryCost = (
           await query.getCost(hederaClient.getClient())
@@ -133,14 +133,20 @@ export class GetAccountInfoFacade {
 
         const dialogParamsForHederaAccountId: DialogParams = {
           type: 'confirmation',
-          content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+          content: await SnapUtils.generateCommonPanel(
+            origin,
+            network,
+            mirrorNodeUrl,
+            panelToShow,
+          ),
         };
         const confirmed = await SnapUtils.snapDialog(
           dialogParamsForHederaAccountId,
         );
         if (!confirmed) {
-          console.error(`User rejected the transaction`);
-          throw providerErrors.userRejectedRequest();
+          const errMessage = 'User rejected the transaction';
+          console.error(errMessage);
+          throw rpcErrors.transactionRejected(errMessage);
         }
 
         accountInfo = await hederaClient.getAccountInfo(accountIdToQuery);
@@ -180,10 +186,9 @@ export class GetAccountInfoFacade {
         await SnapState.updateState(state);
       }
     } catch (error: any) {
-      console.error(`Error while trying to get account info: ${String(error)}`);
-      throw providerErrors.unsupportedMethod(
-        `Error while trying to get account info: ${String(error)}`,
-      );
+      const errMessage = 'Error while trying to get account info';
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return accountInfo;

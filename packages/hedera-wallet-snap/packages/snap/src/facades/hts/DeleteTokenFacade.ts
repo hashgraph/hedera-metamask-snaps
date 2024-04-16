@@ -19,9 +19,9 @@
  */
 
 import { PrivateKey } from '@hashgraph/sdk';
-import { providerErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTokenCommand } from '../../commands/hts/DeleteTokenCommand';
@@ -54,16 +54,33 @@ export class DeleteTokenFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Delete Token'),
         text('Are you sure you want to delete the following token?'),
         divider(),
-      ];
+      );
 
-      panelToShow.push(text(`Token ID: ${tokenId}`));
-      panelToShow.push(divider());
-
-      panelToShow.push(text(`Asset Id: ${tokenId}`));
+      panelToShow.push(text(`Asset ID:`), copyable(tokenId));
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
       if (_.isEmpty(tokenInfo)) {
         const errMessage = `Error while trying to get token info for ${tokenId} from Hedera Mirror Nodes at this time`;
@@ -85,17 +102,22 @@ export class DeleteTokenFacade {
           ),
         );
       }
-      panelToShow.push(text(tokenId));
       panelToShow.push(divider());
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -107,7 +129,7 @@ export class DeleteTokenFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const deleteTokensCommand = new DeleteTokenCommand(
         tokenId,
@@ -115,11 +137,9 @@ export class DeleteTokenFacade {
       );
       txReceipt = await deleteTokensCommand.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to delete token ${tokenId}: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to delete token`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;
