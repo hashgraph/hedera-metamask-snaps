@@ -1883,11 +1883,11 @@ export class HederaUtils {
     mirrorNodeUrl: string,
   ): Promise<MirrorTransactionInfo[]> {
     let result = [] as MirrorTransactionInfo[];
-    let url = `${mirrorNodeUrl}/api/v1/transactions/`;
+    let url = `${encodeURIComponent(mirrorNodeUrl)}/api/v1/transactions/`;
     if (_.isEmpty(transactionId)) {
-      url = `${url}?account.id=${accountId}&limit=50&order=desc`;
+      url = `${url}?account.id=${encodeURIComponent(accountId)}&limit=50&order=desc`;
     } else {
-      url = `${url}${transactionId}`;
+      url = `${url}${encodeURIComponent(transactionId)}`;
     }
 
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
@@ -1921,7 +1921,7 @@ export class HederaUtils {
     mirrorNodeUrl: string,
   ): Promise<AccountInfo> {
     const result = {} as AccountInfo;
-    const url = `${mirrorNodeUrl}/api/v1/accounts/${idOrAliasOrEvmAddress}`;
+    const url = `${encodeURIComponent(mirrorNodeUrl)}/api/v1/accounts/${encodeURIComponent(idOrAliasOrEvmAddress)}`;
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (!response.success) {
       return result;
@@ -2041,7 +2041,7 @@ export class HederaUtils {
   ): Promise<MirrorStakingInfo[]> {
     const result: MirrorStakingInfo[] = [];
 
-    let url = `${mirrorNodeUrl}/api/v1/network/nodes`;
+    let url = `${encodeURIComponent(mirrorNodeUrl)}/api/v1/network/nodes`;
 
     if (_.isNull(nodeId)) {
       url = `${url}?order=desc&limit=50`;

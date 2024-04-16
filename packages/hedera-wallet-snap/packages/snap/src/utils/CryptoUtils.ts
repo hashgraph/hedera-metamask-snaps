@@ -208,7 +208,7 @@ export class CryptoUtils {
     mirrorNodeUrl: string,
   ): Promise<MirrorNftInfo[]> {
     let result = [] as MirrorNftInfo[];
-    const url = `${mirrorNodeUrl}/api/v1/tokens/${tokenId}/nfts?account.id=${accountId}`;
+    const url = `${encodeURIComponent(mirrorNodeUrl)}/api/v1/tokens/${encodeURIComponent(tokenId)}/nfts?account.id=${encodeURIComponent(accountId)}`;
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (response.success) {
       result = response.data.nfts;
@@ -221,7 +221,7 @@ export class CryptoUtils {
     mirrorNodeUrl: string,
   ): Promise<MirrorTokenInfo> {
     let result = {} as MirrorTokenInfo;
-    const url = `${mirrorNodeUrl}/api/v1/tokens/${tokenId}`;
+    const url = `${encodeURIComponent(mirrorNodeUrl)}/api/v1/tokens/${encodeURIComponent(tokenId)}`;
     const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
     if (response.success) {
       result = response.data;
