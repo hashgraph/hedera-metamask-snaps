@@ -20,7 +20,7 @@
 
 import { PrivateKey } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
@@ -54,12 +54,31 @@ export class DeleteTokenFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Delete Token'),
         text('Are you sure you want to delete the following token?'),
         divider(),
-        copyable(),
-      ];
+      );
 
       panelToShow.push(text(`Asset ID:`), copyable(tokenId));
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);

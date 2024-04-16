@@ -19,7 +19,7 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
@@ -60,14 +60,33 @@ export class DissociateTokensFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Dissociate Tokens'),
         text(
           'Are you sure you want to dissociate the following tokens from your account?',
         ),
         divider(),
-        copyable(),
-      ];
+      );
 
       for (const tokenId of tokenIds) {
         const tokenNumber = tokenIds.indexOf(tokenId) + 1;

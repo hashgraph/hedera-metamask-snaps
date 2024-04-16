@@ -102,7 +102,8 @@ export class MintTokenFacade {
         }
       }
       panelToShow.push(
-        text(`Mint to Treasury account: ${tokenInfo.treasury_account_id}`),
+        text(`Mint to Treasury account:`),
+        copyable(tokenInfo.treasury_account_id),
       );
       panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
       panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));

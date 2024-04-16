@@ -20,7 +20,7 @@
 
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -61,14 +61,33 @@ export class StakeHbarFacade {
     let txReceipt = {} as TxReceipt;
 
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Stake/Unstake HBAR'),
         text(
           'Refer to this [guide](https://docs.hedera.com/hedera/core-concepts/staking) for more information on staking HBAR',
         ),
         divider(),
-        copyable(),
-      ];
+      );
 
       // Handle unstaking Hbar
       if (_.isNull(nodeId) && _.isNull(accountId)) {

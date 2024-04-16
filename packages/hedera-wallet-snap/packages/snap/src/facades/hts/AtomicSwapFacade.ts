@@ -19,7 +19,7 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
@@ -116,7 +116,27 @@ export class AtomicSwapFacade {
     try {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Initiate Atomic Swap'),
         text(
           'Learn more about atomic swap [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/atomic-swaps)',
@@ -125,8 +145,7 @@ export class AtomicSwapFacade {
           'Are you sure you want to execute the following swap? Note that the responder will also need to approve the swap by calling "hts/completeSwap" API within 30 minutes from now or the transaction will fail.',
         ),
         divider(),
-        copyable(),
-      ];
+      );
       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
       if (strippedMemo) {
         panelToShow.push(text(`Memo:`), copyable(strippedMemo));
@@ -225,7 +244,27 @@ export class AtomicSwapFacade {
     }
 
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Complete Atomic Swap'),
         text(
           'Learn more about atomic swap [here](https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service/atomic-swaps)',
@@ -234,8 +273,7 @@ export class AtomicSwapFacade {
           'Are you sure you want to execute the following swap? Note that all the parties involved in the swap must approve the swap within 30 minutes from now or the transaction will fail.',
         ),
         divider(),
-        copyable(),
-      ];
+      );
 
       panelToShow.push(
         text(`Atomic Swap Scheduled Transaction ID:`),

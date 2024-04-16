@@ -19,7 +19,7 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAllowanceCommand } from '../../commands/allowance/DeleteAllowanceCommand';
@@ -52,12 +52,31 @@ export class DeleteAllowanceFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Approve an allowance'),
         text('Are you sure you want to delete allowances for your tokens?'),
         divider(),
-        copyable(),
-      ];
+      );
 
       if (assetType === 'HBAR' || assetType === 'TOKEN') {
         panelToShow.push(

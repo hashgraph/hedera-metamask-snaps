@@ -22,7 +22,7 @@ import { PrivateKey } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
 
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -250,9 +250,9 @@ export class SnapAccounts {
           mirrorNodeUrl,
           [
             heading('Connect to EVM Account'),
-            text('Enter private key for the following account'),
             divider(),
-            text(`EVM Address: ${evmAddress}`),
+            text(`EVM Address:`),
+            copyable(evmAddress),
           ],
         ),
         placeholder: '2386d1d21644dc65d...',
@@ -420,7 +420,8 @@ export class SnapAccounts {
             heading('Connect to Hedera Account'),
             text('Enter private key for the following account'),
             divider(),
-            text(`Account Id: ${accountId}`),
+            text(`Account Id:`),
+            copyable(accountId),
           ],
         ),
         placeholder: '2386d1d21644dc65d...',

@@ -19,7 +19,7 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -105,12 +105,31 @@ export class TransferCryptoFacade {
     try {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Transfer Crypto'),
         text('Are you sure you want to execute the following transaction(s)?'),
         divider(),
-        copyable(),
-      ];
+      );
       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
       if (strippedMemo) {
         panelToShow.push(text(`Memo:`), copyable(strippedMemo));
