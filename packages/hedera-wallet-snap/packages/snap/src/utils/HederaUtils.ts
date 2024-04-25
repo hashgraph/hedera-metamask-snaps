@@ -84,7 +84,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkRequiredProperty(
+  static checkRequiredProperty(
     parameter: any,
     methodName: string,
     propertyName: string,
@@ -109,7 +109,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkValidString(
+  static checkValidString(
     parameter: any,
     methodName: string,
     propertyName: string,
@@ -140,7 +140,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkValidAccountId(
+  static checkValidAccountId(
     parameter: any,
     methodName: string,
     propertyName: string,
@@ -172,7 +172,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkValidBoolean(
+  static checkValidBoolean(
     parameter: any,
     methodName: string,
     propertyName: string,
@@ -202,7 +202,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkValidNumber(
+  static checkValidNumber(
     parameter: any,
     methodName: string,
     propertyName: string,
@@ -234,7 +234,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkValidTimestamp(
+  static checkValidTimestamp(
     parameter: any,
     methodName: string,
     propertyName: string,
@@ -272,7 +272,7 @@ export class HederaUtils {
    * @param isRequired - Whether to check if this property is required to be present.
    */
   // eslint-disable-next-line no-restricted-syntax
-  private static checkValidPublicKey(
+  static checkValidPublicKey(
     parameter: any,
     methodName: string,
     propertyName: string,
