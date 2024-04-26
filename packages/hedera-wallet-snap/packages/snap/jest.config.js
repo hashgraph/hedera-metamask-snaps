@@ -39,7 +39,12 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testRegex: '.*\\.spec\\.ts$',
-  transformIgnorePatterns: [],
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!normalize-url).+\\.js$'
+  ],
   testTimeout: 120000,
   reporters: [
     'default',
