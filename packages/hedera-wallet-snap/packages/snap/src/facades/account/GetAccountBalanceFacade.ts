@@ -18,17 +18,20 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import { SnapState } from '../../snap/SnapState';
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { SnapState } from '../../snap/SnapState';
+import type { WalletSnapParams } from '../../types/state';
 
 export class GetAccountBalanceFacade {
-  public static async getAccountBalance(walletSnapParams: WalletSnapParams) {
+  public static async getAccountBalance(
+    walletSnapParams: WalletSnapParams,
+  ): Promise<number> {
     const { state } = walletSnapParams;
 
     const { hederaAccountId, hederaEvmAddress, network } = state.currentAccount;
 
+    let hbarBalance = 0;
     try {
       const hederaClientImplFactory = new HederaClientImplFactory(
         state.accountState[hederaEvmAddress][network].keyStore.curve,
@@ -39,9 +42,9 @@ export class GetAccountBalanceFacade {
       const hederaClient = await hederaClientImplFactory.createClient();
 
       if (hederaClient === null) {
-        throw new Error('hedera client is null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
-      const hbarBalance = await hederaClient.getAccountBalance();
+      hbarBalance = await hederaClient.getAccountBalance();
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       state.accountState[hederaEvmAddress][network].accountInfo.balance.hbars =
         hbarBalance;
@@ -56,15 +59,11 @@ export class GetAccountBalanceFacade {
 
       await SnapState.updateState(state);
     } catch (error: any) {
-      console.error(
-        `Error while trying to get account balance: ${String(error)}`,
-      );
-      throw providerErrors.unsupportedMethod(
-        `Error while trying to get account balance: ${String(error)}`,
-      );
+      const errMessage = 'Error while trying to get account balance';
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
-    return state.accountState[hederaEvmAddress][network].accountInfo.balance
-      .hbars;
+    return hbarBalance;
   }
 }

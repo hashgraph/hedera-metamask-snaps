@@ -18,20 +18,20 @@
  *
  */
 
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
+import _ from 'lodash';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { ApproveAllowanceCommand } from '../../commands/allowance/ApproveAllowanceCommand';
+import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
 import type {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
 } from '../../types/params';
-import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import _ from 'lodash';
-import { providerErrors } from '@metamask/rpc-errors';
 import type { WalletSnapParams } from '../../types/state';
-import { SnapUtils } from '../../utils/SnapUtils';
 import { CryptoUtils } from '../../utils/CryptoUtils';
-import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { ApproveAllowanceCommand } from '../../commands/allowance/ApproveAllowanceCommand';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class ApproveAllowanceFacade {
   public static async approveAllowance(
@@ -55,16 +55,36 @@ export class ApproveAllowanceFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Approve an allowance'),
         text(
           'Are you sure you want to allow the following account to spend your tokens?',
         ),
         divider(),
-      ];
+      );
 
       if (assetType === 'HBAR') {
-        panelToShow.push(text(`Asset: ${assetType}`));
+        panelToShow.push(text(`Asset: HBAR`));
       } else {
         const walletBalance =
           state.accountState[hederaEvmAddress][network].accountInfo.balance;
@@ -95,14 +115,14 @@ export class ApproveAllowanceFacade {
         } else {
           panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
           panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-          panelToShow.push(text(`Id: ${assetDetail.assetId}`));
+          panelToShow.push(text(`Id: ${tokenInfo.token_id}`));
           panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
           assetDetail.assetDecimals = Number(tokenInfo.decimals);
         }
         if (!Number.isFinite(assetDetail.assetDecimals)) {
-          const errMessage = `Error while trying to get token info for ${assetDetail.assetId} from Hedera Mirror Nodes at this time`;
+          const errMessage = `assetDetail.assetDecimal is not a finite number`;
           console.error(errMessage);
-          throw providerErrors.unsupportedMethod(errMessage);
+          throw rpcErrors.invalidParams(errMessage);
         }
 
         panelToShow.push(
@@ -124,20 +144,27 @@ export class ApproveAllowanceFacade {
       }
       panelToShow.push(
         divider(),
-        text(`Spender Account ID: ${spenderAccountId}`),
+        text(`Spender Account ID:`),
+        copyable(spenderAccountId),
       );
       panelToShow.push(text(`Approved Amount: ${amount}`));
 
       const dialogParamsForApproveAllowance: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(
         dialogParamsForApproveAllowance,
       );
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientImplFactory = new HederaClientImplFactory(
@@ -150,7 +177,7 @@ export class ApproveAllowanceFacade {
       const hederaClient = await hederaClientImplFactory.createClient();
 
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
 
       const command = new ApproveAllowanceCommand(
@@ -162,11 +189,9 @@ export class ApproveAllowanceFacade {
 
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to approve an allowance: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to approve an allowance`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

@@ -18,17 +18,17 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import type { DissociateTokensRequestParams } from '../../types/params';
-import type { TxReceipt } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { providerErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DissociateTokensCommand } from '../../commands/hts/DissociateTokensCommand';
+import type { TxReceipt } from '../../types/hedera';
+import type { DissociateTokensRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class DissociateTokensFacade {
   /**
@@ -60,20 +60,40 @@ export class DissociateTokensFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Dissociate Tokens'),
         text(
           'Are you sure you want to dissociate the following tokens from your account?',
         ),
         divider(),
-      ];
+      );
 
       for (const tokenId of tokenIds) {
         const tokenNumber = tokenIds.indexOf(tokenId) + 1;
         panelToShow.push(text(`Token #${tokenNumber}`));
         panelToShow.push(divider());
 
-        panelToShow.push(text(`Asset Id: ${tokenId}`));
+        panelToShow.push(text(`Asset Id:`), copyable(tokenId));
         const tokenInfo = await CryptoUtils.getTokenById(
           tokenId,
           mirrorNodeUrl,
@@ -106,18 +126,23 @@ export class DissociateTokensFacade {
             ),
           );
         }
-        panelToShow.push(text(tokenId));
         panelToShow.push(divider());
       }
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -129,16 +154,14 @@ export class DissociateTokensFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new DissociateTokensCommand(tokenIds);
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to dissociate tokens from the account: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to dissociate tokens from the account`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

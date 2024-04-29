@@ -167,7 +167,9 @@ jobs:
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm publish ${{ steps.publish.outputs.args }}
+        run: |
+          pnpm install
+          pnpm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
         uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0

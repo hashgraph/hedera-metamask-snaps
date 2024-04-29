@@ -26,10 +26,9 @@ import {
   StatusError,
   TransferTransaction,
 } from '@hashgraph/sdk';
-import { providerErrors } from '@metamask/rpc-errors';
 import type { Wallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
-import type { HederaClientFactory } from '../snap/interfaces/HederaClientFactory';
+import type { HederaClientFactory } from '../interfaces/HederaClientFactory';
 import { SimpleHederaClientImpl } from './SimpleHederaClientImpl';
 
 /**
@@ -145,16 +144,16 @@ export class HederaClientImplFactory implements HederaClientFactory {
         );
       }
 
-      throw providerErrors.unauthorized(
-        `The account id does not belong to the associated private key: ${String(
-          error,
-        )}`,
-      );
+      const errMessage =
+        'The account id does not belong to the associated private key';
+      console.log(errMessage, String(error));
+      throw new Error(errMessage);
     }
 
     // under *no* cirumstances should this transaction succeed
-    throw providerErrors.unauthorized(
-      'Unexpected success of intentionally-erroneous transaction to confirm account ID',
-    );
+    const errMessage =
+      'Unexpected success of intentionally-erroneous transaction to confirm account ID';
+    console.log(errMessage);
+    throw new Error(errMessage);
   }
 }

@@ -18,9 +18,9 @@
  *
  */
 
-import { providerErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
@@ -99,20 +99,40 @@ export class TransferCryptoFacade {
 
     const hederaClient = await hederaClientFactory.createClient();
     if (hederaClient === null) {
-      throw new Error('hederaClient is null');
+      throw rpcErrors.resourceUnavailable('hedera client returned null');
     }
 
     try {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Transfer Crypto'),
         text('Are you sure you want to execute the following transaction(s)?'),
         divider(),
-      ];
+      );
       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
       if (strippedMemo) {
-        panelToShow.push(text(`Memo: ${strippedMemo}`));
+        panelToShow.push(text(`Memo:`), copyable(strippedMemo));
       }
       if (maxFee) {
         panelToShow.push(text(`Max Transaction Fee: ${maxFee} Hbar`));
@@ -136,7 +156,7 @@ export class TransferCryptoFacade {
             );
           walletBalance = ownerAccountInfo.balance;
           panelToShow.push(text(`Transaction Type: Delegated Transfer`));
-          panelToShow.push(text(`Owner Account Id: ${transfer.from}`));
+          panelToShow.push(text(`Owner Account Id:`), copyable(transfer.from));
         }
         panelToShow.push(text(`Asset Type: ${transfer.assetType}`));
         if (transfer.assetType === 'HBAR') {
@@ -197,13 +217,13 @@ export class TransferCryptoFacade {
             asset = tokenInfo.symbol;
             panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
             panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-            panelToShow.push(text(`Symbol: ${asset}`));
+            panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
             transfer.decimals = Number(tokenInfo.decimals);
           }
           if (!Number.isFinite(transfer.decimals)) {
-            const errMessage = `Error while trying to get token info for ${assetId} from Hedera Mirror Nodes at this time`;
+            const errMessage = `transfer.decimals is not a finite number`;
             console.error(errMessage);
-            throw providerErrors.unsupportedMethod(errMessage);
+            throw rpcErrors.invalidParams(errMessage);
           }
 
           if (transfer.assetType === 'NFT') {
@@ -216,7 +236,7 @@ export class TransferCryptoFacade {
             feeToDisplay = serviceFeesToPay[transfer.assetId as string];
           }
         }
-        panelToShow.push(text(`To: ${transfer.to}`));
+        panelToShow.push(text(`To:`), copyable(transfer.to));
         panelToShow.push(text(`Amount: ${transfer.amount} ${asset}`));
         if (feeToDisplay > 0) {
           panelToShow.push(
@@ -232,12 +252,18 @@ export class TransferCryptoFacade {
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const command = new TransferCryptoCommand(
@@ -252,8 +278,9 @@ export class TransferCryptoFacade {
 
       return txReceipt;
     } catch (error: any) {
-      console.error(`Error while trying to transfer crypto: ${String(error)}`);
-      throw new Error(error);
+      const errMessage = `Error while trying to transfer crypto`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
   }
 }

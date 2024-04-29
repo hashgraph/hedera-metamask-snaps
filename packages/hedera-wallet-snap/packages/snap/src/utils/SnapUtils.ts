@@ -31,41 +31,60 @@ export class SnapUtils {
   /**
    * Function to generate snap dialog panel.
    * @param origin - The origin of where the call is being made from.
+   * @param network - The network the call is being made on.
+   * @param mirrorNodeUrl - The mirror node url.
    * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
    * @returns Panel to be displayed in the snap dialog.
    */
   public static async generateCommonPanel(
     origin: string,
+    network: string,
+    mirrorNodeUrl: string,
     prompt: any[],
   ): Promise<Panel> {
-    const panelToShow = [text(`Origin: ${origin}`), divider(), ...prompt];
+    const panelToShow = [
+      text(`Origin: **${origin}**`),
+      text(`Network: **${network}**`),
+      text(`Mirror Node: **${mirrorNodeUrl}**`),
+      divider(),
+      ...prompt,
+    ];
     return panel(panelToShow);
   }
 
   /**
    * Request Hedera Account Id.
    * @param origin - Source.
+   * @param network - The network the call is being made on.
+   * @param mirrorNodeUrl - The mirror node url.
    * @param publicKey - Public key.
    * @param address - EVM address.
    * @returns Hedera account id.
    */
   public static async requestHederaAccountId(
     origin: string,
+    network: string,
+    mirrorNodeUrl: string,
     publicKey: string,
     address: string,
   ): Promise<string> {
     const dialogParamsForHederaAccountId: DialogParams = {
       type: 'prompt',
-      content: await SnapUtils.generateCommonPanel(origin, [
-        heading('Connect to Hedera Account'),
-        text(
-          `Enter your hedera account Id associated with the following account`,
-        ),
-        divider(),
-        text(`Public Key: ${publicKey}`),
-        text(`EVM Address: ${address}`),
-        divider(),
-      ]),
+      content: await SnapUtils.generateCommonPanel(
+        origin,
+        network,
+        mirrorNodeUrl,
+        [
+          heading('Connect to Hedera Account'),
+          text(
+            `Enter your hedera account Id associated with the following account`,
+          ),
+          divider(),
+          text(`Public Key: ${publicKey}`),
+          text(`EVM Address: ${address}`),
+          divider(),
+        ],
+      ),
       placeholder: '0.0.3658062',
     };
     return (await SnapUtils.snapDialog(

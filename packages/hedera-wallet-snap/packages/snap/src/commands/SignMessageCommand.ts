@@ -19,9 +19,9 @@
  */
 
 import { PrivateKey } from '@hashgraph/sdk';
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { heading, text } from '@metamask/snaps-sdk';
+import { copyable, heading, text } from '@metamask/snaps-sdk';
 import { ethers, type Wallet } from 'ethers';
 import type { Wallet as HederaWallet } from '../domain/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../domain/wallet/software-private-key';
@@ -46,10 +46,9 @@ export class SignMessageCommand {
   async execute(): Promise<string> {
     const { origin, state } = this.#walletSnapParams;
 
-    const { header = 'Do you want to sign this message?', message } =
-      this.#signMessageRequestParams;
+    const { message } = this.#signMessageRequestParams;
 
-    const { hederaEvmAddress, network } = state.currentAccount;
+    const { hederaEvmAddress, network, mirrorNodeUrl } = state.currentAccount;
 
     const { privateKey: pk, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -58,17 +57,23 @@ export class SignMessageCommand {
     try {
       const panelToShow = [
         heading('Signature request'),
-        text(header),
-        text(message),
+        text('Are you sure you want to sign this message?'),
+        copyable(message),
       ];
       const dialogParamsForSignMessage: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParamsForSignMessage);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       if (curve === 'ECDSA_SECP256K1') {
@@ -87,9 +92,9 @@ export class SignMessageCommand {
         signature = `0x${signature}`;
       }
     } catch (error: any) {
-      const errMessage = `Error while trying to sign message: ${String(error)}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to sign message`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return signature;

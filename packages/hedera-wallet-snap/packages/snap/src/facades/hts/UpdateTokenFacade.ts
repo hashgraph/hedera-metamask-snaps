@@ -20,9 +20,9 @@
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 
-import { providerErrors } from '@metamask/rpc-errors';
+import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
@@ -78,7 +78,8 @@ export class UpdateTokenFacade {
         ),
         text(`You are about to modify the following token:`),
         divider(),
-        text(`Asset Id: ${tokenId}`),
+        text(`Asset Id:`),
+        copyable(tokenId),
       ];
 
       const tokenInfo = await CryptoUtils.getTokenById(tokenId, mirrorNodeUrl);
@@ -119,20 +120,24 @@ export class UpdateTokenFacade {
       );
 
       if (!_.isEmpty(name)) {
-        panelToShow.push(text(`New Token Name: ${name}`));
+        panelToShow.push(text(`New Token Name:`), copyable(name));
       }
       if (!_.isEmpty(symbol)) {
-        panelToShow.push(text(`New Token Symbol: ${symbol}`));
+        panelToShow.push(text(`New Token Symbol:`), copyable(symbol));
       }
       if (!_.isEmpty(tokenMemo)) {
-        panelToShow.push(text(`New Token Memo: ${tokenMemo}`));
+        panelToShow.push(text(`New Token Memo:`), copyable(tokenMemo));
       }
       if (!_.isEmpty(treasuryAccountId)) {
-        panelToShow.push(text(`New Treasury Account Id: ${treasuryAccountId}`));
+        panelToShow.push(
+          text(`New Treasury Account Id:`),
+          copyable(treasuryAccountId),
+        );
       }
       if (!_.isEmpty(autoRenewAccountId)) {
         panelToShow.push(
-          text(`New Auto Renew Account ID: ${autoRenewAccountId}`),
+          text(`New Auto Renew Account ID:`),
+          copyable(autoRenewAccountId),
         );
       }
       if (!_.isEmpty(expirationTime)) {
@@ -143,37 +148,56 @@ export class UpdateTokenFacade {
       }
 
       if (!_.isEmpty(adminPublicKey)) {
-        panelToShow.push(text(`New Admin Public Key: ${adminPublicKey}`));
+        panelToShow.push(
+          text(`New Admin Public Key:`),
+          copyable(adminPublicKey),
+        );
       }
       if (!_.isEmpty(kycPublicKey)) {
-        panelToShow.push(text(`New KYC Public Key: ${kycPublicKey}`));
+        panelToShow.push(text(`New KYC Public Key:`), copyable(kycPublicKey));
       }
       if (!_.isEmpty(freezePublicKey)) {
-        panelToShow.push(text(`New Freeze Public Key: ${freezePublicKey}`));
+        panelToShow.push(
+          text(`New Freeze Public Key:`),
+          copyable(freezePublicKey),
+        );
       }
       if (!_.isEmpty(feeSchedulePublicKey)) {
         panelToShow.push(
-          text(`New Fee Schedule Public Key: ${feeSchedulePublicKey}`),
+          text(`New Fee Schedule Public Key:`),
+          copyable(feeSchedulePublicKey),
         );
       }
       if (!_.isEmpty(pausePublicKey)) {
-        panelToShow.push(text(`New Pause Public Key: ${pausePublicKey}`));
+        panelToShow.push(
+          text(`New Pause Public Key:`),
+          copyable(pausePublicKey),
+        );
       }
       if (!_.isEmpty(wipePublicKey)) {
-        panelToShow.push(text(`New Wipe Public Key: ${wipePublicKey}`));
+        panelToShow.push(text(`New Wipe Public Key:`), copyable(wipePublicKey));
       }
       if (!_.isEmpty(supplyPublicKey)) {
-        panelToShow.push(text(`New Supply Public Key: ${supplyPublicKey}`));
+        panelToShow.push(
+          text(`New Supply Public Key:`),
+          copyable(supplyPublicKey),
+        );
       }
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -185,12 +209,12 @@ export class UpdateTokenFacade {
 
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
 
       const privateKeyObj = hederaClient.getPrivateKey();
       if (privateKeyObj === null) {
-        throw new Error('private key object returned null');
+        throw rpcErrors.resourceUnavailable('private key object returned null');
       }
       const command = new UpdateTokenCommand(tokenId, privateKeyObj);
 
@@ -199,11 +223,9 @@ export class UpdateTokenFacade {
         updateTokenRequestParams,
       );
     } catch (error: any) {
-      const errMessage = `Error while trying to update a token: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to update a token`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

@@ -18,16 +18,16 @@
  *
  */
 
-import type { WalletSnapParams } from '../../types/state';
-import type { DeleteAllowanceRequestParams } from '../../types/params';
-import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
-import { SnapUtils } from '../../utils/SnapUtils';
-import { providerErrors } from '@metamask/rpc-errors';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAllowanceCommand } from '../../commands/allowance/DeleteAllowanceCommand';
+import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
+import type { DeleteAllowanceRequestParams } from '../../types/params';
+import type { WalletSnapParams } from '../../types/state';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 /**
  *
@@ -52,22 +52,43 @@ export class DeleteAllowanceFacade {
 
     let txReceipt = {} as TxReceipt;
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Approve an allowance'),
         text('Are you sure you want to delete allowances for your tokens?'),
         divider(),
-      ];
+      );
 
       if (assetType === 'HBAR' || assetType === 'TOKEN') {
         panelToShow.push(
           divider(),
-          text(`Spender Account ID: ${spenderAccountId as string}`),
+          text(`Spender Account ID:`),
+          copyable(spenderAccountId as string),
           divider(),
         );
       }
 
       if (assetType === 'HBAR') {
-        panelToShow.push(text(`Asset: ${assetType}`));
+        panelToShow.push(text(`Asset: HBAR`));
       } else {
         const tokenInfo: MirrorTokenInfo = await CryptoUtils.getTokenById(
           assetId as string,
@@ -76,7 +97,7 @@ export class DeleteAllowanceFacade {
 
         panelToShow.push(text(`Asset Name: ${tokenInfo.name}`));
         panelToShow.push(text(`Asset Type: ${tokenInfo.type}`));
-        panelToShow.push(text(`Id: ${assetId as string}`));
+        panelToShow.push(text(`Asset Id:`), copyable(assetId as string));
         panelToShow.push(text(`Symbol: ${tokenInfo.symbol}`));
         panelToShow.push(
           text(
@@ -98,14 +119,20 @@ export class DeleteAllowanceFacade {
 
       const dialogParamsForDeleteAllowance: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(
         dialogParamsForDeleteAllowance,
       );
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -118,7 +145,7 @@ export class DeleteAllowanceFacade {
       const hederaClient = await hederaClientFactory.createClient();
 
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
 
       const command = new DeleteAllowanceCommand(
@@ -129,11 +156,9 @@ export class DeleteAllowanceFacade {
 
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = `Error while trying to delete an allowance: ${String(
-        error,
-      )}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to delete an allowance`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;

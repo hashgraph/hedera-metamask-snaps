@@ -19,9 +19,9 @@
  */
 
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
-import { providerErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { divider, heading, text } from '@metamask/snaps-sdk';
+import { rpcErrors } from '@metamask/rpc-errors';
+import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
@@ -61,13 +61,33 @@ export class StakeHbarFacade {
     let txReceipt = {} as TxReceipt;
 
     try {
-      const panelToShow = [
+      const panelToShow: (
+        | {
+            value: string;
+            type: NodeType.Heading;
+          }
+        | {
+            value: string;
+            type: NodeType.Text;
+            markdown?: boolean | undefined;
+          }
+        | {
+            type: NodeType.Divider;
+          }
+        | {
+            value: string;
+            type: NodeType.Copyable;
+            sensitive?: boolean | undefined;
+          }
+      )[] = [];
+
+      panelToShow.push(
         heading('Stake/Unstake HBAR'),
         text(
           'Refer to this [guide](https://docs.hedera.com/hedera/core-concepts/staking) for more information on staking HBAR',
         ),
         divider(),
-      ];
+      );
 
       // Handle unstaking Hbar
       if (_.isNull(nodeId) && _.isNull(accountId)) {
@@ -79,7 +99,7 @@ export class StakeHbarFacade {
         declineStakingReward = true;
       } else {
         if (!_.isNull(nodeId) && !_.isNull(accountId)) {
-          throw providerErrors.unsupportedMethod(
+          throw rpcErrors.methodNotSupported(
             'Cannot stake to both a node and an account',
           );
         }
@@ -94,7 +114,7 @@ export class StakeHbarFacade {
             nodeId,
           );
           if (stakingInfo.length === 0) {
-            throw providerErrors.unsupportedMethod(
+            throw rpcErrors.methodNotSupported(
               `Node ID ${nodeId} does not exist`,
             );
           }
@@ -124,7 +144,7 @@ export class StakeHbarFacade {
           stakedNodeId = String(nodeId);
         }
         if (!_.isEmpty(accountId)) {
-          panelToShow.push(text(`Account ID: ${String(accountId)}`));
+          panelToShow.push(text(`Account ID:`), copyable(accountId as string));
           stakedAccountId = accountId;
         }
         panelToShow.push(divider());
@@ -133,12 +153,18 @@ export class StakeHbarFacade {
 
       const dialogParamsForStakeHbar: DialogParams = {
         type: 'confirmation',
-        content: await SnapUtils.generateCommonPanel(origin, panelToShow),
+        content: await SnapUtils.generateCommonPanel(
+          origin,
+          network,
+          mirrorNodeUrl,
+          panelToShow,
+        ),
       };
       const confirmed = await SnapUtils.snapDialog(dialogParamsForStakeHbar);
       if (!confirmed) {
-        console.error(`User rejected the transaction`);
-        throw providerErrors.userRejectedRequest();
+        const errMessage = 'User rejected the transaction';
+        console.error(errMessage);
+        throw rpcErrors.transactionRejected(errMessage);
       }
 
       const hederaClientFactory = new HederaClientImplFactory(
@@ -149,7 +175,7 @@ export class StakeHbarFacade {
       );
       const hederaClient = await hederaClientFactory.createClient();
       if (hederaClient === null) {
-        throw new Error('hedera client returned null');
+        throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new StakeHbarCommand(nodeId, accountId);
 
@@ -166,9 +192,9 @@ export class StakeHbarFacade {
       ].accountInfo.stakingInfo.declineStakingReward = declineStakingReward;
       await SnapState.updateState(state);
     } catch (error: any) {
-      const errMessage = `Error while trying to stake Hbar: ${String(error)}`;
-      console.error(errMessage);
-      throw providerErrors.unsupportedMethod(errMessage);
+      const errMessage = `Error while trying to stake Hbar`;
+      console.error('Error occurred: %s', errMessage, String(error));
+      throw rpcErrors.transactionRejected(errMessage);
     }
 
     return txReceipt;
