@@ -90,12 +90,25 @@ export class UpdateTokenFeeScheduleFacade {
         panelToShow.push(
           text('Fee Collection Id:'),
           copyable(feeCollectorAccountId),
-          text(`Hbar Amount: ${hbarAmount}`),
-          text(`Token Amount: ${tokenAmount}`),
-          text('Denominating Token Id:'),
-          copyable(denominatingTokenId),
-          text(`All Collectors Are Exempt: ${allCollectorsAreExempt}`),
         );
+
+        if (hbarAmount) {
+          panelToShow.push(text(`Hbar Amount: ${hbarAmount}`));
+        }
+        if (tokenAmount) {
+          panelToShow.push(text(`Token Amount: ${tokenAmount}`));
+        }
+        if (denominatingTokenId) {
+          panelToShow.push(
+            text('Denominating Token Id:'),
+            copyable(denominatingTokenId),
+          );
+        }
+        if (allCollectorsAreExempt) {
+          panelToShow.push(
+            text(`All Collectors Are Exempt: ${allCollectorsAreExempt}`),
+          );
+        }
       }
 
       const dialogParams: DialogParams = {

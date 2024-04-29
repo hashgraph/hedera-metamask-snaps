@@ -69,11 +69,20 @@ const UpdateTokenFeeSchedule: FC<Props> = ({
 
       const tokenCustomFee = {
         feeCollectorAccountId,
-        hbarAmount: numberHbarAmount,
-        tokenAmount: numberTokenAmount,
-        denominatingTokenId,
-        allCollectorsAreExempt: booleanAllCollectors,
       } as TokenCustomFee;
+
+      if (hbarAmount) {
+        tokenCustomFee.hbarAmount = numberHbarAmount;
+      }
+      if (tokenAmount) {
+        tokenCustomFee.tokenAmount = numberTokenAmount;
+      }
+      if (denominatingTokenId) {
+        tokenCustomFee.denominatingTokenId = denominatingTokenId;
+      }
+      if (allCollectorsAreExempt) {
+        tokenCustomFee.allCollectorsAreExempt = booleanAllCollectors;
+      }
 
       const customFees = [tokenCustomFee];
 
@@ -125,12 +134,12 @@ const UpdateTokenFeeSchedule: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter the fee collector account id
+              Enter the fee collector account id that collects the fee
               <input
                 type="text"
                 style={{ width: '100%' }}
                 value={feeCollectorAccountId}
-                placeholder="Token Name"
+                placeholder="Collector Account ID"
                 onChange={(error) =>
                   setTokenFeeCollectorAccountId(error.target.value)
                 }
@@ -138,7 +147,7 @@ const UpdateTokenFeeSchedule: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter the hbar amount
+              Enter the hbar amount to be collected
               <input
                 type="text"
                 style={{ width: '100%' }}
@@ -149,7 +158,7 @@ const UpdateTokenFeeSchedule: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter the new token amount
+              Enter the new token amount to be collected as the fee
               <input
                 type="text"
                 style={{ width: '100%' }}
@@ -160,7 +169,7 @@ const UpdateTokenFeeSchedule: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter the denominating token id
+              Enter the denominating token id used to charge the fee
               <input
                 type="text"
                 style={{ width: '100%' }}
