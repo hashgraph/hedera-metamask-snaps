@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.3.2...v0.3.2) (2024-04-29)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+- [Fixed an issue with copyable on update token fee schedule MM dialog box](https://github.com/hashgraph/hedera-metamask-snaps/issues/342)
+
 ## [0.3.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.3.1...v0.3.1) (2024-04-15)
 
 ### :page_with_curl: Documentation

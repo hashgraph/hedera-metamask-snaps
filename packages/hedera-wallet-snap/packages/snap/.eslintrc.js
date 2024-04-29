@@ -26,7 +26,10 @@ module.exports = {
       files: ['tests/**/*.ts'],
       plugins: ['jest'],
       extends: ['plugin:jest/recommended'],
-      rules: { 'jest/prefer-expect-assertions': 'off' },
+      rules: {
+        'jest/prefer-expect-assertions': 'off',
+        'jest/no-if': 'error',
+      },
       env: { jest: true },
     },
   ],

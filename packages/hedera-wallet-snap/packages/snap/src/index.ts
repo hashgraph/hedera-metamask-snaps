@@ -479,33 +479,7 @@ export const onUpdate: OnUpdateHandler = async () => {
       content: panel([
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
-        text(
-          '🚀 Added a new API to create a new token(fungible and non-fungible)',
-        ),
-        text(
-          '🚀 Added support to be able to transfer any kind of tokens including hbar, fungible and non-fungible tokens',
-        ),
-        text(
-          '🚀 Added new APIs to perform atomic swap between any two accounts. This uses scheduled transaction to send the transaction to the ledger and to complete the swap.',
-        ),
-        text(
-          '🚀 Added a new API to update the properties of an existing token such as name, symbol, treasury account, etc.',
-        ),
-        text('🚀 Added new APIs to associate/dissociate tokens to an account'),
-        text('🚀 Added a new API to delete a token'),
-        text('🚀 Added new APIs to mint/burn fungible and non-fungible tokens'),
-        text(
-          '🚀 Added new APIs grant/revoke KYC to/from any account for a given token provided KYC key was set during its creation',
-        ),
-        text(
-          '🚀 Added new APIs to freeze/unfreeze account for a given token provided Freeze key was set during its creation',
-        ),
-        text(
-          '🚀 Added new APIs pause/unpause provided Pause key was set during token its creation',
-        ),
-        text(
-          '🚀 Added new APIs to wipe a token from any accounts provided Wipe key was set during its creation',
-        ),
+        text('🚀 Fixed an issue with update fee schedule'),
       ]),
     },
   });
