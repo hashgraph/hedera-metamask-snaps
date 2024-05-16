@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.44.0",
-    "@metamask/key-tree": "^9.0.0",
+    "@metamask/key-tree": "^9.1.0",
     "@metamask/providers": "^16.0.0",
     "@metamask/rpc-errors": "^6.2.1",
     "@metamask/snaps-sdk": "^4.0.1",
