@@ -29,6 +29,7 @@ import type {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
+  DeleteSmartContractRequestParams,
   DissociateTokensRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
@@ -1033,6 +1034,36 @@ export const updateSmartContract = async (
           network,
           mirrorNodeUrl,
           ...updateSmartContractRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteSmartContract" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param deleteSmartContractRequestParams
+ * @param externalAccountparams
+ */
+export const deleteSmartContract = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteSmartContractRequestParams: DeleteSmartContractRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/deleteSmartContract',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...deleteSmartContractRequestParams,
           ...externalAccountparams,
         },
       },

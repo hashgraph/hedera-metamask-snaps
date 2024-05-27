@@ -205,3 +205,9 @@ export type UpdateSmartContractRequestParams = {
   autoRenewPeriod?: number;
   autoRenewAccountId?: string;
 };
+
+export type DeleteSmartContractRequestParams = {
+  contractId: string;
+  transferAccountId?: string;
+  transferContractId?: string;
+};
