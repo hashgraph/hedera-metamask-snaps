@@ -192,3 +192,16 @@ export type CreateSmartContractRequestParams = {
   autoRenewPeriod?: number;
   maxAutomaticTokenAssociations?: number;
 };
+
+export type UpdateSmartContractRequestParams = {
+  contractId: string;
+  adminKey?: string;
+  contractMemo?: string;
+  expirationTime?: string;
+  maxAutomaticTokenAssociations?: number;
+  stakedAccountId?: string;
+  stakedNodeId?: number;
+  declineStakingReward?: boolean;
+  autoRenewPeriod?: number;
+  autoRenewAccountId?: string;
+};

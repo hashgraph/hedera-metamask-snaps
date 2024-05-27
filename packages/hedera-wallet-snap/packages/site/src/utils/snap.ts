@@ -40,6 +40,7 @@ import type {
   SignScheduledTxParams,
   StakeHbarRequestParams,
   TransferCryptoRequestParams,
+  UpdateSmartContractRequestParams,
   UpdateTokenFeeScheduleRequestParams,
   UpdateTokenRequestParams,
   WipeTokenRequestParams,
@@ -1002,6 +1003,36 @@ export const createSmartContract = async (
           network,
           mirrorNodeUrl,
           ...createSmartContractRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "updateSmartContract" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param updateSmartContractRequestParams
+ * @param externalAccountparams
+ */
+export const updateSmartContract = async (
+  network: string,
+  mirrorNodeUrl: string,
+  updateSmartContractRequestParams: UpdateSmartContractRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/updateSmartContract',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...updateSmartContractRequestParams,
           ...externalAccountparams,
         },
       },

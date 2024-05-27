@@ -68,6 +68,7 @@ import type {
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
+  UpdateSmartContractRequestParams,
   UpdateTokenFeeScheduleRequestParams,
   UpdateTokenRequestParams,
   WipeTokenRequestParams,
@@ -1959,6 +1960,74 @@ export class HederaUtils {
       parameter,
       'createSmartContract',
       'maxAutomaticTokenAssociations',
+      false,
+    );
+  }
+
+  public static isValidUpdateSmartContractParams(
+    params: unknown,
+  ): asserts params is UpdateSmartContractRequestParams {
+    if (params === null || _.isEmpty(params) || !('contractId' in params)) {
+      console.error(
+        'Invalid updateSmartContract Params passed. "contractId" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid updateSmartContract Params passed. "contractId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as UpdateSmartContractRequestParams;
+
+    this.checkValidString(parameter, 'updateSmartContract', 'contractId', true);
+
+    // Add further validation checks as required for optional parameters
+    this.checkValidString(parameter, 'updateSmartContract', 'adminKey', false);
+    this.checkValidString(
+      parameter,
+      'updateSmartContract',
+      'contractMemo',
+      false,
+    );
+    this.checkValidString(
+      parameter,
+      'updateSmartContract',
+      'expirationTime',
+      false,
+    );
+    this.checkValidNumber(
+      parameter,
+      'updateSmartContract',
+      'maxAutomaticTokenAssociations',
+      false,
+    );
+    this.checkValidString(
+      parameter,
+      'updateSmartContract',
+      'stakedAccountId',
+      false,
+    );
+    this.checkValidNumber(
+      parameter,
+      'updateSmartContract',
+      'stakedNodeId',
+      false,
+    );
+    this.checkValidBoolean(
+      parameter,
+      'updateSmartContract',
+      'declineStakingReward',
+      false,
+    );
+    this.checkValidNumber(
+      parameter,
+      'updateSmartContract',
+      'autoRenewPeriod',
+      false,
+    );
+    this.checkValidString(
+      parameter,
+      'updateSmartContract',
+      'autoRenewAccountId',
       false,
     );
   }
