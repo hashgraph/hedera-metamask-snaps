@@ -50,6 +50,7 @@ import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
+  CallSmartContractFunctionRequestParams,
   CreateSmartContractRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
@@ -2060,6 +2061,55 @@ export class HederaUtils {
       parameter,
       'deleteSmartContract',
       'transferContractId',
+      false,
+    );
+  }
+
+  public static isValidCallSmartContractFunctionParams(
+    params: unknown,
+  ): asserts params is CallSmartContractFunctionRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('contractId' in params) ||
+      !('functionName' in params) ||
+      !('gas' in params)
+    ) {
+      console.error(
+        'Invalid callSmartContractFunction Params passed. "contractId", "functionName" and "gas" must be passed as parameters',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid callSmartContractFunction Params passed. "contractId", "functionName"and "gas" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as CallSmartContractFunctionRequestParams;
+
+    this.checkValidString(
+      parameter,
+      'callSmartContractFunction',
+      'contractId',
+      true,
+    );
+    this.checkValidString(
+      parameter,
+      'callSmartContractFunction',
+      'functionName',
+      true,
+    );
+    this.checkValidString(
+      parameter,
+      'callSmartContractFunction',
+      'functionParams',
+      false,
+    );
+    this.checkValidNumber(parameter, 'callSmartContractFunction', 'gas', true);
+
+    // Add further validation checks as required for optional parameters
+    this.checkValidNumber(
+      parameter,
+      'callSmartContractFunction',
+      'payableAmount',
       false,
     );
   }
