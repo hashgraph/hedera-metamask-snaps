@@ -281,3 +281,11 @@ export type CallSmartContractFunctionRequestParams = {
   gas: number;
   payableAmount?: number;
 };
+
+export type GetSmartContractFunctionRequestParams = {
+  contractId: string;
+  functionName: string;
+  functionParams?: string;
+  gas: number;
+  senderAccountId?: string;
+};

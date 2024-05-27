@@ -40,6 +40,7 @@ import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { CreateSmartContract } from '../components/cards/hscs/CreateSmartContract';
 import { DeleteSmartContract } from '../components/cards/hscs/DeleteSmartContract';
+import { GetSmartContractFunction } from '../components/cards/hscs/GetSmartContractFunction';
 import { UpdateSmartContract } from '../components/cards/hscs/UpdateSmartContract';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { AtomicSwapComplete } from '../components/cards/hts/AtomicSwapComplete';
@@ -371,6 +372,12 @@ const Index = () => {
         />
 
         <CallSmartContractFunction
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetSmartContractFunction
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

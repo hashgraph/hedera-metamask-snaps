@@ -34,6 +34,7 @@ import type {
   DissociateTokensRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
+  GetSmartContractFunctionRequestParams,
   GetTransactionsRequestParams,
   InitiateSwapRequestParams,
   MintTokenRequestParams,
@@ -1095,6 +1096,36 @@ export const callSmartContractFunction = async (
           network,
           mirrorNodeUrl,
           ...callSmartContractFunctionRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getSmartContractFunction" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param getSmartContractFunctionRequestParams
+ * @param externalAccountparams
+ */
+export const getSmartContractFunction = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getSmartContractFunctionRequestParams: GetSmartContractFunctionRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/getSmartContractFunction',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...getSmartContractFunctionRequestParams,
           ...externalAccountparams,
         },
       },

@@ -27,10 +27,10 @@ import {
 import useModal from '../../../hooks/useModal';
 import {
   Account,
-  CallSmartContractFunctionRequestParams,
+  GetSmartContractFunctionRequestParams,
 } from '../../../types/snap';
 import {
-  callSmartContractFunction,
+  getSmartContractFunction,
   shouldDisplayReconnectButton,
 } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
@@ -44,7 +44,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const CallSmartContractFunction: FC<Props> = ({
+const GetSmartContractFunction: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -59,35 +59,35 @@ const CallSmartContractFunction: FC<Props> = ({
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleCallSmartContractFunctionClick = async () => {
+  const handleGetSmartContractFunctionClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const callSmartContractFunctionParams = {
+      const getSmartContractFunctionParams = {
         contractId,
         functionName,
         gas,
-      } as CallSmartContractFunctionRequestParams;
+      } as GetSmartContractFunctionRequestParams;
       if (!_.isEmpty(functionParams)) {
-        callSmartContractFunctionParams.functionParams = functionParams;
+        getSmartContractFunctionParams.functionParams = functionParams;
       }
-      const response: any = await callSmartContractFunction(
+      const response: any = await getSmartContractFunction(
         network,
         mirrorNodeUrl,
-        callSmartContractFunctionParams,
+        getSmartContractFunctionParams,
         externalAccountParams,
       );
 
-      const { receipt, currentAccount } = response;
+      const { result, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('receipt: ', receipt);
+      console.log('result: ', result);
 
       showModal({
-        title: 'Transaction Receipt',
-        content: JSON.stringify({ receipt }, null, 4),
+        title: 'Function Result',
+        content: JSON.stringify({ result }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -99,8 +99,8 @@ const CallSmartContractFunction: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'hscs/callSmartContractFunction',
-        description: 'Call a smart contract function',
+        title: 'hscs/getSmartContractFunction',
+        description: 'Get a smart contract function result',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -134,8 +134,7 @@ const CallSmartContractFunction: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter the amount of gas to use for the transaction (Gas not used
-              will be refunded):
+              Enter the amount of gas to use for the query:
               <input
                 type="number"
                 style={{ width: '100%' }}
@@ -149,8 +148,8 @@ const CallSmartContractFunction: FC<Props> = ({
         ),
         button: (
           <SendHelloButton
-            buttonText="Call Smart Contract Function"
-            onClick={handleCallSmartContractFunctionClick}
+            buttonText="Get Smart Contract Function Result"
+            onClick={handleGetSmartContractFunctionClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -166,4 +165,4 @@ const CallSmartContractFunction: FC<Props> = ({
   );
 };
 
-export { CallSmartContractFunction };
+export { GetSmartContractFunction };

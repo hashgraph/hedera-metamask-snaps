@@ -19,15 +19,9 @@
  */
 
 import type { Client } from '@hashgraph/sdk';
-import {
-  ContractExecuteTransaction,
-  ContractFunctionParameters,
-  Hbar,
-} from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
+import { ContractCallQuery, ContractFunctionParameters } from '@hashgraph/sdk';
 
-export class CallSmartContractFunctionCommand {
+export class GetSmartContractFunctionCommand {
   readonly #contractId: string;
 
   readonly #functionName: string;
@@ -36,43 +30,41 @@ export class CallSmartContractFunctionCommand {
 
   readonly #gas: number;
 
-  readonly #payableAmount: number | undefined;
+  readonly #senderAccountId: string | undefined;
 
   constructor(
     contractId: string,
     functionName: string,
     functionParams: string | undefined,
     gas: number,
-    payableAmount: number | undefined,
+    senderAccountId: string | undefined,
   ) {
     this.#contractId = contractId;
     this.#functionName = functionName;
     this.#functionParams = functionParams;
     this.#gas = gas;
-    this.#payableAmount = payableAmount;
+    this.#senderAccountId = senderAccountId;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new ContractExecuteTransaction()
+  public async execute(client: Client): Promise<any> {
+    const query = new ContractCallQuery()
       .setContractId(this.#contractId)
       .setGas(this.#gas);
 
     if (this.#functionParams === undefined) {
-      transaction.setFunction(this.#functionName);
+      query.setFunction(this.#functionName);
     } else {
-      transaction.setFunction(
+      query.setFunction(
         this.#functionName,
         new ContractFunctionParameters().addString(this.#functionParams),
       );
     }
-    if (this.#payableAmount !== undefined) {
-      transaction.setPayableAmount(new Hbar(this.#payableAmount));
+
+    if (this.#senderAccountId) {
+      query.setSenderAccountId(this.#senderAccountId);
     }
 
-    // Freeze the transaction
-    transaction.freezeWith(client);
-
-    // Sign the transaction with the client operator private key and submit to a Hedera network
-    return await Utils.executeTransaction(client, transaction);
+    // Execute the query
+    return await query.execute(client);
   }
 }

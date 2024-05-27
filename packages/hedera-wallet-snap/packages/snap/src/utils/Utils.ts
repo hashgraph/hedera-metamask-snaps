@@ -117,7 +117,9 @@ export class Utils {
     while (retries < MAX_RETRIES) {
       try {
         const txResponse = await transaction.execute(client);
+        console.log(`txResponse: ${JSON.stringify(txResponse, null, 4)}`);
         const receipt = await txResponse.getReceipt(client);
+        console.log(`receipt: ${JSON.stringify(receipt, null, 4)}`);
 
         // If the transaction succeeded, return the receipt
         return Utils.formatTransactionReceipt(receipt);
