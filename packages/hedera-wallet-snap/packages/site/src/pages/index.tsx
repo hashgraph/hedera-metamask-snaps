@@ -37,6 +37,7 @@ import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
+import { CreateSmartContract } from '../components/cards/hscs/CreateSmartContract';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
 import { AtomicSwapComplete } from '../components/cards/hts/AtomicSwapComplete';
 import { AtomicSwapInitiate } from '../components/cards/hts/AtomicSwapInitiate';
@@ -343,6 +344,12 @@ const Index = () => {
         />
 
         <AtomicSwapComplete
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateSmartContract
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

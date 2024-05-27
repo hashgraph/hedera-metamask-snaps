@@ -35,6 +35,7 @@ import { GetAccountBalanceFacade } from './facades/account/GetAccountBalanceFaca
 import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
+import { CreateSmartContractFacade } from './facades/hscs/CreateSmartContractFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
 import { AtomicSwapFacade } from './facades/hts/AtomicSwapFacade';
 import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
@@ -70,10 +71,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
-  console.log(
-    'request.params=========',
-    JSON.stringify(request.params, null, 4),
-  );
 
   let state = await SnapState.getStateUnchecked();
   if (_.isEmpty(state)) {
@@ -428,6 +425,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await AtomicSwapFacade.completeSwap(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/createSmartContract': {
+      HederaUtils.isValidCreateSmartContractParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await CreateSmartContractFacade.createSmartContract(
           walletSnapParams,
           request.params,
         ),

@@ -239,3 +239,18 @@ export type UpdateTokenFeeScheduleRequestParams = {
   tokenId: string;
   customFees: TokenCustomFee[];
 };
+
+export type CreateSmartContractRequestParams = {
+  gas: number;
+  bytecode: string;
+  initialBalance?: number;
+  adminKey?: string;
+  constructorParameters?: string;
+  contractMemo?: string;
+  stakedNodeId?: number;
+  stakedAccountId?: string;
+  declineStakingReward?: boolean;
+  autoRenewAccountId?: string;
+  autoRenewPeriod?: number;
+  maxAutomaticTokenAssociations?: number;
+};

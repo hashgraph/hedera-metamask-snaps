@@ -50,6 +50,7 @@ import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
+  CreateSmartContractRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -1871,6 +1872,95 @@ export class HederaUtils {
     const parameter = params as SignScheduledTxParams;
 
     this.checkValidString(parameter, 'signScheduledTx', 'scheduleId', true);
+  }
+
+  public static isValidCreateSmartContractParams(
+    params: unknown,
+  ): asserts params is CreateSmartContractRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('gas' in params) ||
+      !('bytecode' in params)
+    ) {
+      console.error(
+        'Invalid createSmartContract Params passed. "gas" and "bytecode" must be passed as parameters',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid createSmartContract Params passed. "gas" and "bytecode" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as CreateSmartContractRequestParams;
+
+    this.checkValidNumber(parameter, 'createSmartContract', 'gas', true);
+    this.checkValidString(parameter, 'createSmartContract', 'bytecode', true);
+
+    // Add further validation checks as required for optional parameters
+    this.checkValidNumber(
+      parameter,
+      'createSmartContract',
+      'initialBalance',
+      false,
+    );
+
+    this.checkValidString(parameter, 'createSmartContract', 'adminKey', false);
+
+    this.checkValidString(
+      parameter,
+      'createSmartContract',
+      'constructorParameters',
+      false,
+    );
+
+    this.checkValidString(
+      parameter,
+      'createSmartContract',
+      'contractMemo',
+      false,
+    );
+
+    this.checkValidNumber(
+      parameter,
+      'createSmartContract',
+      'stakedNodeId',
+      false,
+    );
+
+    this.checkValidString(
+      parameter,
+      'createSmartContract',
+      'stakedAccountId',
+      false,
+    );
+
+    this.checkValidBoolean(
+      parameter,
+      'createSmartContract',
+      'declineStakingReward',
+      false,
+    );
+
+    this.checkValidString(
+      parameter,
+      'createSmartContract',
+      'autoRenewAccountId',
+      false,
+    );
+
+    this.checkValidNumber(
+      parameter,
+      'createSmartContract',
+      'autoRenewPeriod',
+      false,
+    );
+
+    this.checkValidNumber(
+      parameter,
+      'createSmartContract',
+      'maxAutomaticTokenAssociations',
+      false,
+    );
   }
 
   public static validHederaNetwork(network: string) {

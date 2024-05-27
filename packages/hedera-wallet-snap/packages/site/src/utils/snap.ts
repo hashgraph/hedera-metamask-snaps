@@ -25,6 +25,7 @@ import type {
   ApproveAllowanceRequestParams,
   AssociateTokensRequestParams,
   BurnTokenRequestParams,
+  CreateSmartContractRequestParams,
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
@@ -971,6 +972,36 @@ export const completeSwap = async (
           network,
           mirrorNodeUrl,
           ...completeSwapRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "createSmartContract" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param createSmartContractRequestParams
+ * @param externalAccountparams
+ */
+export const createSmartContract = async (
+  network: string,
+  mirrorNodeUrl: string,
+  createSmartContractRequestParams: CreateSmartContractRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/createSmartContract',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...createSmartContractRequestParams,
           ...externalAccountparams,
         },
       },
