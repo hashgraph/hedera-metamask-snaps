@@ -21,6 +21,7 @@
 import { useContext, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
+import { CallSmartContractFunction } from '..//components/cards/hscs/CallSmartContractFunction';
 import { Card, InstallFlaskButton } from '../components/base';
 import { ApproveAllowance } from '../components/cards/ApproveAllowance';
 import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
@@ -364,6 +365,12 @@ const Index = () => {
         />
 
         <DeleteSmartContract
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CallSmartContractFunction
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

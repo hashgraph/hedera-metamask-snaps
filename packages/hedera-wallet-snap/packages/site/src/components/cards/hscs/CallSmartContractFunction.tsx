@@ -25,9 +25,12 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, CreateSmartContractRequestParams } from '../../../types/snap';
 import {
-  createSmartContract,
+  Account,
+  CallSmartContractFunctionRequestParams,
+} from '../../../types/snap';
+import {
+  callSmartContractFunction,
   shouldDisplayReconnectButton,
 } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
@@ -41,7 +44,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const CreateSmartContract: FC<Props> = ({
+const CallSmartContractFunction: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -49,29 +52,31 @@ const CreateSmartContract: FC<Props> = ({
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [gas, setGas] = useState(8000000);
-  const [bytecode, setBytecode] = useState('');
-  const [adminKey, setAdminKey] = useState('');
+  const [contractId, setContractId] = useState('');
+  const [functionName, setFunctionName] = useState('');
+  const [functionParams, setFunctionParams] = useState('');
+  const [gas, setGas] = useState(1000000);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleCreateSmartContractClick = async () => {
+  const handleCallSmartContractFunctionClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const createSmartContractParams = {
+      const callSmartContractFunctionParams = {
+        contractId,
+        functionName,
         gas,
-        bytecode,
-      } as CreateSmartContractRequestParams;
-      if (!_.isEmpty(adminKey)) {
-        createSmartContractParams.adminKey = adminKey;
+      } as CallSmartContractFunctionRequestParams;
+      if (!_.isEmpty(functionParams)) {
+        callSmartContractFunctionParams.functionParams = functionParams;
       }
-      const response: any = await createSmartContract(
+      const response: any = await callSmartContractFunction(
         network,
         mirrorNodeUrl,
-        createSmartContractParams,
+        callSmartContractFunctionParams,
         externalAccountParams,
       );
 
@@ -94,42 +99,49 @@ const CreateSmartContract: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'hscs/createSmartContract',
-        description: 'Create a new smart contract',
+        title: 'hscs/callSmartContractFunction',
+        description: 'Call a smart contract function',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
-              Enter the amount of gas to use for the transaction(Gas not used
-              will be refunded)
+              Enter the Contract ID:
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={contractId}
+                onChange={(e) => setContractId(e.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the Function Name:
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={functionName}
+                onChange={(e) => setFunctionName(e.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the Function Parameters:
+              <textarea
+                style={{ width: '100%' }}
+                value={functionParams}
+                onChange={(e) => setFunctionParams(e.target.value)}
+              />
+            </label>
+            <br />
+            <label>
+              Enter the amount of gas to use for the transaction (Gas not used
+              will be refunded):
               <input
                 type="number"
                 style={{ width: '100%' }}
                 value={gas}
-                placeholder="Enter the amount of gas(in Hbar)"
+                placeholder="Enter the amount of gas"
                 onChange={(e) => setGas(parseFloat(e.target.value))}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the bytecode of the contract
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={bytecode}
-                placeholder="Byte ccode of the contract"
-                onChange={(e) => setBytecode(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the admin public key for your smart contract(OPTIONAL)
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={adminKey}
-                placeholder="Enter the admin key"
-                onChange={(e) => setAdminKey(e.target.value)}
               />
             </label>
             <br />
@@ -137,8 +149,8 @@ const CreateSmartContract: FC<Props> = ({
         ),
         button: (
           <SendHelloButton
-            buttonText="Create Smart Contract"
-            onClick={handleCreateSmartContractClick}
+            buttonText="Call Smart Contract Function"
+            onClick={handleCallSmartContractFunctionClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -154,4 +166,4 @@ const CreateSmartContract: FC<Props> = ({
   );
 };
 
-export { CreateSmartContract };
+export { CallSmartContractFunction };

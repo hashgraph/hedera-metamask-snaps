@@ -211,3 +211,11 @@ export type DeleteSmartContractRequestParams = {
   transferAccountId?: string;
   transferContractId?: string;
 };
+
+export type CallSmartContractFunctionRequestParams = {
+  contractId: string;
+  functionName: string;
+  functionParams?: string;
+  gas: number;
+  payableAmount?: number;
+};

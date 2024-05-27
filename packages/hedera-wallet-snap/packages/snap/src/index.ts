@@ -35,7 +35,9 @@ import { GetAccountBalanceFacade } from './facades/account/GetAccountBalanceFaca
 import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
+import { CallSmartContractFunctionFacade } from './facades/hscs/CallSmartContractFunctionFacade';
 import { CreateSmartContractFacade } from './facades/hscs/CreateSmartContractFacade';
+import { DeleteSmartContractFacade } from './facades/hscs/DeleteSmartContractFacade';
 import { UpdateSmartContractFacade } from './facades/hscs/UpdateSmartContractFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
 import { AtomicSwapFacade } from './facades/hts/AtomicSwapFacade';
@@ -55,7 +57,6 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { DeleteSmartContractFacade } from './facades/hscs/DeleteSmartContractFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -463,6 +464,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           walletSnapParams,
           request.params,
         ),
+      };
+    }
+
+    case 'hscs/callSmartContractFunction': {
+      HederaUtils.isValidCallSmartContractFunctionParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt:
+          await CallSmartContractFunctionFacade.callSmartContractFunction(
+            walletSnapParams,
+            request.params,
+          ),
       };
     }
 
