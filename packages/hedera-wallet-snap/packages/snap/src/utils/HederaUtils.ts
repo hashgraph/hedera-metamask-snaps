@@ -54,6 +54,7 @@ import type {
   CreateTokenRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
+  DeleteSmartContractRequestParams,
   DissociateTokensRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
@@ -2028,6 +2029,37 @@ export class HederaUtils {
       parameter,
       'updateSmartContract',
       'autoRenewAccountId',
+      false,
+    );
+  }
+
+  public static isValidDeleteSmartContractParams(
+    params: unknown,
+  ): asserts params is DeleteSmartContractRequestParams {
+    if (params === null || _.isEmpty(params) || !('contractId' in params)) {
+      console.error(
+        'Invalid deleteSmartContract Params passed. "contractId" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid deleteSmartContract Params passed. "contractId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as DeleteSmartContractRequestParams;
+
+    this.checkValidString(parameter, 'deleteSmartContract', 'contractId', true);
+
+    // Add further validation checks as required for optional parameters
+    this.checkValidString(
+      parameter,
+      'deleteSmartContract',
+      'transferAccountId',
+      false,
+    );
+    this.checkValidString(
+      parameter,
+      'deleteSmartContract',
+      'transferContractId',
       false,
     );
   }
