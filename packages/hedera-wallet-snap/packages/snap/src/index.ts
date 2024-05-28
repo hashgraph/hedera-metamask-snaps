@@ -38,7 +38,9 @@ import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade
 import { CallSmartContractFunctionFacade } from './facades/hscs/CallSmartContractFunctionFacade';
 import { CreateSmartContractFacade } from './facades/hscs/CreateSmartContractFacade';
 import { DeleteSmartContractFacade } from './facades/hscs/DeleteSmartContractFacade';
+import { GetSmartContractBytecodeFacade } from './facades/hscs/GetSmartContractBytecodeFacade';
 import { GetSmartContractFunctionFacade } from './facades/hscs/GetSmartContractFunctionFacade';
+import { GetSmartContractInfoFacade } from './facades/hscs/GetSmartContractInfoFacade';
 import { UpdateSmartContractFacade } from './facades/hscs/UpdateSmartContractFacade';
 import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
 import { AtomicSwapFacade } from './facades/hts/AtomicSwapFacade';
@@ -485,6 +487,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         result: await GetSmartContractFunctionFacade.getSmartContractFunction(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/getSmartContractBytecode': {
+      HederaUtils.isValidGetSmartContractBytecodeParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        bytecode: await GetSmartContractBytecodeFacade.getSmartContractBytecode(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/getSmartContractInfo': {
+      HederaUtils.isValidGetSmartContractInfoParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        info: await GetSmartContractInfoFacade.getSmartContractInfo(
           walletSnapParams,
           request.params,
         ),

@@ -59,6 +59,7 @@ import type {
   DissociateTokensRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
+  GetSmartContractDetailsRequestParams,
   GetSmartContractFunctionRequestParams,
   GetTransactionsRequestParams,
   InitiateSwapRequestParams,
@@ -2160,6 +2161,50 @@ export class HederaUtils {
       'getSmartContractFunction',
       'senderAccountId',
       false,
+    );
+  }
+
+  public static isValidGetSmartContractBytecodeParams(
+    params: unknown,
+  ): asserts params is GetSmartContractDetailsRequestParams {
+    if (params === null || _.isEmpty(params) || !('contractId' in params)) {
+      console.error(
+        'Invalid getSmartContractBytecode Params passed. "contractId" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid getSmartContractBytecode Params passed. "contractId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as GetSmartContractDetailsRequestParams;
+
+    this.checkValidString(
+      parameter,
+      'getSmartContractBytecode',
+      'contractId',
+      true,
+    );
+  }
+
+  public static isValidGetSmartContractInfoParams(
+    params: unknown,
+  ): asserts params is GetSmartContractDetailsRequestParams {
+    if (params === null || _.isEmpty(params) || !('contractId' in params)) {
+      console.error(
+        'Invalid getSmartContractInfo Params passed. "contractId" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid getSmartContractInfo Params passed. "contractId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as GetSmartContractDetailsRequestParams;
+
+    this.checkValidString(
+      parameter,
+      'getSmartContractInfo',
+      'contractId',
+      true,
     );
   }
 

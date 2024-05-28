@@ -227,3 +227,7 @@ export type GetSmartContractFunctionRequestParams = {
   gas: number;
   senderAccountId?: string;
 };
+
+export type GetSmartContractDetailsRequestParams = {
+  contractId: string;
+};

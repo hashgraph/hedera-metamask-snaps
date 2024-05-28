@@ -18,8 +18,14 @@
  *
  */
 
-import type { Client } from '@hashgraph/sdk';
-import { ContractCallQuery, ContractFunctionParameters } from '@hashgraph/sdk';
+import type { Client, ContractFunctionResult } from '@hashgraph/sdk';
+import {
+  ContractCallQuery,
+  ContractFunctionParameters,
+  Hbar,
+} from '@hashgraph/sdk';
+import type { GetSmartContractFunctionResult } from '../../types/hedera';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 
 export class GetSmartContractFunctionCommand {
   readonly #contractId: string;
@@ -46,7 +52,9 @@ export class GetSmartContractFunctionCommand {
     this.#senderAccountId = senderAccountId;
   }
 
-  public async execute(client: Client): Promise<any> {
+  public async execute(
+    client: Client,
+  ): Promise<GetSmartContractFunctionResult> {
     const query = new ContractCallQuery()
       .setContractId(this.#contractId)
       .setGas(this.#gas);
@@ -64,7 +72,25 @@ export class GetSmartContractFunctionCommand {
       query.setSenderAccountId(this.#senderAccountId);
     }
 
+    query.setQueryPayment(new Hbar(1));
+
     // Execute the query
-    return await query.execute(client);
+    const contractCallResult: ContractFunctionResult =
+      await query.execute(client);
+
+    console.log(
+      'Contract call result:',
+      JSON.stringify(contractCallResult, null, 4),
+    );
+    // console.log('message:', contractCallResult.getString(0));
+
+    return {
+      contractId: contractCallResult.contractId?.toString(),
+      bloom: CryptoUtils.uint8ArrayToHex(contractCallResult.bloom),
+      gasUsed: Number(contractCallResult.gasUsed),
+      errorMessage: contractCallResult.errorMessage,
+      logs: contractCallResult.logs.toString(),
+      signerNonce: contractCallResult.signerNonce,
+    } as GetSmartContractFunctionResult;
   }
 }

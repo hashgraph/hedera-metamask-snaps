@@ -23,6 +23,7 @@ import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { GetSmartContractFunctionCommand } from '../../commands/hscs/GetSmartContractFunctionCommand';
+import type { GetSmartContractFunctionResult } from '../../types/hedera';
 import type { GetSmartContractFunctionRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -37,7 +38,7 @@ export class GetSmartContractFunctionFacade {
   public static async getSmartContractFunction(
     walletSnapParams: WalletSnapParams,
     getSmartContractFunctionParams: GetSmartContractFunctionRequestParams,
-  ): Promise<any> {
+  ): Promise<GetSmartContractFunctionResult> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -49,7 +50,7 @@ export class GetSmartContractFunctionFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let result;
+    let result = {} as GetSmartContractFunctionResult;
     try {
       const panelToShow: (
         | {
@@ -129,7 +130,6 @@ export class GetSmartContractFunctionFacade {
       );
 
       result = await command.execute(hederaClient.getClient());
-      console.log('result: ', JSON.stringify(result, null, 4));
     } catch (error: any) {
       const errMessage =
         'Error while trying to get the smart contract function result';
