@@ -18,7 +18,6 @@
  *
  */
 
-import _ from 'lodash';
 import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
@@ -27,10 +26,10 @@ import {
 import useModal from '../../../hooks/useModal';
 import {
   Account,
-  CallSmartContractFunctionRequestParams,
+  GetSmartContractDetailsRequestParams,
 } from '../../../types/snap';
 import {
-  callSmartContractFunction,
+  getSmartContractBytecode,
   shouldDisplayReconnectButton,
 } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
@@ -44,7 +43,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const CallSmartContractFunction: FC<Props> = ({
+const GetSmartContractBytecode: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -53,41 +52,34 @@ const CallSmartContractFunction: FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [contractId, setContractId] = useState('');
-  const [functionName, setFunctionName] = useState('');
-  const [functionParams, setFunctionParams] = useState('');
-  const [gas, setGas] = useState(100000);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleCallSmartContractFunctionClick = async () => {
+  const handleGetSmartContractBytecodeClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const callSmartContractFunctionParams = {
+      const getSmartContractBytecodeParams = {
         contractId,
-        functionName,
-        gas,
-      } as CallSmartContractFunctionRequestParams;
-      if (!_.isEmpty(functionParams)) {
-        callSmartContractFunctionParams.functionParams = functionParams;
-      }
-      const response: any = await callSmartContractFunction(
+      } as GetSmartContractDetailsRequestParams;
+
+      const response: any = await getSmartContractBytecode(
         network,
         mirrorNodeUrl,
-        callSmartContractFunctionParams,
+        getSmartContractBytecodeParams,
         externalAccountParams,
       );
 
-      const { receipt, currentAccount } = response;
+      const { bytecode, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('receipt: ', receipt);
+      console.log('bytecode: ', bytecode);
 
       showModal({
-        title: 'Transaction Receipt',
-        content: JSON.stringify({ receipt }, null, 4),
+        title: 'Smart Contract Bytecode',
+        content: JSON.stringify({ bytecode }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -99,8 +91,8 @@ const CallSmartContractFunction: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'hscs/callSmartContractFunction',
-        description: 'Call a smart contract function',
+        title: 'hscs/getSmartContractBytecode',
+        description: 'Get smart contract bytecode',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -114,43 +106,12 @@ const CallSmartContractFunction: FC<Props> = ({
               />
             </label>
             <br />
-            <label>
-              Enter the Function Name:
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={functionName}
-                onChange={(e) => setFunctionName(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the Function Parameters:
-              <textarea
-                style={{ width: '100%' }}
-                value={functionParams}
-                onChange={(e) => setFunctionParams(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
-              Enter the amount of gas to use for the transaction (Gas not used
-              will be refunded):
-              <input
-                type="number"
-                style={{ width: '100%' }}
-                value={gas}
-                placeholder="Enter the amount of gas"
-                onChange={(e) => setGas(parseFloat(e.target.value))}
-              />
-            </label>
-            <br />
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Call Smart Contract Function"
-            onClick={handleCallSmartContractFunctionClick}
+            buttonText="Get Smart Contract Bytecode"
+            onClick={handleGetSmartContractBytecodeClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -166,4 +127,4 @@ const CallSmartContractFunction: FC<Props> = ({
   );
 };
 
-export { CallSmartContractFunction };
+export { GetSmartContractBytecode };

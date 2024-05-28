@@ -139,6 +139,28 @@ export type TxRecord = {
   evmAddress: string;
 };
 
+export type GetSmartContractFunctionResult = {
+  contractId: string;
+  rawResult: string;
+  bloom: string;
+  gasUsed: number;
+  errorMessage: any;
+  logs: string;
+  signerNonce: any;
+};
+
+export type GetSmartContractInfoResult = {
+  contractId: string;
+  accountId: string;
+  contractAccountId: string;
+  adminKey: string;
+  expirationTime: string;
+  autoRenewPeriod: string;
+  storage: number;
+  contractMemo: string;
+  balance: number;
+};
+
 export type HederaService = {
   getNodeStakingInfo(): Promise<MirrorStakingInfo[]>;
 

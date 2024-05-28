@@ -34,6 +34,9 @@ import type {
   DissociateTokensRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
+  GetSmartContractBytecodeRequestParams,
+  GetSmartContractDetailsRequestParams,
+  GetSmartContractFunctionRequestParams,
   GetTransactionsRequestParams,
   InitiateSwapRequestParams,
   MintTokenRequestParams,
@@ -1095,6 +1098,96 @@ export const callSmartContractFunction = async (
           network,
           mirrorNodeUrl,
           ...callSmartContractFunctionRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getSmartContractFunction" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param getSmartContractFunctionRequestParams
+ * @param externalAccountparams
+ */
+export const getSmartContractFunction = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getSmartContractFunctionRequestParams: GetSmartContractFunctionRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/getSmartContractFunction',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...getSmartContractFunctionRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getSmartContractBytecode" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param getSmartContractBytecodeRequestParams
+ * @param externalAccountparams
+ */
+export const getSmartContractBytecode = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getSmartContractBytecodeRequestParams: GetSmartContractBytecodeRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/getSmartContractBytecode',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...getSmartContractBytecodeRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getSmartContractInfo" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param getSmartContractInfoRequestParams
+ * @param externalAccountparams
+ */
+export const getSmartContractInfo = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getSmartContractInfoRequestParams: GetSmartContractDetailsRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/getSmartContractInfo',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...getSmartContractInfoRequestParams,
           ...externalAccountparams,
         },
       },

@@ -18,11 +18,13 @@
  *
  */
 
+import type { Key } from '@hashgraph/sdk';
 import { PublicKey } from '@hashgraph/sdk';
+import type { HashgraphProto } from '@hashgraph/sdk/lib/Key';
 import { HDNodeWallet, Mnemonic, assertArgument, ethers } from 'ethers';
 import { DEFAULTCOINTYPE } from '../types/constants';
 import type { MirrorNftInfo, MirrorTokenInfo } from '../types/hedera';
-import { type FetchResponse, FetchUtils } from './FetchUtils';
+import { FetchUtils, type FetchResponse } from './FetchUtils';
 
 export class CryptoUtils {
   /**
@@ -227,5 +229,37 @@ export class CryptoUtils {
       result = response.data;
     }
     return result;
+  }
+
+  /**
+   * Convert a key to a string representation.
+   * @param key - The key to convert.
+   * @returns The string representation of the key.
+   */
+  public static keyToString(key: Key | null): string {
+    if (!key) {
+      return '';
+    }
+
+    // Convert the key to a protobuf key
+    const protobufKey: HashgraphProto.proto.IKey = key._toProtobufKey();
+
+    // Extract the key value from the protobuf key
+    if (protobufKey.ed25519) {
+      return CryptoUtils.uint8ArrayToHex(protobufKey.ed25519);
+    } else if (protobufKey.ECDSASecp256k1) {
+      return CryptoUtils.uint8ArrayToHex(protobufKey.ECDSASecp256k1);
+    } else if (protobufKey.RSA_3072) {
+      return CryptoUtils.uint8ArrayToHex(protobufKey.RSA_3072);
+    } else if (protobufKey.ECDSA_384) {
+      return CryptoUtils.uint8ArrayToHex(protobufKey.ECDSA_384);
+    }
+    // Handle other types of keys if necessary
+    return JSON.stringify(protobufKey, (_key, value) => {
+      if (value instanceof Uint8Array) {
+        return CryptoUtils.uint8ArrayToHex(value); // Convert Uint8Array to hex string
+      }
+      return value;
+    });
   }
 }

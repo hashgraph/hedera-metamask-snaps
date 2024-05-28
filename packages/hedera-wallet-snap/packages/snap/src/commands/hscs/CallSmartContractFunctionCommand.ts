@@ -41,7 +41,7 @@ export class CallSmartContractFunctionCommand {
   constructor(
     contractId: string,
     functionName: string,
-    functionParams: any,
+    functionParams: string | undefined,
     gas: number,
     payableAmount: number | undefined,
   ) {
@@ -53,16 +53,18 @@ export class CallSmartContractFunctionCommand {
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const parameters = new ContractFunctionParameters();
-    if (this.#functionParams !== undefined) {
-      parameters.addString(this.#functionParams);
-    }
-
     const transaction = new ContractExecuteTransaction()
       .setContractId(this.#contractId)
-      .setGas(this.#gas)
-      .setFunction(this.#functionName, parameters);
+      .setGas(this.#gas);
 
+    if (this.#functionParams === undefined) {
+      transaction.setFunction(this.#functionName);
+    } else {
+      transaction.setFunction(
+        this.#functionName,
+        new ContractFunctionParameters().addString(this.#functionParams),
+      );
+    }
     if (this.#payableAmount !== undefined) {
       transaction.setPayableAmount(new Hbar(this.#payableAmount));
     }
