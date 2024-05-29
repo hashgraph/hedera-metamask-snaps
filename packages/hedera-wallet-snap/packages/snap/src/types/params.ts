@@ -231,3 +231,9 @@ export type GetSmartContractFunctionRequestParams = {
 export type GetSmartContractDetailsRequestParams = {
   contractId: string;
 };
+
+export type EthereumTransactionRequestParams = {
+  ethereumData: string;
+  callDataFileId?: string;
+  maxGasAllowanceHbar?: number;
+};
