@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.44.0",
-    "@metamask/providers": "^16.0.0",
+    "@metamask/providers": "^16.1.0",
     "bignumber.js": "^9.1.2",
     "bootstrap": "^5.3.3",
     "lodash": "^4.17.21",
@@ -35,7 +35,7 @@
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",
     "react-select": "^5.8.0",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.11"
   },
   "devDependencies": {
     "@metamask/eslint-config": "^12.2.0",
@@ -44,13 +44,13 @@
     "@metamask/eslint-config-typescript": "^12.1.0",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/dom": "^10.1.0",
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^15.0.5",
+    "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.5.2",
     "@types/bootstrap": "^5.2.10",
     "@types/jest": "^29.5.12",
     "@types/lodash.clonedeep": "^4.5.9",
-    "@types/react": "^18.3.1",
+    "@types/react": "^18.3.3",
     "@types/react-bootstrap": "^0.32.36",
     "@types/react-dom": "^18.3.0",
     "@types/react-select": "^5.0.1",
@@ -62,17 +62,17 @@
     "eslint": "8.38.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jest": "^28.3.0",
-    "eslint-plugin-jsdoc": "^48.2.3",
+    "eslint-plugin-jest": "^28.5.0",
+    "eslint-plugin-jsdoc": "^48.2.7",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "gatsby": "^5.13.4",
+    "gatsby": "^5.13.6",
     "gatsby-plugin-manifest": "^5.13.1",
     "gatsby-plugin-styled-components": "^6.13.1",
     "gatsby-plugin-svgr": "^3.0.0-beta.0",
     "prettier": "^3.2.5",
     "prettier-plugin-packagejson": "^2.5.0",
-    "rimraf": "^5.0.5",
+    "rimraf": "^5.0.7",
     "typescript": "^5.4.5"
   }
 }
