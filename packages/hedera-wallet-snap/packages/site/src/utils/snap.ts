@@ -32,6 +32,7 @@ import type {
   DeleteAllowanceRequestParams,
   DeleteSmartContractRequestParams,
   DissociateTokensRequestParams,
+  EthereumTransactionRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
   GetSmartContractBytecodeRequestParams,
@@ -1188,6 +1189,36 @@ export const getSmartContractInfo = async (
           network,
           mirrorNodeUrl,
           ...getSmartContractInfoRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "ethereumTransaction" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param ethereumTransactionRequestParams
+ * @param externalAccountparams
+ */
+export const ethereumTransaction = async (
+  network: string,
+  mirrorNodeUrl: string,
+  ethereumTransactionRequestParams: EthereumTransactionRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hscs/ethereumTransaction',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...ethereumTransactionRequestParams,
           ...externalAccountparams,
         },
       },

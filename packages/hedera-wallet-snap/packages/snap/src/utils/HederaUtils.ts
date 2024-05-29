@@ -57,6 +57,7 @@ import type {
   DeleteAllowanceRequestParams,
   DeleteSmartContractRequestParams,
   DissociateTokensRequestParams,
+  EthereumTransactionRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
   GetAccountInfoRequestParams,
   GetSmartContractDetailsRequestParams,
@@ -2205,6 +2206,41 @@ export class HederaUtils {
       'getSmartContractInfo',
       'contractId',
       true,
+    );
+  }
+
+  public static isValidEthereumTransactionParams(
+    params: unknown,
+  ): asserts params is EthereumTransactionRequestParams {
+    if (params === null || _.isEmpty(params) || !('ethereumData' in params)) {
+      console.error(
+        'Invalid ethereumTransaction Params passed. "ethereumData" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid ethereumTransaction Params passed. "ethereumData" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as EthereumTransactionRequestParams;
+
+    this.checkValidString(
+      parameter,
+      'ethereumTransaction',
+      'ethereumData',
+      true,
+    );
+
+    this.checkValidString(
+      parameter,
+      'ethereumTransaction',
+      'callDataFileId',
+      false,
+    );
+    this.checkValidNumber(
+      parameter,
+      'ethereumTransaction',
+      'maxGasAllowanceHbar',
+      false,
     );
   }
 
