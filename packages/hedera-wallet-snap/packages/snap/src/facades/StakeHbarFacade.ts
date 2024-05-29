@@ -194,6 +194,9 @@ export class StakeHbarFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to stake Hbar`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

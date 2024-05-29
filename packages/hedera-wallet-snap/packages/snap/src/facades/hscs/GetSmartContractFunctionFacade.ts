@@ -134,6 +134,9 @@ export class GetSmartContractFunctionFacade {
       const errMessage =
         'Error while trying to get the smart contract function result';
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

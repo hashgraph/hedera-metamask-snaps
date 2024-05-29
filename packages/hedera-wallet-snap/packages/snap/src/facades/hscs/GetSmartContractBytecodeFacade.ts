@@ -95,6 +95,9 @@ export class GetSmartContractBytecodeFacade {
       const errMessage =
         'Error while trying to get the smart contract bytecode';
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

@@ -139,6 +139,9 @@ export class DeleteTokenFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to delete token`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

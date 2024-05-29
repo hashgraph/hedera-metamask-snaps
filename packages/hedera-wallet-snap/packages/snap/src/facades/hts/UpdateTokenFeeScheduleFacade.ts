@@ -154,6 +154,9 @@ export class UpdateTokenFeeScheduleFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to update a token fee schedule`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

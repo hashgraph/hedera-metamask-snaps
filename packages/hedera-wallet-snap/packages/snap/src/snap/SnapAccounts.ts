@@ -360,6 +360,9 @@ export class SnapAccounts {
       } catch (error: any) {
         const errMessage = `Could not setup a Hedera client. Please try again`;
         console.error('Error occurred: %s', errMessage, String(error));
+        await SnapUtils.snapNotification(
+          `Error occurred: ${errMessage} - ${String(error)}`,
+        );
         throw rpcErrors.transactionRejected(errMessage);
       }
     }
@@ -520,6 +523,9 @@ export class SnapAccounts {
       } catch (error: any) {
         const errMessage = `Could not setup a Hedera client. Please try again`;
         console.error('Error occurred: %s', errMessage, String(error));
+        await SnapUtils.snapNotification(
+          `Error occurred: ${errMessage} - ${String(error)}`,
+        );
         throw rpcErrors.transactionRejected(errMessage);
       }
     }

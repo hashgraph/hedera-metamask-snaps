@@ -158,6 +158,9 @@ export class DeleteAllowanceFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to delete an allowance`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 
