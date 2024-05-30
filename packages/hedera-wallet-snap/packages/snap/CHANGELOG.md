@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.4.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.4.1...v0.4.1) (2024-05-29)
+## [0.4.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.4.1...v0.4.1) (2024-05-30)
 
 ### :page_with_curl: Documentation
 
