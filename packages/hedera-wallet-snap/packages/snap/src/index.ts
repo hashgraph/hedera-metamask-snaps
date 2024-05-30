@@ -84,6 +84,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   if (_.isEmpty(state)) {
     state = await SnapState.initState();
   }
+  console.log('state: ', JSON.stringify(state, null, 4));
 
   let isExternalAccount = false;
   if (HederaUtils.isExternalAccountFlagSet(request.params)) {

@@ -341,6 +341,8 @@ export class HederaUtils {
 
     if (networkInfo.network === 'testnet') {
       networkInfo.mirrorNodeUrl = DEFAULTHEDERAMIRRORNODES.testnet;
+    } else if (networkInfo.network === 'previewnet') {
+      networkInfo.mirrorNodeUrl = DEFAULTHEDERAMIRRORNODES.previewnet;
     }
 
     if (
