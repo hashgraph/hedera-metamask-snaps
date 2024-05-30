@@ -21,6 +21,7 @@
 import type { Client, ContractFunctionResult } from '@hashgraph/sdk';
 import { ContractCallQuery, ContractFunctionParameters } from '@hashgraph/sdk';
 import type { GetSmartContractFunctionResult } from '../../types/hedera';
+import type { SmartContractFunctionParameter } from '../../types/params';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 
 export class GetSmartContractFunctionCommand {
@@ -28,7 +29,7 @@ export class GetSmartContractFunctionCommand {
 
   readonly #functionName: string;
 
-  readonly #functionParams: string | undefined;
+  readonly #functionParams: SmartContractFunctionParameter[] | undefined;
 
   readonly #gas: number;
 
@@ -37,7 +38,7 @@ export class GetSmartContractFunctionCommand {
   constructor(
     contractId: string,
     functionName: string,
-    functionParams: string | undefined,
+    functionParams: SmartContractFunctionParameter[] | undefined,
     gas: number,
     senderAccountId: string | undefined,
   ) {
@@ -58,10 +59,31 @@ export class GetSmartContractFunctionCommand {
     if (this.#functionParams === undefined) {
       query.setFunction(this.#functionName);
     } else {
-      query.setFunction(
-        this.#functionName,
-        new ContractFunctionParameters().addString(this.#functionParams),
-      );
+      const params = new ContractFunctionParameters();
+      this.#functionParams.forEach((param) => {
+        switch (param.type) {
+          case 'string':
+            params.addString(param.value as string);
+            break;
+          case 'bytes':
+            params.addBytes(param.value as Uint8Array);
+            break;
+          case 'boolean':
+            params.addBool(param.value as boolean);
+            break;
+          case 'int':
+            params.addInt256(param.value as number);
+            break;
+          case 'uint':
+            params.addUint256(param.value as number);
+            break;
+          default:
+            throw new Error(
+              `Unsupported constructor parameter type: only 'string', 'bytes', 'boolean', 'int', 'uint' are supported`,
+            );
+        }
+      });
+      query.setFunction(this.#functionName, params);
     }
 
     if (this.#senderAccountId) {
@@ -76,6 +98,7 @@ export class GetSmartContractFunctionCommand {
       contractId: contractCallResult.contractId
         ? contractCallResult.contractId.toString()
         : '',
+      bytes: CryptoUtils.uint8ArrayToHex(contractCallResult.bytes),
       bloom: CryptoUtils.uint8ArrayToHex(contractCallResult.bloom),
       gasUsed: Number(contractCallResult.gasUsed),
       errorMessage: contractCallResult.errorMessage
@@ -83,6 +106,12 @@ export class GetSmartContractFunctionCommand {
         : '',
       logs: contractCallResult.logs.toString(),
       signerNonce: JSON.parse(JSON.stringify(contractCallResult.signerNonce)),
+      evmAddress: contractCallResult.evmAddress
+        ? contractCallResult.evmAddress.toString()
+        : '',
+      gas: Number(contractCallResult.gas),
+      amount: Number(contractCallResult.amount),
+      contractNonces: contractCallResult.contractNonces.toString(),
     } as GetSmartContractFunctionResult;
   }
 }

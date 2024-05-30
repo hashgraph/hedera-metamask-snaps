@@ -70,6 +70,7 @@ import type {
   ServiceFee,
   SignMessageRequestParams,
   SignScheduledTxParams,
+  SmartContractFunctionParameter,
   StakeHbarRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
@@ -1912,12 +1913,56 @@ export class HederaUtils {
 
     this.checkValidString(parameter, 'createSmartContract', 'adminKey', false);
 
-    this.checkValidString(
-      parameter,
-      'createSmartContract',
-      'constructorParameters',
-      false,
-    );
+    if (parameter.constructorParameters) {
+      if (!Array.isArray(parameter.constructorParameters)) {
+        console.error(
+          'Invalid createSmartContract Params passed. "constructorParameters" must be an array',
+        );
+        throw rpcErrors.invalidParams(
+          'Invalid createSmartContract Params passed. "constructorParameters" must be an array',
+        );
+      }
+
+      parameter.constructorParameters.forEach(
+        (param: SmartContractFunctionParameter) => {
+          if (
+            !('type' in param) ||
+            !['string', 'bytes', 'boolean', 'int', 'uint'].includes(param.type)
+          ) {
+            console.error(
+              `Invalid createSmartContract Params passed. Each constructor parameter must have a valid "type"`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid createSmartContract Params passed. Each constructor parameter must have a valid "type"`,
+            );
+          }
+
+          if (!('value' in param)) {
+            console.error(
+              `Invalid createSmartContract Params passed. Each constructor parameter must have a "value"`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid createSmartContract Params passed. Each constructor parameter must have a "value"`,
+            );
+          }
+
+          if (
+            (param.type === 'string' && typeof param.value !== 'string') ||
+            (param.type === 'bytes' && !(param.value instanceof Uint8Array)) ||
+            (param.type === 'boolean' && typeof param.value !== 'boolean') ||
+            (param.type === 'int' && typeof param.value !== 'number') ||
+            (param.type === 'uint' && typeof param.value !== 'number')
+          ) {
+            console.error(
+              `Invalid createSmartContract Params passed. Each constructor parameter's value must match its type`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid createSmartContract Params passed. Each constructor parameter's value must match its type`,
+            );
+          }
+        },
+      );
+    }
 
     this.checkValidString(
       parameter,
@@ -2079,10 +2124,10 @@ export class HederaUtils {
       !('gas' in params)
     ) {
       console.error(
-        'Invalid callSmartContractFunction Params passed. "contractId", "functionName" and "gas" must be passed as parameters',
+        'Invalid callSmartContractFunction Params passed. "contractId", "functionName", and "gas" must be passed as parameters',
       );
       throw rpcErrors.invalidParams(
-        'Invalid callSmartContractFunction Params passed. "contractId", "functionName"and "gas" must be passed as parameters',
+        'Invalid callSmartContractFunction Params passed. "contractId", "functionName", and "gas" must be passed as parameters',
       );
     }
 
@@ -2100,21 +2145,58 @@ export class HederaUtils {
       'functionName',
       true,
     );
-    this.checkValidString(
-      parameter,
-      'callSmartContractFunction',
-      'functionParams',
-      false,
-    );
     this.checkValidNumber(parameter, 'callSmartContractFunction', 'gas', true);
 
-    // Add further validation checks as required for optional parameters
-    this.checkValidNumber(
-      parameter,
-      'callSmartContractFunction',
-      'payableAmount',
-      false,
-    );
+    if (parameter.functionParams) {
+      if (!Array.isArray(parameter.functionParams)) {
+        console.error(
+          'Invalid callSmartContractFunction Params passed. "functionParams" must be an array',
+        );
+        throw rpcErrors.invalidParams(
+          'Invalid callSmartContractFunction Params passed. "functionParams" must be an array',
+        );
+      }
+
+      parameter.functionParams.forEach(
+        (param: SmartContractFunctionParameter) => {
+          if (
+            !('type' in param) ||
+            !['string', 'bytes', 'boolean', 'int', 'uint'].includes(param.type)
+          ) {
+            console.error(
+              `Invalid callSmartContractFunction Params passed. Each function parameter must have a valid "type"`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid callSmartContractFunction Params passed. Each function parameter must have a valid "type"`,
+            );
+          }
+
+          if (!('value' in param)) {
+            console.error(
+              `Invalid callSmartContractFunction Params passed. Each function parameter must have a "value"`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid callSmartContractFunction Params passed. Each function parameter must have a "value"`,
+            );
+          }
+
+          if (
+            (param.type === 'string' && typeof param.value !== 'string') ||
+            (param.type === 'bytes' && !(param.value instanceof Uint8Array)) ||
+            (param.type === 'boolean' && typeof param.value !== 'boolean') ||
+            (param.type === 'int' && typeof param.value !== 'number') ||
+            (param.type === 'uint' && typeof param.value !== 'number')
+          ) {
+            console.error(
+              `Invalid callSmartContractFunction Params passed. Each function parameter's value must match its type`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid callSmartContractFunction Params passed. Each function parameter's value must match its type`,
+            );
+          }
+        },
+      );
+    }
   }
 
   public static isValidGetSmartContractFunctionParams(
@@ -2150,19 +2232,56 @@ export class HederaUtils {
       true,
     );
     this.checkValidNumber(parameter, 'getSmartContractFunction', 'gas', true);
+    if (parameter.functionParams) {
+      if (!Array.isArray(parameter.functionParams)) {
+        console.error(
+          'Invalid getSmartContractFunction Params passed. "functionParams" must be an array',
+        );
+        throw rpcErrors.invalidParams(
+          'Invalid getSmartContractFunction Params passed. "functionParams" must be an array',
+        );
+      }
 
-    this.checkValidString(
-      parameter,
-      'getSmartContractFunction',
-      'functionParams',
-      false,
-    );
-    this.checkValidString(
-      parameter,
-      'getSmartContractFunction',
-      'senderAccountId',
-      false,
-    );
+      parameter.functionParams.forEach(
+        (param: SmartContractFunctionParameter) => {
+          if (
+            !('type' in param) ||
+            !['string', 'bytes', 'boolean', 'int', 'uint'].includes(param.type)
+          ) {
+            console.error(
+              `Invalid getSmartContractFunction Params passed. Each function parameter must have a valid "type"`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid getSmartContractFunction Params passed. Each function parameter must have a valid "type"`,
+            );
+          }
+
+          if (!('value' in param)) {
+            console.error(
+              `Invalid getSmartContractFunction Params passed. Each function parameter must have a "value"`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid getSmartContractFunction Params passed. Each function parameter must have a "value"`,
+            );
+          }
+
+          if (
+            (param.type === 'string' && typeof param.value !== 'string') ||
+            (param.type === 'bytes' && !(param.value instanceof Uint8Array)) ||
+            (param.type === 'boolean' && typeof param.value !== 'boolean') ||
+            (param.type === 'int' && typeof param.value !== 'number') ||
+            (param.type === 'uint' && typeof param.value !== 'number')
+          ) {
+            console.error(
+              `Invalid getSmartContractFunction Params passed. Each function parameter's value must match its type`,
+            );
+            throw rpcErrors.invalidParams(
+              `Invalid getSmartContractFunction Params passed. Each function parameter's value must match its type`,
+            );
+          }
+        },
+      );
+    }
   }
 
   public static isValidGetSmartContractBytecodeParams(

@@ -253,6 +253,10 @@ export class CryptoUtils {
       return CryptoUtils.uint8ArrayToHex(protobufKey.RSA_3072);
     } else if (protobufKey.ECDSA_384) {
       return CryptoUtils.uint8ArrayToHex(protobufKey.ECDSA_384);
+    } else if (protobufKey.contractID) {
+      return protobufKey.contractID.contractNum
+        ? protobufKey.contractID.contractNum.toString()
+        : '';
     }
     // Handle other types of keys if necessary
     return JSON.stringify(protobufKey, (_key, value) => {

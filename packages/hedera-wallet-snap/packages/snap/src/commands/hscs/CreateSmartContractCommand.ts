@@ -19,9 +19,14 @@
  */
 
 import type { Client } from '@hashgraph/sdk';
-import { ContractCreateFlow, Hbar, PublicKey } from '@hashgraph/sdk';
+import {
+  ContractCreateFlow,
+  ContractFunctionParameters,
+  Hbar,
+  PublicKey,
+} from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
-import { CryptoUtils } from '../../utils/CryptoUtils';
+import type { SmartContractFunctionParameter } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
 export class CreateSmartContractCommand {
@@ -33,7 +38,7 @@ export class CreateSmartContractCommand {
 
   readonly #adminKey: string | undefined;
 
-  readonly #constructorParameters: string | undefined;
+  readonly #constructorParameters: SmartContractFunctionParameter[] | undefined;
 
   readonly #contractMemo: string | undefined;
 
@@ -54,7 +59,7 @@ export class CreateSmartContractCommand {
     bytecode: string,
     initialBalance?: number,
     adminKey?: string,
-    constructorParameters?: string,
+    constructorParameters?: SmartContractFunctionParameter[],
     contractMemo?: string,
     stakedNodeId?: number,
     stakedAccountId?: string,
@@ -89,10 +94,33 @@ export class CreateSmartContractCommand {
       transaction.setAdminKey(PublicKey.fromString(this.#adminKey));
     }
     if (this.#constructorParameters) {
-      transaction.setConstructorParameters(
-        CryptoUtils.stringToUint8Array(this.#constructorParameters),
-      );
+      const params = new ContractFunctionParameters();
+      this.#constructorParameters.forEach((param) => {
+        switch (param.type) {
+          case 'string':
+            params.addString(param.value as string);
+            break;
+          case 'bytes':
+            params.addBytes(param.value as Uint8Array);
+            break;
+          case 'boolean':
+            params.addBool(param.value as boolean);
+            break;
+          case 'int':
+            params.addInt256(param.value as number);
+            break;
+          case 'uint':
+            params.addUint256(param.value as number);
+            break;
+          default:
+            throw new Error(
+              `Unsupported constructor parameter type: only 'string', 'bytes', 'boolean', 'int', 'uint' are supported`,
+            );
+        }
+      });
+      transaction.setConstructorParameters(params);
     }
+
     if (this.#contractMemo) {
       transaction.setContractMemo(this.#contractMemo);
     }

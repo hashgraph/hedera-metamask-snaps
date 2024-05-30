@@ -28,6 +28,7 @@ import useModal from '../../../hooks/useModal';
 import {
   Account,
   GetSmartContractFunctionRequestParams,
+  SmartContractFunctionParameter,
 } from '../../../types/snap';
 import {
   getSmartContractFunction,
@@ -54,10 +55,38 @@ const GetSmartContractFunction: FC<Props> = ({
   const { showModal } = useModal();
   const [contractId, setContractId] = useState('');
   const [functionName, setFunctionName] = useState('');
-  const [functionParams, setFunctionParams] = useState('');
-  const [gas, setGas] = useState(100000);
+  const [gas, setGas] = useState(1000000);
+  const [functionParameters, setFunctionParameters] = useState<
+    SmartContractFunctionParameter[]
+  >([]);
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
+
+  const handleAddParameter = () => {
+    setFunctionParameters([
+      ...functionParameters,
+      { type: 'string', value: '' },
+    ]);
+  };
+
+  const handleRemoveParameter = (index: number) => {
+    const newParameters = [...functionParameters];
+    newParameters.splice(index, 1);
+    setFunctionParameters(newParameters);
+  };
+
+  const handleParameterChange = (
+    index: number,
+    field: 'type' | 'value',
+    value: string | number | boolean | Uint8Array,
+  ) => {
+    const newParameters = [...functionParameters];
+    newParameters[index] = {
+      ...newParameters[index],
+      [field]: value,
+    };
+    setFunctionParameters(newParameters);
+  };
 
   const handleGetSmartContractFunctionClick = async () => {
     setLoading(true);
@@ -70,9 +99,10 @@ const GetSmartContractFunction: FC<Props> = ({
         functionName,
         gas,
       } as GetSmartContractFunctionRequestParams;
-      if (!_.isEmpty(functionParams)) {
-        getSmartContractFunctionParams.functionParams = functionParams;
+      if (!_.isEmpty(functionParameters)) {
+        getSmartContractFunctionParams.functionParams = functionParameters;
       }
+
       const response: any = await getSmartContractFunction(
         network,
         mirrorNodeUrl,
@@ -125,15 +155,6 @@ const GetSmartContractFunction: FC<Props> = ({
             </label>
             <br />
             <label>
-              Enter the Function Parameters:
-              <textarea
-                style={{ width: '100%' }}
-                value={functionParams}
-                onChange={(e) => setFunctionParams(e.target.value)}
-              />
-            </label>
-            <br />
-            <label>
               Enter the amount of gas to use for the query:
               <input
                 type="number"
@@ -143,6 +164,71 @@ const GetSmartContractFunction: FC<Props> = ({
                 onChange={(e) => setGas(parseFloat(e.target.value))}
               />
             </label>
+            <br />
+            <label>Function Parameters:</label>
+            {functionParameters.map((param, index) => (
+              <div key={index}>
+                <select
+                  value={param.type}
+                  onChange={(e) =>
+                    handleParameterChange(
+                      index,
+                      'type',
+                      e.target.value as string,
+                    )
+                  }
+                >
+                  <option value="string">String</option>
+                  <option value="bytes">Bytes</option>
+                  <option value="boolean">Boolean</option>
+                  <option value="int">Int</option>
+                  <option value="uint">Uint</option>
+                </select>
+                {param.type === 'bytes' ? (
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          handleParameterChange(
+                            index,
+                            'value',
+                            new Uint8Array(reader.result as ArrayBuffer),
+                          );
+                        };
+                        reader.readAsArrayBuffer(file);
+                      }
+                    }}
+                  />
+                ) : param.type === 'boolean' ? (
+                  <input
+                    type="checkbox"
+                    checked={param.value as boolean}
+                    onChange={(e) =>
+                      handleParameterChange(index, 'value', e.target.checked)
+                    }
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={param.value as string | number}
+                    onChange={(e) => {
+                      const value =
+                        param.type === 'int' || param.type === 'uint'
+                          ? parseInt(e.target.value)
+                          : e.target.value;
+                      handleParameterChange(index, 'value', value);
+                    }}
+                  />
+                )}
+                <button onClick={() => handleRemoveParameter(index)}>
+                  Remove
+                </button>
+              </div>
+            ))}
+            <button onClick={handleAddParameter}>Add Parameter</button>
             <br />
           </>
         ),

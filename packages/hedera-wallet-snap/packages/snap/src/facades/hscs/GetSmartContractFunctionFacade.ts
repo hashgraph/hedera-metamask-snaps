@@ -87,7 +87,11 @@ export class GetSmartContractFunctionFacade {
       );
 
       if (functionParams !== undefined) {
-        panelToShow.push(text(`Function Params: ${functionParams}`));
+        const params = functionParams.map(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          (param) => `${param.type}: ${param.value}`,
+        );
+        panelToShow.push(text(`Function Parameters:`), text(params.join(', ')));
       }
 
       if (senderAccountId !== undefined) {

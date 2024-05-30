@@ -104,9 +104,13 @@ export class CreateSmartContractFacade {
         panelToShow.push(text(`Admin Key:`), copyable(adminKey));
       }
       if (constructorParameters !== undefined) {
+        const params = constructorParameters.map(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          (param) => `${param.type}: ${param.value}`,
+        );
         panelToShow.push(
           text(`Constructor Parameters:`),
-          copyable(constructorParameters),
+          text(params.join(', ')),
         );
       }
       if (contractMemo !== undefined) {
@@ -189,9 +193,6 @@ export class CreateSmartContractFacade {
     } catch (error: any) {
       const errMessage = 'Error while trying to create a smart contract';
       console.error('Error occurred: %s', errMessage, String(error));
-      await SnapUtils.snapNotification(
-        `Error occurred: ${errMessage} - ${String(error)}`,
-      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 
