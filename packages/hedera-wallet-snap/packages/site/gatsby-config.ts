@@ -30,7 +30,7 @@ const config: GatsbyConfig = {
     {
       resolve: 'gatsby-plugin-manifest',
       options: {
-        name: 'Hedera Pulse Snap Demo',
+        name: 'Hedera Snap Demo',
         icon: 'src/assets/logo.svg',
         theme_color: '#6F4CFF',
         background_color: '#FFFFFF',

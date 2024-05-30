@@ -23,12 +23,12 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { Card, InstallFlaskButton } from '../components/base';
 import { ApproveAllowance } from '../components/cards/ApproveAllowance';
-import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
+import { ConnectHederaWalletSnap } from '../components/cards/ConnectHederaWalletSnap';
 import { DeleteAccount } from '../components/cards/DeleteAccount';
 import { DeleteAllowance } from '../components/cards/DeleteAllowance';
 import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
-import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
+import { ReconnectHederaWalletSnap } from '../components/cards/ReconnectHederaWalletSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
 import { ShowAccountPrivateKey } from '../components/cards/ShowAccountPrivateKey';
 import { SignMessage } from '../components/cards/SignMessage';
@@ -107,7 +107,7 @@ const Index = () => {
   return (
     <PageContainer>
       <Heading>
-        Welcome to <Span>Hedera Pulse Snap Demo</Span>
+        Welcome to <Span>Hedera Wallet Snap Demo</Span>
       </Heading>
       <Subtitle>
         <label>Select network</label>
@@ -185,8 +185,8 @@ const Index = () => {
             fullWidth
           />
         )}
-        <ConnectPulseSnap handleConnectClick={handleConnectClick} />
-        <ReconnectPulseSnap handleConnectClick={handleConnectClick} />
+        <ConnectHederaWalletSnap handleConnectClick={handleConnectClick} />
+        <ReconnectHederaWalletSnap handleConnectClick={handleConnectClick} />
 
         <SendHelloHessage
           network={currentNetwork.value}
@@ -409,7 +409,7 @@ const Index = () => {
       <Notice>
         <p>
           Please note that this demo site only serves as an example of how an
-          app would interact with <b>Hedera Pulse Snap</b> and you should do
+          app would interact with <b>Hedera Wallet Snap</b> and you should do
           your own diligence before integrating it into production grade apps.
           Learn more about{' '}
           <a href="https://docs.metamask.io/snaps/" target="_blank">
