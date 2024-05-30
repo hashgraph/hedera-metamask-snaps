@@ -86,15 +86,15 @@ export const connectSnap = async (
   params: Record<'version' | string, unknown> = {},
 ): Promise<string> => {
   try {
-    const hederaPulseSnap = await window.ethereum.request({
+    const hederaWalletSnap = await window.ethereum.request({
       method: 'wallet_requestSnaps',
       params: {
         [snapId]: params,
       },
     });
     console.log(
-      'Hedera Pulse Snap Details: ',
-      JSON.stringify(hederaPulseSnap, null, 4),
+      'Hedera Snap Details: ',
+      JSON.stringify(hederaWalletSnap, null, 4),
     );
     const account = await getCurrentMetamaskAccount();
     console.log('Metamask account: ', account);
@@ -478,7 +478,6 @@ export const createToken = async (
 
 /**
  * Invoke the "updateToken" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param updateTokenRequestParams
@@ -509,7 +508,6 @@ export const updateToken = async (
 
 /**
  * Invoke the "updateTokenFeeSchedule" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param updateTokenFeeScheduleRequestParams
@@ -900,7 +898,6 @@ export const wipeToken = async (
 
 /**
  * Invoke the "showAccountPrivateKey" method from the snap.
- *
  * @param network
  * @param mirrorNodeUrl
  * @param externalAccountparams
@@ -961,6 +958,7 @@ export const initiateSwap = async (
  * @param network
  * @param mirrorNodeUrl
  * @param atomicSwapCompleteParams
+ * @param completeSwapRequestParams
  * @param externalAccountparams
  */
 export const completeSwap = async (

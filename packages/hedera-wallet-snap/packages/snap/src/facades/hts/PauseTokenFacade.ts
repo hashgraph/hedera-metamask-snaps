@@ -144,6 +144,9 @@ export class PauseTokenFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to ${pauseText} a token`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

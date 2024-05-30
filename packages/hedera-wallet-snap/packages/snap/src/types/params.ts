@@ -178,12 +178,17 @@ export type SignScheduledTxParams = {
   scheduleId: string;
 };
 
+export type SmartContractFunctionParameter = {
+  type: 'string' | 'bytes' | 'boolean' | 'int' | 'uint';
+  value: string | number | boolean | Uint8Array;
+};
+
 export type CreateSmartContractRequestParams = {
   gas: number;
   bytecode: string;
   initialBalance?: number;
   adminKey?: string;
-  constructorParameters?: string;
+  constructorParameters?: SmartContractFunctionParameter[];
   contractMemo?: string;
   stakedNodeId?: number;
   stakedAccountId?: string;
@@ -215,7 +220,7 @@ export type DeleteSmartContractRequestParams = {
 export type CallSmartContractFunctionRequestParams = {
   contractId: string;
   functionName: string;
-  functionParams?: string;
+  functionParams?: SmartContractFunctionParameter[];
   gas: number;
   payableAmount?: number;
 };
@@ -223,7 +228,7 @@ export type CallSmartContractFunctionRequestParams = {
 export type GetSmartContractFunctionRequestParams = {
   contractId: string;
   functionName: string;
-  functionParams?: string;
+  functionParams?: SmartContractFunctionParameter[];
   gas: number;
   senderAccountId?: string;
 };

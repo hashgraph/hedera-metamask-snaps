@@ -20,6 +20,7 @@
 
 import { rpcErrors } from '@metamask/rpc-errors';
 import type {
+  OnHomePageHandler,
   OnInstallHandler,
   OnRpcRequestHandler,
   OnUpdateHandler,
@@ -533,6 +534,31 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 };
 
+export const onHomePage: OnHomePageHandler = async () => {
+  return {
+    content: panel([
+      heading('Hello world!'),
+      text('Welcome to Hedera Wallet Snap page!'),
+      divider(),
+      text(
+        'To learn about the Snap, refer to [Hedera Wallet Snap Documentation](https://docs.tuum.tech/hedera-wallet-snap/basics/introduction).',
+      ),
+      divider(),
+      text(
+        '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Hedera Wallet inside MetaMask',
+      ),
+      divider(),
+      text(
+        '⦿ Note that Hedera Wallet Snap does not have direct access to the private key of the MetaMask accounts so it generates a new snap account that is associated with the currently connected MetaMask account so the account created by the snap will have a different address compared to your MetaMask account address.',
+      ),
+      divider(),
+      text(
+        '😭 If you add a new account in MetaMask after you have already approved existing accounts on your application, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
+      ),
+    ]),
+  };
+};
+
 export const onInstall: OnInstallHandler = async () => {
   await snap.request({
     method: 'snap_dialog',
@@ -546,10 +572,6 @@ export const onInstall: OnInstallHandler = async () => {
         divider(),
         text(
           '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Hedera Wallet inside MetaMask',
-        ),
-        divider(),
-        text(
-          '💰 Hedera Wallet is a beta version and is not recommended for use with large amounts of funds. Use at your own risk.',
         ),
         divider(),
         text(
@@ -572,7 +594,14 @@ export const onUpdate: OnUpdateHandler = async () => {
       content: panel([
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
-        text('🚀 Fixed an issue with update fee schedule'),
+        text('🚀 Added new APIs to create/update/delete a smart contract'),
+        text('🚀 Added a new API to call a smart contract function'),
+        text(
+          '🚀 Added a new API to execute ethereum transaction on Hedera network',
+        ),
+        text('🚀 Added a new API to get smart contract function'),
+        text('🚀 Added a new API to get smart contract bytecode'),
+        text('🚀 Added a new API to get smart contract info'),
       ]),
     },
   });

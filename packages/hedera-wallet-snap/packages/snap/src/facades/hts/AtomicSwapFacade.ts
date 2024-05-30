@@ -213,6 +213,9 @@ export class AtomicSwapFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to initiate atomic swap`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
   }
@@ -308,6 +311,9 @@ export class AtomicSwapFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to complete atomic swap`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
   }

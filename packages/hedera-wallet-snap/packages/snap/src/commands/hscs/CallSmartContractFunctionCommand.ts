@@ -25,6 +25,7 @@ import {
   Hbar,
 } from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
+import type { SmartContractFunctionParameter } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
 export class CallSmartContractFunctionCommand {
@@ -32,7 +33,7 @@ export class CallSmartContractFunctionCommand {
 
   readonly #functionName: string;
 
-  readonly #functionParams: string | undefined;
+  readonly #functionParams: SmartContractFunctionParameter[] | undefined;
 
   readonly #gas: number;
 
@@ -41,7 +42,7 @@ export class CallSmartContractFunctionCommand {
   constructor(
     contractId: string,
     functionName: string,
-    functionParams: string | undefined,
+    functionParams: SmartContractFunctionParameter[] | undefined,
     gas: number,
     payableAmount: number | undefined,
   ) {
@@ -60,10 +61,31 @@ export class CallSmartContractFunctionCommand {
     if (this.#functionParams === undefined) {
       transaction.setFunction(this.#functionName);
     } else {
-      transaction.setFunction(
-        this.#functionName,
-        new ContractFunctionParameters().addString(this.#functionParams),
-      );
+      const params = new ContractFunctionParameters();
+      this.#functionParams.forEach((param) => {
+        switch (param.type) {
+          case 'string':
+            params.addString(param.value as string);
+            break;
+          case 'bytes':
+            params.addBytes(param.value as Uint8Array);
+            break;
+          case 'boolean':
+            params.addBool(param.value as boolean);
+            break;
+          case 'int':
+            params.addInt256(param.value as number);
+            break;
+          case 'uint':
+            params.addUint256(param.value as number);
+            break;
+          default:
+            throw new Error(
+              `Unsupported constructor parameter type: only 'string', 'bytes', 'boolean', 'int', 'uint' are supported`,
+            );
+        }
+      });
+      transaction.setFunction(this.#functionName, params);
     }
     if (this.#payableAmount !== undefined) {
       transaction.setPayableAmount(new Hbar(this.#payableAmount));

@@ -20,7 +20,7 @@
 
 import type { Client } from '@hashgraph/sdk';
 import { EthereumTransaction, FileId } from '@hashgraph/sdk';
-import { CryptoUtils } from 'src/utils/CryptoUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
 
 export class EthereumTransactionCommand {
   readonly #ethereumData: string;

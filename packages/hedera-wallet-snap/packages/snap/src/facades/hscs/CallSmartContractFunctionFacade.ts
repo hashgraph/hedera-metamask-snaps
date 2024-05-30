@@ -87,7 +87,11 @@ export class CallSmartContractFunctionFacade {
       );
 
       if (functionParams !== undefined) {
-        panelToShow.push(text(`Function Params: ${functionParams}`));
+        const params = functionParams.map(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          (param) => `${param.type}: ${param.value}`,
+        );
+        panelToShow.push(text(`Function Parameters:`), text(params.join(', ')));
       }
 
       if (payableAmount !== undefined) {
@@ -133,6 +137,9 @@ export class CallSmartContractFunctionFacade {
     } catch (error: any) {
       const errMessage = 'Error while trying to call a smart contract function';
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

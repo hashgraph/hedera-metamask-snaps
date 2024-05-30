@@ -19,7 +19,13 @@
  */
 
 import type { DialogParams, Panel } from '@metamask/snaps-sdk';
-import { divider, heading, panel, text } from '@metamask/snaps-sdk';
+import {
+  NotificationType,
+  divider,
+  heading,
+  panel,
+  text,
+} from '@metamask/snaps-sdk';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
@@ -104,6 +110,27 @@ export class SnapUtils {
       method: 'snap_dialog',
       params,
     })) as boolean;
+  }
+
+  /**
+   * Function that sends notification to Metamask.
+   * @param content - Content to write.
+   */
+  public static async snapNotification(content: string): Promise<void> {
+    await snap.request({
+      method: 'snap_notify',
+      params: {
+        type: NotificationType.InApp,
+        message: content,
+      },
+    });
+    await snap.request({
+      method: 'snap_notify',
+      params: {
+        type: NotificationType.Native,
+        message: content,
+      },
+    });
   }
 
   public static formatFeeDisplay(

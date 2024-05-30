@@ -149,6 +149,9 @@ export class EnableKYCAccountFacade {
     } catch (error: any) {
       const errMessage = `Error while trying to ${enableText} the KYC flag to an account`;
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

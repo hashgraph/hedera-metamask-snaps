@@ -22,6 +22,7 @@ import { rpcErrors } from '@metamask/rpc-errors';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { SnapState } from '../../snap/SnapState';
 import type { WalletSnapParams } from '../../types/state';
+import { SnapUtils } from '../../utils/SnapUtils';
 
 export class GetAccountBalanceFacade {
   public static async getAccountBalance(
@@ -61,6 +62,9 @@ export class GetAccountBalanceFacade {
     } catch (error: any) {
       const errMessage = 'Error while trying to get account balance';
       console.error('Error occurred: %s', errMessage, String(error));
+      await SnapUtils.snapNotification(
+        `Error occurred: ${errMessage} - ${String(error)}`,
+      );
       throw rpcErrors.transactionRejected(errMessage);
     }
 

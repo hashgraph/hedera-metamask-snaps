@@ -141,12 +141,16 @@ export type TxRecord = {
 
 export type GetSmartContractFunctionResult = {
   contractId: string;
-  rawResult: string;
+  bytes: string;
   bloom: string;
   gasUsed: number;
-  errorMessage: any;
+  gas: number;
+  amount: number;
   logs: string;
   signerNonce: any;
+  contractNonces: string;
+  evmAddress: string;
+  errorMessage: any;
 };
 
 export type GetSmartContractInfoResult = {
@@ -155,10 +159,15 @@ export type GetSmartContractInfoResult = {
   contractAccountId: string;
   adminKey: string;
   expirationTime: string;
-  autoRenewPeriod: string;
+  autoRenewPeriod: number;
+  autoRenewAccountId: string;
   storage: number;
   contractMemo: string;
   balance: number;
+  isDeleted: boolean;
+  tokenRelationships: any;
+  ledgerId: string;
+  stakingInfo: any;
 };
 
 export type HederaService = {

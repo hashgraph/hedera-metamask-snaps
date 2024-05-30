@@ -18,7 +18,7 @@
  *
  */
 
-import type { Client } from '@hashgraph/sdk';
+import type { Client, ContractInfo } from '@hashgraph/sdk';
 import { ContractInfoQuery, HbarUnit } from '@hashgraph/sdk';
 import type { GetSmartContractInfoResult } from '../../types/hedera';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -33,7 +33,7 @@ export class GetSmartContractInfoCommand {
 
   public async execute(client: Client): Promise<GetSmartContractInfoResult> {
     const query = new ContractInfoQuery().setContractId(this.#contractId);
-    const info = await query.execute(client);
+    const info: ContractInfo = await query.execute(client);
 
     return {
       contractId: this.#contractId,
@@ -41,12 +41,17 @@ export class GetSmartContractInfoCommand {
       contractAccountId: info.contractAccountId,
       adminKey: CryptoUtils.keyToString(info.adminKey),
       expirationTime: Utils.timestampToString(info.expirationTime.toDate()),
-      autoRenewPeriod: info.autoRenewAccountId
+      autoRenewPeriod: Number(info.autoRenewPeriod.seconds),
+      autoRenewAccountId: info.autoRenewAccountId
         ? info.autoRenewAccountId.toString()
         : '',
       storage: Number(info.storage),
       contractMemo: info.contractMemo,
       balance: Number(info.balance.toString(HbarUnit.Hbar).replace(' ℏ', '')),
+      isDeleted: info.isDeleted,
+      tokenRelationships: info.tokenRelationships.toJSON(),
+      ledgerId: info.ledgerId ? info.ledgerId.toString() : '',
+      stakingInfo: info.stakingInfo ? info.stakingInfo.toJSON() : {},
     } as GetSmartContractInfoResult;
   }
 }

@@ -1,4 +1,5 @@
-import { FC, useContext } from 'react';
+import type { FC } from 'react';
+import { useContext } from 'react';
 import { MetaMaskContext } from '../../contexts/MetamaskContext';
 import { Card, ConnectButton } from '../base';
 
@@ -6,7 +7,7 @@ type Props = {
   handleConnectClick: () => Promise<void>;
 };
 
-const ConnectPulseSnap: FC<Props> = ({ handleConnectClick }) => {
+const ConnectHederaWalletSnap: FC<Props> = ({ handleConnectClick }) => {
   const [state] = useContext(MetaMaskContext);
 
   if (state.installedSnap) {
@@ -16,9 +17,9 @@ const ConnectPulseSnap: FC<Props> = ({ handleConnectClick }) => {
   return (
     <Card
       content={{
-        title: 'Connect to Hedera Pulse Snap',
+        title: 'Connect to Hedera Wallet Snap',
         description:
-          'Get started by connecting to and installing the Hedera Pulse Snap.',
+          'Get started by connecting to and installing the Hedera Wallet Snap.',
         button: (
           <ConnectButton
             onClick={handleConnectClick}
@@ -31,4 +32,4 @@ const ConnectPulseSnap: FC<Props> = ({ handleConnectClick }) => {
   );
 };
 
-export { ConnectPulseSnap };
+export { ConnectHederaWalletSnap };
