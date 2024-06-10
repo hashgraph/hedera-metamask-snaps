@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.4.2...v0.4.2) (2024-06-10)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+- Updated the max query payment to be 5 Hbar so the queries don't fail
+
 ## [0.4.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.4.1...v0.4.1) (2024-05-30)
 
 ### :page_with_curl: Documentation

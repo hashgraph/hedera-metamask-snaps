@@ -111,7 +111,9 @@ export class HederaClientImplFactory implements HederaClientFactory {
     }
 
     // TODO: Fix
-    client.setOperatorWith(this.#accountId, publicKey ?? '', transactionSigner);
+    client
+      .setOperatorWith(this.#accountId, publicKey ?? '', transactionSigner)
+      .setDefaultMaxQueryPayment(new Hbar(5));
 
     if (!(await this.testClientOperatorMatch(client))) {
       return null;
