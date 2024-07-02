@@ -75,6 +75,6 @@
     "prettier": "^3.2.5",
     "prettier-plugin-packagejson": "^2.5.0",
     "rimraf": "^5.0.7",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   }
 }
