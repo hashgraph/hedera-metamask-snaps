@@ -38,6 +38,7 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { CreateTopic } from '../components/cards/hcs/CreateTopic';
+import { UpdateTopic } from '../components/cards/hcs/UpdateTopic';
 import { CallSmartContractFunction } from '../components/cards/hscs/CallSmartContractFunction';
 import { CreateSmartContract } from '../components/cards/hscs/CreateSmartContract';
 import { DeleteSmartContract } from '../components/cards/hscs/DeleteSmartContract';
@@ -196,6 +197,12 @@ const Index = () => {
         />
 
         <CreateTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTopic
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

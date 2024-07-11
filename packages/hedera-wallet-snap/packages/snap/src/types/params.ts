@@ -250,3 +250,13 @@ export type CreateTopicRequestParams = {
   autoRenewPeriod?: number;
   autoRenewAccount?: string;
 };
+
+export type UpdateTopicRequestParams = {
+  topicID: string;
+  memo?: string;
+  expirationTime?: number;
+  adminKey?: string;
+  submitKey?: string;
+  autoRenewPeriod?: number;
+  autoRenewAccount?: string;
+};

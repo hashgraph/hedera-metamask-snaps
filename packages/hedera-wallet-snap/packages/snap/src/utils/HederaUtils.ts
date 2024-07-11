@@ -78,6 +78,7 @@ import type {
   UpdateSmartContractRequestParams,
   UpdateTokenFeeScheduleRequestParams,
   UpdateTokenRequestParams,
+  UpdateTopicRequestParams,
   WipeTokenRequestParams,
 } from '../types/params';
 import { CryptoUtils } from './CryptoUtils';
@@ -2376,6 +2377,29 @@ export class HederaUtils {
     this.checkValidString(parameter, 'createTopic', 'submitKey', false);
     this.checkValidNumber(parameter, 'createTopic', 'autoRenewPeriod', false);
     this.checkValidString(parameter, 'createTopic', 'autoRenewAccount', false);
+  }
+
+  public static isValidUpdateTopicParams(
+    params: unknown,
+  ): asserts params is UpdateTopicRequestParams {
+    if (params === null || _.isEmpty(params) || !('topicID' in params)) {
+      console.error(
+        'Invalid updateTopic Params passed. "topicID" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid updateTopic Params passed. "topicID" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as UpdateTopicRequestParams;
+
+    this.checkValidString(parameter, 'updateTopic', 'topicID', true);
+    this.checkValidString(parameter, 'updateTopic', 'memo', false);
+    this.checkValidString(parameter, 'updateTopic', 'adminKey', false);
+    this.checkValidString(parameter, 'updateTopic', 'submitKey', false);
+    this.checkValidString(parameter, 'updateTopic', 'autoRenewAccount', false);
+    this.checkValidNumber(parameter, 'updateTopic', 'autoRenewPeriod', false);
+    this.checkValidNumber(parameter, 'updateTopic', 'expirationTime', false);
   }
 
   public static validHederaNetwork(network: string) {
