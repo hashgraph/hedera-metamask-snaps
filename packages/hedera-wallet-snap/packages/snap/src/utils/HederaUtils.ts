@@ -73,6 +73,7 @@ import type {
   SignScheduledTxParams,
   SmartContractFunctionParameter,
   StakeHbarRequestParams,
+  SubmitMessageRequestParams,
   TokenCustomFee,
   TransferCryptoRequestParams,
   UpdateSmartContractRequestParams,
@@ -2400,6 +2401,31 @@ export class HederaUtils {
     this.checkValidString(parameter, 'updateTopic', 'autoRenewAccount', false);
     this.checkValidNumber(parameter, 'updateTopic', 'autoRenewPeriod', false);
     this.checkValidNumber(parameter, 'updateTopic', 'expirationTime', false);
+  }
+
+  public static isValidSubmitMessageParams(
+    params: unknown,
+  ): asserts params is SubmitMessageRequestParams {
+    if (
+      params === null ||
+      _.isEmpty(params) ||
+      !('topicID' in params) ||
+      !('message' in params)
+    ) {
+      console.error(
+        'Invalid submitMessage Params passed. "topicID" and "message" must be passed as parameters',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid submitMessage Params passed. "topicID" and "message" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as SubmitMessageRequestParams;
+
+    this.checkValidString(parameter, 'submitMessage', 'topicID', true);
+    this.checkValidString(parameter, 'submitMessage', 'message', true);
+    this.checkValidNumber(parameter, 'submitMessage', 'maxChunks', false);
+    this.checkValidNumber(parameter, 'submitMessage', 'chunkSize', false);
   }
 
   public static validHederaNetwork(network: string) {
