@@ -37,6 +37,7 @@ import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
 import { CreateTopicFacade } from './facades/hcs/CreateTopicFacade';
+import { UpdateTopicFacade } from './facades/hcs/UpdateTopicFacade';
 import { CallSmartContractFunctionFacade } from './facades/hscs/CallSmartContractFunctionFacade';
 import { CreateSmartContractFacade } from './facades/hscs/CreateSmartContractFacade';
 import { DeleteSmartContractFacade } from './facades/hscs/DeleteSmartContractFacade';
@@ -534,6 +535,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         receipt: await CreateTopicFacade.createTopic(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/updateTopic': {
+      HederaUtils.isValidUpdateTopicParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTopicFacade.updateTopic(
           walletSnapParams,
           request.params,
         ),

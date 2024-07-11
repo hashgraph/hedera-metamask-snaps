@@ -50,6 +50,7 @@ import type {
   UpdateSmartContractRequestParams,
   UpdateTokenFeeScheduleRequestParams,
   UpdateTokenRequestParams,
+  UpdateTopicRequestParams,
   WipeTokenRequestParams,
 } from '../types/snap';
 
@@ -1248,6 +1249,36 @@ export const createTopic = async (
           network,
           mirrorNodeUrl,
           ...createTopicRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "updateTopic" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param updateTopicRequestParams
+ * @param externalAccountparams
+ */
+export const updateTopic = async (
+  network: string,
+  mirrorNodeUrl: string,
+  updateTopicRequestParams: UpdateTopicRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hcs/updateTopic',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...updateTopicRequestParams,
           ...externalAccountparams,
         },
       },
