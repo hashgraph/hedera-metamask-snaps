@@ -317,3 +317,10 @@ export type UpdateTopicRequestParams = {
   autoRenewPeriod?: number;
   autoRenewAccount?: string;
 };
+
+export type SubmitMessageRequestParams = {
+  topicID: string;
+  message: string;
+  maxChunks?: number;
+  chunkSize?: number;
+};

@@ -46,6 +46,7 @@ import type {
   SignMessageRequestParams,
   SignScheduledTxParams,
   StakeHbarRequestParams,
+  SubmitMessageRequestParams,
   TransferCryptoRequestParams,
   UpdateSmartContractRequestParams,
   UpdateTokenFeeScheduleRequestParams,
@@ -1279,6 +1280,36 @@ export const updateTopic = async (
           network,
           mirrorNodeUrl,
           ...updateTopicRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "submitMessage" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param submitMessageRequestParams
+ * @param externalAccountparams
+ */
+export const submitMessage = async (
+  network: string,
+  mirrorNodeUrl: string,
+  submitMessageRequestParams: SubmitMessageRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hcs/submitMessage',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...submitMessageRequestParams,
           ...externalAccountparams,
         },
       },

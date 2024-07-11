@@ -21,6 +21,7 @@
 import { useContext, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
+import { CreateSubmitMessage } from '..//components/cards/hcs/SubmitMessage';
 import { Card, InstallFlaskButton } from '../components/base';
 import { ApproveAllowance } from '../components/cards/ApproveAllowance';
 import { ConnectHederaWalletSnap } from '../components/cards/ConnectHederaWalletSnap';
@@ -203,6 +204,12 @@ const Index = () => {
         />
 
         <UpdateTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateSubmitMessage
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
