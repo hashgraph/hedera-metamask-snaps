@@ -242,3 +242,11 @@ export type EthereumTransactionRequestParams = {
   callDataFileId?: string;
   maxGasAllowanceHbar?: number;
 };
+
+export type CreateTopicRequestParams = {
+  memo?: string;
+  adminKey?: string;
+  submitKey?: string;
+  autoRenewPeriod?: number;
+  autoRenewAccount?: string;
+};

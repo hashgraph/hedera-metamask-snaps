@@ -94,8 +94,8 @@ export type SignMessageRequestParams = {
 };
 
 export type StakeHbarRequestParams = {
-  nodeId?: number | null;
-  accountId?: string | null;
+  nodeId?: number;
+  accountId?: string;
 };
 
 export type ApproveAllowanceAssetDetail = {
@@ -298,4 +298,12 @@ export type EthereumTransactionRequestParams = {
   ethereumData: string;
   callDataFileId?: string;
   maxGasAllowanceHbar?: number;
+};
+
+export type CreateTopicRequestParams = {
+  memo?: string;
+  adminKey?: string;
+  submitKey?: string;
+  autoRenewPeriod?: number;
+  autoRenewAccount?: string;
 };

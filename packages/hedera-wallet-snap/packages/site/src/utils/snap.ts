@@ -28,6 +28,7 @@ import type {
   CallSmartContractFunctionRequestParams,
   CreateSmartContractRequestParams,
   CreateTokenRequestParams,
+  CreateTopicRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DeleteSmartContractRequestParams,
@@ -1217,6 +1218,36 @@ export const ethereumTransaction = async (
           network,
           mirrorNodeUrl,
           ...ethereumTransactionRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "createTopic" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param createTopicRequestParams
+ * @param externalAccountparams
+ */
+export const createTopic = async (
+  network: string,
+  mirrorNodeUrl: string,
+  createTopicRequestParams: CreateTopicRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hcs/createTopic',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...createTopicRequestParams,
           ...externalAccountparams,
         },
       },

@@ -53,6 +53,7 @@ import type {
   CallSmartContractFunctionRequestParams,
   CreateSmartContractRequestParams,
   CreateTokenRequestParams,
+  CreateTopicRequestParams,
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DeleteSmartContractRequestParams,
@@ -2363,6 +2364,18 @@ export class HederaUtils {
       'maxGasAllowanceHbar',
       false,
     );
+  }
+
+  public static isValidCreateTopicParams(
+    params: unknown,
+  ): asserts params is CreateTopicRequestParams {
+    const parameter = params as CreateTopicRequestParams;
+
+    this.checkValidString(parameter, 'createTopic', 'memo', false);
+    this.checkValidString(parameter, 'createTopic', 'adminKey', false);
+    this.checkValidString(parameter, 'createTopic', 'submitKey', false);
+    this.checkValidNumber(parameter, 'createTopic', 'autoRenewPeriod', false);
+    this.checkValidString(parameter, 'createTopic', 'autoRenewAccount', false);
   }
 
   public static validHederaNetwork(network: string) {
