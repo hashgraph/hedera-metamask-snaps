@@ -24,8 +24,8 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, SubmitMessageRequestParams } from '../../../types/snap';
-import { shouldDisplayReconnectButton, submitMessage } from '../../../utils';
+import { Account, GetTopicMessagesRequestParams } from '../../../types/snap';
+import { getTopicMessages, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -37,7 +37,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SubmitMessage: FC<Props> = ({
+const GetTopicMessages: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -46,36 +46,38 @@ const SubmitMessage: FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [topicId, setTopicId] = useState('');
-  const [message, setMessage] = useState('');
+  const [sequenceNumber, setSequenceNumber] = useState<number>();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSubmitMessageClick = async () => {
+  const handleGetTopicMessagesClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const submitMessageParams = {
+      const getTopicMessagesParams = {
         topicId,
-        message,
-      } as SubmitMessageRequestParams;
+      } as GetTopicMessagesRequestParams;
+      if (sequenceNumber && Number.isFinite(sequenceNumber)) {
+        getTopicMessagesParams.sequenceNumber = sequenceNumber;
+      }
 
-      const response: any = await submitMessage(
+      const response: any = await getTopicMessages(
         network,
         mirrorNodeUrl,
-        submitMessageParams,
+        getTopicMessagesParams,
         externalAccountParams,
       );
 
-      const { receipt, currentAccount } = response;
+      const { topicMessages, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('receipt: ', receipt);
+      console.log('Topic Messages: ', topicMessages);
 
       showModal({
-        title: 'Transaction Receipt',
-        content: JSON.stringify({ receipt }, null, 4),
+        title: 'Topic Messages',
+        content: JSON.stringify({ topicMessages }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -87,8 +89,8 @@ const SubmitMessage: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'hcs/submitMessage',
-        description: 'Submit a message to a topic',
+        title: 'hcs/getTopicMessages',
+        description: 'Get topic messages using topic ID and/or sequence number',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -104,13 +106,13 @@ const SubmitMessage: FC<Props> = ({
             </label>
             <br />
             <label>
-              Message:
+              Sequence number:
               <input
-                type="text"
+                type="number"
                 style={{ width: '100%' }}
-                value={message}
-                placeholder="Enter message"
-                onChange={(e) => setMessage(e.target.value)}
+                value={sequenceNumber}
+                placeholder="Enter the sequence number"
+                onChange={(e) => setSequenceNumber(parseInt(e.target.value))}
               />
             </label>
             <br />
@@ -118,8 +120,8 @@ const SubmitMessage: FC<Props> = ({
         ),
         button: (
           <SendHelloButton
-            buttonText="Submit Message"
-            onClick={handleSubmitMessageClick}
+            buttonText="Get Topic Messages"
+            onClick={handleGetTopicMessagesClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -135,4 +137,4 @@ const SubmitMessage: FC<Props> = ({
   );
 };
 
-export { SubmitMessage };
+export { GetTopicMessages };

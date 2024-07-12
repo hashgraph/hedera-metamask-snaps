@@ -40,6 +40,7 @@ import type {
   MirrorNftInfo,
   MirrorStakingInfo,
   MirrorTokenInfo,
+  MirrorTopicMessage,
   MirrorTransactionInfo,
   NetworkInfo,
   SimpleTransfer,
@@ -63,6 +64,8 @@ import type {
   GetAccountInfoRequestParams,
   GetSmartContractDetailsRequestParams,
   GetSmartContractFunctionRequestParams,
+  GetTopicInfoRequestParams,
+  GetTopicMessagesRequestParams,
   GetTransactionsRequestParams,
   InitiateSwapRequestParams,
   MintTokenRequestParams,
@@ -2383,18 +2386,18 @@ export class HederaUtils {
   public static isValidUpdateTopicParams(
     params: unknown,
   ): asserts params is UpdateTopicRequestParams {
-    if (params === null || _.isEmpty(params) || !('topicID' in params)) {
+    if (params === null || _.isEmpty(params) || !('topicId' in params)) {
       console.error(
-        'Invalid updateTopic Params passed. "topicID" must be passed as a parameter',
+        'Invalid updateTopic Params passed. "topicId" must be passed as a parameter',
       );
       throw rpcErrors.invalidParams(
-        'Invalid updateTopic Params passed. "topicID" must be passed as a parameter',
+        'Invalid updateTopic Params passed. "topicId" must be passed as a parameter',
       );
     }
 
     const parameter = params as UpdateTopicRequestParams;
 
-    this.checkValidString(parameter, 'updateTopic', 'topicID', true);
+    this.checkValidString(parameter, 'updateTopic', 'topicId', true);
     this.checkValidString(parameter, 'updateTopic', 'memo', false);
     this.checkValidString(parameter, 'updateTopic', 'adminKey', false);
     this.checkValidString(parameter, 'updateTopic', 'submitKey', false);
@@ -2409,23 +2412,82 @@ export class HederaUtils {
     if (
       params === null ||
       _.isEmpty(params) ||
-      !('topicID' in params) ||
+      !('topicId' in params) ||
       !('message' in params)
     ) {
       console.error(
-        'Invalid submitMessage Params passed. "topicID" and "message" must be passed as parameters',
+        'Invalid submitMessage Params passed. "topicId" and "message" must be passed as parameters',
       );
       throw rpcErrors.invalidParams(
-        'Invalid submitMessage Params passed. "topicID" and "message" must be passed as parameters',
+        'Invalid submitMessage Params passed. "topicId" and "message" must be passed as parameters',
       );
     }
 
     const parameter = params as SubmitMessageRequestParams;
 
-    this.checkValidString(parameter, 'submitMessage', 'topicID', true);
+    this.checkValidString(parameter, 'submitMessage', 'topicId', true);
     this.checkValidString(parameter, 'submitMessage', 'message', true);
     this.checkValidNumber(parameter, 'submitMessage', 'maxChunks', false);
     this.checkValidNumber(parameter, 'submitMessage', 'chunkSize', false);
+  }
+
+  /**
+   * Check Validation of getTopicInfo request.
+   * @param params - Request params.
+   */
+  public static isValidGetTopicInfoRequest(
+    params: unknown,
+  ): asserts params is GetTopicInfoRequestParams {
+    if (params === null || _.isEmpty(params) || !('topicId' in params)) {
+      console.error(
+        'Invalid getTopicInfo Params passed. "topicId" must be passed as parameters',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid getTopicInfo Params passed. "topicId" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as GetTopicInfoRequestParams;
+
+    // Check if topicId is valid
+    this.checkValidAccountId(parameter, 'getTopicInfo', 'topicId', true);
+
+    // Check if serviceFee is valid
+    if (
+      'serviceFee' in parameter &&
+      !_.isNull(parameter.serviceFee) &&
+      parameter.serviceFee !== undefined
+    ) {
+      this.isValidServiceFee(parameter.serviceFee);
+    }
+  }
+
+  /**
+   * Check Validation of getTopicMessages request.
+   * @param params - Request params.
+   */
+  public static isValidGetTopicMessagesRequest(
+    params: unknown,
+  ): asserts params is GetTopicMessagesRequestParams {
+    if (params === null || _.isEmpty(params) || !('topicId' in params)) {
+      console.error(
+        'Invalid getTopicInfo Params passed. "topicId" must be passed as parameters',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid getTopicInfo Params passed. "topicId" must be passed as parameters',
+      );
+    }
+
+    const parameter = params as GetTopicMessagesRequestParams;
+
+    // Check if topicId is valid
+    this.checkValidAccountId(parameter, 'getTopicMessage', 'topicId', true);
+    this.checkValidNumber(
+      parameter,
+      'getTopicMessage',
+      'sequenceNumber',
+      false,
+    );
   }
 
   public static validHederaNetwork(network: string) {
@@ -2585,6 +2647,64 @@ export class HederaUtils {
       } as AccountBalance;
     } catch (error: any) {
       console.error('Error in getMirrorAccountInfo:', String(error));
+    }
+
+    return result;
+  }
+
+  public static async getMirrorTopicMessages(
+    mirrorNodeUrl: string,
+    topicId: string,
+    sequenceNumber?: number,
+  ): Promise<MirrorTopicMessage[]> {
+    const result: MirrorTopicMessage[] = [];
+    let url = `${mirrorNodeUrl}/api/v1/topics/${topicId}/messages`;
+    if (sequenceNumber) {
+      url = `${url}/${sequenceNumber}`;
+    }
+    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
+    if (!response.success) {
+      return result;
+    }
+
+    try {
+      if (sequenceNumber) {
+        response.data.chunk_info.initial_transaction_id.transaction_valid_start =
+          Utils.timestampToString(
+            response.data.chunk_info.initial_transaction_id
+              .transaction_valid_start,
+          );
+        response.data.consensus_timestamp = Utils.timestampToString(
+          response.data.consensus_timestamp,
+        );
+        result.push(response.data);
+      } else {
+        for (const message of response.data.messages) {
+          message.chunk_info.initial_transaction_id.transaction_valid_start =
+            Utils.timestampToString(
+              message.chunk_info.initial_transaction_id.transaction_valid_start,
+            );
+          message.consensus_timestamp = Utils.timestampToString(
+            message.consensus_timestamp,
+          );
+          result.push(message);
+        }
+
+        if (response.data.links.next) {
+          const secondUrl = `${mirrorNodeUrl}${
+            response.data.links.next as string
+          }`;
+          const secondResponse: FetchResponse =
+            await FetchUtils.fetchDataFromUrl(secondUrl);
+          if (secondResponse.success) {
+            for (const message of secondResponse.data.messages) {
+              result.push(message);
+            }
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error('Error in getMirrorTopicMessages:', String(error));
     }
 
     return result;

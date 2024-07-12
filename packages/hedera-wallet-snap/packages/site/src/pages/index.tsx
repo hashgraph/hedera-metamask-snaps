@@ -21,7 +21,7 @@
 import { useContext, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
-import { CreateSubmitMessage } from '..//components/cards/hcs/SubmitMessage';
+import { SubmitMessage } from '..//components/cards/hcs/SubmitMessage';
 import { Card, InstallFlaskButton } from '../components/base';
 import { ApproveAllowance } from '../components/cards/ApproveAllowance';
 import { ConnectHederaWalletSnap } from '../components/cards/ConnectHederaWalletSnap';
@@ -39,6 +39,8 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { CreateTopic } from '../components/cards/hcs/CreateTopic';
+import { GetTopicInfo } from '../components/cards/hcs/GetTopicInfo';
+import { GetTopicMessages } from '../components/cards/hcs/GetTopicMessages';
 import { UpdateTopic } from '../components/cards/hcs/UpdateTopic';
 import { CallSmartContractFunction } from '../components/cards/hscs/CallSmartContractFunction';
 import { CreateSmartContract } from '../components/cards/hscs/CreateSmartContract';
@@ -209,7 +211,19 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <CreateSubmitMessage
+        <SubmitMessage
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTopicInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTopicMessages
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}

@@ -45,7 +45,7 @@ export class UpdateTopicFacade {
       state.currentAccount;
 
     const {
-      topicID,
+      topicId,
       memo,
       expirationTime,
       adminKey,
@@ -86,7 +86,7 @@ export class UpdateTopicFacade {
         ),
         text(`You are about to update a topic with the following parameters:`),
         divider(),
-        text(`Topic ID: ${topicID}`),
+        text(`Topic ID: ${topicId}`),
       );
 
       if (memo !== undefined) {
@@ -139,7 +139,7 @@ export class UpdateTopicFacade {
         throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new UpdateTopicCommand(
-        topicID,
+        topicId,
         memo,
         expirationTime,
         adminKey,

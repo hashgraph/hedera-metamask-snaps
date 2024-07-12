@@ -20,9 +20,11 @@
 
 import type { AccountId, Client, PrivateKey, PublicKey } from '@hashgraph/sdk';
 
-import type { AccountInfo } from '../types/account';
-import type { SimpleHederaClient } from '../types/hedera';
 import { HederaAccountStrategy } from '../strategies/HederaAccountStrategy';
+import { HederaConsensusStrategy } from '../strategies/HederaConsensusStrategy';
+import type { AccountInfo } from '../types/account';
+import type { TopicInfo } from '../types/consensus';
+import type { SimpleHederaClient } from '../types/hedera';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   // eslint-disable-next-line no-restricted-syntax
@@ -64,5 +66,9 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
 
   public async getAccountBalance(): Promise<number> {
     return await HederaAccountStrategy.getAccountBalance(this.#client);
+  }
+
+  public async getTopicInfo(topicId: string): Promise<TopicInfo> {
+    return HederaConsensusStrategy.getTopicInfo(this.#client, topicId);
   }
 }

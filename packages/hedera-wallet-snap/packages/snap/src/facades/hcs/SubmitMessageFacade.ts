@@ -44,7 +44,7 @@ export class SubmitMessageFacade {
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const { topicID, message, maxChunks, chunkSize } = submitMessageParams;
+    const { topicId, message, maxChunks, chunkSize } = submitMessageParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -80,7 +80,7 @@ export class SubmitMessageFacade {
           `You are about to submit a message to the topic with the following parameters:`,
         ),
         divider(),
-        text(`Topic ID: ${topicID}`),
+        text(`Topic ID: ${topicId}`),
         text(`Message: ${message}`),
       );
 
@@ -119,7 +119,7 @@ export class SubmitMessageFacade {
         throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
       const command = new SubmitMessageCommand(
-        topicID,
+        topicId,
         message,
         maxChunks,
         chunkSize,

@@ -343,3 +343,20 @@ export type MirrorTransactionInfo = {
     next: string;
   };
 };
+
+export type MirrorTopicMessage = {
+  chunk_info: {
+    initial_transaction_id: string;
+    nonce: number;
+    number: number;
+    total: number;
+    scheduled: boolean;
+  };
+  consensus_timestamp: string;
+  message: string;
+  payer_account_id: string;
+  running_hash: string;
+  running_hash_version: number;
+  sequence_number: number;
+  topic_id: string;
+};

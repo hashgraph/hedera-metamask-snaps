@@ -55,7 +55,7 @@ const StakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       const stakeHbarParams = {
         accountId: accountId || undefined,
       } as StakeHbarRequestParams;
-      if (Number.isFinite(nodeId)) {
+      if (nodeId && Number.isFinite(nodeId)) {
         stakeHbarParams.nodeId = nodeId;
       }
       const response: any = await stakeHbar(

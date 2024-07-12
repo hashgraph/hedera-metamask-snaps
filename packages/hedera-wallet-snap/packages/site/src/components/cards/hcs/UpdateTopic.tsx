@@ -41,7 +41,7 @@ const UpdateTopic: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
-  const [topicID, setTopicID] = useState('');
+  const [topicId, setTopicId] = useState('');
   const [memo, setMemo] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
@@ -53,7 +53,7 @@ const UpdateTopic: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
         externalAccountRef.current?.handleGetAccountParams();
 
       const updateTopicParams = {
-        topicID,
+        topicId,
         memo,
       } as UpdateTopicRequestParams;
 
@@ -93,9 +93,9 @@ const UpdateTopic: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
               <input
                 type="text"
                 style={{ width: '100%' }}
-                value={topicID}
+                value={topicId}
                 placeholder="Enter topic ID"
-                onChange={(e) => setTopicID(e.target.value)}
+                onChange={(e) => setTopicId(e.target.value)}
               />
             </label>
             <br />
