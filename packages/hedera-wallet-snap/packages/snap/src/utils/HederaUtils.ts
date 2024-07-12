@@ -58,6 +58,7 @@ import type {
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DeleteSmartContractRequestParams,
+  DeleteTopicRequestParams,
   DissociateTokensRequestParams,
   EthereumTransactionRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
@@ -2488,6 +2489,23 @@ export class HederaUtils {
       'sequenceNumber',
       false,
     );
+  }
+
+  public static isValidDeleteTopicParams(
+    params: unknown,
+  ): asserts params is DeleteTopicRequestParams {
+    if (params === null || _.isEmpty(params) || !('topicId' in params)) {
+      console.error(
+        'Invalid deleteTopic Params passed. "topicId" must be passed as a parameter',
+      );
+      throw rpcErrors.invalidParams(
+        'Invalid deleteTopic Params passed. "topicId" must be passed as a parameter',
+      );
+    }
+
+    const parameter = params as DeleteTopicRequestParams;
+
+    this.checkValidString(parameter, 'deleteTopic', 'topicId', true);
   }
 
   public static validHederaNetwork(network: string) {

@@ -37,6 +37,7 @@ import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
 import { CreateTopicFacade } from './facades/hcs/CreateTopicFacade';
+import { DeleteTopicFacade } from './facades/hcs/DeleteTopicFacade';
 import { GetTopicInfoFacade } from './facades/hcs/GetTopicInfoFacade';
 import { GetTopicMessagesFacade } from './facades/hcs/GetTopicMessagesFacade';
 import { SubmitMessageFacade } from './facades/hcs/SubmitMessageFacade';
@@ -559,7 +560,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidSubmitMessageParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipts: await SubmitMessageFacade.submitMessage(
+        receipt: await SubmitMessageFacade.submitMessage(
           walletSnapParams,
           request.params,
         ),
@@ -582,6 +583,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: state.currentAccount,
         topicMessages: await GetTopicMessagesFacade.getTopicMessages(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/deleteTopic': {
+      HederaUtils.isValidDeleteTopicParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteTopicFacade.deleteTopic(
           walletSnapParams,
           request.params,
         ),

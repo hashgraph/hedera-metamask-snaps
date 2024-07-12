@@ -19,42 +19,20 @@
  */
 
 import type { Client } from '@hashgraph/sdk';
-import { TopicMessageSubmitTransaction } from '@hashgraph/sdk';
+import { TopicDeleteTransaction } from '@hashgraph/sdk';
 import type { TxReceipt } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
-export class SubmitMessageCommand {
-  readonly #topicID: string;
+export class DeleteTopicCommand {
+  readonly #topicId: string;
 
-  readonly #message: string;
-
-  readonly #maxChunks: number | undefined;
-
-  readonly #chunkSize: number | undefined;
-
-  constructor(
-    topicID: string,
-    message: string,
-    maxChunks?: number,
-    chunkSize?: number,
-  ) {
-    this.#topicID = topicID;
-    this.#message = message;
-    this.#maxChunks = maxChunks;
-    this.#chunkSize = chunkSize;
+  constructor(topicId: string) {
+    this.#topicId = topicId;
   }
 
   public async execute(client: Client): Promise<TxReceipt> {
-    const transaction = new TopicMessageSubmitTransaction()
-      .setTopicId(this.#topicID)
-      .setMessage(this.#message);
+    const transaction = new TopicDeleteTransaction().setTopicId(this.#topicId);
 
-    if (this.#maxChunks) {
-      transaction.setMaxChunks(this.#maxChunks);
-    }
-    if (this.#chunkSize) {
-      transaction.setChunkSize(this.#chunkSize);
-    }
     return await Utils.executeTransaction(client, transaction);
   }
 }

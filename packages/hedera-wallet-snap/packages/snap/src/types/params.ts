@@ -277,3 +277,7 @@ export type GetTopicMessagesRequestParams = {
   topicId: string;
   sequenceNumber?: number;
 };
+
+export type DeleteTopicRequestParams = {
+  topicId: string;
+};
