@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-wallet-snap",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Hedera Wallet Snap unlocks wallet functionality via Metamask that any other apps can interact with, thereby turning Metamask into a native Hedera wallet without relying on Hedera JSON-RPC Relay.",
   "keywords": [
     "MetaMask",
@@ -44,13 +44,13 @@
     "test:ci": "yarn test --silent"
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.45.0",
+    "@hashgraph/sdk": "^2.48.1",
     "@metamask/key-tree": "^9.1.1",
-    "@metamask/providers": "^16.1.0",
-    "@metamask/rpc-errors": "^6.2.1",
-    "@metamask/snaps-sdk": "^4.3.0",
+    "@metamask/providers": "^17.1.0",
+    "@metamask/rpc-errors": "^6.3.1",
+    "@metamask/snaps-sdk": "^6.0.0",
     "bignumber.js": "^9.1.2",
-    "ethers": "^6.12.1",
+    "ethers": "^6.13.1",
     "lodash": "^4.17.21",
     "normalize-url": "^8.0.1"
   },
@@ -61,8 +61,8 @@
     "@metamask/eslint-config-jest": "^12.1.0",
     "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
-    "@metamask/snaps-cli": "^6.2.0",
-    "@metamask/snaps-jest": "^8.1.0",
+    "@metamask/snaps-cli": "^6.2.1",
+    "@metamask/snaps-jest": "^8.2.0",
     "@types/jest": "^29.5.12",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/normalize-url": "^4.2.0",
@@ -72,7 +72,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "28.3.0",
-    "eslint-plugin-jsdoc": "^48.2.7",
+    "eslint-plugin-jsdoc": "^48.7.0",
     "eslint-plugin-n": "17.3.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.1.3",
@@ -81,12 +81,12 @@
     "jest-junit": "^16.0.0",
     "jest-mock": "^29.7.0",
     "lodash.clonedeep": "^4.5.0",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.2",
     "prettier-plugin-packagejson": "^2.5.0",
     "rimraf": "^5.0.7",
-    "ts-jest": "^29.1.4",
+    "ts-jest": "^29.2.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   },
   "packageManager": "yarn@3.2.1",
   "engines": {
