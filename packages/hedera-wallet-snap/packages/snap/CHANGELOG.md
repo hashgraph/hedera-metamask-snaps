@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.5.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.5.0...v0.5.0) (2024-07-12)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- [Added a new API to create a new topic](https://github.com/hashgraph/hedera-metamask-snaps/issues/486)
+- [Added a new API to update a topic](https://github.com/hashgraph/hedera-metamask-snaps/issues/487)
+- [Added a new API to submit message to a topic](https://github.com/hashgraph/hedera-metamask-snaps/issues/488)
+- [Added a new API to delete a topic](https://github.com/hashgraph/hedera-metamask-snaps/issues/489)
+- [Added a new API to get info about the topic](https://github.com/hashgraph/hedera-metamask-snaps/issues/490)
+- [Added a new API to get messages from a topic](https://github.com/hashgraph/hedera-metamask-snaps/issues/490)
+- Updated the dependencies
+- Further optimized the code
+
+### :bug: Bug Fixes
+
 ## [0.4.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.4.2...v0.4.2) (2024-06-10)
 
 ### :page_with_curl: Documentation

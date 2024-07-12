@@ -666,14 +666,12 @@ export const onUpdate: OnUpdateHandler = async () => {
       content: panel([
         heading('Thank you for updating Hedera Wallet Snap'),
         text('New features added in this version:'),
-        text('🚀 Added new APIs to create/update/delete a smart contract'),
-        text('🚀 Added a new API to call a smart contract function'),
-        text(
-          '🚀 Added a new API to execute ethereum transaction on Hedera network',
-        ),
-        text('🚀 Added a new API to get smart contract function'),
-        text('🚀 Added a new API to get smart contract bytecode'),
-        text('🚀 Added a new API to get smart contract info'),
+        text('🚀 Added a new API to create a new topic'),
+        text('🚀 Added a new API to update a topic'),
+        text('🚀 Added a new API to submit a message to a topic'),
+        text('🚀 Added a new API to get topic info'),
+        text('🚀 Added a new API to get topic messages'),
+        text('🚀 Added a new API to delete a topic'),
       ]),
     },
   });
