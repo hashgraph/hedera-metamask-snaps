@@ -32,6 +32,7 @@ import type {
   DeleteAccountRequestParams,
   DeleteAllowanceRequestParams,
   DeleteSmartContractRequestParams,
+  DeleteTopicRequestParams,
   DissociateTokensRequestParams,
   EthereumTransactionRequestParams,
   FreezeOrEnableKYCAccountRequestParams,
@@ -1372,6 +1373,36 @@ export const getTopicMessages = async (
           network,
           mirrorNodeUrl,
           ...getTopicMessagesRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "deleteTopic" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param deleteTopicRequestParams
+ * @param externalAccountparams
+ */
+export const deleteTopic = async (
+  network: string,
+  mirrorNodeUrl: string,
+  deleteTopicRequestParams: DeleteTopicRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hcs/deleteTopic',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...deleteTopicRequestParams,
           ...externalAccountparams,
         },
       },

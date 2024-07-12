@@ -22,29 +22,29 @@ import { rpcErrors } from '@metamask/rpc-errors';
 import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
-import { SubmitMessageCommand } from '../../commands/hcs/SubmitMessageCommand';
+import { DeleteTopicCommand } from '../../commands/hcs/DeleteTopicCommand';
 import type { TxReceipt } from '../../types/hedera';
-import type { SubmitMessageRequestParams } from '../../types/params';
+import type { DeleteTopicRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
 
-export class SubmitMessageFacade {
+export class DeleteTopicFacade {
   /**
-   * Submits a message to a topic on the Hedera network.
+   * Deletes a topic on the Hedera network.
    * @param walletSnapParams - Wallet snap params.
-   * @param submitMessageParams - Parameters for submitting a message.
+   * @param deleteTopicParams - Parameters for deleting a topic.
    * @returns Receipt of the transaction.
    */
-  public static async submitMessage(
+  public static async deleteTopic(
     walletSnapParams: WalletSnapParams,
-    submitMessageParams: SubmitMessageRequestParams,
+    deleteTopicParams: DeleteTopicRequestParams,
   ): Promise<TxReceipt> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
       state.currentAccount;
 
-    const { topicId, message, maxChunks, chunkSize } = submitMessageParams;
+    const { topicId } = deleteTopicParams;
 
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
@@ -72,24 +72,14 @@ export class SubmitMessageFacade {
       )[] = [];
 
       panelToShow.push(
-        heading('Submit a message to a topic'),
+        heading('Delete a topic'),
         text(
-          `Learn more about submitting messages [here](https://docs.hedera.com/hedera/sdks-and-apis/hedera-api/consensus/consensussubmitmessage)`,
+          `Learn more about deleting topics [here](https://docs.hedera.com/hedera/sdks-and-apis/hedera-api/consensus/consensusdeletetopic)`,
         ),
-        text(
-          `You are about to submit a message to the topic with the following parameters:`,
-        ),
+        text(`You are about to delete the following topic:`),
         divider(),
         text(`Topic ID: ${topicId}`),
-        text(`Message: ${message}`),
       );
-
-      if (maxChunks !== undefined) {
-        panelToShow.push(text(`Max Chunks: ${maxChunks}`));
-      }
-      if (chunkSize !== undefined) {
-        panelToShow.push(text(`Chunk Size: ${chunkSize}`));
-      }
 
       const dialogParams: DialogParams = {
         type: 'confirmation',
@@ -118,16 +108,11 @@ export class SubmitMessageFacade {
       if (hederaClient === null) {
         throw rpcErrors.resourceUnavailable('hedera client returned null');
       }
-      const command = new SubmitMessageCommand(
-        topicId,
-        message,
-        maxChunks,
-        chunkSize,
-      );
+      const command = new DeleteTopicCommand(topicId);
 
       txReceipt = await command.execute(hederaClient.getClient());
     } catch (error: any) {
-      const errMessage = 'Error while trying to submit a message';
+      const errMessage = 'Error while trying to delete a topic';
       console.error('Error occurred: %s', errMessage, String(error));
       throw rpcErrors.transactionRejected(errMessage);
     }

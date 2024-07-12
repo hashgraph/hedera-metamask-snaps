@@ -39,6 +39,7 @@ import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
 import { CreateTopic } from '../components/cards/hcs/CreateTopic';
+import { DeleteTopic } from '../components/cards/hcs/DeleteTopic';
 import { GetTopicInfo } from '../components/cards/hcs/GetTopicInfo';
 import { GetTopicMessages } from '../components/cards/hcs/GetTopicMessages';
 import { UpdateTopic } from '../components/cards/hcs/UpdateTopic';
@@ -194,36 +195,6 @@ const Index = () => {
         <ReconnectHederaWalletSnap handleConnectClick={handleConnectClick} />
 
         <SendHelloHessage
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <CreateTopic
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <UpdateTopic
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <SubmitMessage
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <GetTopicInfo
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <GetTopicMessages
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
@@ -434,6 +405,42 @@ const Index = () => {
         />
 
         <EthereumTransaction
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <SubmitMessage
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTopicInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTopicMessages
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteTopic
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
