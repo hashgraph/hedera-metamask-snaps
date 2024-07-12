@@ -252,7 +252,7 @@ export type CreateTopicRequestParams = {
 };
 
 export type UpdateTopicRequestParams = {
-  topicID: string;
+  topicId: string;
   memo?: string;
   expirationTime?: number;
   adminKey?: string;
@@ -262,8 +262,18 @@ export type UpdateTopicRequestParams = {
 };
 
 export type SubmitMessageRequestParams = {
-  topicID: string;
+  topicId: string;
   message: string;
   maxChunks?: number;
   chunkSize?: number;
+};
+
+export type GetTopicInfoRequestParams = {
+  topicId: string;
+  serviceFee?: ServiceFee;
+};
+
+export type GetTopicMessagesRequestParams = {
+  topicId: string;
+  sequenceNumber?: number;
 };

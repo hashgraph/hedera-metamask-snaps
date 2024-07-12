@@ -37,6 +37,9 @@ import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
 import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
 import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
 import { CreateTopicFacade } from './facades/hcs/CreateTopicFacade';
+import { GetTopicInfoFacade } from './facades/hcs/GetTopicInfoFacade';
+import { GetTopicMessagesFacade } from './facades/hcs/GetTopicMessagesFacade';
+import { SubmitMessageFacade } from './facades/hcs/SubmitMessageFacade';
 import { UpdateTopicFacade } from './facades/hcs/UpdateTopicFacade';
 import { CallSmartContractFunctionFacade } from './facades/hscs/CallSmartContractFunctionFacade';
 import { CreateSmartContractFacade } from './facades/hscs/CreateSmartContractFacade';
@@ -64,7 +67,6 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-import { SubmitMessageFacade } from './facades/hcs/SubmitMessageFacade';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -557,7 +559,29 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       HederaUtils.isValidSubmitMessageParams(request.params);
       return {
         currentAccount: state.currentAccount,
-        receipt: await SubmitMessageFacade.submitMessage(
+        receipts: await SubmitMessageFacade.submitMessage(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/getTopicInfo': {
+      HederaUtils.isValidGetTopicInfoRequest(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        topicInfo: await GetTopicInfoFacade.getTopicInfo(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/getTopicMessages': {
+      HederaUtils.isValidGetTopicMessagesRequest(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        topicMessages: await GetTopicMessagesFacade.getTopicMessages(
           walletSnapParams,
           request.params,
         ),

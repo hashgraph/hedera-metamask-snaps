@@ -24,8 +24,12 @@ import {
   MetamaskActions,
 } from '../../../contexts/MetamaskContext';
 import useModal from '../../../hooks/useModal';
-import { Account, SubmitMessageRequestParams } from '../../../types/snap';
-import { shouldDisplayReconnectButton, submitMessage } from '../../../utils';
+import {
+  Account,
+  GetTopicInfoRequestParams,
+  ServiceFee,
+} from '../../../types/snap';
+import { getTopicInfo, shouldDisplayReconnectButton } from '../../../utils';
 import { Card, SendHelloButton } from '../../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -37,7 +41,7 @@ type Props = {
   setAccountInfo: React.Dispatch<React.SetStateAction<Account>>;
 };
 
-const SubmitMessage: FC<Props> = ({
+const GetTopicInfo: FC<Props> = ({
   network,
   mirrorNodeUrl,
   setAccountInfo,
@@ -46,36 +50,41 @@ const SubmitMessage: FC<Props> = ({
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
   const [topicId, setTopicId] = useState('');
-  const [message, setMessage] = useState('');
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
-  const handleSubmitMessageClick = async () => {
+  const handleGetTopicInfoClick = async () => {
     setLoading(true);
     try {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const submitMessageParams = {
-        topicId,
-        message,
-      } as SubmitMessageRequestParams;
+      const TUUMESERVICEADDRESS = '0.0.98'; // Hedera Fee collection account
+      const serviceFee = {
+        percentageCut: 0, // Change this if you want to charge a service fee
+        toAddress: TUUMESERVICEADDRESS,
+      } as ServiceFee;
 
-      const response: any = await submitMessage(
+      const getTopicInfoParams = {
+        topicId,
+        serviceFee,
+      } as GetTopicInfoRequestParams;
+
+      const response: any = await getTopicInfo(
         network,
         mirrorNodeUrl,
-        submitMessageParams,
+        getTopicInfoParams,
         externalAccountParams,
       );
 
-      const { receipt, currentAccount } = response;
+      const { topicInfo, currentAccount } = response;
 
       setAccountInfo(currentAccount);
-      console.log('receipt: ', receipt);
+      console.log('Topic Info: ', topicInfo);
 
       showModal({
-        title: 'Transaction Receipt',
-        content: JSON.stringify({ receipt }, null, 4),
+        title: 'Topic Info',
+        content: JSON.stringify({ topicInfo }, null, 4),
       });
     } catch (e) {
       console.error(e);
@@ -87,8 +96,8 @@ const SubmitMessage: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'hcs/submitMessage',
-        description: 'Submit a message to a topic',
+        title: 'hcs/getTopicInfo',
+        description: 'Get info of a topic',
         form: (
           <>
             <ExternalAccount ref={externalAccountRef} />
@@ -103,23 +112,12 @@ const SubmitMessage: FC<Props> = ({
               />
             </label>
             <br />
-            <label>
-              Message:
-              <input
-                type="text"
-                style={{ width: '100%' }}
-                value={message}
-                placeholder="Enter message"
-                onChange={(e) => setMessage(e.target.value)}
-              />
-            </label>
-            <br />
           </>
         ),
         button: (
           <SendHelloButton
-            buttonText="Submit Message"
-            onClick={handleSubmitMessageClick}
+            buttonText="Get Topic Info"
+            onClick={handleGetTopicInfoClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -135,4 +133,4 @@ const SubmitMessage: FC<Props> = ({
   );
 };
 
-export { SubmitMessage };
+export { GetTopicInfo };

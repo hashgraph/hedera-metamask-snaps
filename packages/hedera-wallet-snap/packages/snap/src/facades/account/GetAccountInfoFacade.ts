@@ -39,7 +39,7 @@ export class GetAccountInfoFacade {
   public static async getAccountInfo(
     walletSnapParams: WalletSnapParams,
     getAccountInfoParams: GetAccountInfoRequestParams,
-  ) {
+  ): Promise<AccountInfo> {
     const { origin, state } = walletSnapParams;
 
     const {

@@ -39,6 +39,8 @@ import type {
   GetSmartContractBytecodeRequestParams,
   GetSmartContractDetailsRequestParams,
   GetSmartContractFunctionRequestParams,
+  GetTopicInfoRequestParams,
+  GetTopicMessagesRequestParams,
   GetTransactionsRequestParams,
   InitiateSwapRequestParams,
   MintTokenRequestParams,
@@ -1310,6 +1312,66 @@ export const submitMessage = async (
           network,
           mirrorNodeUrl,
           ...submitMessageRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getTopicInfo" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param getTopicInfoRequestParams
+ * @param externalAccountparams
+ */
+export const getTopicInfo = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getTopicInfoRequestParams: GetTopicInfoRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hcs/getTopicInfo',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...getTopicInfoRequestParams,
+          ...externalAccountparams,
+        },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getTopicMessages" method from the snap.
+ * @param network
+ * @param mirrorNodeUrl
+ * @param getTopicMessagesRequestParams
+ * @param externalAccountparams
+ */
+export const getTopicMessages = async (
+  network: string,
+  mirrorNodeUrl: string,
+  getTopicMessagesRequestParams: GetTopicMessagesRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'hcs/getTopicMessages',
+        params: {
+          network,
+          mirrorNodeUrl,
+          ...getTopicMessagesRequestParams,
           ...externalAccountparams,
         },
       },
