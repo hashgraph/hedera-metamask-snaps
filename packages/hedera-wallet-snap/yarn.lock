@@ -2559,7 +2559,7 @@ __metadata:
     eslint-plugin-import: ^2.29.1
     eslint-plugin-jest: 28.3.0
     eslint-plugin-jsdoc: ^48.7.0
-    eslint-plugin-n: 17.3.1
+    eslint-plugin-n: 17.10.1
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^5.1.3
     gatsby: ^5.13.6
@@ -2609,7 +2609,7 @@ __metadata:
     eslint-plugin-import: ^2.29.1
     eslint-plugin-jest: 28.3.0
     eslint-plugin-jsdoc: ^48.7.0
-    eslint-plugin-n: 17.3.1
+    eslint-plugin-n: 17.10.1
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^5.1.3
     eslint-plugin-promise: ^6.2.0
@@ -10030,6 +10030,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"enhanced-resolve@npm:^5.17.0":
+  version: 5.17.1
+  resolution: "enhanced-resolve@npm:5.17.1"
+  dependencies:
+    graceful-fs: ^4.2.4
+    tapable: ^2.2.0
+  checksum: 4bc38cf1cea96456f97503db7280394177d1bc46f8f87c267297d04f795ac5efa81e48115a2f5b6273c781027b5b6bfc5f62b54df629e4d25fa7001a86624f59
+  languageName: node
+  linkType: hard
+
 "enquirer@npm:^2.3.5":
   version: 2.4.1
   resolution: "enquirer@npm:2.4.1"
@@ -10534,21 +10544,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-n@npm:17.3.1":
-  version: 17.3.1
-  resolution: "eslint-plugin-n@npm:17.3.1"
+"eslint-plugin-n@npm:17.10.1":
+  version: 17.10.1
+  resolution: "eslint-plugin-n@npm:17.10.1"
   dependencies:
     "@eslint-community/eslint-utils": ^4.4.0
-    enhanced-resolve: ^5.15.0
+    enhanced-resolve: ^5.17.0
     eslint-plugin-es-x: ^7.5.0
     get-tsconfig: ^4.7.0
-    globals: ^15.0.0
+    globals: ^15.8.0
     ignore: ^5.2.4
-    minimatch: ^9.0.0
+    minimatch: ^9.0.5
     semver: ^7.5.3
   peerDependencies:
     eslint: ">=8.23.0"
-  checksum: 37d7bbda1bc3888fe5a88e1d16fa27eea903cef19404c5233ad2b74ec9ac9d234498d752533d73c805d48956772ed73e0118a0b9f717a5b9ef09a6907241c82c
+  checksum: ac0a2848c6eed6464d5bd1fc1b8f55161e0ed6a1258ebe738458792d25ed1fc644141e8468bce9d0cce26f95445ff4f55c4bd7bb2096bd4c149dde98bd1d8f8d
   languageName: node
   linkType: hard
 
@@ -12378,10 +12388,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^15.0.0":
-  version: 15.3.0
-  resolution: "globals@npm:15.3.0"
-  checksum: e2dce715440ee81a11b17dbcf705835f96f2c1ec629a7e3d50f79a453abb286f8e5c6119673789c0a02e6230ab926493f0ee6cc93e6e701927482fbb6c79d6b2
+"globals@npm:^15.8.0":
+  version: 15.8.0
+  resolution: "globals@npm:15.8.0"
+  checksum: 92d0522c47226ca12f6fd8938df04b37852d812cc5a84e31890d919497f102a818d2081570bc08c2dd6353cd8b2699e7180bc468abbbec8c858a19e0fa53aeb8
   languageName: node
   linkType: hard
 
@@ -15314,12 +15324,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.0, minimatch@npm:^9.0.4":
+"minimatch@npm:^9.0.4":
   version: 9.0.4
   resolution: "minimatch@npm:9.0.4"
   dependencies:
     brace-expansion: ^2.0.1
   checksum: cf717f597ec3eed7dabc33153482a2e8d49f4fd3c26e58fd9c71a94c5029a0838728841b93f46bf1263b65a8010e2ee800d0dc9b004ab8ba8b6d1ec07cc115b5
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^9.0.5":
+  version: 9.0.5
+  resolution: "minimatch@npm:9.0.5"
+  dependencies:
+    brace-expansion: ^2.0.1
+  checksum: 2c035575eda1e50623c731ec6c14f65a85296268f749b9337005210bb2b34e2705f8ef1a358b188f69892286ab99dc42c8fb98a57bde55c8d81b3023c19cea28
   languageName: node
   linkType: hard
 
