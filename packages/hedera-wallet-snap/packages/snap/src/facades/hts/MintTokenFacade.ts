@@ -24,7 +24,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { MintTokenCommand } from '../../commands/hts/MintTokenCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { MintTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -42,7 +42,7 @@ export class MintTokenFacade {
   public static async mintToken(
     walletSnapParams: WalletSnapParams,
     mintTokenRequestParams: MintTokenRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -58,7 +58,7 @@ export class MintTokenFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading('Mint token'),
@@ -162,6 +162,7 @@ export class MintTokenFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
     } catch (error: any) {
       const errMessage = `Error while trying to mint tokens`;
       console.error('Error occurred: %s', errMessage, String(error));

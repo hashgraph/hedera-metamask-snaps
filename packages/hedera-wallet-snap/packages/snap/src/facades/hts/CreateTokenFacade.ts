@@ -24,7 +24,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { CreateTokenCommand } from '../../commands/hts/CreateTokenCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { CreateTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -46,7 +46,7 @@ export class CreateTokenFacade {
   public static async createToken(
     walletSnapParams: WalletSnapParams,
     createTokenRequestParams: CreateTokenRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -76,7 +76,7 @@ export class CreateTokenFacade {
       maxSupply = 0,
     } = createTokenRequestParams;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading('Create a token'),
@@ -245,6 +245,7 @@ export class CreateTokenFacade {
         hederaClient.getClient(),
         privateKeyObj,
       );
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
     } catch (error: any) {
       const errMessage = `Error while trying to create a token`;
       console.error('Error occurred: %s', errMessage, String(error));

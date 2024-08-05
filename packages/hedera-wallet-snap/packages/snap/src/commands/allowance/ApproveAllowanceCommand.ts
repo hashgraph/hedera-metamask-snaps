@@ -24,7 +24,7 @@ import {
   type AccountId,
   type Client,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { ApproveAllowanceAssetDetail } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
@@ -49,7 +49,7 @@ export class ApproveAllowanceCommand {
     this.#assetDetail = assetDetail;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new AccountAllowanceApproveTransaction();
 
     if (this.#assetType === 'HBAR') {

@@ -23,7 +23,7 @@ import {
   type AccountId,
   type Client,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class AssociateTokensCommand {
@@ -33,7 +33,7 @@ export class AssociateTokensCommand {
     this.#tokenIds = tokenIds;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new TokenAssociateTransaction()
       .setAccountId(client.operatorAccountId as AccountId)
       .setTokenIds(this.#tokenIds)

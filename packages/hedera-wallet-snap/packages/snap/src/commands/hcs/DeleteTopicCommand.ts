@@ -20,7 +20,7 @@
 
 import type { Client } from '@hashgraph/sdk';
 import { TopicDeleteTransaction } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class DeleteTopicCommand {
@@ -30,7 +30,7 @@ export class DeleteTopicCommand {
     this.#topicId = topicId;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new TopicDeleteTransaction().setTopicId(this.#topicId);
 
     return await Utils.executeTransaction(client, transaction);

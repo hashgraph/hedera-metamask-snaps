@@ -18,9 +18,10 @@
  *
  */
 
-import type { DialogParams, Panel } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType, Panel } from '@metamask/snaps-sdk';
 import {
   NotificationType,
+  copyable,
   divider,
   heading,
   panel,
@@ -31,9 +32,36 @@ import {
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
-import type { SimpleTransfer } from '../types/hedera';
+import type { SimpleTransfer, TxRecord } from '../types/hedera';
 
 export class SnapUtils {
+  /**
+   * Function to generate panel.
+   * @returns Panel to be displayed in the snap dialog.
+   */
+  public static initializePanelToShow(): any {
+    const panelToShow: (
+      | {
+          value: string;
+          type: NodeType.Heading;
+        }
+      | {
+          value: string;
+          type: NodeType.Text;
+          markdown?: boolean | undefined;
+        }
+      | {
+          type: NodeType.Divider;
+        }
+      | {
+          value: string;
+          type: NodeType.Copyable;
+          sensitive?: boolean | undefined;
+        }
+    )[] = [];
+    return panelToShow;
+  }
+
   /**
    * Function to generate snap dialog panel.
    * @param origin - The origin of where the call is being made from.
@@ -110,6 +138,83 @@ export class SnapUtils {
       method: 'snap_dialog',
       params,
     })) as boolean;
+  }
+
+  public static async snapCreateInteractiveUI(
+    panelToShow: Panel,
+  ): Promise<{ interfaceId: string; confirmed: boolean }> {
+    const interfaceId = await snap.request({
+      method: 'snap_createInterface',
+      params: {
+        ui: panelToShow,
+      },
+    });
+    return {
+      interfaceId,
+      confirmed: (await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'confirmation',
+          id: interfaceId,
+        },
+      })) as boolean,
+    };
+  }
+
+  public static async snapUpdateInteractiveUI(
+    interfaceId: string,
+    panelToShow: Panel,
+  ) {
+    await snap.request({
+      method: 'snap_updateInterface',
+      params: {
+        id: interfaceId,
+        ui: panelToShow,
+      },
+    });
+  }
+
+  public static async snapCreateDialogAfterTransaction(
+    network: string,
+    result: TxRecord,
+  ): Promise<any> {
+    const panelToShow = SnapUtils.initializePanelToShow();
+    if (result.receipt.status === 'SUCCESS') {
+      panelToShow.push(
+        heading('Transaction successful'),
+        text(`**Transaction ID**:`),
+        copyable(result.transactionId),
+        text(
+          `View on [Hashscan](https://hashscan.io/${network}/transaction/${result.transactionId})`,
+        ),
+        text(`**Transaction Hash**:`),
+        copyable(result.transactionHash),
+        text(`**Transaction Fee**: ${result.transactionFee}`),
+        text(`**Transaction Time**: ${result.consensusTimestamp}`),
+      );
+      panelToShow.push(divider());
+      panelToShow.push(heading('Transfers:'));
+      for (const transfer of result.transfers) {
+        panelToShow.push(
+          text(
+            `**Transferred** ${transfer.amount} HBAR to ${transfer.accountId}`,
+          ),
+        );
+      }
+    } else {
+      panelToShow.push(
+        heading('Transaction failed'),
+        text(`**Transaction ID**:`),
+        copyable(result.transactionId),
+      );
+    }
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: panel(panelToShow),
+      },
+    });
   }
 
   /**

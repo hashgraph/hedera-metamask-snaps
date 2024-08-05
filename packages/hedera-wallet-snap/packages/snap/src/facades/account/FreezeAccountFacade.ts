@@ -24,7 +24,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { FreezeAccountCommand } from '../../commands/account/FreezeAccountCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -44,7 +44,7 @@ export class FreezeAccountFacade {
     walletSnapParams: WalletSnapParams,
     freezeAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
     freeze: boolean,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -57,7 +57,7 @@ export class FreezeAccountFacade {
 
     const freezeText = freeze ? 'freeze' : 'unfreeze';
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading(
@@ -137,6 +137,7 @@ export class FreezeAccountFacade {
       const command = new FreezeAccountCommand(freeze, tokenId, accountId);
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
     } catch (error: any) {
       const errMessage = `Error while trying to ${freezeText} an account`;
       console.error('Error occurred: %s', errMessage, String(error));

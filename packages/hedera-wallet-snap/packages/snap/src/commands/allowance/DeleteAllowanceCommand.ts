@@ -24,7 +24,7 @@ import {
   type AccountId,
   type Client,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class DeleteAllowanceCommand {
@@ -42,7 +42,7 @@ export class DeleteAllowanceCommand {
     }
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     let transaction:
       | AccountAllowanceApproveTransaction
       | AccountAllowanceDeleteTransaction;

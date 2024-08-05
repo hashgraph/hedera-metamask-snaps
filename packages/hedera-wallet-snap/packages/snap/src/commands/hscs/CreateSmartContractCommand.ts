@@ -25,7 +25,7 @@ import {
   Hbar,
   PublicKey,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { SmartContractFunctionParameter } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
@@ -82,7 +82,7 @@ export class CreateSmartContractCommand {
     this.#maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new ContractCreateFlow()
       .setGas(this.#gas)
       .setBytecode(this.#bytecode);

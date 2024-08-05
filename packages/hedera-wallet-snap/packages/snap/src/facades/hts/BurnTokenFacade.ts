@@ -24,7 +24,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { BurnTokenCommand } from '../../commands/hts/BurnTokenCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { BurnTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -40,7 +40,7 @@ export class BurnTokenFacade {
   public static async burnToken(
     walletSnapParams: WalletSnapParams,
     burnTokenRequestParams: BurnTokenRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -56,7 +56,7 @@ export class BurnTokenFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading('Burn token'),
@@ -159,6 +159,7 @@ export class BurnTokenFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
     } catch (error: any) {
       const errMessage = `Error while trying to burn tokens`;
       console.error('Error occurred: %s', errMessage, String(error));

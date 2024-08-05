@@ -20,7 +20,7 @@
 
 import type { Client } from '@hashgraph/sdk';
 import { ContractDeleteTransaction } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class DeleteSmartContractCommand {
@@ -40,7 +40,7 @@ export class DeleteSmartContractCommand {
     this.#transferContractId = transferContractId;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new ContractDeleteTransaction().setContractId(
       this.#contractId,
     );

@@ -23,7 +23,7 @@ import {
   type Client,
   type PrivateKey,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class DeleteTokenCommand {
@@ -36,7 +36,7 @@ export class DeleteTokenCommand {
     this.#adminKey = adminKey;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = await new TokenDeleteTransaction()
       .setTokenId(this.#tokenId)
       .freezeWith(client)

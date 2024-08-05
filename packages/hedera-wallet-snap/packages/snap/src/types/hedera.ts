@@ -30,6 +30,7 @@ import type {
 import type { Long } from '@hashgraph/sdk/lib/long';
 import type { BigNumber } from 'bignumber.js';
 
+import type { TransferJSON } from '@hashgraph/sdk/lib/Transfer';
 import type { AccountInfo } from './account';
 
 export type NetworkInfo = {
@@ -82,12 +83,6 @@ export type AccountBalance = {
   tokens: Record<string, TokenBalance>;
 };
 
-export type TxRecordTransfer = {
-  accountId: string;
-  amount: string;
-  isApproved: boolean;
-};
-
 export type TxReceiptExchangeRate = {
   hbars: number;
   cents: number;
@@ -108,32 +103,25 @@ export type TxReceipt = {
   topicRunningHash: string;
   totalSupply: string;
   scheduledTransactionId: string;
-  serials: any;
-  duplicates: any;
-  children: any;
+  serials: string[];
+  duplicates: TxReceipt[];
+  children: TxReceipt[];
 };
 
 export type TxRecord = {
-  receipt: any;
+  receipt: TxReceipt;
   transactionHash: string;
   consensusTimestamp: string;
   transactionId: string;
   transactionMemo: string;
   transactionFee: string;
-  transfers: TxRecordTransfer[];
-  contractFunctionResult: any;
-  tokenTransfers: any;
-  tokenTransfersList: any;
+  transfers: TransferJSON[];
   scheduleRef: string;
-  assessedCustomFees: any;
-  nftTransfers: any;
-  automaticTokenAssociations: any;
   parentConsensusTimestamp: string;
   aliasKey: string;
-  duplicates: any;
-  children: any;
+  duplicates: TxRecord[];
+  children: TxRecord[];
   ethereumHash: string;
-  paidStakingRewards: TxRecordTransfer[];
   prngBytes: string;
   prngNumber: string;
   evmAddress: string;

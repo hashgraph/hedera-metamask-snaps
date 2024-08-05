@@ -27,7 +27,7 @@ import {
 } from '@hashgraph/sdk';
 import { ethers } from 'ethers';
 import _ from 'lodash';
-import type { SimpleTransfer, TxReceipt } from '../types/hedera';
+import type { SimpleTransfer, TxRecord } from '../types/hedera';
 import { Utils } from '../utils/Utils';
 
 export class TransferCryptoCommand {
@@ -55,7 +55,7 @@ export class TransferCryptoCommand {
     this.#serviceFeeToAddress = serviceFeeToAddress;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const serviceFeeToAddr: string = this.#serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
     const transaction = new TransferTransaction().setTransactionMemo(

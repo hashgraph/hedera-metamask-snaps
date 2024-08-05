@@ -23,7 +23,7 @@ import {
   TokenUnpauseTransaction,
   type Client,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class PauseTokenCommand {
@@ -36,7 +36,7 @@ export class PauseTokenCommand {
     this.#tokenId = tokenId;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     let transaction: TokenPauseTransaction | TokenUnpauseTransaction;
     if (this.#pause) {
       transaction = new TokenPauseTransaction();
