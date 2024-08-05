@@ -28,7 +28,7 @@ import {
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { ethers } from 'ethers';
-import type { AtomicSwap, TxReceipt } from '../../types/hedera';
+import type { AtomicSwap, TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class AtomicSwapCommand {
@@ -56,7 +56,7 @@ export class AtomicSwapCommand {
     this.#serviceFeeToAddress = serviceFeeToAddress;
   }
 
-  public async initiateSwap(client: Client): Promise<TxReceipt> {
+  public async initiateSwap(client: Client): Promise<TxRecord> {
     const serviceFeeToAddr: string = this.#serviceFeeToAddress ?? '0.0.98'; // 0.0.98 is Hedera Fee collection account
 
     const transaction = new TransferTransaction();
@@ -181,7 +181,7 @@ export class AtomicSwapCommand {
   public async completeSwap(
     client: Client,
     scheduleId: string,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const transaction = new ScheduleSignTransaction().setScheduleId(scheduleId);
 
     return await Utils.executeTransaction(client, transaction);

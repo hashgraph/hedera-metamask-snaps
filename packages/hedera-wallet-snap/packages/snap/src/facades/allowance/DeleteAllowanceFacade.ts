@@ -19,11 +19,11 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAllowanceCommand } from '../../commands/allowance/DeleteAllowanceCommand';
-import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
+import type { MirrorTokenInfo, TxRecord } from '../../types/hedera';
 import type { DeleteAllowanceRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -38,7 +38,7 @@ export class DeleteAllowanceFacade {
   public static async deleteAllowance(
     walletSnapParams: WalletSnapParams,
     deleteAllowanceRequestParams: DeleteAllowanceRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { assetType, assetId, spenderAccountId } =
@@ -50,27 +50,9 @@ export class DeleteAllowanceFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Approve an allowance'),
@@ -155,6 +137,7 @@ export class DeleteAllowanceFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
     } catch (error: any) {
       const errMessage = `Error while trying to delete an allowance`;
       console.error('Error occurred: %s', errMessage, String(error));

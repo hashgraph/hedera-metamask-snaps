@@ -19,13 +19,13 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { AtomicSwapCommand } from '../../commands/hts/AtomicSwapCommand';
 import type { AccountInfo } from '../../types/account';
-import type { AtomicSwap, SimpleTransfer, TxReceipt } from '../../types/hedera';
+import type { AtomicSwap, SimpleTransfer, TxRecord } from '../../types/hedera';
 import type {
   InitiateSwapRequestParams,
   ServiceFee,
@@ -46,7 +46,7 @@ export class AtomicSwapFacade {
   public static async initiateSwap(
     walletSnapParams: WalletSnapParams,
     initiateSwapRequestParams: InitiateSwapRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const {
@@ -99,7 +99,7 @@ export class AtomicSwapFacade {
       return acc;
     }, {});
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
 
     const hederaClientFactory = new HederaClientImplFactory(
       hederaAccountId,
@@ -116,25 +116,7 @@ export class AtomicSwapFacade {
     try {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Initiate Atomic Swap'),
@@ -208,6 +190,7 @@ export class AtomicSwapFacade {
       );
 
       txReceipt = await command.initiateSwap(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
 
       return txReceipt;
     } catch (error: any) {
@@ -223,7 +206,7 @@ export class AtomicSwapFacade {
   public static async completeSwap(
     walletSnapParams: WalletSnapParams,
     signScheduledTxParams: SignScheduledTxParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
     const { scheduleId } = signScheduledTxParams;
 
@@ -232,7 +215,7 @@ export class AtomicSwapFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
 
     const hederaClientFactory = new HederaClientImplFactory(
       hederaAccountId,
@@ -247,25 +230,7 @@ export class AtomicSwapFacade {
     }
 
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Complete Atomic Swap'),
@@ -306,6 +271,7 @@ export class AtomicSwapFacade {
         hederaClient.getClient(),
         scheduleId,
       );
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
 
       return txReceipt;
     } catch (error: any) {

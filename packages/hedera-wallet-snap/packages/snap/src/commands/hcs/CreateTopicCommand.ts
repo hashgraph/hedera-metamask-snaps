@@ -20,7 +20,7 @@
 
 import type { Client } from '@hashgraph/sdk';
 import { PublicKey, TopicCreateTransaction } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class CreateTopicCommand {
@@ -48,7 +48,7 @@ export class CreateTopicCommand {
     this.#autoRenewAccount = autoRenewAccount;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new TopicCreateTransaction();
 
     if (this.#memo) {

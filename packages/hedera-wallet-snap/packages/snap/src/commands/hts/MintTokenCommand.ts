@@ -19,7 +19,7 @@
  */
 
 import { TokenMintTransaction, type Client } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { Utils } from '../../utils/Utils';
 
@@ -44,7 +44,7 @@ export class MintTokenCommand {
     this.#amount = amount;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new TokenMintTransaction().setTokenId(this.#tokenId);
 
     if (this.#assetType === 'NFT') {

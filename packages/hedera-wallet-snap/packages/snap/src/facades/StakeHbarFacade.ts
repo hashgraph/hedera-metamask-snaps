@@ -20,13 +20,13 @@
 
 import { Hbar, HbarUnit } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { StakeHbarCommand } from '../commands/StakeHbarCommand';
 import { SnapState } from '../snap/SnapState';
-import type { TxReceipt } from '../types/hedera';
+import type { TxRecord } from '../types/hedera';
 import type { StakeHbarRequestParams } from '../types/params';
 import type { WalletSnapParams } from '../types/state';
 import { HederaUtils } from '../utils/HederaUtils';
@@ -44,7 +44,7 @@ export class StakeHbarFacade {
   public static async stakeHbar(
     walletSnapParams: WalletSnapParams,
     stakeHbarRequestParams: StakeHbarRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { nodeId = null, accountId = null } = stakeHbarRequestParams;
@@ -58,28 +58,10 @@ export class StakeHbarFacade {
     let { stakedAccountId, stakedNodeId, declineStakingReward } =
       state.accountState[hederaEvmAddress][network].accountInfo.stakingInfo;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
 
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Stake/Unstake HBAR'),
@@ -180,6 +162,7 @@ export class StakeHbarFacade {
       const command = new StakeHbarCommand(nodeId, accountId);
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
 
       state.accountState[hederaEvmAddress][
         network

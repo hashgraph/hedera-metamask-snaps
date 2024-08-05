@@ -25,7 +25,7 @@ import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteAccountCommand } from '../../commands/account/DeleteAccountCommand';
 import { SnapState } from '../../snap/SnapState';
 import type { Account, AccountInfo } from '../../types/account';
-import type { AccountBalance, TxReceipt } from '../../types/hedera';
+import type { AccountBalance, TxRecord } from '../../types/hedera';
 import type { DeleteAccountRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -47,7 +47,7 @@ export class DeleteAccountFacade {
   public static async deleteAccount(
     walletSnapParams: WalletSnapParams,
     deleteAccountRequestParams: DeleteAccountRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { transferAccountId } = deleteAccountRequestParams;
@@ -58,7 +58,7 @@ export class DeleteAccountFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading('Delete Account'),
@@ -100,6 +100,8 @@ export class DeleteAccountFacade {
       }
       const command = new DeleteAccountCommand(transferAccountId);
       txReceipt = await command.execute(hederaClient.getClient());
+
+      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
 
       // eslint-disable-next-line require-atomic-updates
       state.currentAccount = {

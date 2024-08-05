@@ -20,7 +20,7 @@
 
 import { TopicInfoQuery } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import type { TopicInfo } from '../../types/consensus';
@@ -75,26 +75,7 @@ export class GetTopicInfoFacade {
         serviceFee.percentageCut,
       );
 
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
-
+      const panelToShow = SnapUtils.initializePanelToShow();
       panelToShow.push(
         heading('Get topic info'),
         text(

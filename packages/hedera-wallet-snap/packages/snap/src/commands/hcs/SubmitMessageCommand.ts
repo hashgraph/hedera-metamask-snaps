@@ -20,7 +20,7 @@
 
 import type { Client } from '@hashgraph/sdk';
 import { TopicMessageSubmitTransaction } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class SubmitMessageCommand {
@@ -44,7 +44,7 @@ export class SubmitMessageCommand {
     this.#chunkSize = chunkSize;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new TopicMessageSubmitTransaction()
       .setTopicId(this.#topicID)
       .setMessage(this.#message);
