@@ -26,7 +26,7 @@ permissions:
 jobs:
   validate-release:
     name: Validate Release
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: smart-contracts-linux-medium
     outputs:
       tag: ${{ steps.tag.outputs.name }}
       version: ${{ steps.tag.outputs.version }}
@@ -95,7 +95,7 @@ jobs:
 
   run-safety-checks:
     name: Safety Checks
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: smart-contracts-linux-medium
     defaults:
       run:
         working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
@@ -121,7 +121,7 @@ jobs:
 
   publish-release:
     name: Publish Release
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: smart-contracts-linux-medium
     defaults:
       run:
         working-directory: "./packages/${{ github.event.inputs.snap-package-dir }}/packages/snap"
