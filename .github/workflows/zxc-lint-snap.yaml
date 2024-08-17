@@ -26,7 +26,7 @@ env:
 jobs:
   eslint:
     name: ${{ inputs.custom-job-label || 'ESLint' }}
-    runs-on: [self-hosted, Linux, medium, ephemeral]
+    runs-on: smart-contracts-linux-medium
 
     steps:
       - name: Harden Runner
