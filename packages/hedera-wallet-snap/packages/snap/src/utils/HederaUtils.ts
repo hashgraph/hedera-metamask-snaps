@@ -2576,8 +2576,8 @@ export class HederaUtils {
       result.memo = mirrorNodeData.memo;
       result.evmAddress = mirrorNodeData.evm_address;
       result.key = {
-        type: mirrorNodeData.key._type,
-        key: mirrorNodeData.key.key,
+        type: mirrorNodeData?.key?._type,
+        key: mirrorNodeData?.key?.key,
       };
       result.autoRenewPeriod = String(mirrorNodeData.auto_renew_period);
       result.ethereumNonce = String(mirrorNodeData.ethereum_nonce);
