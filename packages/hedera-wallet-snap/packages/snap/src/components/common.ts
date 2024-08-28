@@ -18,20 +18,9 @@
  *
  */
 
-import type { SnapConfig } from '@metamask/snaps-cli';
-// eslint-disable-next-line import/no-nodejs-modules
-import { resolve } from 'path';
-
-const config: SnapConfig = {
-  bundler: 'webpack',
-  // eslint-disable-next-line no-restricted-globals
-  input: resolve(__dirname, 'src/index.tsx'),
-  server: {
-    port: 9001,
-  },
-  polyfills: {
-    buffer: true,
-  },
+export type BasicFormProps = {
+  origin: string;
+  network: string;
+  mirrorNodeUrl: string;
+  [key: string]: any;
 };
-
-export default config;
