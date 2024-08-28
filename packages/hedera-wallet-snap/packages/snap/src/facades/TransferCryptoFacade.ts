@@ -258,7 +258,12 @@ export class TransferCryptoFacade {
 
       txRecord = await command.execute(hederaClient.getClient());
 
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txRecord);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txRecord,
+      );
 
       return txRecord;
     } catch (error: any) {
