@@ -48,7 +48,7 @@
     "@metamask/key-tree": "^9.1.1",
     "@metamask/providers": "^17.1.0",
     "@metamask/rpc-errors": "^6.3.1",
-    "@metamask/snaps-sdk": "^6.0.0",
+    "@metamask/snaps-sdk": "^6.3.0",
     "bignumber.js": "^9.1.2",
     "ethers": "^6.13.1",
     "lodash": "^4.17.21",
