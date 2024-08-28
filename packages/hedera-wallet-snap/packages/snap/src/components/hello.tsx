@@ -20,7 +20,9 @@
 
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
+  Address as MetamaskAddress,
   Box as MetamaskBox,
+  Copyable as MetamaskCopyable,
   Heading as MetamaskHeading,
   Row as MetamaskRow,
   Text as MetamaskText,
@@ -31,6 +33,8 @@ const Box = MetamaskBox as any;
 const Heading = MetamaskHeading as any;
 const Row = MetamaskRow as any;
 const Text = MetamaskText as any;
+const Copyable = MetamaskCopyable as any;
+const Address = MetamaskAddress as any;
 
 type HelloProps = BasicFormProps & {
   accountID: string;
@@ -53,14 +57,15 @@ export const HelloForm: SnapComponent<HelloProps> = ({
       <Row label="Mirror Node">
         <Text>{mirrorNodeUrl}</Text>
       </Row>
-      <Row label="Account ID" tooltip="This is your Hedera Account ID">
-        <Text>{accountID}</Text>
-      </Row>
+      <Box>
+        <Text>Account ID</Text>
+        <Copyable value={accountID} />
+      </Box>
       <Row
         label="EVM Address"
         tooltip="This is the EVM address that corresponds to the Hedera account ID"
       >
-        <Text>{evmAddress}</Text>
+        <Address address={evmAddress} />
       </Row>
       <Row label="Message">
         <Text>

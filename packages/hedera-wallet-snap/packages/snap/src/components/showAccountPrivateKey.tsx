@@ -63,27 +63,30 @@ export const ShowAccountPrivateKeyForm: SnapComponent<
       <Row label="Mirror Node">
         <Text>{mirrorNodeUrl}</Text>
       </Row>
-      <Row label="Account ID" tooltip="This is your Hedera Account ID">
+      <Box>
+        <Text>Account ID</Text>
         <Copyable value={accountID} />
-      </Row>
+      </Box>
       <Row
         label="EVM Address"
         tooltip="This is the EVM address that corresponds to the Hedera account ID"
       >
         <Address address={evmAddress} />
       </Row>
-      <Row label="Public Key">
-        <Copyable value={publicKey} sensitive />
-      </Row>
+      <Box>
+        <Text>Public Key</Text>
+        <Copyable value={publicKey} />
+      </Box>
       <Row label="Warning" variant="warning">
         <Text>
           Never disclose this key. Anyone with your private keys can steal any
           assets held in your account
         </Text>
       </Row>
-      <Row label="Private Key" variant="warning">
+      <Box>
+        <Text>Private Key</Text>
         <Copyable value={privateKey} sensitive />
-      </Row>
+      </Box>
     </Box>
   );
 };
