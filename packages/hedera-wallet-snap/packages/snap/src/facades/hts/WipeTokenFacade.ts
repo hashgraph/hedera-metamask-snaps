@@ -163,7 +163,12 @@ export class WipeTokenFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to wipe tokens`;
       console.error('Error occurred: %s', errMessage, String(error));

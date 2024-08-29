@@ -245,7 +245,12 @@ export class CreateTokenFacade {
         hederaClient.getClient(),
         privateKeyObj,
       );
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to create a token`;
       console.error('Error occurred: %s', errMessage, String(error));

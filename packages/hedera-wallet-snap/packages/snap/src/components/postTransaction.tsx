@@ -19,33 +19,25 @@
  */
 
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
-import {
-  Bold as MetamaskBold,
-  Box as MetamaskBox,
-  Copyable as MetamaskCopyable,
-  Divider as MetamaskDivider,
-  Heading as MetamaskHeading,
-  Link as MetamaskLink,
-  Row as MetamaskRow,
-  Text as MetamaskText,
-} from '@metamask/snaps-sdk/jsx';
 import type { TxRecord } from '../types/hedera';
-import type { BasicFormProps } from './common';
+import {
+  Bold,
+  Box,
+  CommonUI,
+  Copyable,
+  Divider,
+  Heading,
+  Link,
+  Row,
+  Text,
+  type CommonProps,
+} from './common';
 
-const Box = MetamaskBox as any;
-const Heading = MetamaskHeading as any;
-const Row = MetamaskRow as any;
-const Text = MetamaskText as any;
-const Copyable = MetamaskCopyable as any;
-const Link = MetamaskLink as any;
-const Divider = MetamaskDivider as any;
-const Bold = MetamaskBold as any;
-
-type PostTransactionProps = BasicFormProps & {
+type Props = CommonProps & {
   result: TxRecord;
 };
 
-export const PostTransactionForm: SnapComponent<PostTransactionProps> = ({
+const MetamaskUI: SnapComponent<Props> = ({
   origin,
   network,
   mirrorNodeUrl,
@@ -54,16 +46,12 @@ export const PostTransactionForm: SnapComponent<PostTransactionProps> = ({
   const status = result.receipt.status === 'SUCCESS' ? 'Succeeded' : 'Failed';
   let content = (
     <Box>
+      <CommonUI
+        origin={origin}
+        network={network}
+        mirrorNodeUrl={mirrorNodeUrl}
+      />
       <Heading>Transaction {status}</Heading>
-      <Row label="Origin">
-        <Text>{origin}</Text>
-      </Row>
-      <Row label="Network">
-        <Text>{network}</Text>
-      </Row>
-      <Row label="Mirror Node">
-        <Text>{mirrorNodeUrl}</Text>
-      </Row>
       <Box>
         <Text>Transaction ID</Text>
         <Copyable value={result.transactionId} />
@@ -71,6 +59,7 @@ export const PostTransactionForm: SnapComponent<PostTransactionProps> = ({
     </Box>
   );
   if (result.receipt.status === 'SUCCESS') {
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     const link = `https://hashscan.io/${network}/transaction/${result.transactionId}`;
     content = (
       <Box>
@@ -105,3 +94,5 @@ export const PostTransactionForm: SnapComponent<PostTransactionProps> = ({
   }
   return content;
 };
+
+export const PostTransactionUI = MetamaskUI as any;

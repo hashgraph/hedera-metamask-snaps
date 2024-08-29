@@ -20,27 +20,23 @@
 
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
-  Address,
   Box,
   CommonUI,
   Copyable,
   Heading,
-  Row,
   Text,
   type CommonProps,
 } from './common';
 
 type Props = CommonProps & {
-  accountID: string;
-  evmAddress: string;
+  message: string;
 };
 
 const MetamaskUI: SnapComponent<Props> = ({
   origin,
   network,
   mirrorNodeUrl,
-  accountID,
-  evmAddress,
+  message,
 }) => {
   return (
     <Box>
@@ -49,24 +45,13 @@ const MetamaskUI: SnapComponent<Props> = ({
         network={network}
         mirrorNodeUrl={mirrorNodeUrl}
       />
-      <Heading>Hello!!</Heading>
+      <Heading>Sign Message</Heading>
       <Box>
-        <Text>Account ID</Text>
-        <Copyable value={accountID} />
+        <Text>Are you sure you want to sign this message?</Text>
+        <Copyable value={message} />
       </Box>
-      <Row
-        label="EVM Address"
-        tooltip="This is the EVM address that corresponds to the Hedera account ID"
-      >
-        <Address address={evmAddress} />
-      </Row>
-      <Row label="Message">
-        <Text>
-          You are seeing this because you interacted with the 'hello' method
-        </Text>
-      </Row>
     </Box>
   );
 };
 
-export const HelloUI = MetamaskUI as any;
+export const SignMessageUI = MetamaskUI as any;

@@ -26,15 +26,13 @@ import {
   panel,
   text,
 } from '@metamask/snaps-sdk';
-import { PostTransactionForm as MetamaskPostTransactionForm } from '../components/postTransaction';
+import { PostTransactionUI } from '../components/postTransaction';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
 import type { SimpleTransfer, TxRecord } from '../types/hedera';
-
-const PostTransactionForm = MetamaskPostTransactionForm as any;
 
 export class SnapUtils {
   /**
@@ -187,7 +185,7 @@ export class SnapUtils {
       params: {
         type: 'alert',
         content: (
-          <PostTransactionForm
+          <PostTransactionUI
             origin={origin}
             network={network}
             mirrorNodeUrl={mirrorNodeUrl}

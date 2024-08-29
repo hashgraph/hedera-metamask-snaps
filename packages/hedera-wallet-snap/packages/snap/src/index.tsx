@@ -28,8 +28,8 @@ import type {
 } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
-import { HelloForm as MetamaskHelloForm } from './components/hello';
-import { ShowAccountPrivateKeyForm as MetamaskShowAccountPrivateKeyForm } from './components/showAccountPrivateKey';
+import { HelloUI } from './components/hello';
+import { ShowAccountPrivateKeyUI } from './components/showAccountPrivateKey';
 import { OnHomePageUI } from './custom-ui/onHome';
 import { onInstallUI } from './custom-ui/onInstall';
 import { onUpdateUI } from './custom-ui/onUpdate';
@@ -74,9 +74,6 @@ import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrat
 import type { StakeHbarRequestParams } from './types/params';
 import type { WalletSnapParams } from './types/state';
 import { HederaUtils } from './utils/HederaUtils';
-
-const HelloForm = MetamaskHelloForm as any;
-const ShowAccountPrivateKeyForm = MetamaskShowAccountPrivateKeyForm as any;
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -132,7 +129,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         params: {
           type: 'alert',
           content: (
-            <HelloForm
+            <HelloUI
               origin={origin}
               network={network}
               mirrorNodeUrl={mirrorNodeUrl}
@@ -155,7 +152,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         params: {
           type: 'alert',
           content: (
-            <ShowAccountPrivateKeyForm
+            <ShowAccountPrivateKeyUI
               origin={origin}
               network={network}
               mirrorNodeUrl={mirrorNodeUrl}
@@ -185,6 +182,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         signature: await signMessageCommand.execute(),
       };
     }
+    // TODO: Need to refactor to use JSX
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
       return {
@@ -213,7 +211,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-
+    // TODO: Need to refactor to use JSX
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
@@ -224,7 +222,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-
     case 'stakeHbar': {
       HederaUtils.isValidStakeHbarParams(request.params);
       return {

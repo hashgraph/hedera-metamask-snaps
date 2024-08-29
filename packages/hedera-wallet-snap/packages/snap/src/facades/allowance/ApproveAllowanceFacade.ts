@@ -170,7 +170,12 @@ export class ApproveAllowanceFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to approve an allowance`;
       console.error('Error occurred: %s', errMessage, String(error));

@@ -101,8 +101,12 @@ export class DeleteAccountFacade {
       const command = new DeleteAccountCommand(transferAccountId);
       txReceipt = await command.execute(hederaClient.getClient());
 
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
-
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
       // eslint-disable-next-line require-atomic-updates
       state.currentAccount = {
         ...state.currentAccount,

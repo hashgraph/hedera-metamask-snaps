@@ -162,7 +162,12 @@ export class StakeHbarFacade {
       const command = new StakeHbarCommand(nodeId, accountId);
 
       txReceipt = await command.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
 
       state.accountState[hederaEvmAddress][
         network

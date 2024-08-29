@@ -20,32 +20,24 @@
 
 import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
 import {
-  Address as MetamaskAddress,
-  Box as MetamaskBox,
-  Copyable as MetamaskCopyable,
-  Heading as MetamaskHeading,
-  Row as MetamaskRow,
-  Text as MetamaskText,
-} from '@metamask/snaps-sdk/jsx';
-import type { BasicFormProps } from './common';
+  Address,
+  Box,
+  CommonUI,
+  Copyable,
+  Heading,
+  Row,
+  Text,
+  type CommonProps,
+} from './common';
 
-const Box = MetamaskBox as any;
-const Heading = MetamaskHeading as any;
-const Row = MetamaskRow as any;
-const Text = MetamaskText as any;
-const Copyable = MetamaskCopyable as any;
-const Address = MetamaskAddress as any;
-
-type ShowAccountPrivateKeyProps = BasicFormProps & {
+type Props = CommonProps & {
   privateKey: string;
   publicKey: string;
   accountID: string;
   evmAddress: string;
 };
 
-export const ShowAccountPrivateKeyForm: SnapComponent<
-  ShowAccountPrivateKeyProps
-> = ({
+const MetamaskUI: SnapComponent<Props> = ({
   origin,
   network,
   mirrorNodeUrl,
@@ -56,13 +48,12 @@ export const ShowAccountPrivateKeyForm: SnapComponent<
 }) => {
   return (
     <Box>
-      <Heading>Request from {origin}!</Heading>
-      <Row label="Network">
-        <Text>{network}</Text>
-      </Row>
-      <Row label="Mirror Node">
-        <Text>{mirrorNodeUrl}</Text>
-      </Row>
+      <CommonUI
+        origin={origin}
+        network={network}
+        mirrorNodeUrl={mirrorNodeUrl}
+      />
+      <Heading>Show Account Private Key</Heading>
       <Box>
         <Text>Account ID</Text>
         <Copyable value={accountID} />
@@ -90,3 +81,5 @@ export const ShowAccountPrivateKeyForm: SnapComponent<
     </Box>
   );
 };
+
+export const ShowAccountPrivateKeyUI = MetamaskUI as any;
