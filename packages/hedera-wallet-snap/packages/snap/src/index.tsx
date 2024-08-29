@@ -211,7 +211,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-    // TODO: Need to refactor to use JSX
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
