@@ -80,13 +80,13 @@ jobs:
         run: yarn test
 
       - name: Publish Snap Unit Test Reports
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: ${{ inputs.snap-report-name }} Unit Test Reports
           path: ${{ env.SNAP_DIRECTORY }}/junit*.xml
 
       - name: Publish Snap Coverage Reports
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
         with:
           name: ${{ inputs.snap-report-name }} Coverage Reports
           path: ${{ env.SNAP_DIRECTORY }}/coverage
