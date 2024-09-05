@@ -74,7 +74,7 @@ jobs:
         run: ls -la ${{ env.SNAP_DIRECTORY }}/coverage ${{ env.SNAP_DIRECTORY }}/junit*.xml
 
       - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@30eadd5010312f995f0d3b3cff7fe2984f69409e # v2.16.1
+        uses: EnricoMi/publish-unit-test-result-action@82082dac68ad6a19d980f8ce817e108b9f496c2a # v2.17.1
         with:
           check_name: "${{ inputs.snap-report-name }} Unit Test Results"
           files: "packages/${{ inputs.snap-package-dir }}/**/junit-snap.xml"
