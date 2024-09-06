@@ -1,8 +1,8 @@
 import express from 'express';
 
 import MessageResponse from '../interfaces/MessageResponse';
-import credentialRouter from './credential';
-import emojiRouter from './emoji';
+import credentialRouter from './credential.js';
+import emojiRouter from './emoji.js';
 
 const router = express.Router();
 

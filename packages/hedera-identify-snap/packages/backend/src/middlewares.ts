@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 import ErrorResponse from './interfaces/ErrorResponse';
-import { getAgent, setupAgent } from './veramo/setup';
+import { getAgent, setupAgent } from './veramo/setup.js';
 
 /**
  *

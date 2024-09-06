@@ -18,6 +18,14 @@ import { BigNumber } from 'bignumber.js';
 
 import { WalletHedera } from './wallet/abstract';
 
+import * as protobuf from 'protobufjs';
+import Long from 'long';
+
+// Ensure that protobuf uses Long for 64-bit integers
+protobuf.util.Long = Long;
+protobuf.configure();
+
+
 export type HederaService = {
   // returns null if the account ID does not match the chosen key
   createClient(options: {

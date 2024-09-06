@@ -47,7 +47,7 @@ import {
 } from '@veramo/selective-disclosure';
 import console from 'console';
 import { Resolver } from 'did-resolver';
-import { JsonFileStore } from './utils/json-file-store';
+import { JsonFileStore } from './utils/json-file-store.js';
 
 let databaseFile: string;
 const secretKey =

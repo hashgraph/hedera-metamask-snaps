@@ -5,8 +5,8 @@ import express from 'express';
 import jwt_decode from 'jwt-decode';
 import cloneDeep from 'lodash.clonedeep';
 import NodeCache from 'node-cache';
-import * as middlewares from '../middlewares';
-import { getAgent } from '../veramo/setup';
+import * as middlewares from '../middlewares.js';
+import { getAgent } from '../veramo/setup.js';
 
 const router = express.Router();
 
