@@ -2489,9 +2489,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hashgraph/cryptography@npm:1.4.8-beta.5":
-  version: 1.4.8-beta.5
-  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.5"
+"@hashgraph/cryptography@npm:1.4.8-beta.7":
+  version: 1.4.8-beta.7
+  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.7"
   dependencies:
     asn1js: ^3.0.5
     bignumber.js: ^9.1.1
@@ -2515,7 +2515,7 @@ __metadata:
       optional: true
     expo-random:
       optional: true
-  checksum: 0a7092ece75e4be318b91cafb472da6c1bf72738f2ca62a644d868536fc18f698597d9ab8ae860656ffd7e8dc832cc68a8a459417e62a47e5828278bc6cbc69b
+  checksum: fc4aca4182c16f23c8e7f73e2bbf628e33cf3e6a7b4f2be5ede3188e99c9a2a5f064d0b66d5039c36523fae4be3146523dc190b31fa37059b998b741652505f2
   languageName: node
   linkType: hard
 
@@ -2529,7 +2529,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap-site@workspace:packages/site"
   dependencies:
-    "@hashgraph/sdk": ^2.48.1
+    "@hashgraph/sdk": ^2.50.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -2559,7 +2559,7 @@ __metadata:
     eslint-plugin-import: ^2.29.1
     eslint-plugin-jest: 28.3.0
     eslint-plugin-jsdoc: ^50.2.2
-    eslint-plugin-n: 17.3.1
+    eslint-plugin-n: ^17.10.2
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^5.2.1
     gatsby: ^5.13.7
@@ -2585,7 +2585,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap@workspace:packages/snap"
   dependencies:
-    "@hashgraph/sdk": ^2.48.1
+    "@hashgraph/sdk": ^2.50.0
     "@jest/globals": ^29.7.0
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -2609,7 +2609,7 @@ __metadata:
     eslint-plugin-import: ^2.29.1
     eslint-plugin-jest: 28.3.0
     eslint-plugin-jsdoc: ^50.2.2
-    eslint-plugin-n: 17.3.1
+    eslint-plugin-n: ^17.10.2
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^5.2.1
     eslint-plugin-promise: ^7.1.0
@@ -2629,27 +2629,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hashgraph/proto@npm:2.15.0-beta.2":
-  version: 2.15.0-beta.2
-  resolution: "@hashgraph/proto@npm:2.15.0-beta.2"
+"@hashgraph/proto@npm:2.15.0-beta.3":
+  version: 2.15.0-beta.3
+  resolution: "@hashgraph/proto@npm:2.15.0-beta.3"
   dependencies:
     long: ^4.0.0
     protobufjs: ^7.2.5
-  checksum: c340114e6d6494969fe98871c4c7c97ce9ca3edf0e9cdab528e82fbf7d9f656dde7016b278cd0ef320946ddc1b5f3398b9b3a446b793b5c36cf72b877168b6cb
+  checksum: e3f647905919b068c6eecee449ced13085968f4ee75d719ff32e609c0fe9fec1b909829523e52638bcd6de5122b06e660dddecaa68d725b77a73d09358988988
   languageName: node
   linkType: hard
 
-"@hashgraph/sdk@npm:^2.48.1":
-  version: 2.48.1
-  resolution: "@hashgraph/sdk@npm:2.48.1"
+"@hashgraph/sdk@npm:^2.50.0":
+  version: 2.50.0
+  resolution: "@hashgraph/sdk@npm:2.50.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
-    "@hashgraph/cryptography": 1.4.8-beta.5
-    "@hashgraph/proto": 2.15.0-beta.2
+    "@hashgraph/cryptography": 1.4.8-beta.7
+    "@hashgraph/proto": 2.15.0-beta.3
     axios: ^1.6.4
     bignumber.js: ^9.1.1
     bn.js: ^5.1.1
@@ -2666,7 +2666,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: e9c7e1eef83d1c4f85928eb4a6ace465ce3e5a6f1ed95f2df576e8557f29b50d02653f72de91d84ce4e94f20af103367ef6a723fa6ace5895f6f397d200847be
+  checksum: 592f7d0106f4e9264612059e3b5210af7ddb210d8cfa6d78bbe7a1491462169d5ff65d8372ef2817beec945c75e808f505b37d7133c0c573bcfa37ba7670cc63
   languageName: node
   linkType: hard
 
@@ -6550,7 +6550,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.11.0, acorn@npm:^8.4.1, acorn@npm:^8.7.1, acorn@npm:^8.8.2, acorn@npm:^8.9.0":
+"acorn@npm:^8.11.0, acorn@npm:^8.4.1, acorn@npm:^8.7.1, acorn@npm:^8.8.2":
   version: 8.11.3
   resolution: "acorn@npm:8.11.3"
   bin:
@@ -6559,7 +6559,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.12.0":
+"acorn@npm:^8.12.0, acorn@npm:^8.9.0":
   version: 8.12.1
   resolution: "acorn@npm:8.12.1"
   bin:
@@ -9966,6 +9966,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"enhanced-resolve@npm:^5.17.0":
+  version: 5.17.1
+  resolution: "enhanced-resolve@npm:5.17.1"
+  dependencies:
+    graceful-fs: ^4.2.4
+    tapable: ^2.2.0
+  checksum: 4bc38cf1cea96456f97503db7280394177d1bc46f8f87c267297d04f795ac5efa81e48115a2f5b6273c781027b5b6bfc5f62b54df629e4d25fa7001a86624f59
+  languageName: node
+  linkType: hard
+
 "enquirer@npm:^2.3.5":
   version: 2.4.1
   resolution: "enquirer@npm:2.4.1"
@@ -10471,21 +10481,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-n@npm:17.3.1":
-  version: 17.3.1
-  resolution: "eslint-plugin-n@npm:17.3.1"
+"eslint-plugin-n@npm:^17.10.2":
+  version: 17.10.2
+  resolution: "eslint-plugin-n@npm:17.10.2"
   dependencies:
     "@eslint-community/eslint-utils": ^4.4.0
-    enhanced-resolve: ^5.15.0
+    enhanced-resolve: ^5.17.0
     eslint-plugin-es-x: ^7.5.0
     get-tsconfig: ^4.7.0
-    globals: ^15.0.0
+    globals: ^15.8.0
     ignore: ^5.2.4
-    minimatch: ^9.0.0
+    minimatch: ^9.0.5
     semver: ^7.5.3
   peerDependencies:
     eslint: ">=8.23.0"
-  checksum: 37d7bbda1bc3888fe5a88e1d16fa27eea903cef19404c5233ad2b74ec9ac9d234498d752533d73c805d48956772ed73e0118a0b9f717a5b9ef09a6907241c82c
+  checksum: 93f27e5c3aab6cf37fbf428520482d84cda3db0b0210aec384dd6840d14f486bd51cdc165a03c511059e4e38f34f4d559108e2ce06e747512674029f5052f700
   languageName: node
   linkType: hard
 
@@ -10800,7 +10810,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esquery@npm:^1.4.0, esquery@npm:^1.4.2":
+"esquery@npm:^1.4.0":
   version: 1.5.0
   resolution: "esquery@npm:1.5.0"
   dependencies:
@@ -10809,7 +10819,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esquery@npm:^1.6.0":
+"esquery@npm:^1.4.2, esquery@npm:^1.6.0":
   version: 1.6.0
   resolution: "esquery@npm:1.6.0"
   dependencies:
@@ -12350,10 +12360,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^15.0.0":
-  version: 15.3.0
-  resolution: "globals@npm:15.3.0"
-  checksum: e2dce715440ee81a11b17dbcf705835f96f2c1ec629a7e3d50f79a453abb286f8e5c6119673789c0a02e6230ab926493f0ee6cc93e6e701927482fbb6c79d6b2
+"globals@npm:^15.8.0":
+  version: 15.9.0
+  resolution: "globals@npm:15.9.0"
+  checksum: 32c4470ffcc26db3ddbc579ddf968b74c26462d1a268039980c2fa2e107090fd442a7a7445d953dc4ee874f68846e713066c5a8e63d146fd9349cd1fc5a6f63d
   languageName: node
   linkType: hard
 
@@ -15315,12 +15325,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^9.0.0, minimatch@npm:^9.0.4":
+"minimatch@npm:^9.0.4":
   version: 9.0.4
   resolution: "minimatch@npm:9.0.4"
   dependencies:
     brace-expansion: ^2.0.1
   checksum: cf717f597ec3eed7dabc33153482a2e8d49f4fd3c26e58fd9c71a94c5029a0838728841b93f46bf1263b65a8010e2ee800d0dc9b004ab8ba8b6d1ec07cc115b5
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^9.0.5":
+  version: 9.0.5
+  resolution: "minimatch@npm:9.0.5"
+  dependencies:
+    brace-expansion: ^2.0.1
+  checksum: 2c035575eda1e50623c731ec6c14f65a85296268f749b9337005210bb2b34e2705f8ef1a358b188f69892286ab99dc42c8fb98a57bde55c8d81b3023c19cea28
   languageName: node
   linkType: hard
 
