@@ -45,6 +45,7 @@ export type CommonProps = {
   origin: string;
   network: string;
   mirrorNodeUrl: string;
+  [key: string]: any;
 };
 
 const MetamaskUI: SnapComponent<CommonProps> = ({
