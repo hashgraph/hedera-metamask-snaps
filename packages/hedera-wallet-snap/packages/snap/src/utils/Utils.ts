@@ -18,10 +18,13 @@
  *
  */
 
-import type { Client, TransactionReceipt } from '@hashgraph/sdk';
+import { Hbar, type Client, type TransactionRecord } from '@hashgraph/sdk';
+import type {
+  TransactionReceiptJSON,
+  TransactionRecordJSON,
+} from '@hashgraph/sdk/lib/transaction/TransactionRecord';
 import { EMPTY_STRING, MAX_RETRIES } from '../types/constants';
-import type { TxReceipt } from '../types/hedera';
-import { CryptoUtils } from './CryptoUtils';
+import type { TxReceipt, TxRecord } from '../types/hedera';
 
 export class Utils {
   public static timestampToString(
@@ -65,9 +68,9 @@ export class Utils {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  public static formatTransactionReceipt(
-    receipt: TransactionReceipt,
-  ): TxReceipt {
+  public static formatTransactionReceipt = (
+    receipt: TransactionReceiptJSON,
+  ): TxReceipt => {
     let newExchangeRate;
     if (receipt.exchangeRate) {
       newExchangeRate = {
@@ -79,48 +82,89 @@ export class Utils {
     }
 
     return {
-      status: receipt.status.toString(),
-      accountId: receipt.accountId
-        ? receipt.accountId.toString()
-        : EMPTY_STRING,
-      fileId: receipt.fileId ? receipt.fileId.toString() : EMPTY_STRING,
-      contractId: receipt.contractId
-        ? receipt.contractId.toString()
-        : EMPTY_STRING,
-      topicId: receipt.topicId ? receipt.topicId.toString() : EMPTY_STRING,
-      tokenId: receipt.tokenId ? receipt.tokenId.toString() : EMPTY_STRING,
-      scheduleId: receipt.scheduleId
-        ? receipt.scheduleId.toString()
-        : EMPTY_STRING,
+      status: receipt.status,
+      accountId: receipt.accountId ? receipt.accountId : EMPTY_STRING,
+      fileId: receipt.filedId ? receipt.filedId : EMPTY_STRING,
+      contractId: receipt.contractId ? receipt.contractId : EMPTY_STRING,
+      topicId: receipt.topicId ? receipt.topicId : EMPTY_STRING,
+      tokenId: receipt.tokenId ? receipt.tokenId : EMPTY_STRING,
+      scheduleId: receipt.scheduleId ? receipt.scheduleId : EMPTY_STRING,
       exchangeRate: newExchangeRate,
       topicSequenceNumber: receipt.topicSequenceNumber
-        ? String(receipt.topicSequenceNumber)
+        ? receipt.topicSequenceNumber.toString()
         : EMPTY_STRING,
-      topicRunningHash: CryptoUtils.uint8ArrayToHex(receipt.topicRunningHash),
+      topicRunningHash: receipt.topicRunningHash
+        ? receipt.topicRunningHash
+        : EMPTY_STRING,
       totalSupply: receipt.totalSupply
-        ? String(receipt.totalSupply)
+        ? receipt.totalSupply.toString()
         : EMPTY_STRING,
       scheduledTransactionId: receipt.scheduledTransactionId
-        ? receipt.scheduledTransactionId.toString()
+        ? receipt.scheduledTransactionId
         : EMPTY_STRING,
-      serials: JSON.parse(JSON.stringify(receipt.serials)),
-      duplicates: JSON.parse(JSON.stringify(receipt.duplicates)),
-      children: JSON.parse(JSON.stringify(receipt.children)),
+      serials: receipt.serials,
+      duplicates: receipt.duplicates
+        ? receipt.duplicates.map(this.formatTransactionReceipt)
+        : [],
+      children: receipt.children
+        ? receipt.children.map(this.formatTransactionReceipt)
+        : [],
     } as TxReceipt;
-  }
+  };
+
+  public static formatTransactionRecord = (
+    record: TransactionRecordJSON,
+  ): TxRecord => {
+    return {
+      receipt: Utils.formatTransactionReceipt(record.receipt),
+      transactionHash: record.transactionHash
+        ? record.transactionHash
+        : EMPTY_STRING,
+      consensusTimestamp: Utils.timestampToString(record.consensusTimestamp),
+      transactionId: record.transactionId,
+      transactionMemo: record.transactionMemo,
+      transactionFee: Hbar.fromTinybars(record.transactionFee).toString(),
+      transfers: record.transfers
+        ? record.transfers.map((transfer) => ({
+            ...transfer,
+            amount: Hbar.fromTinybars(transfer.amount).toString(),
+          }))
+        : [],
+      scheduleRef: record.scheduleRef ? record.scheduleRef : EMPTY_STRING,
+      parentConsensusTimestamp: Utils.timestampToString(
+        record.parentConsensusTimestamp,
+      ),
+      aliasKey: record.aliasKey ? record.aliasKey : EMPTY_STRING,
+      ethereumHash: record.ethereumHash ? record.ethereumHash : EMPTY_STRING,
+      prngBytes: record.prngBytes ? record.prngBytes : EMPTY_STRING,
+      prngNumber: record.prngNumber
+        ? record.prngNumber.toString()
+        : EMPTY_STRING,
+      evmAddress: record.evmAddress ? record.evmAddress : EMPTY_STRING,
+      duplicates: record.duplicates
+        ? record.duplicates.map((duplicate) =>
+            Utils.formatTransactionRecord(duplicate.toJSON()),
+          )
+        : [],
+      children: record.children
+        ? record.children.map((child) =>
+            Utils.formatTransactionRecord(child.toJSON()),
+          )
+        : [],
+    } as TxRecord;
+  };
 
   public static async executeTransaction(
     client: Client,
     transaction: any,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     let retries = 0;
     while (retries < MAX_RETRIES) {
       try {
         const txResponse = await transaction.execute(client);
-        const receipt = await txResponse.getReceipt(client);
-
-        // If the transaction succeeded, return the receipt
-        return Utils.formatTransactionReceipt(receipt);
+        const record: TransactionRecord = await txResponse.getRecord(client);
+        const recordJson: TransactionRecordJSON = record.toJSON();
+        return Utils.formatTransactionRecord(recordJson);
       } catch (error: any) {
         // If the error is BUSY, retry the transaction
         if (error.toString().includes('BUSY')) {

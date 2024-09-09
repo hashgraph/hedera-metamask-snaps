@@ -35,22 +35,23 @@ module.exports = {
       },
     },
   },
-  moduleFileExtensions: ['js', 'json', 'ts', 'mjs', 'cjs'],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx', 'mjs', 'cjs'],
   preset: 'ts-jest',
   testEnvironment: 'node',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.js$': 'babel-jest',
   },
-  transformIgnorePatterns: [
-    '/node_modules/(?!normalize-url).+\\.js$'
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!normalize-url).+\\.js$'],
   testTimeout: 120000,
   reporters: [
     'default',
-    ['jest-junit', {
-      suiteName: 'Wallet Snap Unit Tests',
-      outputName: 'junit-snap.xml',
-    }]
+    [
+      'jest-junit',
+      {
+        suiteName: 'Wallet Snap Unit Tests',
+        outputName: 'junit-snap.xml',
+      },
+    ],
   ],
 };

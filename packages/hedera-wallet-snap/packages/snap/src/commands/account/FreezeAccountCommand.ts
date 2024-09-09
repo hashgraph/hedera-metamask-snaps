@@ -23,7 +23,7 @@ import {
   TokenUnfreezeTransaction,
   type Client,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class FreezeAccountCommand {
@@ -39,7 +39,7 @@ export class FreezeAccountCommand {
     this.#accountId = accountId;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     let transaction: TokenFreezeTransaction | TokenUnfreezeTransaction;
     if (this.#freeze) {
       transaction = new TokenFreezeTransaction();

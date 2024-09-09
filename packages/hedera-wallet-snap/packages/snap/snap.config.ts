@@ -25,7 +25,7 @@ import { resolve } from 'path';
 const config: SnapConfig = {
   bundler: 'webpack',
   // eslint-disable-next-line no-restricted-globals
-  input: resolve(__dirname, 'src/index.ts'),
+  input: resolve(__dirname, 'src/index.tsx'),
   server: {
     port: 9001,
   },

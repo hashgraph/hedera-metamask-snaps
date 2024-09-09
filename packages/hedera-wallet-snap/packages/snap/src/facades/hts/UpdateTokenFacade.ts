@@ -26,7 +26,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { UpdateTokenCommand } from '../../commands/hts/UpdateTokenCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { UpdateTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -42,7 +42,7 @@ export class UpdateTokenFacade {
   public static async updateToken(
     walletSnapParams: WalletSnapParams,
     updateTokenRequestParams: UpdateTokenRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -69,7 +69,7 @@ export class UpdateTokenFacade {
       autoRenewPeriod,
     } = updateTokenRequestParams;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading('Update token'),
@@ -221,6 +221,12 @@ export class UpdateTokenFacade {
       txReceipt = await command.execute(
         hederaClient.getClient(),
         updateTokenRequestParams,
+      );
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
       );
     } catch (error: any) {
       const errMessage = `Error while trying to update a token`;

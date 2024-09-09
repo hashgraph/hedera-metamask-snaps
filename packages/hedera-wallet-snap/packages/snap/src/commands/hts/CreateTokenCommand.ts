@@ -29,7 +29,7 @@ import {
   type Client,
   type PrivateKey,
 } from '@hashgraph/sdk';
-import { type TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { TokenCustomFee } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
@@ -113,7 +113,7 @@ export class CreateTokenCommand {
   public async execute(
     client: Client,
     privateKey: PrivateKey,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const transaction = new TokenCreateTransaction()
       .setAdminKey(client.operatorPublicKey as PublicKey)
       .setTreasuryAccountId(client.operatorAccountId as AccountId)

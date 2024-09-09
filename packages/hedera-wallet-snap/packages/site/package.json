@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-wallet-snap-site",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@hashgraph/sdk": "^2.48.1",
-    "@metamask/providers": "^17.1.0",
+    "@metamask/providers": "^17.2.0",
     "bignumber.js": "^9.1.2",
     "bootstrap": "^5.3.3",
     "lodash": "^4.17.21",
@@ -35,8 +35,8 @@
     "react-dom": "^18.3.1",
     "react-is": "^18.3.1",
     "react-select": "^5.8.0",
-    "sharp": "^0.33.4",
-    "styled-components": "^6.1.11"
+    "sharp": "^0.33.5",
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
     "@metamask/eslint-config": "^12.2.0",
@@ -44,9 +44,9 @@
     "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
     "@svgr/webpack": "^8.1.0",
-    "@testing-library/dom": "^10.3.1",
-    "@testing-library/jest-dom": "^6.4.6",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/bootstrap": "^5.2.10",
     "@types/jest": "^29.5.12",
@@ -64,17 +64,17 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "28.3.0",
-    "eslint-plugin-jsdoc": "^48.7.0",
+    "eslint-plugin-jsdoc": "^50.2.2",
     "eslint-plugin-n": "17.3.1",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "gatsby": "^5.13.6",
+    "eslint-plugin-prettier": "^5.2.1",
+    "gatsby": "^5.13.7",
     "gatsby-plugin-manifest": "^5.13.1",
     "gatsby-plugin-styled-components": "^6.13.1",
     "gatsby-plugin-svgr": "^3.0.0-beta.0",
-    "prettier": "^3.3.2",
+    "prettier": "^3.3.3",
     "prettier-plugin-packagejson": "^2.5.0",
-    "rimraf": "^5.0.7",
-    "typescript": "^5.5.3"
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2"
   }
 }
