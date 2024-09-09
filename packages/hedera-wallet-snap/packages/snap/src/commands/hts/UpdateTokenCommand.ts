@@ -20,7 +20,7 @@
 
 import type { Client, PrivateKey } from '@hashgraph/sdk';
 import { PublicKey, TokenUpdateTransaction } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { UpdateTokenRequestParams } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
@@ -37,7 +37,7 @@ export class UpdateTokenCommand {
   public async execute(
     client: Client,
     updateParams: UpdateTokenRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const updateTransaction =
       this.#updateTransaction(updateParams).freezeWith(client);
 

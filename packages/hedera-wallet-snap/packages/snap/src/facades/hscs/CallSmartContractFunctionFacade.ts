@@ -19,11 +19,11 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { CallSmartContractFunctionCommand } from '../../commands/hscs/CallSmartContractFunctionCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { CallSmartContractFunctionRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -38,7 +38,7 @@ export class CallSmartContractFunctionFacade {
   public static async callSmartContractFunction(
     walletSnapParams: WalletSnapParams,
     callSmartContractFunctionParams: CallSmartContractFunctionRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -50,27 +50,9 @@ export class CallSmartContractFunctionFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Call a smart contract function'),
@@ -134,6 +116,12 @@ export class CallSmartContractFunctionFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = 'Error while trying to call a smart contract function';
       console.error('Error occurred: %s', errMessage, String(error));

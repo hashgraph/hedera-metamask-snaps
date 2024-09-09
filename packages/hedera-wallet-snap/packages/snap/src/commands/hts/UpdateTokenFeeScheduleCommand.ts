@@ -24,7 +24,7 @@ import {
   Hbar,
   TokenFeeScheduleUpdateTransaction,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { TokenCustomFee } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
@@ -49,7 +49,7 @@ export class UpdateTokenFeeScheduleCommand {
     this.#customFees = customFees;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const scheduleTransaction = new TokenFeeScheduleUpdateTransaction()
       .setTokenId(this.#tokenId)
       .setCustomFees(this.#convertCustomFees(this.#customFees, this.#decimals))

@@ -19,12 +19,12 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { ApproveAllowanceCommand } from '../../commands/allowance/ApproveAllowanceCommand';
-import type { MirrorTokenInfo, TxReceipt } from '../../types/hedera';
+import type { MirrorTokenInfo, TxRecord } from '../../types/hedera';
 import type {
   ApproveAllowanceAssetDetail,
   ApproveAllowanceRequestParams,
@@ -37,7 +37,7 @@ export class ApproveAllowanceFacade {
   public static async approveAllowance(
     walletSnapParams: WalletSnapParams,
     approveAllowanceRequestParams: ApproveAllowanceRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const {
@@ -53,27 +53,9 @@ export class ApproveAllowanceFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Approve an allowance'),
@@ -188,6 +170,12 @@ export class ApproveAllowanceFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to approve an allowance`;
       console.error('Error occurred: %s', errMessage, String(error));
