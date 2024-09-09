@@ -76,8 +76,12 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           walletSnapParams,
           params,
         );
-        await SnapUtils.snapCreateDialogAfterTransaction(network, result);
-
+        await SnapUtils.snapCreateDialogAfterTransaction(
+          origin,
+          network,
+          mirrorNodeUrl,
+          result,
+        );
         break;
       }
       default:

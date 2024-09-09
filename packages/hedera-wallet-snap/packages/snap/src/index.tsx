@@ -26,9 +26,10 @@ import type {
   OnUpdateHandler,
   OnUserInputHandler,
 } from '@metamask/snaps-sdk';
-import { copyable, panel, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
+import { HelloUI } from './components/hello';
+import { ShowAccountPrivateKeyUI } from './components/showAccountPrivateKey';
 import { OnHomePageUI } from './custom-ui/onHome';
 import { onInstallUI } from './custom-ui/onInstall';
 import { onUpdateUI } from './custom-ui/onUpdate';
@@ -127,14 +128,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         method: 'snap_dialog',
         params: {
           type: 'alert',
-          content: panel([
-            text(`Hello, **${origin}**!`),
-            text(`Network: **${network}**`),
-            text(`Mirror Node: **${mirrorNodeUrl}**`),
-            text(
-              "You are seeing this because you interacted with the 'hello' method",
-            ),
-          ]),
+          content: (
+            <HelloUI
+              origin={origin}
+              network={network}
+              mirrorNodeUrl={mirrorNodeUrl}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.hederaEvmAddress}
+            />
+          ),
         },
       });
       return {
@@ -149,19 +151,21 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         method: 'snap_dialog',
         params: {
           type: 'alert',
-          content: panel([
-            text(`Request from: **${origin}**`),
-            text(`Network: **${network}**`),
-            text(`Mirror Node: **${mirrorNodeUrl}**`),
-            text(
-              'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
-            ),
-            copyable(
-              state.accountState[state.currentAccount.hederaEvmAddress][
-                state.currentAccount.network
-              ].keyStore.privateKey,
-            ),
-          ]),
+          content: (
+            <ShowAccountPrivateKeyUI
+              origin={origin}
+              network={network}
+              mirrorNodeUrl={mirrorNodeUrl}
+              privateKey={
+                state.accountState[state.currentAccount.hederaEvmAddress][
+                  state.currentAccount.network
+                ].keyStore.privateKey
+              }
+              publicKey={state.currentAccount.publicKey}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.hederaEvmAddress}
+            />
+          ),
         },
       });
       return {
@@ -178,6 +182,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         signature: await signMessageCommand.execute(),
       };
     }
+    // TODO: Need to refactor to use JSX
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
       return {
@@ -206,7 +211,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
@@ -217,7 +221,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-
     case 'stakeHbar': {
       HederaUtils.isValidStakeHbarParams(request.params);
       return {

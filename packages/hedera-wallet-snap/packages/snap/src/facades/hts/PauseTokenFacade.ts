@@ -141,7 +141,12 @@ export class PauseTokenFacade {
       const command = new PauseTokenCommand(pause, tokenId);
 
       txReceipt = await command.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to ${pauseText} a token`;
       console.error('Error occurred: %s', errMessage, String(error));

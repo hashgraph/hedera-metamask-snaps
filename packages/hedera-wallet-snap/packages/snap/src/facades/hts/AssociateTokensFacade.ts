@@ -140,8 +140,12 @@ export class AssociateTokensFacade {
       }
       const command = new AssociateTokensCommand(tokenIds);
       txReceipt = await command.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
-
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to associate tokens to the account`;

@@ -118,7 +118,12 @@ export class DeleteTokenFacade {
         PrivateKey.fromStringECDSA(privateKey),
       );
       txReceipt = await deleteTokensCommand.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to delete token`;
       console.error('Error occurred: %s', errMessage, String(error));

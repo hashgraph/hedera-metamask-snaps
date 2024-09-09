@@ -28,14 +28,13 @@ export const onUpdateUI: OnUpdateHandler = async () => {
     params: {
       type: 'alert',
       content: panel([
-        heading('Thank you for updating Hedera Wallet Snap'),
+        heading('Thank you for updating Hedera Wallet Snap to v0.6.0'),
         text('New features added in this version:'),
-        text('🚀 Added a new API to create a new topic'),
-        text('🚀 Added a new API to update a topic'),
-        text('🚀 Added a new API to submit a message to a topic'),
-        text('🚀 Added a new API to get topic info'),
-        text('🚀 Added a new API to get topic messages'),
-        text('🚀 Added a new API to delete a topic'),
+        text('🚀 Added snap home page'),
+        text('🚀 Updated some dialog boxes'),
+        text(
+          '🚀 Send notifications for certain API calls whenever snap errors out',
+        ),
       ]),
     },
   });

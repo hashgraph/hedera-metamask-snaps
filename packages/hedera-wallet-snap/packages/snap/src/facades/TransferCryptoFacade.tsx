@@ -19,8 +19,13 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams } from '@metamask/snaps-sdk';
-import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
+import {
+  copyable,
+  divider,
+  heading,
+  text,
+  type DialogParams,
+} from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
@@ -241,6 +246,25 @@ export class TransferCryptoFacade {
           panelToShow,
         ),
       };
+
+      /*       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
+      const dialogParams: DialogParams = {
+        type: 'confirmation',
+        content: (
+          <TransferCryptoUI
+            origin={origin}
+            network={network}
+            mirrorNodeUrl={mirrorNodeUrl}
+            memo={strippedMemo}
+            maxFee={maxFee}
+            transfers={transfers}
+            walletBalance={
+              state.accountState[hederaEvmAddress][network].accountInfo.balance
+            }
+            serviceFeesToPay={serviceFeesToPay}
+          />
+        ),
+      }; */
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
         const errMessage = 'User rejected the transaction';
@@ -258,7 +282,12 @@ export class TransferCryptoFacade {
 
       txRecord = await command.execute(hederaClient.getClient());
 
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txRecord);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txRecord,
+      );
 
       return txRecord;
     } catch (error: any) {

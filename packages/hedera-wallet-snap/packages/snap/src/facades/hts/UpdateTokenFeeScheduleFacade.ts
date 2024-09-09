@@ -151,7 +151,12 @@ export class UpdateTokenFeeScheduleFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to update a token fee schedule`;
       console.error('Error occurred: %s', errMessage, String(error));

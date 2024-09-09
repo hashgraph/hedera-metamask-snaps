@@ -21,12 +21,12 @@
 import type { DialogParams, NodeType, Panel } from '@metamask/snaps-sdk';
 import {
   NotificationType,
-  copyable,
   divider,
   heading,
   panel,
   text,
 } from '@metamask/snaps-sdk';
+import { PostTransactionUI } from '../components/postTransaction';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
@@ -175,44 +175,23 @@ export class SnapUtils {
   }
 
   public static async snapCreateDialogAfterTransaction(
+    origin: string,
     network: string,
-    result: TxRecord,
-  ): Promise<any> {
-    const panelToShow = SnapUtils.initializePanelToShow();
-    if (result.receipt.status === 'SUCCESS') {
-      panelToShow.push(
-        heading('Transaction successful'),
-        text(`**Transaction ID**:`),
-        copyable(result.transactionId),
-        text(
-          `View on [Hashscan](https://hashscan.io/${network}/transaction/${result.transactionId})`,
-        ),
-        text(`**Transaction Hash**:`),
-        copyable(result.transactionHash),
-        text(`**Transaction Fee**: ${result.transactionFee}`),
-        text(`**Transaction Time**: ${result.consensusTimestamp}`),
-      );
-      panelToShow.push(divider());
-      panelToShow.push(heading('Transfers:'));
-      for (const transfer of result.transfers) {
-        panelToShow.push(
-          text(
-            `**Transferred** ${transfer.amount} HBAR to ${transfer.accountId}`,
-          ),
-        );
-      }
-    } else {
-      panelToShow.push(
-        heading('Transaction failed'),
-        text(`**Transaction ID**:`),
-        copyable(result.transactionId),
-      );
-    }
+    mirrorNodeUrl: string,
+    txRecord: TxRecord,
+  ): Promise<void> {
     await snap.request({
       method: 'snap_dialog',
       params: {
         type: 'alert',
-        content: panel(panelToShow),
+        content: (
+          <PostTransactionUI
+            origin={origin}
+            network={network}
+            mirrorNodeUrl={mirrorNodeUrl}
+            result={txRecord}
+          />
+        ),
       },
     });
   }

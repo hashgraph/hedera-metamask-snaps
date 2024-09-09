@@ -190,8 +190,12 @@ export class AtomicSwapFacade {
       );
 
       txReceipt = await command.initiateSwap(hederaClient.getClient());
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
-
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to initiate atomic swap`;
@@ -271,8 +275,12 @@ export class AtomicSwapFacade {
         hederaClient.getClient(),
         scheduleId,
       );
-      await SnapUtils.snapCreateDialogAfterTransaction(network, txReceipt);
-
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to complete atomic swap`;
