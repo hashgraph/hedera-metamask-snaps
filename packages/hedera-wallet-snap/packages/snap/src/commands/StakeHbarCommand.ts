@@ -20,7 +20,7 @@
 
 import { AccountUpdateTransaction, type Client } from '@hashgraph/sdk';
 import _ from 'lodash';
-import type { TxReceipt } from '../types/hedera';
+import type { TxRecord } from '../types/hedera';
 import { Utils } from '../utils/Utils';
 
 export class StakeHbarCommand {
@@ -33,7 +33,7 @@ export class StakeHbarCommand {
     this.#accountId = accountId;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new AccountUpdateTransaction().setAccountId(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       client.operatorAccountId!,

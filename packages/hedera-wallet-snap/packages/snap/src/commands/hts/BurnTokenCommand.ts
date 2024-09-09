@@ -19,7 +19,7 @@
  */
 
 import { TokenBurnTransaction, type Client } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import { Utils } from '../../utils/Utils';
 
 export class BurnTokenCommand {
@@ -43,7 +43,7 @@ export class BurnTokenCommand {
     this.#amount = amount;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new TokenBurnTransaction().setTokenId(this.#tokenId);
 
     if (this.#assetType === 'NFT') {

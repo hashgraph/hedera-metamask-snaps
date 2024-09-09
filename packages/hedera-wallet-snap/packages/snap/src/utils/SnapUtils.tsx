@@ -18,7 +18,7 @@
  *
  */
 
-import type { DialogParams, Panel } from '@metamask/snaps-sdk';
+import type { DialogParams, NodeType, Panel } from '@metamask/snaps-sdk';
 import {
   NotificationType,
   divider,
@@ -26,14 +26,42 @@ import {
   panel,
   text,
 } from '@metamask/snaps-sdk';
+import { PostTransactionUI } from '../components/postTransaction';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
-import type { SimpleTransfer } from '../types/hedera';
+import type { SimpleTransfer, TxRecord } from '../types/hedera';
 
 export class SnapUtils {
+  /**
+   * Function to generate panel.
+   * @returns Panel to be displayed in the snap dialog.
+   */
+  public static initializePanelToShow(): any {
+    const panelToShow: (
+      | {
+          value: string;
+          type: NodeType.Heading;
+        }
+      | {
+          value: string;
+          type: NodeType.Text;
+          markdown?: boolean | undefined;
+        }
+      | {
+          type: NodeType.Divider;
+        }
+      | {
+          value: string;
+          type: NodeType.Copyable;
+          sensitive?: boolean | undefined;
+        }
+    )[] = [];
+    return panelToShow;
+  }
+
   /**
    * Function to generate snap dialog panel.
    * @param origin - The origin of where the call is being made from.
@@ -110,6 +138,62 @@ export class SnapUtils {
       method: 'snap_dialog',
       params,
     })) as boolean;
+  }
+
+  public static async snapCreateInteractiveUI(
+    panelToShow: Panel,
+  ): Promise<{ interfaceId: string; confirmed: boolean }> {
+    const interfaceId = await snap.request({
+      method: 'snap_createInterface',
+      params: {
+        ui: panelToShow,
+      },
+    });
+    return {
+      interfaceId,
+      confirmed: (await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'confirmation',
+          id: interfaceId,
+        },
+      })) as boolean,
+    };
+  }
+
+  public static async snapUpdateInteractiveUI(
+    interfaceId: string,
+    panelToShow: Panel,
+  ) {
+    await snap.request({
+      method: 'snap_updateInterface',
+      params: {
+        id: interfaceId,
+        ui: panelToShow,
+      },
+    });
+  }
+
+  public static async snapCreateDialogAfterTransaction(
+    origin: string,
+    network: string,
+    mirrorNodeUrl: string,
+    txRecord: TxRecord,
+  ): Promise<void> {
+    await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'alert',
+        content: (
+          <PostTransactionUI
+            origin={origin}
+            network={network}
+            mirrorNodeUrl={mirrorNodeUrl}
+            result={txRecord}
+          />
+        ),
+      },
+    });
   }
 
   /**

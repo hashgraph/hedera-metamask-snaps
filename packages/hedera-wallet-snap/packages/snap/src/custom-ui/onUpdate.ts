@@ -18,21 +18,24 @@
  *
  */
 
-import type { Client } from '@hashgraph/sdk';
-import { TopicDeleteTransaction } from '@hashgraph/sdk';
-import type { TxRecord } from '../../types/hedera';
-import { Utils } from '../../utils/Utils';
+import type { OnUpdateHandler } from '@metamask/snaps-sdk';
 
-export class DeleteTopicCommand {
-  readonly #topicId: string;
+import { heading, panel, text } from '@metamask/snaps-sdk';
 
-  constructor(topicId: string) {
-    this.#topicId = topicId;
-  }
-
-  public async execute(client: Client): Promise<TxRecord> {
-    const transaction = new TopicDeleteTransaction().setTopicId(this.#topicId);
-
-    return await Utils.executeTransaction(client, transaction);
-  }
-}
+export const onUpdateUI: OnUpdateHandler = async () => {
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([
+        heading('Thank you for updating Hedera Wallet Snap to v0.6.0'),
+        text('New features added in this version:'),
+        text('🚀 Added snap home page'),
+        text('🚀 Updated some dialog boxes'),
+        text(
+          '🚀 Send notifications for certain API calls whenever snap errors out',
+        ),
+      ]),
+    },
+  });
+};

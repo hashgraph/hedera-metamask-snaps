@@ -24,7 +24,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { PauseTokenCommand } from '../../commands/hts/PauseTokenCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { PauseOrDeleteTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -56,7 +56,7 @@ export class PauseTokenFacade {
     walletSnapParams: WalletSnapParams,
     pauseTokenRequestParams: PauseOrDeleteTokenRequestParams,
     pause: boolean,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -69,7 +69,7 @@ export class PauseTokenFacade {
 
     const pauseText = pause ? 'pause' : 'unpause';
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading(`${Utils.capitalizeFirstLetter(pauseText)} token`),
@@ -141,6 +141,12 @@ export class PauseTokenFacade {
       const command = new PauseTokenCommand(pause, tokenId);
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to ${pauseText} a token`;
       console.error('Error occurred: %s', errMessage, String(error));

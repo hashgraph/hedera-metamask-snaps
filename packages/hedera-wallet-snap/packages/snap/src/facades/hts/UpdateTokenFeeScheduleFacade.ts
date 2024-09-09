@@ -25,7 +25,7 @@ import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { UpdateTokenFeeScheduleCommand } from '../../commands/hts/UpdateTokenFeeScheduleCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { UpdateTokenFeeScheduleRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -41,7 +41,7 @@ export class UpdateTokenFeeScheduleFacade {
   public static async updateTokenFeeSchedule(
     walletSnapParams: WalletSnapParams,
     updateTokenFeeScheduleRequestParams: UpdateTokenFeeScheduleRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     if (updateTokenFeeScheduleRequestParams.customFees === undefined) {
       const errMessage = 'null custom fee schedule given';
       console.error(errMessage);
@@ -63,7 +63,7 @@ export class UpdateTokenFeeScheduleFacade {
       mirrorNodeUrl,
     );
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading('Update token fee schedule'),
@@ -151,6 +151,12 @@ export class UpdateTokenFeeScheduleFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to update a token fee schedule`;
       console.error('Error occurred: %s', errMessage, String(error));

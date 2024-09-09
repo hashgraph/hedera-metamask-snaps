@@ -20,12 +20,12 @@
 
 import { PrivateKey } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTokenCommand } from '../../commands/hts/DeleteTokenCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { PauseOrDeleteTokenRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -41,7 +41,7 @@ export class DeleteTokenFacade {
   public static async deleteToken(
     walletSnapParams: WalletSnapParams,
     deleteTokenRequestParams: PauseOrDeleteTokenRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { tokenId } = deleteTokenRequestParams;
@@ -52,27 +52,9 @@ export class DeleteTokenFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Delete Token'),
@@ -136,6 +118,12 @@ export class DeleteTokenFacade {
         PrivateKey.fromStringECDSA(privateKey),
       );
       txReceipt = await deleteTokensCommand.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to delete token`;
       console.error('Error occurred: %s', errMessage, String(error));

@@ -24,7 +24,7 @@ import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { EnableKYCAccountCommand } from '../../commands/hts/EnableKYCAccountCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { FreezeOrEnableKYCAccountRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -45,7 +45,7 @@ export class EnableKYCAccountFacade {
     walletSnapParams: WalletSnapParams,
     enableKYCAccountRequestParams: FreezeOrEnableKYCAccountRequestParams,
     enableKYC: boolean,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -58,7 +58,7 @@ export class EnableKYCAccountFacade {
 
     const enableText = enableKYC ? 'grant' : 'revoke';
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
       const panelToShow = [
         heading(
@@ -146,6 +146,12 @@ export class EnableKYCAccountFacade {
       );
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = `Error while trying to ${enableText} the KYC flag to an account`;
       console.error('Error occurred: %s', errMessage, String(error));

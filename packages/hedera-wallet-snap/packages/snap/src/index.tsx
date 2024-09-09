@@ -24,10 +24,16 @@ import type {
   OnInstallHandler,
   OnRpcRequestHandler,
   OnUpdateHandler,
+  OnUserInputHandler,
 } from '@metamask/snaps-sdk';
-import { copyable, divider, heading, panel, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { SignMessageCommand } from './commands/SignMessageCommand';
+import { HelloUI } from './components/hello';
+import { ShowAccountPrivateKeyUI } from './components/showAccountPrivateKey';
+import { OnHomePageUI } from './custom-ui/onHome';
+import { onInstallUI } from './custom-ui/onInstall';
+import { onUpdateUI } from './custom-ui/onUpdate';
+import { onUserInputUI } from './custom-ui/onUserInput';
 import { StakeHbarFacade } from './facades/StakeHbarFacade';
 import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
 import { DeleteAccountFacade } from './facades/account/DeleteAccountFacade';
@@ -122,14 +128,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         method: 'snap_dialog',
         params: {
           type: 'alert',
-          content: panel([
-            text(`Hello, **${origin}**!`),
-            text(`Network: **${network}**`),
-            text(`Mirror Node: **${mirrorNodeUrl}**`),
-            text(
-              "You are seeing this because you interacted with the 'hello' method",
-            ),
-          ]),
+          content: (
+            <HelloUI
+              origin={origin}
+              network={network}
+              mirrorNodeUrl={mirrorNodeUrl}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.hederaEvmAddress}
+            />
+          ),
         },
       });
       return {
@@ -144,19 +151,21 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         method: 'snap_dialog',
         params: {
           type: 'alert',
-          content: panel([
-            text(`Request from: **${origin}**`),
-            text(`Network: **${network}**`),
-            text(`Mirror Node: **${mirrorNodeUrl}**`),
-            text(
-              'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
-            ),
-            copyable(
-              state.accountState[state.currentAccount.hederaEvmAddress][
-                state.currentAccount.network
-              ].keyStore.privateKey,
-            ),
-          ]),
+          content: (
+            <ShowAccountPrivateKeyUI
+              origin={origin}
+              network={network}
+              mirrorNodeUrl={mirrorNodeUrl}
+              privateKey={
+                state.accountState[state.currentAccount.hederaEvmAddress][
+                  state.currentAccount.network
+                ].keyStore.privateKey
+              }
+              publicKey={state.currentAccount.publicKey}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.hederaEvmAddress}
+            />
+          ),
         },
       });
       return {
@@ -173,6 +182,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         signature: await signMessageCommand.execute(),
       };
     }
+    // TODO: Need to refactor to use JSX
     case 'getAccountInfo': {
       HederaUtils.isValidGetAccountInfoRequest(request.params);
       return {
@@ -201,7 +211,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-
     case 'transferCrypto': {
       HederaUtils.isValidTransferCryptoParams(request.params);
       return {
@@ -212,7 +221,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ),
       };
     }
-
     case 'stakeHbar': {
       HederaUtils.isValidStakeHbarParams(request.params);
       return {
@@ -606,73 +614,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 };
 
-export const onHomePage: OnHomePageHandler = async () => {
-  return {
-    content: panel([
-      heading('Hello world!'),
-      text('Welcome to Hedera Wallet Snap page!'),
-      divider(),
-      text(
-        'To learn about the Snap, refer to [Hedera Wallet Snap Documentation](https://docs.tuum.tech/hedera-wallet-snap/basics/introduction).',
-      ),
-      divider(),
-      text(
-        '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Hedera Wallet inside MetaMask',
-      ),
-      divider(),
-      text(
-        '⦿ Note that Hedera Wallet Snap does not have direct access to the private key of the MetaMask accounts so it generates a new snap account that is associated with the currently connected MetaMask account so the account created by the snap will have a different address compared to your MetaMask account address.',
-      ),
-      divider(),
-      text(
-        '😭 If you add a new account in MetaMask after you have already approved existing accounts on your application, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
-      ),
-    ]),
-  };
-};
+export const onHomePage: OnHomePageHandler = OnHomePageUI;
 
-export const onInstall: OnInstallHandler = async () => {
-  await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'alert',
-      content: panel([
-        heading('Thank you for installing Hedera Wallet Snap'),
-        text(
-          'To learn about the Snap, refer to [Hedera Wallet Snap Documentation](https://docs.tuum.tech/hedera-wallet-snap/basics/introduction).',
-        ),
-        divider(),
-        text(
-          '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Hedera Wallet inside MetaMask',
-        ),
-        divider(),
-        text(
-          '⦿ Note that Hedera Wallet Snap does not have direct access to the private key of the MetaMask accounts so it generates a new snap account that is associated with the currently connected MetaMask account so the account created by the snap will have a different address compared to your MetaMask account address.',
-        ),
-        divider(),
-        text(
-          '😭 If you add a new account in MetaMask after you have already approved existing accounts on your application, you will need to reinstall the snap and reconnect to approve the newly added account. This is only temporary and in the future, you will not need to do the reinstall once MetaMask Snaps support account change events.',
-        ),
-      ]),
-    },
-  });
-};
+export const onUserInput: OnUserInputHandler = onUserInputUI;
 
-export const onUpdate: OnUpdateHandler = async () => {
-  await snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'alert',
-      content: panel([
-        heading('Thank you for updating Hedera Wallet Snap'),
-        text('New features added in this version:'),
-        text('🚀 Added a new API to create a new topic'),
-        text('🚀 Added a new API to update a topic'),
-        text('🚀 Added a new API to submit a message to a topic'),
-        text('🚀 Added a new API to get topic info'),
-        text('🚀 Added a new API to get topic messages'),
-        text('🚀 Added a new API to delete a topic'),
-      ]),
-    },
-  });
-};
+export const onInstall: OnInstallHandler = onInstallUI;
+
+export const onUpdate: OnUpdateHandler = onUpdateUI;

@@ -19,7 +19,7 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { GetSmartContractFunctionCommand } from '../../commands/hscs/GetSmartContractFunctionCommand';
@@ -52,25 +52,7 @@ export class GetSmartContractFunctionFacade {
 
     let result = {} as GetSmartContractFunctionResult;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Get a smart contract function result'),

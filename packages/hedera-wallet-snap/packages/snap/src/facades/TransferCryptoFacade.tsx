@@ -19,13 +19,18 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
-import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
+import {
+  copyable,
+  divider,
+  heading,
+  text,
+  type DialogParams,
+} from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
 import { TransferCryptoCommand } from '../commands/TransferCryptoCommand';
 import type { AccountInfo } from '../types/account';
-import type { SimpleTransfer, TxReceipt } from '../types/hedera';
+import type { SimpleTransfer, TxRecord } from '../types/hedera';
 import type { ServiceFee, TransferCryptoRequestParams } from '../types/params';
 import type { WalletSnapParams } from '../types/state';
 import { CryptoUtils } from '../utils/CryptoUtils';
@@ -42,7 +47,7 @@ export class TransferCryptoFacade {
   public static async transferCrypto(
     walletSnapParams: WalletSnapParams,
     transferCryptoParams: TransferCryptoRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const {
@@ -88,7 +93,7 @@ export class TransferCryptoFacade {
       return acc;
     }, {});
 
-    let txReceipt = {} as TxReceipt;
+    let txRecord = {} as TxRecord;
 
     const hederaClientFactory = new HederaClientImplFactory(
       hederaAccountId,
@@ -105,25 +110,7 @@ export class TransferCryptoFacade {
     try {
       await HederaUtils.getMirrorAccountInfo(hederaAccountId, mirrorNodeUrl);
 
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Transfer Crypto'),
@@ -259,6 +246,25 @@ export class TransferCryptoFacade {
           panelToShow,
         ),
       };
+
+      /*       const strippedMemo = memo ? memo.replace(/\r?\n|\r/gu, '').trim() : '';
+      const dialogParams: DialogParams = {
+        type: 'confirmation',
+        content: (
+          <TransferCryptoUI
+            origin={origin}
+            network={network}
+            mirrorNodeUrl={mirrorNodeUrl}
+            memo={strippedMemo}
+            maxFee={maxFee}
+            transfers={transfers}
+            walletBalance={
+              state.accountState[hederaEvmAddress][network].accountInfo.balance
+            }
+            serviceFeesToPay={serviceFeesToPay}
+          />
+        ),
+      }; */
       const confirmed = await SnapUtils.snapDialog(dialogParams);
       if (!confirmed) {
         const errMessage = 'User rejected the transaction';
@@ -274,12 +280,23 @@ export class TransferCryptoFacade {
         serviceFee.toAddress as string,
       );
 
-      txReceipt = await command.execute(hederaClient.getClient());
+      txRecord = await command.execute(hederaClient.getClient());
 
-      return txReceipt;
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txRecord,
+      );
+
+      return txRecord;
     } catch (error: any) {
       const errMessage = `Error while trying to transfer crypto`;
-      console.error('Error occurred: %s', errMessage, String(error));
+      console.error(
+        'Error occurred:',
+        errMessage,
+        JSON.stringify(error, null, 4),
+      );
       await SnapUtils.snapNotification(
         `Error occurred: ${errMessage} - ${String(error)}`,
       );

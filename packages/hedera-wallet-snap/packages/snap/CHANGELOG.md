@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.6.0...v0.6.0) (2024-09-09)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- [Added snap home page](https://github.com/hashgraph/hedera-metamask-snaps/issues/558)
+- [Updated some dialog boxes](https://github.com/hashgraph/hedera-metamask-snaps/issues/559)
+- [Send notifications for certain API calls whenever snap errors out](https://github.com/hashgraph/hedera-metamask-snaps/issues/560)
+- Updated the dependencies
+- Further optimized the code
+
+### :bug: Bug Fixes
+
 ## [0.5.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.5.0...v0.5.0) (2024-07-12)
 
 ### :page_with_curl: Documentation

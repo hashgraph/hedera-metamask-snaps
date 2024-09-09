@@ -19,11 +19,11 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { divider, heading, text } from '@metamask/snaps-sdk';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { DeleteTopicCommand } from '../../commands/hcs/DeleteTopicCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { DeleteTopicRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { SnapUtils } from '../../utils/SnapUtils';
@@ -38,7 +38,7 @@ export class DeleteTopicFacade {
   public static async deleteTopic(
     walletSnapParams: WalletSnapParams,
     deleteTopicParams: DeleteTopicRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { hederaEvmAddress, hederaAccountId, network, mirrorNodeUrl } =
@@ -49,28 +49,9 @@ export class DeleteTopicFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
-
+      const panelToShow = SnapUtils.initializePanelToShow();
       panelToShow.push(
         heading('Delete a topic'),
         text(
@@ -111,6 +92,12 @@ export class DeleteTopicFacade {
       const command = new DeleteTopicCommand(topicId);
 
       txReceipt = await command.execute(hederaClient.getClient());
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
     } catch (error: any) {
       const errMessage = 'Error while trying to delete a topic';
       console.error('Error occurred: %s', errMessage, String(error));

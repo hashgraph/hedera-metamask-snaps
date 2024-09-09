@@ -19,12 +19,12 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import type { DialogParams, NodeType } from '@metamask/snaps-sdk';
+import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
 import { AssociateTokensCommand } from '../../commands/hts/AssociateTokensCommand';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { AssociateTokensRequestParams } from '../../types/params';
 import type { WalletSnapParams } from '../../types/state';
 import { CryptoUtils } from '../../utils/CryptoUtils';
@@ -47,7 +47,7 @@ export class AssociateTokensFacade {
   public static async associateTokens(
     walletSnapParams: WalletSnapParams,
     associateTokensRequestParams: AssociateTokensRequestParams,
-  ): Promise<TxReceipt> {
+  ): Promise<TxRecord> {
     const { origin, state } = walletSnapParams;
 
     const { tokenIds = [] as string[] } = associateTokensRequestParams;
@@ -58,27 +58,9 @@ export class AssociateTokensFacade {
     const { privateKey, curve } =
       state.accountState[hederaEvmAddress][network].keyStore;
 
-    let txReceipt = {} as TxReceipt;
+    let txReceipt = {} as TxRecord;
     try {
-      const panelToShow: (
-        | {
-            value: string;
-            type: NodeType.Heading;
-          }
-        | {
-            value: string;
-            type: NodeType.Text;
-            markdown?: boolean | undefined;
-          }
-        | {
-            type: NodeType.Divider;
-          }
-        | {
-            value: string;
-            type: NodeType.Copyable;
-            sensitive?: boolean | undefined;
-          }
-      )[] = [];
+      const panelToShow = SnapUtils.initializePanelToShow();
 
       panelToShow.push(
         heading('Associate Tokens'),
@@ -158,7 +140,12 @@ export class AssociateTokensFacade {
       }
       const command = new AssociateTokensCommand(tokenIds);
       txReceipt = await command.execute(hederaClient.getClient());
-
+      await SnapUtils.snapCreateDialogAfterTransaction(
+        origin,
+        network,
+        mirrorNodeUrl,
+        txReceipt,
+      );
       return txReceipt;
     } catch (error: any) {
       const errMessage = `Error while trying to associate tokens to the account`;

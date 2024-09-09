@@ -24,7 +24,7 @@ import {
   ContractFunctionParameters,
   Hbar,
 } from '@hashgraph/sdk';
-import type { TxReceipt } from '../../types/hedera';
+import type { TxRecord } from '../../types/hedera';
 import type { SmartContractFunctionParameter } from '../../types/params';
 import { Utils } from '../../utils/Utils';
 
@@ -53,7 +53,7 @@ export class CallSmartContractFunctionCommand {
     this.#payableAmount = payableAmount;
   }
 
-  public async execute(client: Client): Promise<TxReceipt> {
+  public async execute(client: Client): Promise<TxRecord> {
     const transaction = new ContractExecuteTransaction()
       .setContractId(this.#contractId)
       .setGas(this.#gas);
