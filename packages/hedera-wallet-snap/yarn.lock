@@ -2489,9 +2489,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hashgraph/cryptography@npm:1.4.8-beta.7":
-  version: 1.4.8-beta.7
-  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.7"
+"@hashgraph/cryptography@npm:1.4.8-beta.8":
+  version: 1.4.8-beta.8
+  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.8"
   dependencies:
     asn1js: ^3.0.5
     bignumber.js: ^9.1.1
@@ -2515,7 +2515,7 @@ __metadata:
       optional: true
     expo-random:
       optional: true
-  checksum: fc4aca4182c16f23c8e7f73e2bbf628e33cf3e6a7b4f2be5ede3188e99c9a2a5f064d0b66d5039c36523fae4be3146523dc190b31fa37059b998b741652505f2
+  checksum: a8688923bc9931957ea6d38ceec757016bd97d928761d2e8dd5f1e3f6a3f29da2cf259f7b0d09888081e08d32d5e4b9bed8fcb3f9c6376d8ba94b199b5b6b636
   languageName: node
   linkType: hard
 
@@ -2529,7 +2529,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap-site@workspace:packages/site"
   dependencies:
-    "@hashgraph/sdk": ^2.50.0
+    "@hashgraph/sdk": ^2.51.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -2585,7 +2585,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap@workspace:packages/snap"
   dependencies:
-    "@hashgraph/sdk": ^2.50.0
+    "@hashgraph/sdk": ^2.51.0
     "@jest/globals": ^29.7.0
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -2629,27 +2629,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hashgraph/proto@npm:2.15.0-beta.3":
-  version: 2.15.0-beta.3
-  resolution: "@hashgraph/proto@npm:2.15.0-beta.3"
+"@hashgraph/proto@npm:2.15.0-beta.4":
+  version: 2.15.0-beta.4
+  resolution: "@hashgraph/proto@npm:2.15.0-beta.4"
   dependencies:
     long: ^4.0.0
     protobufjs: ^7.2.5
-  checksum: e3f647905919b068c6eecee449ced13085968f4ee75d719ff32e609c0fe9fec1b909829523e52638bcd6de5122b06e660dddecaa68d725b77a73d09358988988
+  checksum: 9470832e5de409a2d80706ff46d208465207cadd81cbd60bae366e269ac3054c71133a89e8bab4a4504012944bb15aea54c37d630860c7965c014229bba184b1
   languageName: node
   linkType: hard
 
-"@hashgraph/sdk@npm:^2.50.0":
-  version: 2.50.0
-  resolution: "@hashgraph/sdk@npm:2.50.0"
+"@hashgraph/sdk@npm:^2.51.0":
+  version: 2.51.0
+  resolution: "@hashgraph/sdk@npm:2.51.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
-    "@hashgraph/cryptography": 1.4.8-beta.7
-    "@hashgraph/proto": 2.15.0-beta.3
+    "@hashgraph/cryptography": 1.4.8-beta.8
+    "@hashgraph/proto": 2.15.0-beta.4
     axios: ^1.6.4
     bignumber.js: ^9.1.1
     bn.js: ^5.1.1
@@ -2666,7 +2666,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 592f7d0106f4e9264612059e3b5210af7ddb210d8cfa6d78bbe7a1491462169d5ff65d8372ef2817beec945c75e808f505b37d7133c0c573bcfa37ba7670cc63
+  checksum: 7de736204a22763481c6d881c53a0afb684b7c996efd1fe8a50405ee6dda1a2732dbb449937b9ad85a26ce71bd3c14f5c3424c66ef305c4fde881845e848316c
   languageName: node
   linkType: hard
 
