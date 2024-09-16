@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';

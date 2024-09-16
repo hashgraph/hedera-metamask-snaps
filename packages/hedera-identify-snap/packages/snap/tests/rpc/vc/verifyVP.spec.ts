@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiablePresentation } from '@veramo/core';
@@ -96,6 +98,6 @@ describe('VerifyVP', () => {
       request: verifyVPRequest as any,
     });
 
-    await expect(verifyVPResponse).rejects.toThrowError();
+    await expect(verifyVPResponse).rejects.toThrow();
   });
 });

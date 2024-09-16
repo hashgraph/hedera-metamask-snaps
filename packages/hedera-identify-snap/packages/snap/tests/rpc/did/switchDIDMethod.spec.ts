@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
@@ -74,7 +76,7 @@ describe('SwitchDIDMethod', () => {
         origin: 'tests',
         request: switchDIDMethodRequestParams as any,
       }),
-    ).rejects.toThrowError();
+    ).rejects.toThrow();
 
     expect.assertions(1);
   });
@@ -98,7 +100,7 @@ describe('SwitchDIDMethod', () => {
       origin: 'tests',
       request: switchDIDMethodRequestParams as any,
     });
-    await expect(request).rejects.toThrowError();
+    await expect(request).rejects.toThrow();
     expect.assertions(1);
   });
 });

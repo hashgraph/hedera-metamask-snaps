@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
@@ -58,7 +60,7 @@ describe('delete all VCs', () => {
 
     await expect(
       onRpcRequest({ origin: 'tests', request: deleteAllVcsRequest as any }),
-    ).rejects.toThrowError();
+    ).rejects.toThrow();
 
     expect.assertions(1);
   });

@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
@@ -95,7 +97,7 @@ describe('RemoveVC', () => {
         origin: 'tests',
         request: removeVcRequest as any,
       }),
-    ).rejects.toThrowError();
+    ).rejects.toThrow();
 
     expect.assertions(1);
   });

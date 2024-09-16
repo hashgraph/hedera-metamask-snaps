@@ -11,21 +11,21 @@ type IWalletMock = {
 };
 
 export class WalletMock implements IWalletMock {
-  private snapState: IdentitySnapState | null = null;
+  #snapState: IdentitySnapState | null = null;
 
-  private wallet: Wallet = new Wallet(privateKey);
+  readonly #wallet: Wallet = new Wallet(privateKey);
 
-  private snapManageState(...params: unknown[]): IdentitySnapState | null {
+  #snapManageState(...params: unknown[]): IdentitySnapState | null {
     if (params.length === 0) {
       return null;
     }
 
     if (params[0] === 'get') {
-      return this.snapState;
+      return this.#snapState;
     } else if (params[0] === 'update') {
-      this.snapState = params[1] as IdentitySnapState;
+      this.#snapState = params[1] as IdentitySnapState;
     } else if (params[0] === 'clear') {
-      this.snapState = null;
+      this.#snapState = null;
     }
 
     return null;
@@ -38,7 +38,7 @@ export class WalletMock implements IWalletMock {
     snap_manageState: jest
       .fn()
       .mockImplementation((...params: unknown[]) =>
-        this.snapManageState(...params),
+        this.#snapManageState(...params),
       ),
     personal_sign: jest.fn().mockResolvedValue(signedMsg),
     eth_signTypedData_v4: jest
@@ -51,7 +51,7 @@ export class WalletMock implements IWalletMock {
         delete types.EIP712Domain;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        return this.wallet._signTypedData(domain, types, message);
+        return this.#wallet.signTypedData(domain, types, message);
       }),
   };
 

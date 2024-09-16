@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
@@ -80,7 +82,7 @@ describe('VerifyVC', () => {
     });
     await expect(
       onRpcRequest({ origin: 'tests', request: verifyVCRequest as any }),
-    ).rejects.toThrowError();
+    ).rejects.toThrow();
     expect.assertions(1);
   });
 });

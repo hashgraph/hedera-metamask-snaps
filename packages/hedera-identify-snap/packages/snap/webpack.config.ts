@@ -1,6 +1,9 @@
+/* eslint-disable no-restricted-globals */
+
 import SnapsWebpackPlugin from '@metamask/snaps-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+// eslint-disable-next-line import/no-nodejs-modules
 import { resolve } from 'path';
 import { Configuration, ProvidePlugin } from 'webpack';
 import { merge } from 'webpack-merge';

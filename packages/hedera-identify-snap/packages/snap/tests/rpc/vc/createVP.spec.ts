@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiablePresentation } from '@veramo/core';
@@ -55,7 +57,7 @@ describe('createVP', () => {
 
   it('should succeed creating VP from 1 VC', async () => {
     const createVpRequest = getRequestParams('createVP', {
-      vcIds: [vcIds[0] as string],
+      vcIds: [vcIds[0]],
     });
 
     const presentation = (await onRpcRequest({
@@ -85,7 +87,7 @@ describe('createVP', () => {
     snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 
     const createVpRequest = getRequestParams('createVP', {
-      vcs: [vcIds[0] as string],
+      vcs: [vcIds[0]],
     });
 
     await expect(
@@ -93,7 +95,7 @@ describe('createVP', () => {
         origin: 'tests',
         request: createVpRequest as any,
       }),
-    ).rejects.toThrowError();
+    ).rejects.toThrow();
     expect.assertions(1);
   });
 });
