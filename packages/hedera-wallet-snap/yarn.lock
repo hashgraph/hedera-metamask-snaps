@@ -2543,7 +2543,7 @@ __metadata:
     "@types/bootstrap": ^5.2.10
     "@types/jest": ^29.5.12
     "@types/lodash.clonedeep": ^4.5.9
-    "@types/react": ^18.3.3
+    "@types/react": ^18.3.6
     "@types/react-bootstrap": ^0.32.37
     "@types/react-dom": ^18.3.0
     "@types/react-select": ^5.0.1
@@ -5972,13 +5972,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:>=16.9.11, @types/react@npm:^18.3.3":
+"@types/react@npm:*, @types/react@npm:>=16.9.11":
   version: 18.3.3
   resolution: "@types/react@npm:18.3.3"
   dependencies:
     "@types/prop-types": "*"
     csstype: ^3.0.2
   checksum: c63d6a78163244e2022b01ef79b0baec4fe4da3475dc4a90bb8accefad35ef0c43560fd0312e5974f92a0f1108aa4d669ac72d73d66396aa060ea03b5d2e3873
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^18.3.6":
+  version: 18.3.6
+  resolution: "@types/react@npm:18.3.6"
+  dependencies:
+    "@types/prop-types": "*"
+    csstype: ^3.0.2
+  checksum: 66cf1ea408b63c518e2d36c5a8c425e856885c62160d85cfa653c061bbf744f7858b102da04d2bad72bd93a5469e016538e0723f57ef56de512c79712d209add
   languageName: node
   linkType: hard
 
