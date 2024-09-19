@@ -62,7 +62,7 @@
     "@metamask/eslint-config-nodejs": "^12.1.0",
     "@metamask/eslint-config-typescript": "^12.1.0",
     "@metamask/snaps-cli": "^6.3.1",
-    "@metamask/snaps-jest": "^8.3.0",
+    "@metamask/snaps-jest": "^8.4.0",
     "@types/jest": "^29.5.12",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/normalize-url": "^4.2.0",
