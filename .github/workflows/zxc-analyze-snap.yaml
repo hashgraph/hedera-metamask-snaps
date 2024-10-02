@@ -80,7 +80,7 @@ jobs:
           files: "packages/${{ inputs.snap-package-dir }}/**/junit-snap.xml"
 
       - name: Publish Coverage to CodeCov
-        uses: codecov/codecov-action@84508663e988701840491b86de86b666e8a86bed # v4.3.0
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
         with:
           token: ${{ secrets.codecov-token }}
           slug: hashgraph/hedera-metamask-snaps
