@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
  *
  */
 
-import { Panel } from '@metamask/snaps-ui';
-
-import { Account, AccountInfo } from './account';
+import type { Account, AccountInfo } from './account';
 
 export type WalletSnapState = {
   currentAccount: Account;
@@ -67,11 +65,4 @@ export type WalletAccountState = {
 export type WalletSnapParams = {
   origin: string;
   state: WalletSnapState;
-  mirrorNodeUrl: string;
-};
-
-export type SnapDialogParams = {
-  type: 'alert' | 'confirmation' | 'prompt';
-  content: Panel;
-  placeholder?: string;
 };

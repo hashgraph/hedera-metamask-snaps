@@ -55,6 +55,9 @@ const TransferCrypto: FC<Props> = ({
           amount: sendAmount,
         } as SimpleTransfer,
       ];
+      if (assetType === 'NFT') {
+        transfers[0].amount = 1;
+      }
       if (assetType === 'TOKEN' || assetType === 'NFT') {
         transfers[0].assetId = assetId;
       }
@@ -71,10 +74,12 @@ const TransferCrypto: FC<Props> = ({
 
       const transferCryptoParams = {
         transfers,
-        memo,
         undefined,
         serviceFee,
       } as TransferCryptoRequestParams;
+      if (!_.isEmpty(memo)) {
+        transferCryptoParams.memo = memo;
+      }
 
       const response: any = await transferCrypto(
         network,
@@ -170,7 +175,8 @@ const TransferCrypto: FC<Props> = ({
 
             {(assetType === 'TOKEN' || assetType === 'NFT') && (
               <label>
-                Enter Asset Id (eg. Token Id, NFT Id)
+                Enter Asset Id (eg. Token Id, NFT Id(Nft Id should be in the
+                form TokenId/SerialNumber))
                 <input
                   type="text"
                   style={{ width: '100%' }}
@@ -181,17 +187,22 @@ const TransferCrypto: FC<Props> = ({
               </label>
             )}
             <br />
-            <label>
-              Enter an amount to send
-              <input
-                type="number"
-                style={{ width: '100%' }}
-                value={sendAmount}
-                placeholder="0.01"
-                onChange={(e) => setSendAmount(parseFloat(e.target.value))}
-              />
-            </label>
-            <br />
+
+            {assetType !== 'NFT' && (
+              <>
+                <label>
+                  Enter an amount to send
+                  <input
+                    type="number"
+                    style={{ width: '100%' }}
+                    value={sendAmount}
+                    placeholder="0.01"
+                    onChange={(e) => setSendAmount(parseFloat(e.target.value))}
+                  />
+                </label>
+                <br />
+              </>
+            )}
           </>
         ),
         button: (

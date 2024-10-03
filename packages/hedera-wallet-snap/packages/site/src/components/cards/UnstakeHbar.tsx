@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
  * limitations under the License.
  *
  */
+
 import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
-import { Account, StakeHbarRequestParams } from '../../types/snap';
-import { shouldDisplayReconnectButton, stakeHbar } from '../../utils';
+import { Account } from '../../types/snap';
+import { shouldDisplayReconnectButton, unstakeHbar } from '../../utils';
 import { Card, SendHelloButton } from '../base';
 import ExternalAccount, {
   GetExternalAccountRef,
@@ -49,14 +50,9 @@ const UnstakeHbar: FC<Props> = ({ network, mirrorNodeUrl, setAccountInfo }) => {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const stakeHbarParams = {
-        nodeId: null,
-        accountId: null,
-      } as StakeHbarRequestParams;
-      const response: any = await stakeHbar(
+      const response: any = await unstakeHbar(
         network,
         mirrorNodeUrl,
-        stakeHbarParams,
         externalAccountParams,
       );
 

@@ -1,0 +1,95 @@
+name: "ZXC: Test Snap"
+
+on:
+  workflow_call:
+    inputs:
+      snap-package-dir:
+        description: "The directory of the snap package to test:"
+        type: string
+        required: true
+      snap-report-name:
+        description: "The name of the snap project being tested:"
+        type: string
+        required: true
+      custom-job-label:
+        description: "Custom Job Label:"
+        type: string
+        required: false
+        default: "Analyze"
+    secrets:
+      codecov-token:
+        description: "Codecov Token"
+        required: true
+      codacy-project-token:
+        description: "Codacy Project Token"
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  id-token: write
+  issues: write
+  checks: write
+  pull-requests: write
+  contents: read
+
+env:
+  PROJECT_DIRECTORY: packages/${{ inputs.snap-package-dir }}
+  SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
+
+jobs:
+  analyze:
+    name: ${{ inputs.custom-job-label || 'Analyze' }}
+    runs-on: smart-contracts-linux-medium
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+          disable-sudo: true
+
+      - name: Checkout Code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 20
+
+      - name: Fetch Snap Unit Test Reports
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: ${{ inputs.snap-report-name }} Unit Test Reports
+          path: ${{ env.SNAP_DIRECTORY }}/junit*.xml
+
+      - name: Fetch Snap Coverage Reports
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: ${{ inputs.snap-report-name }} Coverage Reports
+          path: ${{ env.SNAP_DIRECTORY }}/coverage
+
+      - name: Show Snap Contents
+        run: ls -la ${{ env.SNAP_DIRECTORY }}/coverage ${{ env.SNAP_DIRECTORY }}/junit*.xml
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@30eadd5010312f995f0d3b3cff7fe2984f69409e # v2.16.1
+        with:
+          check_name: "${{ inputs.snap-report-name }} Unit Test Results"
+          files: "packages/${{ inputs.snap-package-dir }}/**/junit-snap.xml"
+
+      - name: Publish Coverage to CodeCov
+        uses: codecov/codecov-action@84508663e988701840491b86de86b666e8a86bed # v4.3.0
+        with:
+          token: ${{ secrets.codecov-token }}
+          slug: hashgraph/hedera-metamask-snaps
+          directory: ${{ env.SNAP_DIRECTORY }}/coverage
+
+      - name: Publish Coverage to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.codacy-project-token }}
+        run: bash <(curl -Ls https://coverage.codacy.com/get.sh) report -l Typescript $(find '${{ env.SNAP_DIRECTORY }}' -name 'lcov.info' -printf '-r %p ')
+
+
+

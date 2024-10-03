@@ -1,36 +1,57 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
+ *
+ * note on the window.location.href global: without this, some tests will fail
+ * because of an upstream hashgraph / node-forge dependency
  */
-
-const config = {
-  // Automatically clear mock calls, instances, contexts and results before every test
+module.exports = {
   clearMocks: false,
-  // Indicates whether the coverage information should be collected while executing the test
-  collectCoverage: false,
-  // The directory where Jest should output its coverage files
-  coverageDirectory: 'coverage',
-  // An array of regexp pattern strings used to skip coverage collection
-  coveragePathIgnorePatterns: ['/node_modules/', 'tests'],
-  // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: 'v8',
-  // An array of file extensions your modules use
-  moduleFileExtensions: ['js', 'json', 'ts', 'mjs', 'cjs'],
-  // The test environment that will be used for testing
-  testEnvironment: 'node',
-  // The regexp pattern or array of patterns that Jest uses to detect test files
-  testRegex: '.*\\.spec\\.ts$',
-  // A set of global variables that need to be available in all test environments
   globals: {
     window: {
       location: {
         hostname: 'hedera-pulse',
+        href: 'http://localhost',
       },
     },
   },
-  // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  transformIgnorePatterns: [],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx', 'mjs', 'cjs'],
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testRegex: '.*\\.spec\\.ts$',
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['/node_modules/(?!normalize-url).+\\.js$'],
   testTimeout: 120000,
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        suiteName: 'Wallet Snap Unit Tests',
+        outputName: 'junit-snap.xml',
+      },
+    ],
+  ],
 };
-
-export default config;

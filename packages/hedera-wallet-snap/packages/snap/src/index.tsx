@@ -1,0 +1,623 @@
+/*-
+ *
+ * Hedera Wallet Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+import { rpcErrors } from '@metamask/rpc-errors';
+import type {
+  OnHomePageHandler,
+  OnInstallHandler,
+  OnRpcRequestHandler,
+  OnUpdateHandler,
+  OnUserInputHandler,
+} from '@metamask/snaps-sdk';
+import _ from 'lodash';
+import { SignMessageCommand } from './commands/SignMessageCommand';
+import { HelloUI } from './components/hello';
+import { ShowAccountPrivateKeyUI } from './components/showAccountPrivateKey';
+import { OnHomePageUI } from './custom-ui/onHome';
+import { onInstallUI } from './custom-ui/onInstall';
+import { onUpdateUI } from './custom-ui/onUpdate';
+import { onUserInputUI } from './custom-ui/onUserInput';
+import { StakeHbarFacade } from './facades/StakeHbarFacade';
+import { TransferCryptoFacade } from './facades/TransferCryptoFacade';
+import { DeleteAccountFacade } from './facades/account/DeleteAccountFacade';
+import { FreezeAccountFacade } from './facades/account/FreezeAccountFacade';
+import { GetAccountBalanceFacade } from './facades/account/GetAccountBalanceFacade';
+import { GetAccountInfoFacade } from './facades/account/GetAccountInfoFacade';
+import { ApproveAllowanceFacade } from './facades/allowance/ApproveAllowanceFacade';
+import { DeleteAllowanceFacade } from './facades/allowance/DeleteAllowanceFacade';
+import { CreateTopicFacade } from './facades/hcs/CreateTopicFacade';
+import { DeleteTopicFacade } from './facades/hcs/DeleteTopicFacade';
+import { GetTopicInfoFacade } from './facades/hcs/GetTopicInfoFacade';
+import { GetTopicMessagesFacade } from './facades/hcs/GetTopicMessagesFacade';
+import { SubmitMessageFacade } from './facades/hcs/SubmitMessageFacade';
+import { UpdateTopicFacade } from './facades/hcs/UpdateTopicFacade';
+import { CallSmartContractFunctionFacade } from './facades/hscs/CallSmartContractFunctionFacade';
+import { CreateSmartContractFacade } from './facades/hscs/CreateSmartContractFacade';
+import { DeleteSmartContractFacade } from './facades/hscs/DeleteSmartContractFacade';
+import { EthereumTransactionFacade } from './facades/hscs/EthereumTransactionFacade';
+import { GetSmartContractBytecodeFacade } from './facades/hscs/GetSmartContractBytecodeFacade';
+import { GetSmartContractFunctionFacade } from './facades/hscs/GetSmartContractFunctionFacade';
+import { GetSmartContractInfoFacade } from './facades/hscs/GetSmartContractInfoFacade';
+import { UpdateSmartContractFacade } from './facades/hscs/UpdateSmartContractFacade';
+import { AssociateTokensFacade } from './facades/hts/AssociateTokensFacade';
+import { AtomicSwapFacade } from './facades/hts/AtomicSwapFacade';
+import { BurnTokenFacade } from './facades/hts/BurnTokenFacade';
+import { CreateTokenFacade } from './facades/hts/CreateTokenFacade';
+import { DeleteTokenFacade } from './facades/hts/DeleteTokenFacade';
+import { DissociateTokensFacade } from './facades/hts/DissociateTokensFacade';
+import { EnableKYCAccountFacade } from './facades/hts/EnableKYCAccountFacade';
+import { MintTokenFacade } from './facades/hts/MintTokenFacade';
+import { PauseTokenFacade } from './facades/hts/PauseTokenFacade';
+import { UpdateTokenFacade } from './facades/hts/UpdateTokenFacade';
+import { UpdateTokenFeeScheduleFacade } from './facades/hts/UpdateTokenFeeScheduleFacade';
+import { WipeTokenFacade } from './facades/hts/WipeTokenFacade';
+import { SnapAccounts } from './snap/SnapAccounts';
+import { SnapState } from './snap/SnapState';
+import { HederaTransactionsStrategy } from './strategies/HederaTransactionsStrategy';
+import type { StakeHbarRequestParams } from './types/params';
+import type { WalletSnapParams } from './types/state';
+import { HederaUtils } from './utils/HederaUtils';
+
+/**
+ * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
+ * @param args - The request handler args as object.
+ * @param args.origin - The origin of the request, e.g., the website that
+ * invoked the snap.
+ * @param args.request - A validated JSON-RPC request object.
+ * @returns The result of `snap_dialog`.
+ * @throws If the request method is not valid for this snap.
+ */
+export const onRpcRequest: OnRpcRequestHandler = async ({
+  origin,
+  request,
+}) => {
+  console.log('Request:', JSON.stringify(request, null, 4));
+  console.log('Origin:', origin);
+  console.log('-------------------------------------------------------------');
+
+  let state = await SnapState.getStateUnchecked();
+  if (_.isEmpty(state)) {
+    state = await SnapState.initState();
+  }
+
+  let isExternalAccount = false;
+  if (HederaUtils.isExternalAccountFlagSet(request.params)) {
+    isExternalAccount = true;
+  }
+
+  // Get network and mirrorNodeUrl
+  const { network, mirrorNodeUrl } = HederaUtils.getNetworkInfoFromUser(
+    request.params,
+  );
+
+  // Set current account
+  await SnapAccounts.setCurrentAccount(
+    origin,
+    state,
+    request.params,
+    network,
+    mirrorNodeUrl,
+    isExternalAccount,
+  );
+
+  const walletSnapParams: WalletSnapParams = {
+    origin,
+    state,
+  };
+
+  switch (request.method) {
+    case 'hello':
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: (
+            <HelloUI
+              origin={origin}
+              network={network}
+              mirrorNodeUrl={mirrorNodeUrl}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.hederaEvmAddress}
+            />
+          ),
+        },
+      });
+      return {
+        currentAccount: state.currentAccount,
+      };
+    case 'getCurrentAccount':
+      return {
+        currentAccount: state.currentAccount,
+      };
+    case 'showAccountPrivateKey':
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: (
+            <ShowAccountPrivateKeyUI
+              origin={origin}
+              network={network}
+              mirrorNodeUrl={mirrorNodeUrl}
+              privateKey={
+                state.accountState[state.currentAccount.hederaEvmAddress][
+                  state.currentAccount.network
+                ].keyStore.privateKey
+              }
+              publicKey={state.currentAccount.publicKey}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.hederaEvmAddress}
+            />
+          ),
+        },
+      });
+      return {
+        currentAccount: state.currentAccount,
+      };
+    case 'signMessage': {
+      HederaUtils.isValidSignMessageRequest(request.params);
+      const signMessageCommand = new SignMessageCommand(
+        walletSnapParams,
+        request.params,
+      );
+      return {
+        currentAccount: state.currentAccount,
+        signature: await signMessageCommand.execute(),
+      };
+    }
+    // TODO: Need to refactor to use JSX
+    case 'getAccountInfo': {
+      HederaUtils.isValidGetAccountInfoRequest(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        accountInfo: await GetAccountInfoFacade.getAccountInfo(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'getAccountBalance': {
+      return {
+        currentAccount: state.currentAccount,
+        // eslint-disable-next-line prettier/prettier
+        accountBalance:
+          await GetAccountBalanceFacade.getAccountBalance(walletSnapParams),
+      };
+    }
+    case 'getTransactions': {
+      HederaUtils.isValidGetTransactionsParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        transactions: await HederaTransactionsStrategy.getTransactions(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'transferCrypto': {
+      HederaUtils.isValidTransferCryptoParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await TransferCryptoFacade.transferCrypto(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'stakeHbar': {
+      HederaUtils.isValidStakeHbarParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await StakeHbarFacade.stakeHbar(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'unstakeHbar': {
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await StakeHbarFacade.stakeHbar(
+          walletSnapParams,
+          {} as StakeHbarRequestParams,
+        ),
+      };
+    }
+    case 'approveAllowance': {
+      HederaUtils.isValidApproveAllowanceParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await ApproveAllowanceFacade.approveAllowance(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'deleteAllowance': {
+      HederaUtils.isValidDeleteAllowanceParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteAllowanceFacade.deleteAllowance(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'deleteAccount': {
+      HederaUtils.isValidDeleteAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteAccountFacade.deleteAccount(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/createToken': {
+      HederaUtils.isValidCreateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await CreateTokenFacade.createToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/mintToken': {
+      HederaUtils.isValidMintTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await MintTokenFacade.mintToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/burnToken': {
+      HederaUtils.isValidBurnTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await BurnTokenFacade.burnToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/pauseToken': {
+      HederaUtils.isValidPauseOrDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await PauseTokenFacade.pauseToken(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/unpauseToken': {
+      HederaUtils.isValidPauseOrDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await PauseTokenFacade.pauseToken(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
+    case 'hts/associateTokens': {
+      HederaUtils.isValidAssociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await AssociateTokensFacade.associateTokens(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/dissociateTokens': {
+      HederaUtils.isValidDissociateTokensParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DissociateTokensFacade.dissociateTokens(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+    case 'hts/freezeAccount': {
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/unfreezeAccount': {
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await FreezeAccountFacade.freezeAccount(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
+    case 'hts/enableKYCFlag': {
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await EnableKYCAccountFacade.enableKYCAccount(
+          walletSnapParams,
+          request.params,
+          true,
+        ),
+      };
+    }
+    case 'hts/disableKYCFlag': {
+      HederaUtils.isValidFreezeOrEnableKYCAccountParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await EnableKYCAccountFacade.enableKYCAccount(
+          walletSnapParams,
+          request.params,
+          false,
+        ),
+      };
+    }
+    case 'hts/wipeToken': {
+      HederaUtils.isValidWipeTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await WipeTokenFacade.wipeToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/deleteToken': {
+      HederaUtils.isValidPauseOrDeleteTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteTokenFacade.deleteToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/updateToken': {
+      HederaUtils.isValidUpdateTokenParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTokenFacade.updateToken(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/updateTokenFeeSchedule': {
+      HederaUtils.isValidUpdateTokenFeeScheduleParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTokenFeeScheduleFacade.updateTokenFeeSchedule(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/initiateSwap': {
+      HederaUtils.isValidInitiateSwapParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await AtomicSwapFacade.initiateSwap(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hts/completeSwap': {
+      HederaUtils.isValidSignScheduledTxParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await AtomicSwapFacade.completeSwap(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/createSmartContract': {
+      HederaUtils.isValidCreateSmartContractParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await CreateSmartContractFacade.createSmartContract(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/updateSmartContract': {
+      HederaUtils.isValidUpdateSmartContractParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateSmartContractFacade.updateSmartContract(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/deleteSmartContract': {
+      HederaUtils.isValidDeleteSmartContractParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteSmartContractFacade.deleteSmartContract(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/callSmartContractFunction': {
+      HederaUtils.isValidCallSmartContractFunctionParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt:
+          await CallSmartContractFunctionFacade.callSmartContractFunction(
+            walletSnapParams,
+            request.params,
+          ),
+      };
+    }
+
+    case 'hscs/getSmartContractFunction': {
+      HederaUtils.isValidGetSmartContractFunctionParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        result: await GetSmartContractFunctionFacade.getSmartContractFunction(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/getSmartContractBytecode': {
+      HederaUtils.isValidGetSmartContractBytecodeParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        bytecode: await GetSmartContractBytecodeFacade.getSmartContractBytecode(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/getSmartContractInfo': {
+      HederaUtils.isValidGetSmartContractInfoParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        info: await GetSmartContractInfoFacade.getSmartContractInfo(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hscs/ethereumTransaction': {
+      HederaUtils.isValidEthereumTransactionParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await EthereumTransactionFacade.ethereumTransaction(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/createTopic': {
+      HederaUtils.isValidCreateTopicParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await CreateTopicFacade.createTopic(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/updateTopic': {
+      HederaUtils.isValidUpdateTopicParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await UpdateTopicFacade.updateTopic(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/submitMessage': {
+      HederaUtils.isValidSubmitMessageParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await SubmitMessageFacade.submitMessage(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/getTopicInfo': {
+      HederaUtils.isValidGetTopicInfoRequest(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        topicInfo: await GetTopicInfoFacade.getTopicInfo(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/getTopicMessages': {
+      HederaUtils.isValidGetTopicMessagesRequest(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        topicMessages: await GetTopicMessagesFacade.getTopicMessages(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    case 'hcs/deleteTopic': {
+      HederaUtils.isValidDeleteTopicParams(request.params);
+      return {
+        currentAccount: state.currentAccount,
+        receipt: await DeleteTopicFacade.deleteTopic(
+          walletSnapParams,
+          request.params,
+        ),
+      };
+    }
+
+    default:
+      // Throw a known error to avoid crashing the Snap
+      throw rpcErrors.methodNotFound(request.method);
+  }
+};
+
+export const onHomePage: OnHomePageHandler = OnHomePageUI;
+
+export const onUserInput: OnUserInputHandler = onUserInputUI;
+
+export const onInstall: OnInstallHandler = onInstallUI;
+
+export const onUpdate: OnUpdateHandler = onUpdateUI;

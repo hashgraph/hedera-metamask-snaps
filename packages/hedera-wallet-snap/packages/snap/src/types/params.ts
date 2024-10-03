@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,27 @@
  *
  */
 
-import { SimpleTransfer } from '../services/hedera';
+import type { AtomicSwap, SimpleTransfer } from './hedera';
 
 export type MirrorNodeParams = { mirrorNodeUrl?: string };
 
 export type ServiceFee = {
   percentageCut: number;
-  toAddress: string;
+  toAddress?: string;
 };
 
 export type SignMessageRequestParams = {
-  header?: string;
   message: string;
 };
 
 export type GetAccountInfoRequestParams = {
   accountId?: string;
   serviceFee?: ServiceFee;
+  fetchUsingMirrorNode?: boolean;
 };
 
 export type GetTransactionsRequestParams = {
   transactionId?: string;
-};
-
-export type AssociateTokensRequestParams = {
-  tokenIds: string[];
 };
 
 export type TransferCryptoRequestParams = {
@@ -78,4 +74,210 @@ export type DeleteAllowanceRequestParams = {
   assetType: 'HBAR' | 'TOKEN' | 'NFT';
   assetId?: string;
   spenderAccountId?: string;
+};
+
+export type TokenCustomFee = {
+  feeCollectorAccountId: string; // Sets the fee collector account ID that collects the fee
+  hbarAmount?: number; // Set the amount of HBAR to be collected
+  tokenAmount?: number; // Sets the amount of tokens to be collected as the fee
+  denominatingTokenId?: string; // The ID of the token used to charge the fee. The denomination of the fee is taken as HBAR if left unset
+  allCollectorsAreExempt?: boolean; // If true, exempts all the token's fee collector accounts from this fee
+};
+
+export type CreateTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  name: string;
+  symbol: string;
+  decimals: number;
+  initialSupply?: number;
+  kycPublicKey?: string;
+  freezePublicKey?: string;
+  pausePublicKey?: string;
+  wipePublicKey?: string;
+  supplyPublicKey?: string;
+  feeSchedulePublicKey?: string;
+  freezeDefault?: boolean;
+  expirationTime?: string;
+  autoRenewAccountId?: string;
+  tokenMemo?: string;
+  customFees?: TokenCustomFee[];
+  supplyType: 'FINITE' | 'INFINITE';
+  maxSupply?: number;
+};
+
+export type MintTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  amount?: number;
+  metadata?: string[];
+};
+
+export type BurnTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  amount?: number;
+  serialNumbers?: number[];
+};
+
+export type PauseOrDeleteTokenRequestParams = {
+  tokenId: string;
+};
+
+export type AssociateTokensRequestParams = {
+  tokenIds: string[];
+};
+
+export type DissociateTokensRequestParams = {
+  tokenIds: string[];
+};
+
+export type FreezeOrEnableKYCAccountRequestParams = {
+  tokenId: string;
+  accountId: string;
+};
+
+export type WipeTokenRequestParams = {
+  assetType: 'TOKEN' | 'NFT';
+  tokenId: string;
+  accountId: string;
+  amount?: number;
+  serialNumbers?: number[];
+};
+
+export type UpdateTokenRequestParams = {
+  tokenId: string;
+  name?: string;
+  symbol?: string;
+  treasuryAccountId?: string;
+  adminPublicKey?: string;
+  kycPublicKey?: string;
+  freezePublicKey?: string;
+  feeSchedulePublicKey?: string;
+  pausePublicKey?: string;
+  wipePublicKey?: string;
+  supplyPublicKey?: string;
+  expirationTime?: string;
+  tokenMemo?: string;
+  autoRenewAccountId?: string;
+  autoRenewPeriod?: number;
+};
+
+export type UpdateTokenFeeScheduleRequestParams = {
+  tokenId: string;
+  customFees: TokenCustomFee[];
+};
+
+export type InitiateSwapRequestParams = {
+  atomicSwaps: AtomicSwap[];
+  memo?: string;
+  maxFee?: number; // hbars
+  serviceFee?: ServiceFee;
+};
+
+export type SignScheduledTxParams = {
+  scheduleId: string;
+};
+
+export type SmartContractFunctionParameter = {
+  type: 'string' | 'bytes' | 'boolean' | 'int' | 'uint';
+  value: string | number | boolean | Uint8Array;
+};
+
+export type CreateSmartContractRequestParams = {
+  gas: number;
+  bytecode: string;
+  initialBalance?: number;
+  adminKey?: string;
+  constructorParameters?: SmartContractFunctionParameter[];
+  contractMemo?: string;
+  stakedNodeId?: number;
+  stakedAccountId?: string;
+  declineStakingReward?: boolean;
+  autoRenewAccountId?: string;
+  autoRenewPeriod?: number;
+  maxAutomaticTokenAssociations?: number;
+};
+
+export type UpdateSmartContractRequestParams = {
+  contractId: string;
+  adminKey?: string;
+  contractMemo?: string;
+  expirationTime?: string;
+  maxAutomaticTokenAssociations?: number;
+  stakedAccountId?: string;
+  stakedNodeId?: number;
+  declineStakingReward?: boolean;
+  autoRenewPeriod?: number;
+  autoRenewAccountId?: string;
+};
+
+export type DeleteSmartContractRequestParams = {
+  contractId: string;
+  transferAccountId?: string;
+  transferContractId?: string;
+};
+
+export type CallSmartContractFunctionRequestParams = {
+  contractId: string;
+  functionName: string;
+  functionParams?: SmartContractFunctionParameter[];
+  gas: number;
+  payableAmount?: number;
+};
+
+export type GetSmartContractFunctionRequestParams = {
+  contractId: string;
+  functionName: string;
+  functionParams?: SmartContractFunctionParameter[];
+  gas: number;
+  senderAccountId?: string;
+};
+
+export type GetSmartContractDetailsRequestParams = {
+  contractId: string;
+};
+
+export type EthereumTransactionRequestParams = {
+  ethereumData: string;
+  callDataFileId?: string;
+  maxGasAllowanceHbar?: number;
+};
+
+export type CreateTopicRequestParams = {
+  memo?: string;
+  adminKey?: string;
+  submitKey?: string;
+  autoRenewPeriod?: number;
+  autoRenewAccount?: string;
+};
+
+export type UpdateTopicRequestParams = {
+  topicId: string;
+  memo?: string;
+  expirationTime?: number;
+  adminKey?: string;
+  submitKey?: string;
+  autoRenewPeriod?: number;
+  autoRenewAccount?: string;
+};
+
+export type SubmitMessageRequestParams = {
+  topicId: string;
+  message: string;
+  maxChunks?: number;
+  chunkSize?: number;
+};
+
+export type GetTopicInfoRequestParams = {
+  topicId: string;
+  serviceFee?: ServiceFee;
+};
+
+export type GetTopicMessagesRequestParams = {
+  topicId: string;
+  sequenceNumber?: number;
+};
+
+export type DeleteTopicRequestParams = {
+  topicId: string;
 };

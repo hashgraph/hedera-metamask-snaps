@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2024 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,22 +21,53 @@
 import { useContext, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
+import { SubmitMessage } from '..//components/cards/hcs/SubmitMessage';
 import { Card, InstallFlaskButton } from '../components/base';
 import { ApproveAllowance } from '../components/cards/ApproveAllowance';
-import { ConnectPulseSnap } from '../components/cards/ConnectPulseSnap';
+import { ConnectHederaWalletSnap } from '../components/cards/ConnectHederaWalletSnap';
 import { DeleteAccount } from '../components/cards/DeleteAccount';
 import { DeleteAllowance } from '../components/cards/DeleteAllowance';
 import { GetAccountInfo } from '../components/cards/GetAccountInfo';
 import { GetTransactions } from '../components/cards/GetTransactions';
-import { ReconnectPulseSnap } from '../components/cards/ReconnectPulseSnap';
+import { ReconnectHederaWalletSnap } from '../components/cards/ReconnectHederaWalletSnap';
 import { SendHelloHessage } from '../components/cards/SendHelloMessage';
+import { ShowAccountPrivateKey } from '../components/cards/ShowAccountPrivateKey';
 import { SignMessage } from '../components/cards/SignMessage';
 import { StakeHbar } from '../components/cards/StakeHbar';
 import { Todo } from '../components/cards/Todo';
 import Tokens from '../components/cards/Tokens';
 import { TransferCrypto } from '../components/cards/TransferCrypto';
 import { UnstakeHbar } from '../components/cards/UnstakeHbar';
+import { CreateTopic } from '../components/cards/hcs/CreateTopic';
+import { DeleteTopic } from '../components/cards/hcs/DeleteTopic';
+import { GetTopicInfo } from '../components/cards/hcs/GetTopicInfo';
+import { GetTopicMessages } from '../components/cards/hcs/GetTopicMessages';
+import { UpdateTopic } from '../components/cards/hcs/UpdateTopic';
+import { CallSmartContractFunction } from '../components/cards/hscs/CallSmartContractFunction';
+import { CreateSmartContract } from '../components/cards/hscs/CreateSmartContract';
+import { DeleteSmartContract } from '../components/cards/hscs/DeleteSmartContract';
+import { EthereumTransaction } from '../components/cards/hscs/EthereumTransaction';
+import { GetSmartContractBytecode } from '../components/cards/hscs/GetSmartContractBytecode';
+import { GetSmartContractFunction } from '../components/cards/hscs/GetSmartContractFunction';
+import { GetSmartContractInfo } from '../components/cards/hscs/GetSmartContractInfo';
+import { UpdateSmartContract } from '../components/cards/hscs/UpdateSmartContract';
 import { AssociateTokens } from '../components/cards/hts/AssociateTokens';
+import { AtomicSwapComplete } from '../components/cards/hts/AtomicSwapComplete';
+import { AtomicSwapInitiate } from '../components/cards/hts/AtomicSwapInitiate';
+import { BurnToken } from '../components/cards/hts/BurnToken';
+import { CreateToken } from '../components/cards/hts/CreateToken';
+import { DeleteToken } from '../components/cards/hts/DeleteToken';
+import { DisableKYCAccount } from '../components/cards/hts/DisableKYCAccount';
+import { DissociateTokens } from '../components/cards/hts/DissociateTokens';
+import { EnableKYCAccount } from '../components/cards/hts/EnableKYCAccount';
+import { FreezeAccount } from '../components/cards/hts/FreezeAccount';
+import { MintToken } from '../components/cards/hts/MintToken';
+import { PauseToken } from '../components/cards/hts/PauseToken';
+import { UnfreezeAccount } from '../components/cards/hts/UnfreezeAccount';
+import { UnpauseToken } from '../components/cards/hts/UnpauseToken';
+import { UpdateToken } from '../components/cards/hts/UpdateToken';
+import { UpdateTokenFeeSchedule } from '../components/cards/hts/UpdateTokenFeeSchedule';
+import { WipeToken } from '../components/cards/hts/WipeToken';
 import { networkOptions } from '../config/constants';
 import {
   CardContainer,
@@ -48,7 +79,7 @@ import {
   Subtitle,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
-import { Account } from '../types/snap';
+import type { Account } from '../types/snap';
 import { connectSnap, getSnap } from '../utils';
 
 const Index = () => {
@@ -56,6 +87,7 @@ const Index = () => {
   const [currentNetwork, setCurrentNetwork] = useState(networkOptions[0]);
   const [mirrorNodeUrl, setMirrorNodeUrl] = useState('');
   const [accountInfo, setAccountInfo] = useState<Account>({} as Account);
+  const [showZeroBalances, setShowZeroBalances] = useState(false);
 
   const handleNetworkChange = (network: any) => {
     setCurrentNetwork(network);
@@ -72,16 +104,16 @@ const Index = () => {
         payload: installedSnap,
       });
       setAccountInfo({} as Account);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
+    } catch (error) {
+      console.error(error);
+      dispatch({ type: MetamaskActions.SetError, payload: error });
     }
   };
 
   return (
     <PageContainer>
       <Heading>
-        Welcome to <Span>Hedera Pulse Snap Demo</Span>
+        Welcome to <Span>Hedera Wallet Snap Demo</Span>
       </Heading>
       <Subtitle>
         <label>Select network</label>
@@ -106,7 +138,7 @@ const Index = () => {
           type="text"
           placeholder="eg. https://testnet.mirrornode.hedera.com"
           style={{ marginBottom: 8 }}
-          onChange={(e) => setMirrorNodeUrl(e.target.value)}
+          onChange={(error) => setMirrorNodeUrl(error.target.value)}
         />
       </Subtitle>
       <Container>
@@ -116,6 +148,8 @@ const Index = () => {
             <dd>{accountInfo?.hederaAccountId}</dd>
             <dt>Hedera EVM Address: </dt>
             <dd>{accountInfo?.hederaEvmAddress}</dd>
+            <dt>Hedera Public Key: </dt>
+            <dd>{accountInfo?.publicKey}</dd>
 
             <dt>Balance: </dt>
             <dd>
@@ -126,7 +160,16 @@ const Index = () => {
           </Col>
           {accountInfo?.balance?.tokens && (
             <Col>
-              <Tokens tokens={accountInfo?.balance?.tokens} />
+              <Form.Check
+                type="checkbox"
+                label="Show tokens with 0 balances"
+                checked={showZeroBalances}
+                onChange={() => setShowZeroBalances(!showZeroBalances)}
+              />
+              <Tokens
+                tokens={accountInfo?.balance?.tokens}
+                showZeroBalances={showZeroBalances}
+              />
             </Col>
           )}
         </Row>
@@ -148,8 +191,8 @@ const Index = () => {
             fullWidth
           />
         )}
-        <ConnectPulseSnap handleConnectClick={handleConnectClick} />
-        <ReconnectPulseSnap handleConnectClick={handleConnectClick} />
+        <ConnectHederaWalletSnap handleConnectClick={handleConnectClick} />
+        <ReconnectHederaWalletSnap handleConnectClick={handleConnectClick} />
 
         <SendHelloHessage
           network={currentNetwork.value}
@@ -163,13 +206,7 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
-        <AssociateTokens
-          network={currentNetwork.value}
-          mirrorNodeUrl={mirrorNodeUrl}
-          setAccountInfo={setAccountInfo}
-        />
-
-        <TransferCrypto
+        <ShowAccountPrivateKey
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
@@ -182,6 +219,102 @@ const Index = () => {
         />
 
         <GetTransactions
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <TransferCrypto
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTokenFeeSchedule
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <MintToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <BurnToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <PauseToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnpauseToken
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <AssociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DissociateTokens
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <FreezeAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UnfreezeAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <EnableKYCAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DisableKYCAccount
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <WipeToken
           network={currentNetwork.value}
           mirrorNodeUrl={mirrorNodeUrl}
           setAccountInfo={setAccountInfo}
@@ -217,12 +350,108 @@ const Index = () => {
           setAccountInfo={setAccountInfo}
         />
 
+        <AtomicSwapInitiate
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <AtomicSwapComplete
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateSmartContract
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateSmartContract
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteSmartContract
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CallSmartContractFunction
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetSmartContractFunction
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetSmartContractBytecode
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetSmartContractInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <EthereumTransaction
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <CreateTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <UpdateTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <SubmitMessage
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTopicInfo
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <GetTopicMessages
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
+        <DeleteTopic
+          network={currentNetwork.value}
+          mirrorNodeUrl={mirrorNodeUrl}
+          setAccountInfo={setAccountInfo}
+        />
+
         <Todo />
       </CardContainer>
       <Notice>
         <p>
           Please note that this demo site only serves as an example of how an
-          app would interact with <b>Hedera Pulse Snap</b> and you should do
+          app would interact with <b>Hedera Wallet Snap</b> and you should do
           your own diligence before integrating it into production grade apps.
           Learn more about{' '}
           <a href="https://docs.metamask.io/snaps/" target="_blank">

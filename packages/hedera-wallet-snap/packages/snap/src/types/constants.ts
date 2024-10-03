@@ -2,7 +2,7 @@
  *
  * Hedera Wallet Snap
  *
- * Copyright (C) 2023 Tuum Tech
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,3 +26,17 @@ export const isIn = <T>(values: readonly T[], value: any): value is T => {
 export const DEFAULTCOINTYPE = 3030;
 
 export const hederaNetworks: string[] = ['mainnet', 'testnet', 'previewnet'];
+
+export const DEFAULTHEDERAMIRRORNODES: Record<string, string> = {
+  mainnet: 'https://mainnet-public.mirrornode.hedera.com',
+  testnet: 'https://testnet.mirrornode.hedera.com',
+  previewnet: 'https://previewnet.mirrornode.hedera.com',
+};
+
+export const EMPTY_STRING = '';
+export const FEE_DISPLAY_REGEX = /(\.\d*?[1-9])0+$|\.0*$/u;
+export const FEE_DIGIT_LENGTH = 8;
+export const HBAR_ASSET_STRING = 'HBAR';
+export const NFT_ASSET_STRING = 'NFT';
+
+export const MAX_RETRIES = 3;

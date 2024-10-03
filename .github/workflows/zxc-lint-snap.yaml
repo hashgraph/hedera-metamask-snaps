@@ -1,0 +1,76 @@
+name: "ZXC: ESLint Snap"
+on:
+  workflow_call:
+    inputs:
+      snap-package-dir:
+        description: "The directory of the snap package to lint:"
+        type: string
+        required: true
+      custom-job-label:
+        description: "Custom Job Label:"
+        type: string
+        required: false
+        default: "Lint"
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+env:
+  PROJECT_DIRECTORY: packages/${{ inputs.snap-package-dir }}
+  SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
+
+jobs:
+  eslint:
+    name: ${{ inputs.custom-job-label || 'ESLint' }}
+    runs-on: smart-contracts-linux-medium
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+          disable-sudo: true
+
+      - name: Checkout Code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 18
+
+      - name: Setup Yarn
+        run: npm install -g corepack && corepack enable
+
+      - name: Yarn Cache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          path: ${{ env.PROJECT_DIRECTORY }}/.yarn/cache
+          key: yarn-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-${{ hashFiles(format('packages/{0}/yarn.lock', inputs.snap-package-dir)) }}
+          restore-keys: |
+            yarn-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-
+            yarn-cache-${{ runner.os }}-${{ inputs.snap-package-dir }}-
+
+      - name: Node Modules Cache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          path: |
+            ${{ env.PROJECT_DIRECTORY }}/node_modules
+            ${{ env.PROJECT_DIRECTORY }}/packages/snap/node_modules
+            ${{ env.PROJECT_DIRECTORY }}/packages/site/node_modules
+          key: node-modules-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-${{ hashFiles(format('packages/{0}/yarn.lock', inputs.snap-package-dir)) }}
+          restore-keys: |
+            node-modules-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-
+            node-modules-cache-${{ runner.os }}-${{ inputs.snap-package-dir }}-
+
+      - name: Install Snap Dependencies
+        working-directory: ${{ env.PROJECT_DIRECTORY }}
+        run: yarn install
+
+      - name: Check Snap Formatting
+        working-directory: ${{ env.SNAP_DIRECTORY }}
+        run: yarn lint

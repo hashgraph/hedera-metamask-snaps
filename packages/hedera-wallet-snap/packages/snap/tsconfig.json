@@ -3,12 +3,14 @@
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": ".",
-
     "declaration": true,
     "inlineSourceMap": true,
     "incremental": false,
-    "removeComments": true
+    "removeComments": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@metamask/snaps-sdk"
   },
   "files": ["./json-typings.d.ts"],
-  "include": ["src/**/*"]
+  "exclude": ["./jest.config.js"],
+  "include": ["**/*.ts", "**/*.tsx"]
 }

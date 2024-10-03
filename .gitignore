@@ -128,3 +128,16 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Code Coverage
+coverage/
+
+# Test Reports
+**/junit*.xml
+
+# IntelliJ IDEA files
+.idea/
+
+# MacOS X Metadata files
+.DS_Store
+
