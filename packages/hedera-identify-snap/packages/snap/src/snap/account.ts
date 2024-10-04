@@ -103,8 +103,8 @@ export async function getCurrentAccount(
       metamaskAddress,
     );
   } catch (e:any) {
-    console.error(`Error while trying to get the account: ${e} \n ${e.stack}`);
-    throw new Error(`Error while trying to get the account: ${e} \n ${e.stack}`);
+    console.error(`Error while trying to get the account: ${e}`);
+    throw new Error(`Error while trying to get the account: ${e}`);
   }
 }
 
