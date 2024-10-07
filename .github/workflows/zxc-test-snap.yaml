@@ -51,7 +51,7 @@ jobs:
         run: npm install -g corepack && corepack enable
 
       - name: Yarn Cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
         with:
           path: ${{ env.PROJECT_DIRECTORY }}/.yarn/cache
           key: yarn-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-${{ hashFiles(format('packages/{0}/yarn.lock', inputs.snap-package-dir)) }}
@@ -60,7 +60,7 @@ jobs:
             yarn-cache-${{ runner.os }}-${{ inputs.snap-package-dir }}-
 
       - name: Node Modules Cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
         with:
           path: |
             ${{ env.PROJECT_DIRECTORY }}/node_modules
