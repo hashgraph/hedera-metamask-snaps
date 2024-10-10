@@ -14,8 +14,6 @@
 
 - [Fixed an issue whereby snap wasn't able to retrieve lazy-created account](https://github.com/hashgraph/hedera-metamask-snaps/issues/732)
 
-## [0.5.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.5.0...v0.5.0) (2024-07-12)
-
 ## [0.6.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.6.0...v0.6.0) (2024-09-09)
 
 ### :page_with_curl: Documentation
