@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.6.1...v0.6.1) (2024-10-10)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+- [Added memo support to snap home page](https://github.com/hashgraph/hedera-metamask-snaps/issues/730)
+
+### :bug: Bug Fixes
+
+- [Fixed an issue whereby snap wasn't able to retrieve lazy-created account](https://github.com/hashgraph/hedera-metamask-snaps/issues/732)
+
 ## [0.6.0](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.6.0...v0.6.0) (2024-09-09)
 
 ### :page_with_curl: Documentation

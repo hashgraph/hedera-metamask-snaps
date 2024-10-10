@@ -53,22 +53,22 @@ export const OnHomePageUI: OnHomePageHandler = async () => {
   // Get connected metamask account
   const connectedAddress = await SnapAccounts.getCurrentMetamaskAccount();
 
+  const snapAddress = await SnapAccounts.setCurrentAccount(
+    origin,
+    state,
+    null,
+    network,
+    mirrorNodeUrl,
+    false,
+    true,
+  );
+
+  const walletSnapParams: WalletSnapParams = {
+    origin,
+    state,
+  };
+
   try {
-    // Set current account
-    await SnapAccounts.setCurrentAccount(
-      origin,
-      state,
-      null,
-      network,
-      mirrorNodeUrl,
-      false,
-    );
-
-    const walletSnapParams: WalletSnapParams = {
-      origin,
-      state,
-    };
-
     const accountInfo: AccountInfo = await GetAccountInfoFacade.getAccountInfo(
       walletSnapParams,
       {} as GetAccountInfoRequestParams,
@@ -101,6 +101,10 @@ export const OnHomePageUI: OnHomePageHandler = async () => {
             input({
               name: 'amount',
               placeholder: 'Amount',
+            }),
+            input({
+              name: 'memo',
+              placeholder: 'Memo(Needed for exchange transfers)',
             }),
             button({
               value: 'Send Hbar',
@@ -138,11 +142,20 @@ export const OnHomePageUI: OnHomePageHandler = async () => {
         text(`**Mirror Node URL**: ${mirrorNodeUrl}`),
         divider(),
         text(`**Account Id**: Could not fetch account id.`),
-        text(`**Account EVM Address**: Could not fetch EVM address.`),
+        text(`**Account EVM Address**:`),
+        copyable(snapAddress),
         text(`**Associated Metamask Address**:`),
         copyable(connectedAddress),
         divider(),
+        button({
+          value: 'Export Snap Account Private Key',
+          name: 'btn-export-snap-account-private-key',
+        }),
+        divider(),
         text(`**FAQs**:`),
+        text(
+          `**Why is my MetaMask address different from my Hedera EVM address?**: Since MetaMask does not allow Snaps to access the private keys of MetaMask accounts, Hedera Wallet Snap creates a new account with its own private key. However, this new account is still associated with the MetaMask account so you can easily get back to your account on any device as long as you're connected to the same MetaMask account.`,
+        ),
         text(
           `**Why is my account not activated?**: On Hedera, until a transaction is sent to the network, the account is not activated. Please visit [Pulse](https://pulse.tuum.tech) to activate your account for free.`,
         ),
