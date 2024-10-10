@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-metamask-snaps",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A collection of Hedera related Metamask snaps that expose and utilize Hedera functionality inside Metamask",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
