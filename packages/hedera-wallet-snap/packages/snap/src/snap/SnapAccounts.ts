@@ -96,6 +96,7 @@ export class SnapAccounts {
    * @param network - Hedera network.
    * @param mirrorNodeUrl - Hedera mirror node URL.
    * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
+   * @param returnEarly - Whether to return early.
    * @returns Nothing.
    */
   public static async setCurrentAccount(
@@ -105,7 +106,7 @@ export class SnapAccounts {
     network: string,
     mirrorNodeUrl: string,
     isExternalAccount: boolean,
-    returnEarly: boolean = false,
+    returnEarly = false,
   ): Promise<string> {
     let metamaskEvmAddress = '';
     let externalEvmAddress = '';
@@ -548,6 +549,8 @@ export class SnapAccounts {
    * @param metamaskEvmAddress - Metamask EVM address.
    * @param externalEvmAddress - External EVM address.
    * @param keyStore - Keystore for private, public keys and EVM address.
+   * @param returnEarly - Whether to return early.
+   * @returns Result.
    */
   public static async importMetaMaskAccount(
     _origin: string,
@@ -558,7 +561,7 @@ export class SnapAccounts {
     metamaskEvmAddress: string,
     externalEvmAddress: string,
     keyStore: KeyStore,
-    returnEarly: boolean = false,
+    returnEarly = false,
   ): Promise<string> {
     const { curve, privateKey, publicKey, address } = keyStore;
 
