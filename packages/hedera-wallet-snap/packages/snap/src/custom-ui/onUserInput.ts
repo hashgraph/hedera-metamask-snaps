@@ -44,13 +44,14 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
   const { network, mirrorNodeUrl } = HederaUtils.getNetworkInfoFromUser(null);
 
   // Set current account
-  await SnapAccounts.setCurrentAccount(
+  const snapAddress = await SnapAccounts.setCurrentAccount(
     origin,
     state,
     null,
     network,
     mirrorNodeUrl,
     false,
+    true,
   );
 
   const walletSnapParams: WalletSnapParams = {
@@ -72,6 +73,9 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
             } as SimpleTransfer,
           ],
         } as TransferCryptoRequestParams;
+        if (event.value.memo) {
+          params.memo = event.value.memo as string;
+        }
         result = await TransferCryptoFacade.transferCrypto(
           walletSnapParams,
           params,
@@ -101,9 +105,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
                 'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
               ),
               copyable(
-                state.accountState[state.currentAccount.hederaEvmAddress][
-                  state.currentAccount.network
-                ].keyStore.privateKey,
+                state.accountState[snapAddress][network].keyStore.privateKey,
               ),
             ]),
           },

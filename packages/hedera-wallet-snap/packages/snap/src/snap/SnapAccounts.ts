@@ -105,7 +105,8 @@ export class SnapAccounts {
     network: string,
     mirrorNodeUrl: string,
     isExternalAccount: boolean,
-  ): Promise<void> {
+    returnEarly: boolean = false,
+  ): Promise<string> {
     let metamaskEvmAddress = '';
     let externalEvmAddress = '';
     let connectedAddress = '';
@@ -189,7 +190,7 @@ export class SnapAccounts {
       await SnapAccounts.initAccountState(state, network, connectedAddress);
     }
 
-    await SnapAccounts.importMetaMaskAccount(
+    return await SnapAccounts.importMetaMaskAccount(
       origin,
       state,
       network,
@@ -198,6 +199,7 @@ export class SnapAccounts {
       metamaskEvmAddress,
       externalEvmAddress,
       keyStore,
+      returnEarly,
     );
   }
 
@@ -556,7 +558,8 @@ export class SnapAccounts {
     metamaskEvmAddress: string,
     externalEvmAddress: string,
     keyStore: KeyStore,
-  ): Promise<void> {
+    returnEarly: boolean = false,
+  ): Promise<string> {
     const { curve, privateKey, publicKey, address } = keyStore;
 
     console.log('Retrieving account info from Hedera Mirror node');
@@ -567,6 +570,19 @@ export class SnapAccounts {
     if (_.isEmpty(accountInfo)) {
       const errMessage = `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`;
       console.error(errMessage);
+      if (returnEarly) {
+        // eslint-disable-next-line require-atomic-updates
+        state.accountState[connectedAddress][network].keyStore = {
+          curve,
+          privateKey,
+          publicKey,
+          address,
+          hederaAccountId: '',
+        };
+
+        await SnapState.updateState(state);
+        return address;
+      }
       throw rpcErrors.resourceNotFound({
         message: errMessage,
         data: address,
@@ -600,5 +616,7 @@ export class SnapAccounts {
     };
 
     await SnapState.updateState(state);
+
+    return address;
   }
 }
