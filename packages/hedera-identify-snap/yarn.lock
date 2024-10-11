@@ -3051,12 +3051,10 @@ __metadata:
     "@metamask/snaps-cli": ^6.3.1
     "@metamask/snaps-jest": ^8.3.0
     "@metamask/snaps-sdk": ^6.3.0
-    "@metamask/snaps-types": ^1.0.1
-    "@metamask/snaps-ui": ^1.0.1
     "@types/jest": ^29.5.12
-    "@types/jsonpath": ^0.2.0
+    "@types/jsonpath": ^0.2.4
     "@types/lodash.clonedeep": ^4.5.9
-    "@types/uuid": ^9.0.1
+    "@types/uuid": ^10.0.0
     "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.62.0
     "@veramo/core": 5.1.2
@@ -7014,7 +7012,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsonpath@npm:^0.2.0":
+"@types/jsonpath@npm:^0.2.4":
   version: 0.2.4
   resolution: "@types/jsonpath@npm:0.2.4"
   checksum: 401c59dd26eb47e59af10a558788e6d69600adfafec134bf0691a48a80f1ee4f61afaa235663d043c20d7de6f036037731f8289e9662a031bf460a22f156638b
@@ -7236,10 +7234,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:^9.0.1":
-  version: 9.0.8
-  resolution: "@types/uuid@npm:9.0.8"
-  checksum: b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
+"@types/uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@types/uuid@npm:10.0.0"
+  checksum: e3958f8b0fe551c86c14431f5940c3470127293280830684154b91dc7eb3514aeb79fe3216968833cf79d4d1c67f580f054b5be2cd562bebf4f728913e73e944
   languageName: node
   linkType: hard
 
