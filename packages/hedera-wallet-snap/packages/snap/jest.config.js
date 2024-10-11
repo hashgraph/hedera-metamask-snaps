@@ -30,7 +30,7 @@ module.exports = {
   globals: {
     window: {
       location: {
-        hostname: 'hedera-pulse',
+        hostname: 'hedera-wallet-snap',
         href: 'http://localhost',
       },
     },
