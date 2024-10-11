@@ -1,5 +1,4 @@
 dist
-index.html
+coverage
 post-process.js
 node_modules
-coverage
