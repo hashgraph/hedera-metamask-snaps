@@ -7,7 +7,7 @@
     "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "knIkZ1zOiyuzTrICdhUZ0F1nucrut4ufWxm3sRvOdMU=",
+    "shasum": "Ojffk8pFx2UF/QTRJpYTxWLaXXCMEjgToIL9emJYNxk=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",
@@ -18,16 +18,18 @@
     }
   },
   "initialPermissions": {
-    "endowment:webassembly": {},
-    "endowment:network-access": {},
-    "endowment:rpc": {
-      "snaps": true,
-      "dapps": true
-    },
-    "endowment:ethereum-provider": {},
-    "snap_manageState": {},
     "snap_dialog": {},
-    "snap_getEntropy": {}
+    "snap_manageState": {},
+    "snap_getEntropy": {},
+    "snap_notify": {},
+    "endowment:ethereum-provider": {},
+    "endowment:network-access": {},
+    "endowment:lifecycle-hooks": {},
+    "endowment:rpc": {
+      "dapps": true,
+      "snaps": true
+    },
+    "endowment:page-home": {}
   },
   "manifestVersion": "0.1"
 }

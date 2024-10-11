@@ -1,12 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "experimentalDecorators": true,
     "outDir": "./dist",
     "baseUrl": ".",
-    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
-    "sourceMap": true
+    "declaration": true,
+    "inlineSourceMap": true,
+    "incremental": false,
+    "removeComments": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@metamask/snaps-sdk",
+    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"]
   },
   "files": ["./global.d.ts", "./json-typings.d.ts"],
-  "include": ["src/**/*", "tests/**/*", "global.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", "global.d.ts"]
 }
