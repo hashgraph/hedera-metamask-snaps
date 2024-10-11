@@ -1,13 +1,13 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "proposedName": "Identify",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tuum-tech/identify.git"
+    "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "pubYFIgH4W5VdcnuPOqdduaQQm0cLR92FsGujMtyQC8=",
+    "shasum": "knIkZ1zOiyuzTrICdhUZ0F1nucrut4ufWxm3sRvOdMU=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",
