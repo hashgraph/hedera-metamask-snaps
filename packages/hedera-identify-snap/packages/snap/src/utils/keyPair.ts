@@ -1,4 +1,24 @@
-import { assertArgument, HDNodeWallet, Mnemonic } from 'ethers'
+/*-
+ *
+ * Hedera Identify Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+import { assertArgument, HDNodeWallet, Mnemonic } from 'ethers';
 import { DEFAULTCOINTYPE } from '../types/constants';
 
 export const generateWallet = async (
@@ -13,15 +33,15 @@ export const generateWallet = async (
   });
 
   let nodeWallet = HDNodeWallet.fromMnemonic(Mnemonic.fromEntropy(entropy));
-  nodeWallet = await derivePathForWallet(nodeWallet, `m/44/${DEFAULTCOINTYPE}/0/0/0`);
+  nodeWallet = await derivePathForWallet(
+    nodeWallet,
+    `m/44/${DEFAULTCOINTYPE}/0/0/0`,
+  );
 
   return nodeWallet;
 };
 
-export const derivePathForWallet = async (
-  node: HDNodeWallet,
-  path: string,
-) => {
+export const derivePathForWallet = async (node: HDNodeWallet, path: string) => {
   const components = path.split('/');
 
   assertArgument(
@@ -42,10 +62,7 @@ export const derivePathForWallet = async (
     const component = components[i];
 
     if (component.match(/^[0-9]+'$/u)) {
-      const index = parseInt(
-        component.substring(0, component.length - 1),
-        10,
-      );
+      const index = parseInt(component.substring(0, component.length - 1), 10);
 
       assertArgument(
         index < HardenedBit,
@@ -64,14 +81,9 @@ export const derivePathForWallet = async (
       );
       result = result.deriveChild(index);
     } else {
-      assertArgument(
-        false,
-        'invalid path component',
-        `path[${i}]`,
-        component,
-      );
+      assertArgument(false, 'invalid path component', `path[${i}]`, component);
     }
   }
 
   return result;
-}
+};

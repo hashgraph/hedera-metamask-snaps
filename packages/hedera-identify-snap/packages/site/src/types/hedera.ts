@@ -25,7 +25,6 @@ import type {
   Key,
   LedgerId,
   LiveHash,
-  PrivateKey,
   PublicKey,
   Timestamp,
   TokenAllowance,
@@ -34,56 +33,9 @@ import type {
 import TokenRelationshipMap from '@hashgraph/sdk/lib/account/TokenRelationshipMap';
 import Duration from '@hashgraph/sdk/lib/Duration';
 import StakingInfo from '@hashgraph/sdk/lib/StakingInfo';
-import { BigNumber } from 'bignumber.js';
-
-import { WalletHedera } from './wallet/abstract';
-
-import * as protobuf from 'protobufjs';
 import Long from 'long';
 
-// Ensure that protobuf uses Long for 64-bit integers
-protobuf.util.Long = Long;
-protobuf.configure();
-
-export type HederaService = {
-  // returns null if the account ID does not match the chosen key
-  createClient(options: {
-    network: string;
-    walletHedera: WalletHedera;
-    // index into the wallet, meaning depends on the wallet type
-    // 0 always means the canonical key for the wallet
-    keyIndex: number;
-    // account ID we wish to associate with the wallet
-    accountId: AccountId;
-  }): Promise<SimpleHederaClient | null>;
-
-  getAccountFromPublicKey(publicKey: string): Promise<HederaMirrorInfo | null>;
-
-  getAccountFromEvmAddres(evmAddress: string): Promise<HederaMirrorInfo | null>;
-};
-
-export type SimpleHederaClient = {
-  // get the associated private key, if available
-  getPrivateKey(): PrivateKey | null;
-
-  // get the associated public key
-  getPublicKey(): PublicKey;
-
-  // get the associated account ID
-  getAccountId(): AccountId;
-
-  getAccountInfo(accountId: string): Promise<HederaAccountInfo>;
-
-  createAccountForPublicKey(options: {
-    publicKey: PublicKey;
-    initialBalance: BigNumber;
-  }): Promise<HederaMirrorInfo | null>;
-
-  createAccountForEvmAddress(options: {
-    evmAddress: string;
-    initialBalance: BigNumber;
-  }): Promise<HederaMirrorInfo | null>;
-};
+/* eslint-disable*/
 
 export type HederaMirrorInfo = {
   account: string;

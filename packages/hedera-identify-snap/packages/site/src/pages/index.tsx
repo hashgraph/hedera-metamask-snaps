@@ -1,12 +1,28 @@
+/*-
+ *
+ * Hedera Identify Snap
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 import { useContext, useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
-import {
-  HederaAccountParams,
-  PublicAccountInfo,
-} from '@tuum-tech/identify/src/interfaces';
 import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
@@ -36,6 +52,7 @@ import {
   Span,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
+import { HederaAccountParams, PublicAccountInfo } from '../types/snap';
 import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
 
@@ -61,7 +78,7 @@ const Index = () => {
 
   const handleConnectClick = async () => {
     try {
-      setMetamaskAddress(await connectSnap());
+      setMetamaskAddress((await connectSnap()) as string);
       setCurrentChainId(await getCurrentNetwork());
       const installedSnap = await getSnap();
 
