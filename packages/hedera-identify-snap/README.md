@@ -6,10 +6,6 @@ integrate it into your own application.
 
 MetaMask Snaps is a system that allows anyone to safely expand the capabilities of MetaMask. A _snap_ is a program that we run in an isolated environment that can customize the wallet experience.
 
-**_DISCLAIMER_**
-_This snap is developed by Tuum Tech while the code for the snap is managed by Swirlds Labs. Furthermore, this wallet is
-neither created nor sponsored by Hedera and is built specifically for Metamask_
-
 ## Getting Started
 
 ### Setup the development environment

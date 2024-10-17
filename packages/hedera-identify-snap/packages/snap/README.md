@@ -6,10 +6,6 @@ integrate it into your own application.
 
 MetaMask Snaps is a system that allows anyone to safely expand the capabilities of MetaMask. A _snap_ is a program that we run in an isolated environment that can customize the wallet experience.
 
-**_DISCLAIMER_**
-_This snap is developed by Tuum Tech while the code for the snap is managed by Swirlds Labs. Furthermore, this wallet is
-neither created nor sponsored by Hedera and is built specifically for Metamask_
-
 ## Github Actions
 
 Linting, static analysis and testing via Jest are configured via Github Actions in the repository. Replication of these
@@ -95,6 +91,7 @@ process; see those repositories for more information about how they work.
 - Babel is used for transpiling TypeScript to JavaScript, so when building with the CLI,
   `transpilationMode` must be set to `localOnly` (default) or `localAndDeps`.
 - For the global `wallet` type to work, you have to add the following to your `tsconfig.json`:
+
   ```json
   {
     "files": ["./node_modules/@metamask/snap-types/global.d.ts"]
