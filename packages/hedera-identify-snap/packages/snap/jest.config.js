@@ -1,6 +1,6 @@
 /*-
  *
- * Hedera Wallet Snap
+ * Hedera Identify Snap
  *
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
@@ -30,7 +30,7 @@ module.exports = {
   globals: {
     window: {
       location: {
-        hostname: 'hedera-wallet-snap',
+        hostname: 'identify-snap',
         href: 'http://localhost',
       },
     },
@@ -49,7 +49,7 @@ module.exports = {
     [
       'jest-junit',
       {
-        suiteName: 'Wallet Snap Unit Tests',
+        suiteName: 'Identify Snap Unit Tests',
         outputName: 'junit-snap.xml',
       },
     ],

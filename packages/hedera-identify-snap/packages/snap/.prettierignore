@@ -1,0 +1,4 @@
+dist
+coverage
+post-process.js
+node_modules
