@@ -18,27 +18,46 @@
  *
  */
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
+import {
+  DialogParams,
+  divider,
+  heading,
+  NodeType,
+  panel,
+  Panel,
+  text,
+} from '@metamask/snaps-sdk';
 import { VerifiableCredential } from '@veramo/core';
 import _ from 'lodash';
 import cloneDeep from 'lodash.clonedeep';
-import { IdentitySnapState, SnapDialogParams } from '../interfaces';
+import {
+  getHederaNetwork,
+  getOtherNetwork,
+  validHederaChainID,
+} from '../hedera/config';
 import { IDataManagerQueryResult } from '../plugins/veramo/verifiable-creds-manager';
-import { updateSnapState } from './state';
 
-/**
- * Function that toggles the disablePopups flag in the config.
- *
- * @param snap - Snap.
- * @param state - IdentitySnapState.
- */
-export async function updatePopups(
-  snap: SnapsGlobalObject,
-  state: IdentitySnapState,
-) {
-  state.snapConfig.dApp.disablePopups = !state.snapConfig.dApp.disablePopups;
-  await updateSnapState(snap, state);
+export function initializePanelToShow(): any {
+  const panelToShow: (
+    | {
+        value: string;
+        type: NodeType.Heading;
+      }
+    | {
+        value: string;
+        type: NodeType.Text;
+        markdown?: boolean | undefined;
+      }
+    | {
+        type: NodeType.Divider;
+      }
+    | {
+        value: string;
+        type: NodeType.Copyable;
+        sensitive?: boolean | undefined;
+      }
+  )[] = [];
+  return panelToShow;
 }
 
 /**
@@ -48,8 +67,7 @@ export async function updatePopups(
  * @param params - Snap dialog params.
  */
 export async function snapDialog(
-  snap: SnapsGlobalObject,
-  params: SnapDialogParams,
+  params: DialogParams,
 ): Promise<string | boolean | null> {
   return (await snap.request({
     method: 'snap_dialog',
@@ -59,15 +77,29 @@ export async function snapDialog(
 
 /**
  * Function to generate snap dialog panel.
- *
  * @param origin - The origin of where the call is being made from.
+ * @param network - The network the call is being made on.
+ * @param mirrorNodeUrl - The mirror node url.
  * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
+ * @returns Panel to be displayed in the snap dialog.
  */
 export async function generateCommonPanel(
   origin: string,
+  network: string,
   prompt: any[],
 ): Promise<Panel> {
-  const panelToShow = [text(`Origin: ${origin}`), divider(), ...prompt];
+  let networkToShow = network;
+  if (validHederaChainID(network)) {
+    networkToShow = `Hedera - ${getHederaNetwork(network)}`;
+  } else {
+    networkToShow = getOtherNetwork(network);
+  }
+  const panelToShow = [
+    text(`Origin: **${origin}**`),
+    text(`Network: **${networkToShow}**`),
+    divider(),
+    ...prompt,
+  ];
   return panel(panelToShow);
 }
 
@@ -82,14 +114,22 @@ export async function generateCommonPanel(
  */
 export async function generateVCPanel(
   origin: string,
+  network: string,
   header: string,
   prompt: string,
   description: string,
   vcs: IDataManagerQueryResult[],
 ): Promise<Panel> {
+  let networkToShow = network;
+  if (validHederaChainID(network)) {
+    networkToShow = `Hedera - ${getHederaNetwork(network)}`;
+  } else {
+    networkToShow = getOtherNetwork(network);
+  }
   const vcsToUse = cloneDeep(vcs);
   const panelToShow = [
     text(`Origin: ${origin}`),
+    text(`Network: **${networkToShow}**`),
     divider(),
     heading(header),
     text(prompt),
@@ -165,12 +205,13 @@ export async function generateVCPanel(
  * @param prevHederaAccountId - HederaIdentifier.
  */
 export async function requestHederaAccountId(
-  snap: SnapsGlobalObject,
+  origin: string,
+  network: string,
   prevHederaAccountId?: string,
 ): Promise<string> {
-  const dialogParamsForHederaAccountId: SnapDialogParams = {
+  const dialogParamsForHederaAccountId: DialogParams = {
     type: 'prompt',
-    content: await generateCommonPanel(origin, [
+    content: await generateCommonPanel(origin, network, [
       heading('Connect to Hedera Account'),
       prevHederaAccountId
         ? text(
@@ -180,5 +221,5 @@ export async function requestHederaAccountId(
     ]),
     placeholder: '0.0.3658062',
   };
-  return (await snapDialog(snap, dialogParamsForHederaAccountId)) as string;
+  return (await snapDialog(dialogParamsForHederaAccountId)) as string;
 }

@@ -18,16 +18,17 @@
  *
  */
 
-import { IdentitySnapParams } from '../../interfaces';
+import { base58btc } from 'multiformats/bases/base58';
 
-/**
- * Function to get available methods.
- *
- * @param identitySnapParams - Identity snap params.
- */
-export async function getCurrentDIDMethod(
-  identitySnapParams: IdentitySnapParams,
-): Promise<string> {
-  const { state } = identitySnapParams;
-  return state.snapConfig.dApp.didMethod;
+import { addMulticodecPrefix } from '../../utils/formatUtils';
+import { getCompressedPublicKey } from '../../utils/keyPair';
+
+export async function getDidKeyIdentifier(publicKey: string): Promise<string> {
+  const compressedKey = getCompressedPublicKey(publicKey);
+
+  return Buffer.from(
+    base58btc.encode(
+      addMulticodecPrefix('secp256k1-pub', Buffer.from(compressedKey, 'hex')),
+    ),
+  ).toString();
 }

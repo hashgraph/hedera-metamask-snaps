@@ -18,26 +18,25 @@
  *
  */
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { Panel } from '@metamask/snaps-ui';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
 
 export type Account = {
-  evmAddress: string;
-  addrToUseForDid: string;
+  metamaskAddress: string;
+  snapAddress: string;
   method: string;
   identifier: IIdentifier;
   privateKey: string;
+  publicKey: string;
   extraData?: unknown;
 };
 
 export type PublicAccountInfo = {
-  evmAddress: string;
+  metamaskAddress: string;
+  snapAddress: string;
   did: string;
   method: string;
-  extraData?: unknown;
+  accountID: string;
 };
 
 export type IdentitySnapState = {
@@ -60,6 +59,7 @@ export type IdentitySnapConfig = {
     acceptedTerms: boolean;
   };
   dApp: {
+    didMethod: string;
     disablePopups: boolean;
     friendlyDapps: string[];
   };
@@ -86,7 +86,6 @@ export type GoogleUserInfo = {
 
 export type IdentityAccountConfig = {
   identity: {
-    didMethod: string;
     vcStore: string;
     googleUserInfo: GoogleUserInfo;
   };
@@ -94,16 +93,9 @@ export type IdentityAccountConfig = {
 
 export type IdentitySnapParams = {
   origin: string;
-  snap: SnapsGlobalObject;
+  network: string;
   state: IdentitySnapState;
-  metamask: MetaMaskInpageProvider;
   account: Account;
-};
-
-export type SnapDialogParams = {
-  type: 'alert' | 'confirmation' | 'prompt';
-  content: Panel;
-  placeholder?: string;
 };
 
 export type UploadData = {

@@ -27,7 +27,6 @@ import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
   ConnectIdentitySnap,
-  CreateNewHederaAccount,
   CreateVC,
   DeleteAllVCs,
   GetAccountInfo,
@@ -52,9 +51,10 @@ import {
   Span,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
-import { HederaAccountParams, PublicAccountInfo } from '../types/snap';
+import { PublicAccountInfo } from '../types/snap';
 import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
+import { SwitchDIDMethod } from '../components/cards/SwitchDIDMethod';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -113,23 +113,18 @@ const Index = () => {
             {isHederaNetwork
               ? accountInfo && (
                   <>
-                    <dd>
-                      Hedera Account ID:{' '}
-                      {
-                        (accountInfo?.extraData as HederaAccountParams)
-                          ?.accountId
-                      }
-                    </dd>
+                    <dd>Hedera Account ID: {accountInfo?.accountID}</dd>
                     <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
-                    <dd>EVM Address: {accountInfo?.evmAddress}</dd>
+                    <dd>Metamask Address: {accountInfo?.metamaskAddress}</dd>
+                    <dd>Snap Address: {accountInfo?.snapAddress}</dd>
                   </>
                 )
               : accountInfo && (
                   <>
                     <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
-                    <dd>EVM Address: {accountInfo?.evmAddress}</dd>
+                    <dd>EVM Address: {accountInfo?.metamaskAddress}</dd>
                   </>
                 )}
           </Col>
@@ -160,14 +155,12 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
         />
 
-        {isHederaNetwork && (
-          <CreateNewHederaAccount
-            setMetamaskAddress={setMetamaskAddress}
-            setCurrentChainId={setCurrentChainId}
-          />
-        )}
-
         <ToggleMetamaskPopups
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
+
+        <SwitchDIDMethod
           setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />

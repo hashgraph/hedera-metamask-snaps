@@ -65,8 +65,8 @@ describe('getAccountInfo', () => {
         origin: 'tests',
         request: accountInfoRequestParams as any,
       })) as PublicAccountInfo;
-      expect(accountInfo.evmAddress).toBe(ETH_ADDRESS);
-      expect(accountInfo.extraData).toBeUndefined();
+      expect(accountInfo.metamaskAddress).toBe(ETH_ADDRESS);
+      expect(accountInfo.accountID).toBeUndefined();
 
       expect.assertions(2);
     });
@@ -116,9 +116,9 @@ describe('getAccountInfo', () => {
         origin: 'tests',
         request: accountInfoRequestParams as any,
       })) as PublicAccountInfo;
-      expect(accountInfo.evmAddress).toBe(HEDERA_ACCOUNT.address);
+      expect(accountInfo.metamaskAddress).toBe(HEDERA_ACCOUNT.address);
       console.log(JSON.stringify(accountInfo));
-      expect((accountInfo.extraData as HederaAccountParams).accountId).toBe(
+      expect((accountInfo.accountID as HederaAccountParams).accountId).toBe(
         HEDERA_ACCOUNT.accountId,
       );
       expect.assertions(2);
@@ -156,7 +156,7 @@ describe('getAccountInfo', () => {
         origin: 'tests',
         request: accountInfoRequestParams as any,
       })) as PublicAccountInfo;
-      expect(accountInfo.evmAddress).toBe(EVM_ACCOUNT.address);
+      expect(accountInfo.metamaskAddress).toBe(EVM_ACCOUNT.address);
       console.log(JSON.stringify(accountInfo));
       expect(
         (accountInfo.externalAccountInfo as EvmAccountParams).address,

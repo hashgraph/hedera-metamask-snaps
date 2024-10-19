@@ -18,61 +18,42 @@
  *
  */
 
-import { FC, useContext, useRef, useState } from 'react';
+import { FC, useContext, useState } from 'react';
+import Form from 'react-bootstrap/esm/Form';
 import {
   MetaMaskContext,
   MetamaskActions,
 } from '../../contexts/MetamaskContext';
-import useModal from '../../hooks/useModal';
 import {
-  getAccountInfo,
   getCurrentMetamaskAccount,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
+  switchDIDMethod,
 } from '../../utils';
 import { Card, SendHelloButton } from '../base';
-import ExternalAccount, {
-  GetExternalAccountRef,
-} from '../sections/ExternalAccount';
-import { PublicAccountInfo } from '../../types/snap';
 
 type Props = {
   setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  setAccountInfo: React.Dispatch<React.SetStateAction<PublicAccountInfo>>;
 };
 
-const GetAccountInfo: FC<Props> = ({
+const SwitchDIDMethod: FC<Props> = ({
   setMetamaskAddress,
   setCurrentChainId,
-  setAccountInfo,
 }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [didMethod, setDidMethod] = useState('did:pkh'); // Default method is 'did:pkh'
   const [loading, setLoading] = useState(false);
-  const { showModal } = useModal();
 
-  const externalAccountRef = useRef<GetExternalAccountRef>(null);
-
-  const handleGetAccountInfoClick = async () => {
+  const handleswitchDIDMethodClick = async () => {
     setLoading(true);
     try {
       const metamaskAddress = await getCurrentMetamaskAccount();
       setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
-      const externalAccountParams =
-        externalAccountRef.current?.handleGetAccountParams();
-
-      const accountInfo = await getAccountInfo(
-        metamaskAddress,
-        externalAccountParams,
-      );
-      console.log(`Your account info:`, accountInfo);
-      setAccountInfo(accountInfo as PublicAccountInfo);
-      showModal({
-        title: 'Your account info',
-        content: JSON.stringify(accountInfo),
-      });
+      const switched = await switchDIDMethod(metamaskAddress, didMethod);
+      console.log(`DID Method switched : ${switched}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -83,13 +64,43 @@ const GetAccountInfo: FC<Props> = ({
   return (
     <Card
       content={{
-        title: 'getAccountInfo',
-        description: 'Get the current account information',
-        form: <ExternalAccount ref={externalAccountRef} />,
+        title: 'switchDIDMethod',
+        description: 'Select and switch DID Method to use',
+        form: (
+          <>
+            <Form.Check
+              type="radio"
+              label="did:pkh (default)"
+              name="didMethod"
+              value="did:pkh"
+              checked={didMethod === 'did:pkh'}
+              onChange={(e) => setDidMethod(e.target.value)}
+              style={{ marginBottom: 8 }}
+            />
+            <Form.Check
+              type="radio"
+              label="did:key"
+              name="didMethod"
+              value="did:key"
+              checked={didMethod === 'did:key'}
+              onChange={(e) => setDidMethod(e.target.value)}
+              style={{ marginBottom: 8 }}
+            />
+            <Form.Check
+              type="radio"
+              label="did:hedera"
+              name="didMethod"
+              value="did:hedera"
+              checked={didMethod === 'did:hedera'}
+              onChange={(e) => setDidMethod(e.target.value)}
+              style={{ marginBottom: 8 }}
+            />
+          </>
+        ),
         button: (
           <SendHelloButton
-            buttonText="Get Account Info"
-            onClick={handleGetAccountInfoClick}
+            buttonText="Switch DID Method"
+            onClick={handleswitchDIDMethodClick}
             disabled={!state.installedSnap}
             loading={loading}
           />
@@ -105,4 +116,4 @@ const GetAccountInfo: FC<Props> = ({
   );
 };
 
-export { GetAccountInfo };
+export { SwitchDIDMethod };

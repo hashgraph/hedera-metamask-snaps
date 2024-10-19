@@ -91,7 +91,7 @@ export type IDataManagerDeleteArgs = {
  * Types for DataManager method return values
  */
 export type IDataManagerQueryResult = {
-  data: unknown;
+  data: any;
   metadata: QueryMetadata;
 };
 

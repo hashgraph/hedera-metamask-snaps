@@ -60,7 +60,7 @@ export const exampleDIDPkh = `did:pkh:eip155:4:${ETH_ADDRESS}`;
 
 const defaultSnapState: IdentitySnapState = {
   currentAccount: {
-    evmAddress: ETH_ADDRESS,
+    metamaskAddress: ETH_ADDRESS,
     method: '',
     identifier: {} as any,
     privateKey: '',
