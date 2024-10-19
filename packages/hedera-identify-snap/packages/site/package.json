@@ -1,0 +1,76 @@
+{
+  "name": "@hashgraph/hedera-identify-snap-example-site",
+  "version": "0.2.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "cross-env GATSBY_TELEMETRY_DISABLED=1 gatsby build",
+    "clean": "rimraf build",
+    "lint": "yarn lint:eslint && yarn lint:misc --check",
+    "lint:eslint": "eslint . --cache",
+    "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
+    "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
+    "start": "cross-env GATSBY_TELEMETRY_DISABLED=1 gatsby develop"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@metamask/providers": "^17.2.0",
+    "@react-oauth/google": "^0.7.0",
+    "@veramo/core": "5.1.2",
+    "axios": "^1.2.4",
+    "bootstrap": "^5.3.3",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-dom": "^18.3.1",
+    "react-is": "^18.3.1",
+    "react-select": "^5.8.0",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.10.0",
+    "@metamask/eslint-config": "^12.2.0",
+    "@metamask/eslint-config-jest": "^12.1.0",
+    "@metamask/eslint-config-nodejs": "^12.1.0",
+    "@metamask/eslint-config-typescript": "^12.1.0",
+    "@svgr/webpack": "^8.1.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/styled-components": "^5.1.34",
+    "@typescript-eslint/eslint-plugin": "5.62.0",
+    "@typescript-eslint/parser": "5.62.0",
+    "babel-plugin-styled-components": "^2.1.4",
+    "cross-env": "^7.0.3",
+    "eslint": "8.38.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "28.3.0",
+    "eslint-plugin-jsdoc": "^50.2.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "gatsby": "^5.13.7",
+    "gatsby-plugin-manifest": "^5.13.1",
+    "gatsby-plugin-styled-components": "^6.13.1",
+    "gatsby-plugin-svgr": "^3.0.0-beta.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-packagejson": "^2.5.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2"
+  }
+}

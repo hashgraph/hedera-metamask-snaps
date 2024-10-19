@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "description": "A snap for managing Decentralized Identifiers(DIDs)",
+  "proposedName": "Identify",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
+  },
+  "source": {
+    "shasum": "KKHT+Asb4aIVAUtmMGvhd4YOL9j/dyuBleGXdi/b1gs=",
+    "location": {
+      "npm": {
+        "filePath": "dist/bundle.js",
+        "iconPath": "images/icon.svg",
+        "packageName": "@hashgraph/hedera-identify-snap",
+        "registry": "https://registry.npmjs.org/"
+      }
+    }
+  },
+  "initialPermissions": {
+    "snap_dialog": {},
+    "snap_manageState": {},
+    "snap_getEntropy": {},
+    "snap_notify": {},
+    "endowment:ethereum-provider": {},
+    "endowment:network-access": {},
+    "endowment:lifecycle-hooks": {},
+    "endowment:rpc": {
+      "dapps": true,
+      "snaps": true
+    },
+    "endowment:page-home": {}
+  },
+  "manifestVersion": "0.1"
+}
