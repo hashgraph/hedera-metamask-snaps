@@ -21,12 +21,7 @@
 /* eslint-disable no-restricted-globals */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
-import {
-  EvmAccountParams,
-  HederaAccountParams,
-  PublicAccountInfo,
-} from 'src/interfaces';
+import { PublicAccountInfo } from 'src/interfaces';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
@@ -40,16 +35,13 @@ import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('getAccountInfo', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   describe('getAccountInfo Ethereum', () => {
     beforeAll(async () => {
       snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
       metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-      global.snap = snapMock;
-      global.ethereum = metamask;
     });
 
     beforeEach(async () => {
@@ -95,9 +87,6 @@ describe('getAccountInfo', () => {
     beforeAll(async () => {
       snapMock = buildMockSnap(HEDERA_CHAIN_ID.testnet, HEDERA_ACCOUNT.address);
       metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-      global.snap = snapMock;
-      global.ethereum = metamask;
     });
 
     it('should set hedera external account info', async () => {
@@ -118,9 +107,7 @@ describe('getAccountInfo', () => {
       })) as PublicAccountInfo;
       expect(accountInfo.metamaskAddress).toBe(HEDERA_ACCOUNT.address);
       console.log(JSON.stringify(accountInfo));
-      expect((accountInfo.accountID as HederaAccountParams).accountId).toBe(
-        HEDERA_ACCOUNT.accountId,
-      );
+      expect(accountInfo.accountID).toBe(HEDERA_ACCOUNT.accountId);
       expect.assertions(2);
     });
   });
@@ -129,9 +116,6 @@ describe('getAccountInfo', () => {
     beforeAll(async () => {
       snapMock = buildMockSnap(EVM_ACCOUNT.chainId, EVM_ACCOUNT.address);
       metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-      global.snap = snapMock;
-      global.ethereum = metamask;
     });
 
     // eslint-disable-next-line
@@ -158,9 +142,7 @@ describe('getAccountInfo', () => {
       })) as PublicAccountInfo;
       expect(accountInfo.metamaskAddress).toBe(EVM_ACCOUNT.address);
       console.log(JSON.stringify(accountInfo));
-      expect(
-        (accountInfo.externalAccountInfo as EvmAccountParams).address,
-      ).toBe(EVM_ACCOUNT.address);
+      expect(accountInfo.snapAddress).toBe(EVM_ACCOUNT.address);
       expect.assertions(2);
     });
   });

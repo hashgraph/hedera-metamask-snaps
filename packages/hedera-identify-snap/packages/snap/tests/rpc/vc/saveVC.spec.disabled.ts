@@ -20,22 +20,18 @@
 
 /* eslint-disable */
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
 import { getRequestParams } from '../../../tests/testUtils/helper';
 import { getDefaultSnapState } from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('saveVC', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   beforeAll(async () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-    global.snap = snapMock;
-    global.ethereum = metamask;
   });
 
   beforeEach(async () => {
