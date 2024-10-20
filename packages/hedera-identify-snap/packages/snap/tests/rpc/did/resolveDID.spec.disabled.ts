@@ -21,7 +21,6 @@
 /* eslint-disable no-restricted-globals */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { DIDResolutionResult } from 'did-resolver';
 import { PublicAccountInfo } from 'src/interfaces';
 import { onRpcRequest } from '../../../src';
@@ -35,7 +34,7 @@ import { getRequestParams } from '../../testUtils/helper';
 import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('resolveDID', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   let currentDID = exampleDIDPkh;
@@ -43,9 +42,6 @@ describe('resolveDID', () => {
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-    global.snap = snapMock;
-    global.ethereum = metamask;
   });
 
   beforeEach(async () => {
@@ -69,7 +65,7 @@ describe('resolveDID', () => {
     const resolvedDID = (await onRpcRequest({
       origin: 'tests',
       request: resolveDIDRequestParams as any,
-    })) as DIDResolutionResult;
+    })) as any;
 
     expect(resolvedDID.didDocument?.id).toBe(currentDID);
     expect.assertions(1);

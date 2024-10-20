@@ -18,8 +18,9 @@
  *
  */
 
-import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { heading, text } from '@metamask/snaps-ui';
+import { rpcErrors } from '@metamask/rpc-errors';
+import { OnRpcRequestHandler } from '@metamask/snaps-sdk';
+import { HelloUI } from './components/hello';
 import { Account, ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
@@ -27,7 +28,6 @@ import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchDIDMethod } from './rpc/did/switchDIDMethod';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -40,14 +40,12 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
-import { generateCommonPanel } from './snap/dialog';
-import { getSnapStateUnchecked } from './snap/state';
-import { CreateNewHederaAccountRequestParams } from './types/params';
+import { getCurrentNetwork } from './snap/network';
+import { getStateUnchecked } from './snap/state';
 import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
-  isValidCreateNewHederaAccountParams,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
@@ -77,16 +75,43 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
-  console.log(
-    'request.params=========',
-    JSON.stringify(request.params, null, 4),
-  );
 
-  let state = await getSnapStateUnchecked(snap);
+  const network = await getCurrentNetwork();
+
+  let state = await getStateUnchecked();
   if (state === null) {
-    state = await init(snap);
+    state = await init(origin, network);
   }
   console.log('state:', JSON.stringify(state, null, 4));
+
+  const identitySnapParams: IdentitySnapParams = {
+    origin,
+    network,
+    state,
+    account: {} as Account,
+  };
+
+  switch (request.method) {
+    case 'hello': {
+      return await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: <HelloUI origin={origin} network={network} />,
+        },
+      });
+    }
+    case 'togglePopups': {
+      return await togglePopups(identitySnapParams);
+    }
+    case 'switchDIDMethod': {
+      isValidSwitchMethodRequest(request.params);
+      return await switchDIDMethod(
+        identitySnapParams,
+        request.params.didMethod,
+      );
+    }
+  }
 
   let isExternalAccount: boolean;
   let extraData: unknown;
@@ -99,58 +124,22 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   const account: Account = await getCurrentAccount(
+    origin,
+    network,
     state,
     request.params,
     isExternalAccount,
   );
   account.extraData = extraData;
 
-  console.log(`Current account: ${JSON.stringify(account, null, 4)}`);
+  identitySnapParams.account = account;
 
-  const identitySnapParams: IdentitySnapParams = {
-    origin,
-    snap,
-    state,
-    metamask: ethereum,
-    account,
-  };
+  const accountInfoPublic = await getAccountInfo(identitySnapParams);
 
   switch (request.method) {
-    case 'hello': {
-      return snap.request({
-        method: 'snap_dialog',
-        params: {
-          /*
-            Type can be one of the following:
-            - 'alert': for displaying information.
-            - 'confirmation': for accepting or rejecting some action.
-            - 'prompt': for inputting some information.
-          */
-          type: 'alert',
-          content: await generateCommonPanel(origin, [
-            heading('Hello from Identify Snap!'),
-            text('This custom alert is just for display purposes.'),
-          ]),
-        },
-      });
-    }
-
-    case 'togglePopups': {
-      return await togglePopups(identitySnapParams);
-    }
-
     case 'getAccountInfo': {
-      return await getAccountInfo(identitySnapParams);
+      return accountInfoPublic;
     }
-
-    case 'createNewHederaAccount': {
-      isValidCreateNewHederaAccountParams(request.params);
-      return await createNewHederaAccount(
-        identitySnapParams,
-        request.params as CreateNewHederaAccountRequestParams,
-      );
-    }
-
     case 'resolveDID': {
       isValidResolveDIDRequest(request.params);
       return await resolveDID(identitySnapParams, request.params.did);
@@ -210,14 +199,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getCurrentDIDMethod(identitySnapParams);
     }
 
-    case 'switchDIDMethod': {
-      isValidSwitchMethodRequest(request.params);
-      return await switchDIDMethod(
-        identitySnapParams,
-        request.params.didMethod,
-      );
-    }
-
     case 'getSupportedProofFormats': {
       return getSupportedProofFormats();
     }
@@ -231,9 +212,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return await syncGoogleVCs(identitySnapParams);
     }
 
-    default: {
-      console.error('Method not found');
-      throw new Error('Method not found');
-    }
+    default:
+      // Throw a known error to avoid crashing the Snap
+      throw rpcErrors.methodNotFound(request.method);
   }
 };

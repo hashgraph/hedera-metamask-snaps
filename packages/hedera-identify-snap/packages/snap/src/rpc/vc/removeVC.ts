@@ -18,7 +18,8 @@
  *
  */
 
-import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { DialogParams } from '@metamask/snaps-sdk';
+import { IdentitySnapParams } from '../../interfaces';
 import {
   DeleteOptions,
   IDataManagerDeleteArgs,
@@ -39,14 +40,14 @@ export async function removeVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: IDataManagerDeleteArgs,
 ): Promise<IDataManagerDeleteResult[] | null> {
-  const { origin, snap, state, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
 
   const { id = '', options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
   const optionsFiltered = { store } as DeleteOptions;
 
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   const ids = typeof id === 'string' ? [id] : id;
   if (ids.length === 0) {
@@ -55,7 +56,7 @@ export async function removeVC(
 
   const accountState = await getAccountStateByCoinType(
     state,
-    account.evmAddress,
+    account.metamaskAddress,
   );
   const vcsToBeRemoved: IDataManagerQueryResult[] = [];
   for (const vcId of ids) {
@@ -76,10 +77,11 @@ export async function removeVC(
   const header = 'Remove specific Verifiable Credentials';
   const prompt = 'Are you sure you want to remove the following VCs?';
   const description = `Note that this action cannot be reversed and you will need to recreate your VCs if you go through with it. Number of VCs to be removed is ${vcsToBeRemoved.length.toString()}`;
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'confirmation',
     content: await generateVCPanel(
       origin,
+      network,
       header,
       prompt,
       description,
@@ -87,7 +89,7 @@ export async function removeVC(
     ),
   };
 
-  if (await snapDialog(snap, dialogParams)) {
+  if (await snapDialog(dialogParams)) {
     // Remove the specified Verifiable Credentials from the store based on their IDs
     return Promise.all(
       ids.map(async (_id: string) => {

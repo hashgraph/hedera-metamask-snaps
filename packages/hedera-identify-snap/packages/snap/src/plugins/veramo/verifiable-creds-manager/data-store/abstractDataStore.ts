@@ -19,24 +19,24 @@
  */
 
 export type ISaveArgs = {
-  data: unknown;
-  options?: unknown;
+  data: any;
+  options?: any;
 };
 
 export type ISaveVC = {
-  vc: unknown;
+  vc: any;
   id?: string;
 };
 
 export type IDeleteArgs = {
   id: string;
-  options?: unknown;
+  options?: any;
 };
 
 export type IFilterArgs = {
   filter?: {
     type: string;
-    filter: unknown;
+    filter: any;
   };
 };
 
@@ -45,7 +45,7 @@ export type IConfigureArgs = {
 };
 
 export type IQueryResult = {
-  data: unknown;
+  data: any;
   metadata: {
     id: string;
   };

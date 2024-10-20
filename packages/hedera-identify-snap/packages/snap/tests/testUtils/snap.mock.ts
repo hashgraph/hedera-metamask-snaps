@@ -21,13 +21,12 @@
 /* eslint-disable */
 
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
-import { RequestArguments } from '@metamask/providers/dist/BaseProvider';
-import { Maybe } from '@metamask/providers/dist/utils';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 
-import { providers, Wallet } from 'ethers';
+import { AlchemyProvider, Provider, Wallet } from 'ethers';
 import { IdentitySnapState } from '../../src/interfaces';
 import { ETH_ADDRESS, mnemonic, privateKey } from './constants';
+import { RequestArguments } from '@metamask/providers';
+import { Maybe } from '@metamask/providers/dist/utils.cjs';
 
 type ISnapMock = {
   request<T>(args: RequestArguments): Promise<Maybe<T>>;
@@ -69,15 +68,15 @@ export class SnapMock implements ISnapMock {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async snapEthCall(data: any[]): Promise<string> {
     const apiKey = 'NRFBwig_CLVL0WnQLY3dUo8YkPmW-7iN';
-    const provider = new providers.AlchemyProvider('goerli', apiKey);
+    const provider = new AlchemyProvider('goerli', apiKey);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return provider.call(data[0], data[1]);
+    return provider.call(data[0]);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async snapEthLogs(data: any[]): Promise<unknown> {
     const apiKey = 'NRFBwig_CLVL0WnQLY3dUo8YkPmW-7iN';
-    const provider = new providers.AlchemyProvider('goerli', apiKey);
+    const provider = new AlchemyProvider('goerli', apiKey);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return provider.getLogs(data[0]);
   }
@@ -122,7 +121,7 @@ export class SnapMock implements ISnapMock {
         delete types.EIP712Domain;
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, no-underscore-dangle
-        return this.snap._signTypedData(domain, types, message);
+        return this.snap.signTypedData(domain, types, message);
       }),
   };
 
@@ -143,8 +142,8 @@ export class SnapMock implements ISnapMock {
  *
  * @returns {SnapsGlobalObject & SnapMock} SnapMock
  */
-export function createMockSnap(): SnapsGlobalObject & SnapMock {
-  return new SnapMock() as SnapsGlobalObject & SnapMock;
+export function createMockSnap(): SnapMock {
+  return new SnapMock() as SnapMock;
 }
 
 /**
@@ -152,11 +151,8 @@ export function createMockSnap(): SnapsGlobalObject & SnapMock {
  *
  * @returns {SnapsGlobalObject & SnapMock} SnapMock
  */
-export function buildMockSnap(
-  chainId: string,
-  address: string,
-): SnapsGlobalObject & SnapMock {
-  let snapMock = new SnapMock() as SnapsGlobalObject & SnapMock;
+export function buildMockSnap(chainId: string, address: string): SnapMock {
+  let snapMock = new SnapMock() as SnapMock;
   snapMock.rpcMocks.eth_requestAccounts.mockResolvedValue([address]);
   snapMock.rpcMocks.eth_chainId.mockResolvedValue(chainId);
   return snapMock;

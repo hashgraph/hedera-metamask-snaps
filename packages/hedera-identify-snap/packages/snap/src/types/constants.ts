@@ -27,7 +27,7 @@ export const isIn = <T>(values: readonly T[], value: any): value is T => {
 export const availableVCStores = ['snap', 'googleDrive'] as const;
 export const isValidVCStore = (x: string) => isIn(availableVCStores, x);
 
-export const availableMethods = ['did:pkh'] as const;
+export const availableMethods = ['did:pkh', 'did:key', 'did:hedera'] as const;
 export const isValidMethod = (x: string) => isIn(availableMethods, x);
 
 // 60 for ethereum and 3030 for hedera

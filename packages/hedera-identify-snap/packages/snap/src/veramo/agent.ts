@@ -29,7 +29,6 @@ import {
 } from '@veramo/core';
 import { CredentialIssuerEIP712 } from '@veramo/credential-eip712';
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
@@ -38,14 +37,15 @@ import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
-import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
+import { getDidKeyResolver as keyDidResolver } from '../did/key/keyDidResolver';
 import {
   AbstractDataStore,
   DataManager,
   IDataManager,
 } from '../plugins/veramo/verifiable-creds-manager';
 
+import { KeyDIDProvider } from '../did/key/keyDidProvider';
 import { IdentitySnapState } from '../interfaces';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';
 import {
@@ -71,16 +71,14 @@ export type Agent = TAgent<
  * @param state - IdentitySnapState.
  * @returns Agent.
  */
-export async function getVeramoAgent(
-  snap: SnapsGlobalObject,
-  state: IdentitySnapState,
-): Promise<Agent> {
+export async function getVeramoAgent(state: IdentitySnapState): Promise<Agent> {
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
-  vcStorePlugins.snap = new SnapVCStore(snap, state);
-  vcStorePlugins.googleDrive = new GoogleDriveVCStore(snap, state);
+  didProviders['did:key'] = new KeyDIDProvider({ defaultKms: 'snap' });
+  vcStorePlugins.snap = new SnapVCStore(state);
+  vcStorePlugins.googleDrive = new GoogleDriveVCStore(state);
 
   const agent = createAgent<
     IKeyManager &
@@ -92,34 +90,27 @@ export async function getVeramoAgent(
   >({
     plugins: [
       new KeyManager({
-        store: new SnapKeyStore(snap, state),
+        store: new SnapKeyStore(state),
         kms: {
-          snap: new KeyManagementSystem(new SnapPrivateKeyStore(snap, state)),
+          snap: new KeyManagementSystem(new SnapPrivateKeyStore(state)),
         },
       }),
       new DIDManager({
-        store: new SnapDIDStore(snap, state),
+        store: new SnapDIDStore(state),
         defaultProvider: 'metamask',
         providers: didProviders,
       }),
       new DIDResolverPlugin({
         resolver: new Resolver({
           ...getDidPkhResolver(),
+          ...keyDidResolver(),
         }),
       }),
       new DataManager({ store: vcStorePlugins }),
       new CredentialPlugin(),
       new CredentialIssuerEIP712(),
-      /*  new CredentialIssuerLD({
-        contextMaps: [LdDefaultContexts],
-        suites: [new VeramoEcdsaSecp256k1RecoverySignature2020()],
-      }), */
       new MessageHandler({
-        messageHandlers: [
-          new JwtMessageHandler(),
-          new W3cMessageHandler(),
-          new SdrMessageHandler(),
-        ],
+        messageHandlers: [new JwtMessageHandler(), new W3cMessageHandler()],
       }),
     ],
   });

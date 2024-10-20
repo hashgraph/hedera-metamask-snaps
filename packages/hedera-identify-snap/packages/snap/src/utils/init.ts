@@ -18,11 +18,10 @@
  *
  */
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { heading, text } from '@metamask/snaps-ui';
-import { IdentitySnapState, SnapDialogParams } from '../interfaces';
+import { DialogParams, heading, text } from '@metamask/snaps-sdk';
+import { IdentitySnapState } from '../interfaces';
 import { generateCommonPanel, snapDialog } from '../snap/dialog';
-import { initSnapState } from '../snap/state';
+import { initState } from '../snap/state';
 
 /**
  * Init snap state.
@@ -30,11 +29,12 @@ import { initSnapState } from '../snap/state';
  * @param snap - Snap.
  */
 export async function init(
-  snap: SnapsGlobalObject,
+  origin: string,
+  network: string,
 ): Promise<IdentitySnapState> {
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'alert',
-    content: await generateCommonPanel(origin, [
+    content: await generateCommonPanel(origin, network, [
       heading('Risks about using Identify Snap'),
       text(
         'Applications do NOT have access to your private keys. You are in control of what VCs and VPs you sign and what you use your DIDs for.',
@@ -42,7 +42,7 @@ export async function init(
     ]),
   };
 
-  await snapDialog(snap, dialogParams);
+  await snapDialog(dialogParams);
   console.log('starting init');
-  return await initSnapState(snap);
+  return await initState();
 }

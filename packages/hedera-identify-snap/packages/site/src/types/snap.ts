@@ -41,10 +41,11 @@ export type ExternalAccountParams = {
 };
 
 export type PublicAccountInfo = {
-  evmAddress: string;
+  metamaskAddress: string;
+  snapAddress: string;
   did: string;
   method: string;
-  extraData?: unknown;
+  accountID: string;
 };
 
 export type UploadData = {
@@ -111,10 +112,4 @@ export type CreateVPRequestParams = {
   vcs?: W3CVerifiableCredential[];
   options?: CreateVPOptions;
   proofInfo?: ProofInfo;
-};
-
-export type CreateNewHederaAccountRequestParams = {
-  hbarAmountToSend: number;
-  newAccountPublickey?: string;
-  newAccountEvmAddress?: string;
 };

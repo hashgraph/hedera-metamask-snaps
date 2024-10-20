@@ -22,10 +22,7 @@
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapId } from '../config/snap';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
-import {
-  CreateNewHederaAccountRequestParams,
-  CreateVPRequestParams,
-} from '../types/snap';
+import { CreateVPRequestParams } from '../types/snap';
 import {
   Filter,
   IDataManagerClearArgs,
@@ -132,9 +129,27 @@ export const togglePopups = async (metamaskAddress: string) => {
 };
 
 /**
+ * Invoke the "switchDIDMethod" method from the snap.
+ */
+export const switchDIDMethod = async (
+  metamaskAddress: string,
+  didMethod: string,
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapId,
+      request: {
+        method: 'switchDIDMethod',
+        params: { metamaskAddress, didMethod },
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "getAccountInfo" method from the snap.
  */
-
 export const getAccountInfo = async (
   metamaskAddress: string,
   externalAccountparams?: ExternalAccountParams,
@@ -152,56 +167,8 @@ export const getAccountInfo = async (
 };
 
 /**
- * Invoke "createNewHederaAccount" method from the snap
- */
-
-export const createNewHederaAccount = async (
-  metamaskAddress: string,
-  {
-    hbarAmountToSend,
-    newAccountPublickey = '',
-    newAccountEvmAddress = '',
-  }: CreateNewHederaAccountRequestParams,
-  externalAccountparams?: ExternalAccountParams,
-) => {
-  if (newAccountPublickey) {
-    return await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: {
-        snapId: defaultSnapId,
-        request: {
-          method: 'createNewHederaAccount',
-          params: {
-            metamaskAddress,
-            hbarAmountToSend,
-            newAccountPublickey,
-            ...externalAccountparams,
-          },
-        },
-      },
-    });
-  }
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: {
-      snapId: defaultSnapId,
-      request: {
-        method: 'createNewHederaAccount',
-        params: {
-          metamaskAddress,
-          hbarAmountToSend,
-          newAccountEvmAddress,
-          ...externalAccountparams,
-        },
-      },
-    },
-  });
-};
-
-/**
  * Invoke the "resolveDID" method from the snap.
  */
-
 export const resolveDID = async (
   metamaskAddress: string,
   did?: string,

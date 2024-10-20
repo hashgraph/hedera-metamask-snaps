@@ -19,7 +19,8 @@
  */
 
 import { AccountId, PrivateKey } from '@hashgraph/sdk';
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { validHederaChainID } from '../hedera/config';
@@ -31,7 +32,6 @@ import {
   HederaAccountParams,
   IdentitySnapState,
   MetamaskAccountParams,
-  SnapDialogParams,
 } from '../interfaces';
 import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 import { getHederaAccountIfExists } from '../utils/params';
@@ -49,6 +49,8 @@ import { getCurrentCoinType, initAccountState } from './state';
  * @returns MetaMask address and did.
  */
 export async function getCurrentAccount(
+  origin: string,
+  network: string,
   state: IdentitySnapState,
   params: unknown,
   isExternalAccount: boolean,
@@ -70,7 +72,12 @@ export async function getCurrentAccount(
               `Invalid Hedera Account Id '${hederaAccountId}' is not a valid account Id`,
             );
           }
-          return await connectHederaAccount(state, hederaAccountId);
+          return await connectHederaAccount(
+            origin,
+            network,
+            state,
+            hederaAccountId,
+          );
         } else if (
           nonMetamaskAccount.externalAccount.blockchainType === 'evm'
         ) {
@@ -85,7 +92,7 @@ export async function getCurrentAccount(
               `Invalid EVM Account Address '${ethAddress}' is not a valid address`,
             );
           }
-          return await connectEVMAccount(state, ethAddress);
+          return await connectEVMAccount(origin, network, state, ethAddress);
         }
 
         console.error(
@@ -114,12 +121,12 @@ export async function getCurrentAccount(
       console.log(
         `The address ${metamaskAddress} has NOT yet been configured in the Identify Snap. Configuring now...`,
       );
-      await initAccountState(snap, state, coinType, metamaskAddress);
+      await initAccountState(state, coinType, metamaskAddress);
     }
     return await veramoImportMetaMaskAccount(
-      snap,
+      network,
       state,
-      ethereum,
+      (window as any).ethereum as MetaMaskInpageProvider,
       metamaskAddress,
     );
   } catch (e: any) {
@@ -135,6 +142,8 @@ export async function getCurrentAccount(
  * @param evmAddress - EVM Account address.
  */
 async function connectEVMAccount(
+  origin: string,
+  network: string,
   state: IdentitySnapState,
   evmAddress: string,
 ): Promise<Account> {
@@ -154,9 +163,9 @@ async function connectEVMAccount(
         controllerKeyId
       ].privateKeyHex;
   } else {
-    const dialogParamsForPrivateKey: SnapDialogParams = {
+    const dialogParamsForPrivateKey: DialogParams = {
       type: 'prompt',
-      content: await generateCommonPanel(origin, [
+      content: await generateCommonPanel(origin, network, [
         heading('Connect to EVM Account'),
         text('Enter your ECDSA private key for the following Account'),
         divider(),
@@ -165,7 +174,7 @@ async function connectEVMAccount(
       placeholder: '2386d1d21644dc65d...', // You can use '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c' for testing purposes
     };
     privateKey = PrivateKey.fromString(
-      (await snapDialog(snap, dialogParamsForPrivateKey)) as string,
+      (await snapDialog(dialogParamsForPrivateKey)) as string,
     ).toStringRaw();
   }
 
@@ -177,9 +186,9 @@ async function connectEVMAccount(
   };
 
   return await veramoImportMetaMaskAccount(
-    snap,
+    network,
     state,
-    ethereum,
+    (window as any).ethereum as MetaMaskInpageProvider,
     '',
     accountViaPrivateKey,
   );
@@ -192,10 +201,12 @@ async function connectEVMAccount(
  * @param accountId - Account id.
  */
 async function connectHederaAccount(
+  origin: string,
+  network: string,
   state: IdentitySnapState,
   accountId: string,
 ): Promise<Account> {
-  const chainId = await getCurrentNetwork(ethereum);
+  const chainId = await getCurrentNetwork();
   if (!validHederaChainID(chainId)) {
     console.error(
       'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet]',
@@ -212,9 +223,9 @@ async function connectHederaAccount(
     undefined,
   );
   if (evmAddress === null || _.isEmpty(evmAddress)) {
-    const dialogParamsForPrivateKey: SnapDialogParams = {
+    const dialogParamsForPrivateKey: DialogParams = {
       type: 'prompt',
-      content: await generateCommonPanel(origin, [
+      content: await generateCommonPanel(origin, network, [
         heading('Connect to Hedera Account'),
         text('Enter your ECDSA private key for the following Account'),
         divider(),
@@ -222,8 +233,8 @@ async function connectHederaAccount(
       ]),
       placeholder: '2386d1d21644dc65d...', // You can use '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c' and '0.0.15215' for testing purposes
     };
-    privateKey = PrivateKey.fromString(
-      (await snapDialog(snap, dialogParamsForPrivateKey)) as string,
+    privateKey = PrivateKey.fromStringECDSA(
+      (await snapDialog(dialogParamsForPrivateKey)) as string,
     ).toStringRaw();
   } else {
     const controllerKeyId = `metamask-${evmAddress}`;
@@ -242,9 +253,9 @@ async function connectHederaAccount(
   };
 
   return await veramoImportMetaMaskAccount(
-    snap,
+    network,
     state,
-    ethereum,
+    (window as any).ethereum as MetaMaskInpageProvider,
     '',
     accountViaPrivateKey,
   );

@@ -21,7 +21,6 @@
 /* eslint-disable no-restricted-globals */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
 import {
   IDataManagerDeleteResult,
@@ -38,7 +37,7 @@ import { getRequestParams } from '../../testUtils/helper';
 import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('RemoveVC', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   const vcs: W3CVerifiableCredential[] = [];
@@ -46,9 +45,6 @@ describe('RemoveVC', () => {
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-    global.snap = snapMock;
-    global.ethereum = metamask;
   });
 
   beforeEach(async () => {

@@ -34,7 +34,7 @@ export async function verifyVC(
 ): Promise<boolean | null> {
   const { state } = identitySnapParams;
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   // Verify the verifiable credential(VC)
   const result = await agent.verifyCredential({ credential: vc });

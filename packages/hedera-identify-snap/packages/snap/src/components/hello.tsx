@@ -1,6 +1,6 @@
 /*-
  *
- * Hedera Identify Snap
+ * Hedera Wallet Snap
  *
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
@@ -18,16 +18,21 @@
  *
  */
 
-import { IdentitySnapParams } from '../../interfaces';
+import type { SnapComponent } from '@metamask/snaps-sdk/jsx';
+import { Box, CommonUI, Heading, Row, Text, type CommonProps } from './common';
 
-/**
- * Function to get available methods.
- *
- * @param identitySnapParams - Identity snap params.
- */
-export async function getCurrentDIDMethod(
-  identitySnapParams: IdentitySnapParams,
-): Promise<string> {
-  const { state } = identitySnapParams;
-  return state.snapConfig.dApp.didMethod;
-}
+const MetamaskUI: SnapComponent<CommonProps> = ({ origin, network }) => {
+  return (
+    <Box>
+      <CommonUI origin={origin} network={network} />
+      <Heading>Hello!!</Heading>
+      <Row label="Message">
+        <Text>
+          You are seeing this because you interacted with the 'hello' method
+        </Text>
+      </Row>
+    </Box>
+  );
+};
+
+export const HelloUI = MetamaskUI as any;

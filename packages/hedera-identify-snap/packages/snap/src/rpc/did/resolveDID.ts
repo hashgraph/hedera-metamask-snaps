@@ -18,9 +18,7 @@
  *
  */
 
-import { DIDResolutionResult } from '@veramo/core';
 import { IdentitySnapParams } from '../../interfaces';
-import { getVeramoAgent } from '../../veramo/agent';
 
 /**
  * Resolve DID.
@@ -31,18 +29,17 @@ import { getVeramoAgent } from '../../veramo/agent';
 export async function resolveDID(
   identitySnapParams: IdentitySnapParams,
   didUrl?: string,
-): Promise<DIDResolutionResult | null> {
-  const { state, account } = identitySnapParams;
-
-  // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+): Promise<any> {
+  const { account } = identitySnapParams;
 
   let did = didUrl;
   // GET DID if not exists
   if (!did) {
     did = account.identifier.did;
   }
-  return await agent.resolveDid({
-    didUrl: did,
-  });
+
+  const response = await fetch(
+    `https://dev.uniresolver.io/1.0/identifiers/${did}`,
+  );
+  return await response.json();
 }

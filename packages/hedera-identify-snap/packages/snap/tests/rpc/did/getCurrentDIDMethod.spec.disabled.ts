@@ -21,7 +21,6 @@
 /* eslint-disable no-restricted-globals */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
@@ -32,15 +31,12 @@ import { getRequestParams } from '../../testUtils/helper';
 import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('GetCurrentDIDMethod', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-    global.snap = snapMock;
-    global.ethereum = metamask;
   });
 
   beforeEach(async () => {

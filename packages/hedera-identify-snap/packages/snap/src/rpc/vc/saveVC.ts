@@ -18,8 +18,9 @@
  *
  */
 
+import { DialogParams } from '@metamask/snaps-sdk';
 import { W3CVerifiableCredential } from '@veramo/core';
-import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import {
   IDataManagerQueryResult,
   IDataManagerSaveArgs,
@@ -41,7 +42,7 @@ export async function saveVC(
   identitySnapParams: IdentitySnapParams,
   vcSaveRequestParams: IDataManagerSaveArgs,
 ): Promise<IDataManagerSaveResult[]> {
-  const { origin, snap, state, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
 
   const { data: verifiableCredentials, options } = vcSaveRequestParams || {};
   const { store = 'snap' } = options || {};
@@ -49,7 +50,7 @@ export async function saveVC(
   const optionsFiltered = { store } as SaveOptions;
 
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   const header = 'Save Verifiable Credentials';
   const prompt = `Are you sure you want to save the following VCs in ${
@@ -72,10 +73,11 @@ export async function saveVC(
       });
     },
   );
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'confirmation',
     content: await generateVCPanel(
       origin,
+      network,
       header,
       prompt,
       description,
@@ -83,11 +85,11 @@ export async function saveVC(
     ),
   };
 
-  if (await snapDialog(snap, dialogParams)) {
+  if (await snapDialog(dialogParams)) {
     // Save the Verifiable Credential
     const accountState = await getAccountStateByCoinType(
       state,
-      account.evmAddress,
+      account.metamaskAddress,
     );
 
     const filteredCredentials: W3CVerifiableCredential[] = (
@@ -97,7 +99,7 @@ export async function saveVC(
 
       const subjectDid: string = vcObj.credentialSubject.id;
       const subjectAccount = subjectDid.split(':')[4];
-      return account.evmAddress === subjectAccount;
+      return account.metamaskAddress === subjectAccount;
     });
     return await agent.saveVC({
       data: (filteredCredentials as W3CVerifiableCredential[]).map(

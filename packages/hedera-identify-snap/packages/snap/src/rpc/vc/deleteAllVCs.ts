@@ -18,7 +18,8 @@
  *
  */
 
-import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { DialogParams } from '@metamask/snaps-sdk';
+import { IdentitySnapParams } from '../../interfaces';
 import {
   ClearOptions,
   IDataManagerClearArgs,
@@ -39,17 +40,17 @@ export async function deleteAllVCs(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: IDataManagerClearArgs,
 ): Promise<IDataManagerClearResult[] | null> {
-  const { origin, snap, state, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
   const { options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
   const optionsFiltered = { store } as ClearOptions;
 
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   const accountState = await getAccountStateByCoinType(
     state,
-    account.evmAddress,
+    account.metamaskAddress,
   );
   const vcsToBeRemoved = (await agent.queryVC({
     filter: undefined,
@@ -60,10 +61,11 @@ export async function deleteAllVCs(
   const header = 'Delete all Verifiable Credentials';
   const prompt = `Are you sure you want to remove all your VCs from the store '${store}'?`;
   const description = `Note that this action cannot be reversed and you will need to recreate your VCs if you go through with it. Number of VCs to be removed is ${vcsToBeRemoved.length.toString()}`;
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'confirmation',
     content: await generateVCPanel(
       origin,
+      network,
       header,
       prompt,
       description,
@@ -71,7 +73,7 @@ export async function deleteAllVCs(
     ),
   };
 
-  if (await snapDialog(snap, dialogParams)) {
+  if (await snapDialog(dialogParams)) {
     // Remove all the Verifiable Credentials from the store
     return await agent.clearVCs({
       options: optionsFiltered,

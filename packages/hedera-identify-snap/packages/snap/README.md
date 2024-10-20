@@ -91,7 +91,6 @@ process; see those repositories for more information about how they work.
 - Babel is used for transpiling TypeScript to JavaScript, so when building with the CLI,
   `transpilationMode` must be set to `localOnly` (default) or `localAndDeps`.
 - For the global `wallet` type to work, you have to add the following to your `tsconfig.json`:
-
   ```json
   {
     "files": ["./node_modules/@metamask/snap-types/global.d.ts"]

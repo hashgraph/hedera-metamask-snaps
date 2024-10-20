@@ -17,13 +17,11 @@
  * limitations under the License.
  *
  */
-
-import { RequestArguments } from '@metamask/providers/dist/BaseProvider';
-import { Maybe } from '@metamask/providers/dist/utils';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { Wallet } from 'ethers';
 import { IdentitySnapState } from '../../src/interfaces';
 import { ETH_ADDRESS, privateKey, signedMsg } from './constants';
+import { RequestArguments } from '@metamask/providers';
+import { Maybe } from '@metamask/providers/dist/utils.cjs';
 
 type IWalletMock = {
   request<T>(args: RequestArguments): Promise<Maybe<T>>;
@@ -93,6 +91,6 @@ export class WalletMock implements IWalletMock {
  *
  * @returns Wallet mock.
  */
-export function createMockWallet(): SnapsGlobalObject & WalletMock {
-  return new WalletMock() as SnapsGlobalObject & WalletMock;
+export function createMockWallet(): WalletMock {
+  return new WalletMock() as WalletMock;
 }

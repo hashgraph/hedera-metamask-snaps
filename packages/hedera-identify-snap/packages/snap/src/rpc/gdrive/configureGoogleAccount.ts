@@ -18,32 +18,28 @@
  *
  */
 
-import { divider, heading, text } from '@metamask/snaps-ui';
-import {
-  GoogleToken,
-  IdentitySnapParams,
-  SnapDialogParams,
-} from '../../interfaces';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import { GoogleToken, IdentitySnapParams } from '../../interfaces';
 import { verifyToken } from '../../plugins/veramo/google-drive-data-store';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { getCurrentCoinType, updateSnapState } from '../../snap/state';
+import { getCurrentCoinType, updateState } from '../../snap/state';
 
 export const configureGoogleAccount = async (
   identitySnapParams: IdentitySnapParams,
   { accessToken }: GoogleToken,
 ) => {
-  const { origin, snap, state, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
   try {
     const newGUserEmail = await verifyToken(accessToken);
     const coinType = await getCurrentCoinType();
 
     const currentGUserInfo =
-      state.accountState[coinType][account.evmAddress].accountConfig.identity
-        .googleUserInfo;
+      state.accountState[coinType][account.metamaskAddress].accountConfig
+        .identity.googleUserInfo;
 
-    const dialogParams: SnapDialogParams = {
+    const dialogParams: DialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, [
+      content: await generateCommonPanel(origin, network, [
         heading('Configure Google Drive'),
         text('Would you like to change your Google account to the following?'),
         divider(),
@@ -56,18 +52,18 @@ export const configureGoogleAccount = async (
       ]),
     };
 
-    const result = await snapDialog(snap, dialogParams);
+    const result = await snapDialog(dialogParams);
     if (result) {
       state.accountState[coinType][
-        account.evmAddress
+        account.metamaskAddress
       ].accountConfig.identity.googleUserInfo.accessToken = accessToken;
 
       state.accountState[coinType][
-        account.evmAddress
+        account.metamaskAddress
       ].accountConfig.identity.googleUserInfo.email = newGUserEmail;
 
       console.log('new state: ', JSON.stringify(state, null, 4));
-      await updateSnapState(snap, state);
+      await updateState(state);
       return true;
     }
     return false;

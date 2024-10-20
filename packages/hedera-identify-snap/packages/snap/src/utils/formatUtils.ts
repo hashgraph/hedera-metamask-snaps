@@ -18,16 +18,27 @@
  *
  */
 
-import { IdentitySnapParams } from '../../interfaces';
+import { CodecName, MULTICODECS } from '../constants';
 
 /**
- * Function to get available methods.
+ * Prefix a buffer with a multicodec-packed.
  *
- * @param identitySnapParams - Identity snap params.
+ * @param {CodecName} multicodec
+ * @param {Uint8Array} data
+ *
+ * @returns {Uint8Array}
  */
-export async function getCurrentDIDMethod(
-  identitySnapParams: IdentitySnapParams,
-): Promise<string> {
-  const { state } = identitySnapParams;
-  return state.snapConfig.dApp.didMethod;
-}
+export const addMulticodecPrefix = (
+  multicodec: CodecName,
+  data: Uint8Array,
+): Uint8Array => {
+  let prefix;
+
+  if (MULTICODECS[multicodec]) {
+    prefix = Buffer.from(MULTICODECS[multicodec]);
+  } else {
+    throw new Error('multicodec not recognized');
+  }
+
+  return Buffer.concat([prefix, data], prefix.length + data.length);
+};

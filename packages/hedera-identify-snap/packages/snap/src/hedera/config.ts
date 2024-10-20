@@ -26,9 +26,33 @@ const hederaChainIDs: Record<string, string> = {
   '0x129': 'previewnet',
 };
 
+const otherChainIDs: Record<string, string> = {
+  '0x1': 'Ethereum Mainnet',
+  '0xa': 'Optimisim',
+  '0xe': 'Flare',
+  '0x13': 'Songbird',
+  '0x14': 'Elastos',
+  '0x1e': 'RSK',
+  '0x32': 'XDC',
+  '0x38': 'Binance Smart Chain',
+  '0x89': 'Polygon',
+  '0x13a': 'Filecoin',
+  '0x44d': 'Polygon ZKEVM',
+  '0x8ae': 'Kava',
+  '0x2105': 'Base',
+  '0xa4b1': 'Arbitrum',
+  '0xa86a': 'Avalanche',
+  '0xe71c': 'Linea',
+};
+
 export const getHederaNetwork = (chainId: string): string => {
   const network = hederaChainIDs[chainId];
   return network || 'mainnet';
+};
+
+export const getOtherNetwork = (chainId: string): string => {
+  const network = otherChainIDs[chainId];
+  return network || `Unknown Network (Chain ID: ${chainId})`;
 };
 
 export const validHederaChainID = (x: string) => {

@@ -34,7 +34,7 @@ export async function verifyVP(
 ): Promise<boolean | null> {
   const { state } = identitySnapParams;
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   // Verify the verifiable presentation(VP)
   const result = await agent.verifyPresentation({

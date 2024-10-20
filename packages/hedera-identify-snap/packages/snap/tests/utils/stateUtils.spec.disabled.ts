@@ -20,20 +20,19 @@
 
 /* eslint-disable */
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { DEFAULTCOINTYPE } from 'src/types/constants';
 import {
-  getSnapStateUnchecked,
+  getStateUnchecked,
   initAccountState,
-  initSnapState,
-  updateSnapState,
+  initState,
+  updateState,
 } from '../../src/snap/state';
 import { getInitialSnapState } from '../../src/utils/config';
 import { ETH_ADDRESS, getDefaultSnapState } from '../testUtils/constants';
 import { WalletMock, createMockWallet } from '../testUtils/wallet.mock';
-import { DEFAULTCOINTYPE } from 'src/types/constants';
 
 describe.skip('Utils [state]', () => {
-  let walletMock: SnapsGlobalObject & WalletMock;
+  let walletMock: WalletMock;
 
   beforeEach(() => {
     walletMock = createMockWallet();
@@ -43,9 +42,7 @@ describe.skip('Utils [state]', () => {
     it('should succeed updating snap state with default state', async () => {
       const initialState = getDefaultSnapState();
 
-      await expect(
-        updateSnapState(walletMock, initialState),
-      ).resolves.not.toThrow();
+      await expect(updateState(initialState)).resolves.not.toThrow();
 
       expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(
         'update',
@@ -60,7 +57,7 @@ describe.skip('Utils [state]', () => {
 
       await expect(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any
-        updateSnapState(walletMock, emptyState as any),
+        updateState(emptyState as any),
       ).resolves.not.toThrow();
 
       expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(
@@ -74,7 +71,7 @@ describe.skip('Utils [state]', () => {
 
   describe('getSnapStateUnchecked', () => {
     it('should return null if state is not initialized', async () => {
-      await expect(getSnapStateUnchecked(walletMock)).resolves.toEqual(null);
+      await expect(getStateUnchecked()).resolves.toEqual(null);
 
       expect.assertions(1);
     });
@@ -83,9 +80,7 @@ describe.skip('Utils [state]', () => {
       const initialState = getDefaultSnapState();
       walletMock.rpcMocks.snap_manageState.mockReturnValueOnce(initialState);
 
-      await expect(getSnapStateUnchecked(walletMock)).resolves.toEqual(
-        initialState,
-      );
+      await expect(getStateUnchecked()).resolves.toEqual(initialState);
 
       expect.assertions(1);
     });
@@ -95,7 +90,7 @@ describe.skip('Utils [state]', () => {
     it('should succeed initializing snap state', async () => {
       const initialState = getInitialSnapState();
 
-      await expect(initSnapState(walletMock)).resolves.toEqual(initialState);
+      await expect(initState()).resolves.toEqual(initialState);
 
       expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(
         'update',
@@ -113,12 +108,7 @@ describe.skip('Utils [state]', () => {
       //  defaultState.accountState[address].publicKey = publicKey;
 
       await expect(
-        initAccountState(
-          walletMock,
-          initialState,
-          DEFAULTCOINTYPE.toString(),
-          ETH_ADDRESS,
-        ),
+        initAccountState(initialState, DEFAULTCOINTYPE.toString(), ETH_ADDRESS),
       ).resolves.not.toThrow();
 
       expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(

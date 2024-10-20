@@ -19,6 +19,7 @@
  */
 
 import { assertArgument, HDNodeWallet, Mnemonic } from 'ethers';
+import { publicKeyConvert } from 'secp256k1';
 import { DEFAULTCOINTYPE } from '../types/constants';
 
 export const generateWallet = async (
@@ -33,15 +34,15 @@ export const generateWallet = async (
   });
 
   let nodeWallet = HDNodeWallet.fromMnemonic(Mnemonic.fromEntropy(entropy));
-  nodeWallet = await derivePathForWallet(
-    nodeWallet,
-    `m/44/${DEFAULTCOINTYPE}/0/0/0`,
-  );
+  nodeWallet = derivePathForWallet(nodeWallet, `m/44/${DEFAULTCOINTYPE}/0/0/0`);
 
   return nodeWallet;
 };
 
-export const derivePathForWallet = async (node: HDNodeWallet, path: string) => {
+export const derivePathForWallet = (
+  node: HDNodeWallet,
+  path: string,
+): HDNodeWallet => {
   const components = path.split('/');
 
   assertArgument(
@@ -87,3 +88,17 @@ export const derivePathForWallet = async (node: HDNodeWallet, path: string) => {
 
   return result;
 };
+
+export function uint8ArrayToHex(arr: Uint8Array) {
+  return Buffer.from(arr).toString('hex');
+}
+
+export function hexToUint8Array(str: string): Uint8Array {
+  return new Uint8Array(Buffer.from(str, 'hex'));
+}
+
+export function getCompressedPublicKey(publicKey: string): string {
+  return uint8ArrayToHex(
+    publicKeyConvert(hexToUint8Array(publicKey.split('0x')[1]), true),
+  );
+}

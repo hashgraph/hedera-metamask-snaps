@@ -18,10 +18,10 @@
  *
  */
 
-import { divider, heading, text } from '@metamask/snaps-ui';
-import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
+import { IdentitySnapParams } from '../../interfaces';
+import { updateDIDMethod } from '../../snap/dapp';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
-import { getAccountStateByCoinType, updateSnapState } from '../../snap/state';
 import { availableMethods, isValidMethod } from '../../types/constants';
 
 /**
@@ -34,13 +34,9 @@ export async function switchDIDMethod(
   identitySnapParams: IdentitySnapParams,
   didMethod: string,
 ): Promise<boolean> {
-  const { snap, state, account } = identitySnapParams;
+  const { origin, network, state } = identitySnapParams;
 
-  const accountState = await getAccountStateByCoinType(
-    state,
-    account.evmAddress,
-  );
-  const method = accountState.accountConfig.identity.didMethod;
+  const method = state.snapConfig.dApp.didMethod;
   if (!isValidMethod(didMethod)) {
     console.error(
       `did method '${didMethod}' not supported. Supported methods are: ${availableMethods}`,
@@ -51,19 +47,19 @@ export async function switchDIDMethod(
   }
 
   if (method !== didMethod) {
-    const dialogParams: SnapDialogParams = {
+    const dialogParams: DialogParams = {
       type: 'confirmation',
-      content: await generateCommonPanel(origin, [
+      content: await generateCommonPanel(origin, network, [
         heading('Switch to a different DID method to use'),
         text('Would you like to change did method to the following?'),
         divider(),
-        text(`Current DID method: ${method}\nNew DID method: ${didMethod}`),
+        text(`Current DID method: ${method}`),
+        text(`New DID method: ${didMethod}`),
       ]),
     };
 
-    if (await snapDialog(snap, dialogParams)) {
-      accountState.accountConfig.identity.didMethod = didMethod;
-      await updateSnapState(snap, state);
+    if (await snapDialog(dialogParams)) {
+      await updateDIDMethod(state, didMethod);
       return true;
     }
 
