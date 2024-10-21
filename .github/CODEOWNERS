@@ -9,6 +9,11 @@
 ###############################
 /packages/hedera-wallet-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts @hashgraph/tuum-tech-hedera
 
+###############################
+##### Hedera Identify Snap ######
+###############################
+/packages/hedera-identify-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts @hashgraph/tuum-tech-hedera
+
 #########################
 #####  Core Files  ######
 #########################
