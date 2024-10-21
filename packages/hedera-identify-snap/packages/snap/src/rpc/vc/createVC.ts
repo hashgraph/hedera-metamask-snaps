@@ -18,15 +18,16 @@
  *
  */
 
-import { divider, heading, text } from '@metamask/snaps-ui';
+import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { v4 as uuidv4 } from 'uuid';
 import { validHederaChainID } from '../../hedera/config';
-import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import {
   IDataManagerSaveResult,
   ISaveVC,
+  QueryMetadata,
   SaveOptions,
 } from '../../plugins/veramo/verifiable-creds-manager';
 import { generateCommonPanel, snapDialog } from '../../snap/dialog';
@@ -37,6 +38,7 @@ import {
   CreateVCResponseResult,
 } from '../../types/params';
 import { getVeramoAgent } from '../../veramo/agent';
+import { sha256 } from 'js-sha256';
 
 /**
  * Function to create VC.
@@ -48,10 +50,10 @@ export async function createVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: CreateVCRequestParams,
 ): Promise<CreateVCResponseResult> {
-  const { origin, snap, state, metamask, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
 
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   // GET DID
   const { did } = account.identifier;
@@ -65,9 +67,9 @@ export async function createVC(
   const { store = 'snap' } = options || {};
   const optionsFiltered = { store } as SaveOptions;
 
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'confirmation',
-    content: await generateCommonPanel(origin, [
+    content: await generateCommonPanel(origin, network, [
       heading('Create Verifiable Credential'),
       text('Would you like to create and save the following VC in the snap?'),
       divider(),
@@ -79,7 +81,7 @@ export async function createVC(
     ]),
   };
 
-  if (await snapDialog(snap, dialogParams)) {
+  if (await snapDialog(dialogParams)) {
     const issuanceDate = new Date();
     // Set the expiration date to be 1 year from the date it's issued
     const expirationDate = cloneDeep(issuanceDate);
@@ -99,10 +101,10 @@ export async function createVC(
       id: did, // identifier for the only subject of the credential
       [vcKey]: vcValue, // assertion about the only subject of the credential
     };
-    const chainId = await getCurrentNetwork(metamask);
+    const chainId = await getCurrentNetwork();
     const accountState = await getAccountStateByCoinType(
       state,
-      account.evmAddress,
+      account.metamaskAddress,
     );
     if (validHederaChainID(chainId)) {
       const hederaAccountId = accountState.extraData as string;
@@ -119,10 +121,19 @@ export async function createVC(
         // digital proof that makes the credential tamper-evident
         proofFormat: 'jwt' as ProofFormat,
       });
+    console.log(
+      'verifiableCredential: ',
+      JSON.stringify(verifiableCredential, null, 4),
+    );
 
     // Save the Verifiable Credential to all the stores the user requested for
     const saved: IDataManagerSaveResult[] = await agent.saveVC({
-      data: [{ vc: verifiableCredential, id: uuidv4() }] as ISaveVC[],
+      data: [
+        {
+          vc: verifiableCredential,
+          id: sha256(JSON.stringify(verifiableCredential)),
+        },
+      ] as ISaveVC[],
       options: optionsFiltered,
       accessToken:
         accountState.accountConfig.identity.googleUserInfo.accessToken,
@@ -130,11 +141,11 @@ export async function createVC(
 
     // Retrieve the created Verifiable Credential
     const result: CreateVCResponseResult = {
-      data: verifiableCredential,
+      data: verifiableCredential as W3CVerifiableCredential,
       metadata: {
         id: saved[0].id,
         store: saved.map((res) => res.store),
-      },
+      } as QueryMetadata,
     };
 
     console.log(

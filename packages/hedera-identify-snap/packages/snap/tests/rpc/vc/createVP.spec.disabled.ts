@@ -21,7 +21,6 @@
 /* eslint-disable no-restricted-globals */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiablePresentation } from '@veramo/core';
 import { CreateVCResponseResult } from 'src/types/params';
 import { onRpcRequest } from '../../../src';
@@ -34,7 +33,7 @@ import { getRequestParams } from '../../testUtils/helper';
 import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('createVP', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   const vcIds: string[] = [];
@@ -42,9 +41,6 @@ describe('createVP', () => {
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-    global.snap = snapMock;
-    global.ethereum = metamask;
   });
 
   beforeEach(async () => {

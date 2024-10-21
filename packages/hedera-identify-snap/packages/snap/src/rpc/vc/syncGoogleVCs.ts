@@ -18,11 +18,11 @@
  *
  */
 
+import { DialogParams } from '@metamask/snaps-sdk';
 import {
   Account,
   IdentitySnapParams,
   IdentitySnapState,
-  SnapDialogParams,
 } from '../../interfaces';
 import { verifyToken } from '../../plugins/veramo/google-drive-data-store';
 import {
@@ -44,15 +44,15 @@ import { Agent, getVeramoAgent } from '../../veramo/agent';
 export async function syncGoogleVCs(
   identitySnapParams: IdentitySnapParams,
 ): Promise<boolean> {
-  const { origin, state, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
 
   try {
     // Get Veramo agent
-    const agent = await getVeramoAgent(snap, state);
+    const agent = await getVeramoAgent(state);
 
     const accountState = await getAccountStateByCoinType(
       state,
-      account.evmAddress,
+      account.metamaskAddress,
     );
     const gUserEmail = await verifyToken(
       accountState.accountConfig.identity.googleUserInfo.accessToken,
@@ -95,6 +95,7 @@ export async function syncGoogleVCs(
     let vcsNotInSnapSync = true;
     if (vcsNotInSnap.length > 0) {
       vcsNotInSnapSync = await handleSync(
+        network,
         state,
         account,
         agent,
@@ -109,6 +110,7 @@ export async function syncGoogleVCs(
     let vcsNotInGDriveSync = true;
     if (vcsNotInGDrive.length > 0) {
       vcsNotInGDriveSync = await handleSync(
+        network,
         state,
         account,
         agent,
@@ -143,6 +145,7 @@ export async function syncGoogleVCs(
 /**
  * Function to handle the snap dialog and import/export each VC.
  *
+ * @param network- Network name.
  * @param state - Identity state.
  * @param account - Currently connected account.
  * @param agent - Veramo.
@@ -154,6 +157,7 @@ export async function syncGoogleVCs(
  * @param store - The snap store to use(snap or googleDrive).
  */
 async function handleSync(
+  network: string,
   state: IdentitySnapState,
   account: Account,
   agent: Agent,
@@ -164,17 +168,24 @@ async function handleSync(
   vcs: IDataManagerQueryResult[],
   store: string,
 ): Promise<boolean> {
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'confirmation',
-    content: await generateVCPanel(origin, header, prompt, description, vcs),
+    content: await generateVCPanel(
+      origin,
+      network,
+      header,
+      prompt,
+      description,
+      vcs,
+    ),
   };
-  if (await snapDialog(snap, dialogParams)) {
+  if (await snapDialog(dialogParams)) {
     const options = {
       store,
     } as SaveOptions;
     const accountState = await getAccountStateByCoinType(
       state,
-      account.evmAddress,
+      account.metamaskAddress,
     );
     const data = vcs.map((x) => {
       return { vc: x.data, id: x.metadata.id } as ISaveVC;

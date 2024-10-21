@@ -36,7 +36,6 @@ const emptyAccountState = {
   index: 0,
   accountConfig: {
     identity: {
-      didMethod: 'did:pkh',
       vcStore: 'snap',
       googleUserInfo: {} as GoogleUserInfo,
     },
@@ -55,6 +54,7 @@ const initialSnapState: IdentitySnapState = {
   },
   snapConfig: {
     dApp: {
+      didMethod: 'did:pkh',
       disablePopups: false,
       friendlyDapps: [],
     },

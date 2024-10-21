@@ -21,7 +21,6 @@
 /* eslint-disable no-restricted-globals */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
 import { getAccountStateByCoinType } from '../../../src/snap/state';
 import {
@@ -33,15 +32,12 @@ import { getRequestParams } from '../../testUtils/helper';
 import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('SwitchDIDMethod', () => {
-  let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-
-    global.snap = snapMock;
-    global.ethereum = metamask;
   });
 
   beforeEach(async () => {
@@ -55,7 +51,7 @@ describe('SwitchDIDMethod', () => {
   it.skip('should change snap state when switch to did:pkh methods', async () => {
     const snapState = getDefaultSnapState();
     const accountType = await getAccountStateByCoinType(snapState, ETH_ADDRESS);
-    accountType.accountConfig.identity.didMethod = 'did:key';
+    snapState.snapConfig.dApp.didMethod = 'did:key';
 
     snapState.accountState['60'][ETH_ADDRESS] = accountType;
 
@@ -106,7 +102,7 @@ describe('SwitchDIDMethod', () => {
 
     const snapState = getDefaultSnapState();
     const accountType = await getAccountStateByCoinType(snapState, ETH_ADDRESS);
-    accountType.accountConfig.identity.didMethod = 'did:key';
+    snapState.snapConfig.dApp.didMethod = 'did:key';
 
     snapState.accountState['60'][ETH_ADDRESS] = accountType;
 

@@ -54,9 +54,3 @@ export type CreateVPRequestParams = {
   options?: CreateVPOptions;
   proofInfo?: ProofInfo;
 };
-
-export type CreateNewHederaAccountRequestParams = {
-  hbarAmountToSend: number;
-  newAccountPublickey?: string;
-  newAccountEvmAddress?: string;
-};

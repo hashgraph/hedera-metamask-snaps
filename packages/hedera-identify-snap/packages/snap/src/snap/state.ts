@@ -18,12 +18,11 @@
  *
  */
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { validHederaChainID } from '../hedera/config';
 import {
   Account,
+  IdentitySnapState as IdentifySnapState,
   IdentityAccountState,
-  IdentitySnapState,
 } from '../interfaces';
 import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 import { getEmptyAccountState, getInitialSnapState } from '../utils/config';
@@ -36,10 +35,7 @@ import { getCurrentNetwork } from './network';
  * @param snap - Snap.
  * @param snapState - Object to replace the current object in the MetaMask state.
  */
-export async function updateSnapState(
-  snap: SnapsGlobalObject,
-  snapState: IdentitySnapState,
-) {
+export async function updateState(snapState: IdentifySnapState) {
   await snap.request({
     method: 'snap_manageState',
     params: {
@@ -56,35 +52,31 @@ export async function updateSnapState(
  * @public
  * @returns Object from the state.
  */
-export async function getSnapState(
-  snap: SnapsGlobalObject,
-): Promise<IdentitySnapState> {
+export async function getState(): Promise<IdentifySnapState> {
   const state = (await snap.request({
     method: 'snap_manageState',
     params: { operation: 'get' },
-  })) as IdentitySnapState | null;
+  })) as IdentifySnapState | null;
 
   if (!state) {
-    throw Error('IdentitySnapState is not initialized!');
+    throw Error('IdentifySnapState is not initialized!');
   }
 
   return state;
 }
 
 /**
- * Function to retrieve IdentitySnapState object from the MetaMask state.
+ * Function to retrieve IdentifySnapState object from the MetaMask state.
  *
  * @param snap - Snap.
  * @public
  * @returns Object from the state.
  */
-export async function getSnapStateUnchecked(
-  snap: SnapsGlobalObject,
-): Promise<IdentitySnapState | null> {
+export async function getStateUnchecked(): Promise<IdentifySnapState | null> {
   const state = (await snap.request({
     method: 'snap_manageState',
     params: { operation: 'get' },
-  })) as IdentitySnapState | null;
+  })) as IdentifySnapState | null;
 
   return state;
 }
@@ -96,11 +88,9 @@ export async function getSnapStateUnchecked(
  * @public
  * @returns Object.
  */
-export async function initSnapState(
-  snap: SnapsGlobalObject,
-): Promise<IdentitySnapState> {
+export async function initState(): Promise<IdentifySnapState> {
   const state = getInitialSnapState();
-  await updateSnapState(snap, state);
+  await updateState(state);
   return state;
 }
 
@@ -113,14 +103,13 @@ export async function initSnapState(
  * @param evmAddress - The account address.
  */
 export async function initAccountState(
-  snap: SnapsGlobalObject,
-  state: IdentitySnapState,
+  state: IdentifySnapState,
   coinType: string,
   evmAddress: string,
 ): Promise<void> {
-  state.currentAccount = { evmAddress } as Account;
+  state.currentAccount = { metamaskAddress: evmAddress } as Account;
   state.accountState[coinType][evmAddress] = getEmptyAccountState();
-  await updateSnapState(snap, state);
+  await updateState(state);
 }
 
 /**
@@ -129,7 +118,7 @@ export async function initAccountState(
  * @returns Result.
  */
 export async function getCurrentCoinType(): Promise<number> {
-  const chainId = await getCurrentNetwork(ethereum);
+  const chainId = await getCurrentNetwork();
   let coinType = DEFAULTCOINTYPE;
   if (validHederaChainID(chainId)) {
     coinType = HEDERACOINTYPE;
@@ -145,7 +134,7 @@ export async function getCurrentCoinType(): Promise<number> {
  * @returns Result.
  */
 export async function getAccountStateByCoinType(
-  state: IdentitySnapState,
+  state: IdentifySnapState,
   evmAddress: string,
 ): Promise<IdentityAccountState> {
   const coinType = await getCurrentCoinType();

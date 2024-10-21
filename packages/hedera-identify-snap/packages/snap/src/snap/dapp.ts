@@ -18,9 +18,19 @@
  *
  */
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapState } from '../interfaces';
-import { updateSnapState } from './state';
+import { updateState } from './state';
+
+/**
+ * Function that toggles the disablePopups flag in the config.
+ *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ */
+export async function updatePopups(state: IdentitySnapState) {
+  state.snapConfig.dApp.disablePopups = !state.snapConfig.dApp.disablePopups;
+  await updateState(state);
+}
 
 /**
  * Function that lets you add a friendly dApp.
@@ -29,13 +39,9 @@ import { updateSnapState } from './state';
  * @param state - IdentitySnapState.
  * @param dapp - Dapp.
  */
-export async function addFriendlyDapp(
-  snap: SnapsGlobalObject,
-  state: IdentitySnapState,
-  dapp: string,
-) {
+export async function addFriendlyDapp(state: IdentitySnapState, dapp: string) {
   state.snapConfig.dApp.friendlyDapps.push(dapp);
-  await updateSnapState(snap, state);
+  await updateState(state);
 }
 
 /**
@@ -46,7 +52,6 @@ export async function addFriendlyDapp(
  * @param dapp - Dapp.
  */
 export async function removeFriendlyDapp(
-  snap: SnapsGlobalObject,
   state: IdentitySnapState,
   dapp: string,
 ) {
@@ -55,5 +60,19 @@ export async function removeFriendlyDapp(
   // friendlyDapps = friendlyDapps.filter((d) => d !== dapp);
   state.snapConfig.dApp.friendlyDapps =
     state.snapConfig.dApp.friendlyDapps.filter((d) => d !== dapp);
-  await updateSnapState(snap, state);
+  await updateState(state);
+}
+
+/**
+ * Function that switches the did method to use.
+ *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ */
+export async function updateDIDMethod(
+  state: IdentitySnapState,
+  didMethod: string,
+) {
+  state.snapConfig.dApp.didMethod = didMethod;
+  await updateState(state);
 }

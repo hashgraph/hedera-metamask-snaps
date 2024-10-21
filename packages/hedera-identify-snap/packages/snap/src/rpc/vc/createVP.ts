@@ -18,12 +18,13 @@
  *
  */
 
+import { DialogParams } from '@metamask/snaps-sdk';
 import {
   ProofFormat,
   VerifiableCredential,
   VerifiablePresentation,
 } from '@veramo/core';
-import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import {
   IDataManagerQueryResult,
   QueryOptions,
@@ -46,7 +47,7 @@ export async function createVP(
   identitySnapParams: IdentitySnapParams,
   vpRequestParams: CreateVPRequestParams,
 ): Promise<VerifiablePresentation | null> {
-  const { origin, snap, state, account } = identitySnapParams;
+  const { origin, network, state, account } = identitySnapParams;
 
   const {
     vcIds = [],
@@ -65,7 +66,7 @@ export async function createVP(
   const challenge = proofInfo?.challenge;
 
   // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  const agent = await getVeramoAgent(state);
 
   // GET DID
   const { did } = account.identifier;
@@ -111,17 +112,18 @@ export async function createVP(
   const prompt = 'Do you wish to create a VP from the following VCs?';
   const description =
     'A Verifiable Presentation is a secure way for someone to present information about themselves or their identity to someone else while ensuring that the information is accureate and trustworthy';
-  const dialogParams: SnapDialogParams = {
+  const dialogParams: DialogParams = {
     type: 'confirmation',
     content: await generateVCPanel(
       origin,
+      network,
       header,
       prompt,
       description,
       vcsWithMetadata,
     ),
   };
-  if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
+  if (config.dApp.disablePopups || (await snapDialog(dialogParams))) {
     // Generate a Verifiable Presentation from VCs
     const vp = await agent.createVerifiablePresentation({
       presentation: {

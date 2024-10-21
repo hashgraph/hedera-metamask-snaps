@@ -19,7 +19,7 @@
  */
 
 import cloneDeep from 'lodash.clonedeep';
-import { IdentitySnapState } from '../../src/interfaces';
+import { Account, IdentitySnapState } from '../../src/interfaces';
 import { getEmptyAccountState } from '../../src/utils/config';
 
 export const privateKey =
@@ -60,12 +60,12 @@ export const exampleDIDPkh = `did:pkh:eip155:4:${ETH_ADDRESS}`;
 
 const defaultSnapState: IdentitySnapState = {
   currentAccount: {
-    evmAddress: ETH_ADDRESS,
+    metamaskAddress: ETH_ADDRESS,
     method: '',
     identifier: {} as any,
     privateKey: '',
     publicKey: '',
-  },
+  } as Account,
   accountState: {
     '60': {
       '0xf49d65c80c3d2d98231654513b2da4652f09c9fe': getEmptyAccountState(),
@@ -73,6 +73,7 @@ const defaultSnapState: IdentitySnapState = {
   },
   snapConfig: {
     dApp: {
+      didMethod: 'did:pkh',
       disablePopups: false,
       friendlyDapps: [],
     },
