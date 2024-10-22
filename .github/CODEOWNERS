@@ -2,12 +2,17 @@
 ##### Global Protection Rule ######
 ###################################
 # NOTE: This rule is overriden by the more specific rules below. This is the catch-all rule for all files not covered by the more specific rules below
-*                                               @hashgraph/hedera-smart-contracts
+*                                               @hashgraph/hedera-smart-contracts-product
 
 ###############################
 ##### Hedera Wallet Snap ######
 ###############################
-/packages/hedera-wallet-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts @hashgraph/tuum-tech-hedera
+/packages/hedera-wallet-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera
+
+###############################
+##### Hedera Identify Snap ######
+###############################
+/packages/hedera-identify-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera
 
 #########################
 #####  Core Files  ######
