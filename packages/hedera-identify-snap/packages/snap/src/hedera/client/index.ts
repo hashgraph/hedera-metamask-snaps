@@ -38,7 +38,7 @@ import {
   SimpleHederaClient,
 } from '../service';
 
-import { createAccountForPublicKey } from './create-account';
+import { AccountUtils } from './Account';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   private _client: Client;
@@ -78,7 +78,7 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     publicKey: PublicKey;
     initialBalance: BigNumber;
   }): Promise<HederaMirrorInfo | null> {
-    return createAccountForPublicKey(this._client, options);
+    return AccountUtils.createAccountForPublicKey(this._client, options);
   }
 
   /**
