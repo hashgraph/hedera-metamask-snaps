@@ -31,10 +31,8 @@ import { VerifiableCredential } from '@veramo/core';
 import _ from 'lodash';
 import cloneDeep from 'lodash.clonedeep';
 import {
-  getHederaNetwork,
-  getOtherNetwork,
-  validHederaChainID,
-} from '../hedera/config';
+  ConfigUtils
+} from '../hedera/ConfigUtils';
 import { IDataManagerQueryResult } from '../plugins/veramo/verifiable-creds-manager';
 
 export function initializePanelToShow(): any {
@@ -89,10 +87,10 @@ export async function generateCommonPanel(
   prompt: any[],
 ): Promise<Panel> {
   let networkToShow = network;
-  if (validHederaChainID(network)) {
-    networkToShow = `Hedera - ${getHederaNetwork(network)}`;
+  if (ConfigUtils.validHederaChainID(network)) {
+    networkToShow = `Hedera - ${ConfigUtils.getHederaNetwork(network)}`;
   } else {
-    networkToShow = getOtherNetwork(network);
+    networkToShow = ConfigUtils.getOtherNetwork(network);
   }
   const panelToShow = [
     text(`Origin: **${origin}**`),
@@ -121,10 +119,10 @@ export async function generateVCPanel(
   vcs: IDataManagerQueryResult[],
 ): Promise<Panel> {
   let networkToShow = network;
-  if (validHederaChainID(network)) {
-    networkToShow = `Hedera - ${getHederaNetwork(network)}`;
+  if (ConfigUtils.validHederaChainID(network)) {
+    networkToShow = `Hedera - ${ConfigUtils.getHederaNetwork(network)}`;
   } else {
-    networkToShow = getOtherNetwork(network);
+    networkToShow = ConfigUtils.getOtherNetwork(network);
   }
   const vcsToUse = cloneDeep(vcs);
   const panelToShow = [

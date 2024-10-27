@@ -23,7 +23,7 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
-import { validHederaChainID } from '../hedera/config';
+import { ConfigUtils } from '../hedera/ConfigUtils';
 import {
   Account,
   AccountViaPrivateKey,
@@ -207,7 +207,7 @@ async function connectHederaAccount(
   accountId: string,
 ): Promise<Account> {
   const chainId = await getCurrentNetwork();
-  if (!validHederaChainID(chainId)) {
+  if (!ConfigUtils.validHederaChainID(chainId)) {
     console.error(
       'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet]',
     );

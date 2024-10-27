@@ -18,7 +18,7 @@
  *
  */
 
-import { validHederaChainID } from '../hedera/config';
+import { ConfigUtils } from '../hedera/ConfigUtils';
 import {
   Account,
   IdentitySnapState as IdentifySnapState,
@@ -120,7 +120,7 @@ export async function initAccountState(
 export async function getCurrentCoinType(): Promise<number> {
   const chainId = await getCurrentNetwork();
   let coinType = DEFAULTCOINTYPE;
-  if (validHederaChainID(chainId)) {
+  if (ConfigUtils.validHederaChainID(chainId)) {
     coinType = HEDERACOINTYPE;
   }
   return coinType;

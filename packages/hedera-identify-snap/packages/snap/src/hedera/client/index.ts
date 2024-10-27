@@ -38,7 +38,7 @@ import {
   SimpleHederaClient,
 } from '../service';
 
-import { AccountUtils } from './Account';
+import { AccountUtils } from './AccountUtils';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   private _client: Client;

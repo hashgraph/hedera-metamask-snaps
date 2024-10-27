@@ -22,7 +22,7 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
 import { DidKeyIdentifier } from '../did/key/KeyDidUtils';
 import { HederaServiceImpl } from '../hedera';
-import { getHederaNetwork, validHederaChainID } from '../hedera/config';
+import { ConfigUtils } from '../hedera/ConfigUtils';
 import {
   Account,
   AccountViaPrivateKey,
@@ -77,7 +77,7 @@ export async function veramoImportMetaMaskAccount(
     publicKey = accountViaPrivateKey.publicKey;
     address = accountViaPrivateKey.address.toLowerCase();
     snapAddress = address;
-    if (validHederaChainID(chainId)) {
+    if (ConfigUtils.validHederaChainID(chainId)) {
       hederaAccountId = accountViaPrivateKey.extraData as string;
     }
   } else {
@@ -102,7 +102,7 @@ export async function veramoImportMetaMaskAccount(
     publicKey = res.publicKey;
     snapAddress = res.address.toLowerCase();
 
-    if (validHederaChainID(chainId)) {
+    if (ConfigUtils.validHederaChainID(chainId)) {
       hederaAccountId = await getHederaAccountIfExists(
         state,
         undefined,
@@ -110,14 +110,14 @@ export async function veramoImportMetaMaskAccount(
       );
 
       if (!hederaAccountId) {
-        const hederaService = new HederaServiceImpl(getHederaNetwork(network));
+        const hederaService = new HederaServiceImpl(ConfigUtils.getHederaNetwork(network));
         const result = await hederaService.getAccountFromEvmAddres(address);
         if (!result) {
           console.error(
-            `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${getHederaNetwork(network)}'`,
+            `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${ConfigUtils.getHederaNetwork(network)}'`,
           );
           throw new Error(
-            `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${getHederaNetwork(network)}'`,
+            `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${ConfigUtils.getHederaNetwork(network)}'`,
           );
         }
         hederaAccountId = result.account;
