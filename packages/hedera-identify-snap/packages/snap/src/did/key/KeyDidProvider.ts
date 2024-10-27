@@ -42,7 +42,7 @@ type IContext = IAgentContext<IKeyManager>;
  *
  * @beta This API may change without a BREAKING CHANGE notice.
  */
-export class KeyDIDProvider extends AbstractIdentifierProvider {
+export class KeyDidProvider extends AbstractIdentifierProvider {
   private defaultKms: string;
 
   constructor(options: { defaultKms: string }) {
@@ -87,7 +87,7 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
     },
     context: IAgentContext<IKeyManager>,
   ): Promise<IIdentifier> {
-    throw new Error('KeyDIDProvider updateIdentifier not supported yet.');
+    throw new Error('KeyDidProvider updateIdentifier not supported yet.');
   }
 
   async deleteIdentifier(
@@ -110,7 +110,7 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
     }: { identifier: IIdentifier; key: IKey; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider addKey not supported');
+    throw Error('KeyDidProvider addKey not supported');
   }
 
   async addService(
@@ -121,20 +121,20 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
     }: { identifier: IIdentifier; service: IService; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider addService not supported');
+    throw Error('KeyDidProvider addService not supported');
   }
 
   async removeKey(
     args: { identifier: IIdentifier; kid: string; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider removeKey not supported');
+    throw Error('KeyDidProvider removeKey not supported');
   }
 
   async removeService(
     args: { identifier: IIdentifier; id: string; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider removeService not supported');
+    throw Error('KeyDidProvider removeService not supported');
   }
 }

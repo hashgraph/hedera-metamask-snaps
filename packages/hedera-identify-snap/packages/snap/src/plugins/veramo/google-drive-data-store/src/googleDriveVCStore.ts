@@ -21,7 +21,7 @@
 import { VerifiableCredential } from '@veramo/core';
 import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
-import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
+import { DidKeyIdentifier } from '../../../../did/key/KeyDidUtils';
 import { IdentitySnapState } from '../../../../interfaces';
 import {
   AbstractDataStore,
@@ -149,7 +149,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     for (const vc of vcs) {
       let identifier = this.state.currentAccount.snapAddress;
       if (currentMethod === 'did:key') {
-        identifier = await getDidKeyIdentifier(
+        identifier = await DidKeyIdentifier.getDidKeyIdentifier(
           this.state.currentAccount.publicKey,
         );
       }
@@ -195,7 +195,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const currentMethod = this.state.currentAccount.method;
     let identifier = this.state.currentAccount.snapAddress;
     if (currentMethod === 'did:key') {
-      identifier = await getDidKeyIdentifier(
+      identifier = await DidKeyIdentifier.getDidKeyIdentifier(
         this.state.currentAccount.publicKey,
       );
     }

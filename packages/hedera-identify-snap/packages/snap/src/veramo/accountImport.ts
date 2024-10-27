@@ -20,7 +20,7 @@
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
-import { getDidKeyIdentifier } from '../did/key/keyDidUtils';
+import { DidKeyIdentifier } from '../did/key/KeyDidUtils';
 import { HederaServiceImpl } from '../hedera';
 import { getHederaNetwork, validHederaChainID } from '../hedera/config';
 import {
@@ -142,7 +142,7 @@ export async function veramoImportMetaMaskAccount(
   if (method === 'did:pkh') {
     did = `did:pkh:eip155:${convertChainIdFromHex(chainId)}:${snapAddress}`;
   } else if (method === 'did:key') {
-    did = `did:key:${await getDidKeyIdentifier(publicKey)}`;
+    did = `did:key:${await DidKeyIdentifier.getDidKeyIdentifier(publicKey)}`;
   } else if (method === 'did:hedera') {
     did = `did:hedera:${hederaAccountId}`;
   }

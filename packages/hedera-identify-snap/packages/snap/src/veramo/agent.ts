@@ -38,14 +38,14 @@ import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { Resolver } from 'did-resolver';
-import { getDidKeyResolver as keyDidResolver } from '../did/key/keyDidResolver';
+import { DidKeyResolver as keyDidResolver } from '../did/key/KeyDidResolver';
 import {
   AbstractDataStore,
   DataManager,
   IDataManager,
 } from '../plugins/veramo/verifiable-creds-manager';
 
-import { KeyDIDProvider } from '../did/key/keyDidProvider';
+import { KeyDidProvider } from '../did/key/KeyDidProvider';
 import { IdentitySnapState } from '../interfaces';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';
 import {
@@ -76,7 +76,7 @@ export async function getVeramoAgent(state: IdentitySnapState): Promise<Agent> {
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
-  didProviders['did:key'] = new KeyDIDProvider({ defaultKms: 'snap' });
+  didProviders['did:key'] = new KeyDidProvider({ defaultKms: 'snap' });
   vcStorePlugins.snap = new SnapVCStore(state);
   vcStorePlugins.googleDrive = new GoogleDriveVCStore(state);
 
@@ -103,7 +103,7 @@ export async function getVeramoAgent(state: IdentitySnapState): Promise<Agent> {
       new DIDResolverPlugin({
         resolver: new Resolver({
           ...getDidPkhResolver(),
-          ...keyDidResolver(),
+          ...keyDidResolver.getDidKeyResolver(),
         }),
       }),
       new DataManager({ store: vcStorePlugins }),
