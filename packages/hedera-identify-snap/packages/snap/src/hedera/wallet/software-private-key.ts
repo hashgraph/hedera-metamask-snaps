@@ -20,9 +20,9 @@
 
 import type { PrivateKey, PublicKey } from '@hashgraph/sdk';
 
-import { WalletHedera } from './abstract';
+import { Wallet } from './abstract';
 
-export class PrivateKeySoftwareWallet extends WalletHedera {
+export class PrivateKeySoftwareWallet extends Wallet {
   private _privateKey: PrivateKey;
 
   constructor(privateKey: PrivateKey) {

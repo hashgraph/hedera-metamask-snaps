@@ -32,19 +32,25 @@ import { CredentialIssuerEIP712 } from '@veramo/credential-eip712';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
-import { getDidPkhResolver, PkhDIDProvider } from '@veramo/did-provider-pkh';
+import {
+  PkhDIDProvider,
+  getDidPkhResolver as pkhDidResolver,
+} from '@veramo/did-provider-pkh';
 import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { Resolver } from 'did-resolver';
+import { getDidHederaResolver as hederaDidResolver } from '../did/hedera/hederaDidResolver';
 import { getDidKeyResolver as keyDidResolver } from '../did/key/keyDidResolver';
+
 import {
   AbstractDataStore,
   DataManager,
   IDataManager,
 } from '../plugins/veramo/verifiable-creds-manager';
 
+import { HederaDIDProvider } from '../did/hedera/hederaDidProvider';
 import { KeyDIDProvider } from '../did/key/keyDidProvider';
 import { IdentitySnapState } from '../interfaces';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';
@@ -77,6 +83,7 @@ export async function getVeramoAgent(state: IdentitySnapState): Promise<Agent> {
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   didProviders['did:key'] = new KeyDIDProvider({ defaultKms: 'snap' });
+  didProviders['did:hedera'] = new HederaDIDProvider({ defaultKms: 'snap' });
   vcStorePlugins.snap = new SnapVCStore(state);
   vcStorePlugins.googleDrive = new GoogleDriveVCStore(state);
 
@@ -102,8 +109,9 @@ export async function getVeramoAgent(state: IdentitySnapState): Promise<Agent> {
       }),
       new DIDResolverPlugin({
         resolver: new Resolver({
-          ...getDidPkhResolver(),
+          ...pkhDidResolver(),
           ...keyDidResolver(),
+          ...hederaDidResolver(),
         }),
       }),
       new DataManager({ store: vcStorePlugins }),

@@ -23,7 +23,6 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
-import { validHederaChainID } from '../hedera/config';
 import {
   Account,
   AccountViaPrivateKey,
@@ -34,6 +33,7 @@ import {
   MetamaskAccountParams,
 } from '../interfaces';
 import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
+import { HederaUtils } from '../utils/hederaUtils';
 import { getHederaAccountIfExists } from '../utils/params';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
 import { generateCommonPanel, snapDialog } from './dialog';
@@ -182,7 +182,7 @@ async function connectEVMAccount(
   const accountViaPrivateKey: AccountViaPrivateKey = {
     privateKey,
     publicKey: wallet.signingKey.publicKey,
-    address: wallet.address,
+    address: wallet.address.toLowerCase(),
   };
 
   return await veramoImportMetaMaskAccount(
@@ -207,7 +207,7 @@ async function connectHederaAccount(
   accountId: string,
 ): Promise<Account> {
   const chainId = await getCurrentNetwork();
-  if (!validHederaChainID(chainId)) {
+  if (!HederaUtils.validHederaChainID(chainId)) {
     console.error(
       'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet]',
     );

@@ -82,7 +82,7 @@ export type IDataManagerClearArgs = {
 };
 
 export type IDataManagerDeleteArgs = {
-  id: string;
+  id: string | string[];
   options?: DeleteOptions;
   accessToken?: string;
 };

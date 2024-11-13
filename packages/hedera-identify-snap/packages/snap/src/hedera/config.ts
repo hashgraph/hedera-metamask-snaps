@@ -18,15 +18,19 @@
  *
  */
 
-import { isIn } from '../types/constants';
-
-const hederaChainIDs: Record<string, string> = {
+export const hederaChainIDs: Record<string, string> = {
   '0x127': 'mainnet',
   '0x128': 'testnet',
   '0x129': 'previewnet',
 };
 
-const otherChainIDs: Record<string, string> = {
+export const DEFAULTHEDERAMIRRORNODES: Record<string, string> = {
+  mainnet: 'https://mainnet-public.mirrornode.hedera.com',
+  testnet: 'https://testnet.mirrornode.hedera.com',
+  previewnet: 'https://previewnet.mirrornode.hedera.com',
+};
+
+export const otherChainIDs: Record<string, string> = {
   '0x1': 'Ethereum Mainnet',
   '0xa': 'Optimisim',
   '0xe': 'Flare',
@@ -43,18 +47,4 @@ const otherChainIDs: Record<string, string> = {
   '0xa4b1': 'Arbitrum',
   '0xa86a': 'Avalanche',
   '0xe71c': 'Linea',
-};
-
-export const getHederaNetwork = (chainId: string): string => {
-  const network = hederaChainIDs[chainId];
-  return network || 'mainnet';
-};
-
-export const getOtherNetwork = (chainId: string): string => {
-  const network = otherChainIDs[chainId];
-  return network || `Unknown Network (Chain ID: ${chainId})`;
-};
-
-export const validHederaChainID = (x: string) => {
-  return isIn(Object.keys(hederaChainIDs) as string[], x);
 };

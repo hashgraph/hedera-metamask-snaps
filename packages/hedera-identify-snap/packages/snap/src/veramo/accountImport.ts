@@ -18,11 +18,17 @@
  *
  */
 
+/*
+import { DidError, HcsDid } from '@hashgraph/did-sdk-js';
+import { PrivateKey } from '@hashgraph/sdk';
+import { HederaClientImplFactory } from '../hedera';
+*/
 import { MetaMaskInpageProvider } from '@metamask/providers';
+import { rpcErrors } from '@metamask/rpc-errors';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
+import _ from 'lodash';
 import { getDidKeyIdentifier } from '../did/key/keyDidUtils';
-import { HederaServiceImpl } from '../hedera';
-import { getHederaNetwork, validHederaChainID } from '../hedera/config';
+
 import {
   Account,
   AccountViaPrivateKey,
@@ -34,7 +40,9 @@ import {
   initAccountState,
   updateState,
 } from '../snap/state';
-import { generateWallet } from '../utils/keyPair';
+import { AccountInfo, NetworkInfo } from '../types/hedera';
+import { CryptoUtils } from '../utils/cryptoUtils';
+import { HederaUtils } from '../utils/hederaUtils';
 import { convertChainIdFromHex } from '../utils/network';
 import { getHederaAccountIfExists } from '../utils/params';
 import { getVeramoAgent } from './agent';
@@ -77,7 +85,7 @@ export async function veramoImportMetaMaskAccount(
     publicKey = accountViaPrivateKey.publicKey;
     address = accountViaPrivateKey.address.toLowerCase();
     snapAddress = address;
-    if (validHederaChainID(chainId)) {
+    if (HederaUtils.validHederaChainID(chainId)) {
       hederaAccountId = accountViaPrivateKey.extraData as string;
     }
   } else {
@@ -92,7 +100,7 @@ export async function veramoImportMetaMaskAccount(
       );
     }
 
-    const res = await generateWallet(address);
+    const res = await CryptoUtils.generateWallet(address);
 
     if (!res) {
       console.log('Failed to generate snap wallet for DID operations');
@@ -102,7 +110,7 @@ export async function veramoImportMetaMaskAccount(
     publicKey = res.publicKey;
     snapAddress = res.address.toLowerCase();
 
-    if (validHederaChainID(chainId)) {
+    if (HederaUtils.validHederaChainID(chainId)) {
       hederaAccountId = await getHederaAccountIfExists(
         state,
         undefined,
@@ -110,17 +118,21 @@ export async function veramoImportMetaMaskAccount(
       );
 
       if (!hederaAccountId) {
-        const hederaService = new HederaServiceImpl(getHederaNetwork(network));
-        const result = await hederaService.getAccountFromEvmAddres(address);
-        if (!result) {
-          console.error(
-            `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${getHederaNetwork(network)}'`,
-          );
-          throw new Error(
-            `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${getHederaNetwork(network)}'`,
-          );
+        const networkInfo: NetworkInfo =
+          HederaUtils.getHederaNetworkInfo(network);
+        const accountInfo: AccountInfo = await HederaUtils.getMirrorAccountInfo(
+          address,
+          networkInfo.mirrorNodeUrl,
+        );
+        if (_.isEmpty(accountInfo)) {
+          const errMessage = `Could not retrieve hedera account info for address '${address}'. Please make sure this account is activated on Hedera '${networkInfo.network}'`;
+          console.error(errMessage);
+          throw rpcErrors.resourceNotFound({
+            message: errMessage,
+            data: { network: networkInfo.network, address, publicKey },
+          });
         }
-        hederaAccountId = result.account;
+        hederaAccountId = accountInfo.accountId;
       }
     }
   }
@@ -144,9 +156,41 @@ export async function veramoImportMetaMaskAccount(
   } else if (method === 'did:key') {
     did = `did:key:${await getDidKeyIdentifier(publicKey)}`;
   } else if (method === 'did:hedera') {
+    /*  const pKey = PrivateKey.fromStringECDSA(privateKey);
+    const networkInfo: NetworkInfo = HederaUtils.getHederaNetworkInfo(network);
+    const hederaClientFactory = new HederaClientImplFactory(
+      hederaAccountId,
+      networkInfo.network,
+      'ECDSA_SECP256K1',
+      privateKey,
+    );
+    const client = await hederaClientFactory.createClient();
+    if (!client) {
+      console.error('Failed to create Hedera client');
+      throw new Error('Failed to create Hedera client');
+    }
+    let didToUse = new HcsDid({
+      privateKey: pKey,
+      client: client.getClient(),
+    });
+    // Try registering the DID if not registered previously
+    try {
+      const registeredDid = await didToUse.register();
+      did = registeredDid.getIdentifier();
+    } catch (e: any) {
+      if (e instanceof DidError) {
+        const didDocument = await didToUse.resolve();
+        did = didDocument.getId();
+      } else {
+        console.error(`Failed to register DID: ${e}`);
+        throw new Error(`Failed to register DID: ${e}`);
+      }
+    } */
     did = `did:hedera:${hederaAccountId}`;
   }
 
+  console.log('did : ', did);
+  did = '';
   if (!did) {
     console.log('Failed to generate DID');
     throw new Error('Failed to generate DID');

@@ -2857,9 +2857,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hashgraph/cryptography@npm:1.4.8-beta.8":
-  version: 1.4.8-beta.8
-  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.8"
+"@hashgraph/cryptography@npm:1.4.8-beta.9":
+  version: 1.4.8-beta.9
+  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.9"
   dependencies:
     asn1js: ^3.0.5
     bignumber.js: ^9.1.1
@@ -2883,7 +2883,7 @@ __metadata:
       optional: true
     expo-random:
       optional: true
-  checksum: a8688923bc9931957ea6d38ceec757016bd97d928761d2e8dd5f1e3f6a3f29da2cf259f7b0d09888081e08d32d5e4b9bed8fcb3f9c6376d8ba94b199b5b6b636
+  checksum: cb916c50aca8699cad5fce5a428e05e240c9d8fdc77bd6faea3f6de653158ffec0d28d77e4cce51f7c53583017945956bc51e6493bfbe400647840fa42b221dc
   languageName: node
   linkType: hard
 
@@ -3025,15 +3025,15 @@ __metadata:
   linkType: hard
 
 "@hashgraph/sdk@npm:^2.51.0":
-  version: 2.51.0
-  resolution: "@hashgraph/sdk@npm:2.51.0"
+  version: 2.53.0
+  resolution: "@hashgraph/sdk@npm:2.53.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
-    "@hashgraph/cryptography": 1.4.8-beta.8
+    "@hashgraph/cryptography": 1.4.8-beta.9
     "@hashgraph/proto": 2.15.0-beta.4
     axios: ^1.6.4
     bignumber.js: ^9.1.1
@@ -3043,7 +3043,7 @@ __metadata:
     long: ^4.0.0
     pino: ^8.14.1
     pino-pretty: ^10.0.0
-    protobufjs: ^7.2.5
+    protobufjs: 7.2.5
     rfc4648: ^1.5.3
     utf8: ^3.0.0
   peerDependencies:
@@ -3051,7 +3051,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 7de736204a22763481c6d881c53a0afb684b7c996efd1fe8a50405ee6dda1a2732dbb449937b9ad85a26ce71bd3c14f5c3424c66ef305c4fde881845e848316c
+  checksum: b75f4ba1c55fe8cc3b3240ce8e7a89d0c85ed4fd10f22ff0353133c478ef3827614e72ded18521bea8a6581eb5178e3cb6fe06593e4940c2d450a0dda659f2c3
   languageName: node
   linkType: hard
 
@@ -19281,6 +19281,26 @@ __metadata:
   version: 1.2.4
   resolution: "proto-list@npm:1.2.4"
   checksum: 4d4826e1713cbfa0f15124ab0ae494c91b597a3c458670c9714c36e8baddf5a6aad22842776f2f5b137f259c8533e741771445eb8df82e861eea37a6eaba03f7
+  languageName: node
+  linkType: hard
+
+"protobufjs@npm:7.2.5":
+  version: 7.2.5
+  resolution: "protobufjs@npm:7.2.5"
+  dependencies:
+    "@protobufjs/aspromise": ^1.1.2
+    "@protobufjs/base64": ^1.1.2
+    "@protobufjs/codegen": ^2.0.4
+    "@protobufjs/eventemitter": ^1.1.0
+    "@protobufjs/fetch": ^1.1.0
+    "@protobufjs/float": ^1.0.2
+    "@protobufjs/inquire": ^1.1.0
+    "@protobufjs/path": ^1.1.2
+    "@protobufjs/pool": ^1.1.0
+    "@protobufjs/utf8": ^1.1.0
+    "@types/node": ">=13.7.0"
+    long: ^5.0.0
+  checksum: 3770a072114061faebbb17cfd135bc4e187b66bc6f40cd8bac624368b0270871ec0cfb43a02b9fb4f029c8335808a840f1afba3c2e7ede7063b98ae6b98a703f
   languageName: node
   linkType: hard
 

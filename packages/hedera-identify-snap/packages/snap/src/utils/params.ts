@@ -18,7 +18,8 @@
  *
  */
 
-import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
+import { AccountId } from '@hashgraph/sdk';
+import { rpcErrors } from '@metamask/rpc-errors';
 import _ from 'lodash';
 import {
   EvmAccountParams,
@@ -42,7 +43,240 @@ import {
   isValidProofFormat,
   isValidVCStore,
 } from '../types/constants';
-import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
+import {
+  CreateVCRequestParams,
+  CreateVPRequestParams,
+  ResolveDIDRequestParams,
+  SwitchMethodRequestParams,
+  VerifyVCRequestParams,
+  VerifyVPRequestParams,
+} from '../types/params';
+import { CryptoUtils } from './cryptoUtils';
+
+export class ParamUtils {
+  /**
+   * Checks if the specified property in the given object is passed.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkRequiredProperty(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    if (isRequired && !(propertyName in parameter)) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be passed`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be passed`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid string.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkValidString(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    this.checkRequiredProperty(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid string
+    if (
+      propertyName in parameter &&
+      (typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid Hedera AccountId.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkValidAccountId(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    this.checkRequiredProperty(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid Hedera AccountId
+    if (
+      propertyName in parameter &&
+      (typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]) ||
+        !AccountId.fromString(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string and a valid Hedera Account Id`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a string and a valid Hedera Account Id`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid boolean.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkValidBoolean(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    this.checkRequiredProperty(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid boolean
+    if (
+      propertyName in parameter &&
+      typeof parameter[propertyName] !== 'boolean'
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a boolean`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a boolean`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid number.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkValidNumber(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    this.checkRequiredProperty(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid number
+    if (
+      propertyName in parameter &&
+      (typeof parameter[propertyName] !== 'number' ||
+        !Number.isFinite(parameter[propertyName]) ||
+        parameter[propertyName] < 0)
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a number`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a number`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid timestamp.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkValidTimestamp(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    this.checkRequiredProperty(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid timestamp
+
+    // Regular expression for validating date in YYYY-MM-DD format
+    // and date-time in YYYY-MM-DDTHH:mm:ss format
+    const dateTimeRegex =
+      /^\d{4}-[01]\d-[0-3]\d(?:T([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9])?$/u;
+
+    if (
+      propertyName in parameter &&
+      (!dateTimeRegex.test(parameter[propertyName]) ||
+        typeof parameter[propertyName] !== 'string' ||
+        _.isEmpty(parameter[propertyName]))
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid date string in the format YYYY-MM-DD or date-time string in the format YYYY-MM-DDTHH:mm:ss`,
+      );
+    }
+  }
+
+  /**
+   * Checks if the specified property in the given object is a valid public key.
+   * @param parameter - The object containing the property to check.
+   * @param methodName - The method name.
+   * @param propertyName - The name of the property to validate.
+   * @param isRequired - Whether to check if this property is required to be present.
+   */
+  // eslint-disable-next-line no-restricted-syntax
+  static checkValidPublicKey(
+    parameter: any,
+    methodName: string,
+    propertyName: string,
+    isRequired: boolean,
+  ) {
+    // Check if the property exists if isRequired is true
+    this.checkRequiredProperty(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid string first
+    this.checkValidString(parameter, methodName, propertyName, isRequired);
+    // Check if the property exists and is a valid public key
+    if (
+      propertyName in parameter &&
+      !(
+        CryptoUtils.isValidEthereumPublicKey(parameter[propertyName]) ||
+        CryptoUtils.isValidHederaPublicKey(parameter[propertyName])
+      )
+    ) {
+      console.error(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a valid public key`,
+      );
+      throw rpcErrors.invalidParams(
+        `Invalid ${methodName} Params passed. "${propertyName}" must be a public key`,
+      );
+    }
+  }
+}
 
 /**
  * Check whether the the account was imported using private key(external account).
@@ -130,10 +364,6 @@ export async function getHederaAccountIfExists(
   return result;
 }
 
-type SwitchMethodRequestParams = {
-  didMethod: string;
-};
-
 /**
  * Check Validation of Switch Method request.
  *
@@ -142,33 +372,18 @@ type SwitchMethodRequestParams = {
 export function isValidSwitchMethodRequest(
   params: unknown,
 ): asserts params is SwitchMethodRequestParams {
-  if (params === null || _.isEmpty(params)) {
+  if (params === null || _.isEmpty(params) || !('didMethod' in params)) {
     console.error(
       'Invalid switchMethod Params passed. "didMethod" must be passed as a parameter',
     );
-    throw new Error(
+    throw rpcErrors.invalidParams(
       'Invalid switchMethod Params passed. "didMethod" must be passed as a parameter',
     );
   }
   const parameter = params as SwitchMethodRequestParams;
 
-  if (
-    'didMethod' in parameter &&
-    parameter.didMethod !== null &&
-    typeof parameter.didMethod === 'string'
-  ) {
-    return;
-  }
-
-  console.error(
-    'Invalid switchMethod Params passed. "didMethod" must be passed as a parameter and it must be a string',
-  );
-  throw new Error(
-    'Invalid switchMethod Params passed. "didMethod" must be passed as a parameter and it must be a string',
-  );
+  ParamUtils.checkValidString(parameter, 'switchMethod', 'didMethod', true);
 }
-
-type ResolveDIDRequestParams = { did?: string };
 
 /**
  * Check Validation of Resolve DID request.
@@ -180,13 +395,7 @@ export function isValidResolveDIDRequest(
 ): asserts params is ResolveDIDRequestParams {
   const parameter = params as ResolveDIDRequestParams;
 
-  if (
-    'did' in parameter &&
-    (parameter.did === null || typeof parameter.did !== 'string')
-  ) {
-    console.error('Invalid resolveDID Params passed. "did" must be a string');
-    throw new Error('Invalid resolveDID Params passed. "did" must be a string');
-  }
+  ParamUtils.checkValidString(parameter, 'resolveDID', 'did', false);
 }
 
 /**
@@ -200,32 +409,14 @@ export function isValidGetVCsRequest(
   const parameter = params as IDataManagerQueryArgs;
 
   // Check if filter is valid
-  if (
-    'filter' in parameter &&
-    parameter.filter !== null &&
-    typeof parameter.filter === 'object'
-  ) {
-    if (
-      !(
-        'type' in parameter.filter &&
-        parameter.filter?.type !== null &&
-        typeof parameter.filter?.type === 'string'
-      )
-    ) {
-      console.error(
-        'Invalid getVCs Params passed. "filter.type" is either missing or is not a string',
-      );
-      throw new Error(
-        'Invalid getVCs Params passed. "filter.type" is either missing or is not a string',
-      );
-    }
-
-    if (!('filter' in parameter.filter && parameter.filter?.filter !== null)) {
-      console.error('Invalid getVCs Params passed. "filter.filter" is missing');
-      throw new Error(
-        'Invalid getVCs Params passed. "filter.filter" is missing',
-      );
-    }
+  if ('filter' in parameter) {
+    ParamUtils.checkValidString(parameter.filter, 'getVCs', 'type', true);
+    ParamUtils.checkRequiredProperty(
+      parameter.filter,
+      'getVCs',
+      'filter',
+      true,
+    );
   }
 
   // Check if options is valid
@@ -267,42 +458,17 @@ export function isValidGetVCsRequest(
         );
       }
     }
-
-    // Check if returnStore is valid
-    if ('returnStore' in parameter.options) {
-      if (
-        !(
-          'returnStore' in parameter.options &&
-          parameter.options?.returnStore !== null &&
-          typeof parameter.options?.returnStore === 'boolean'
-        )
-      ) {
-        console.error(
-          'Invalid getVCs Params passed. "options.returnStore" is not in a valid format. It must be a boolean',
-        );
-        throw new Error(
-          'Invalid getVCs Params passed. "options.store" is not in a valid format. It must be a boolean',
-        );
-      }
-    }
   }
+
+  ParamUtils.checkValidBoolean(
+    parameter.options,
+    'getVCs',
+    'returnStore',
+    false,
+  );
 
   // Check if accessToken is valid
-  if ('accessToken' in parameter) {
-    if (
-      !(
-        parameter.accessToken !== null &&
-        typeof parameter.accessToken === 'string'
-      )
-    ) {
-      console.error(
-        'Invalid getVCs Params passed. "accessToken" is not in a valid format. It must be a string',
-      );
-      throw new Error(
-        'Invalid getVCs Params passed. "accessToken" is not in a valid format. It must be a string',
-      );
-    }
-  }
+  ParamUtils.checkValidString(parameter, 'getVCs', 'accessToken', false);
 }
 
 /**
@@ -324,20 +490,30 @@ export function isValidSaveVCRequest(
 
   const parameter = params as IDataManagerSaveArgs;
 
+  ParamUtils.checkRequiredProperty(parameter, 'saveVC', 'data', true);
+
+  // Check if options is valid
   if (
-    'data' in parameter &&
-    parameter.data !== null &&
-    typeof parameter.data === 'object'
+    'options' in parameter &&
+    parameter.options !== null &&
+    typeof parameter.options === 'object'
   ) {
-    // Check if options is valid
-    if (
-      'options' in parameter &&
-      parameter.options !== null &&
-      typeof parameter.options === 'object'
-    ) {
-      if ('store' in parameter.options && parameter.options?.store !== null) {
-        if (typeof parameter.options?.store === 'string') {
-          if (!isValidVCStore(parameter.options?.store)) {
+    if ('store' in parameter.options && parameter.options?.store !== null) {
+      if (typeof parameter.options?.store === 'string') {
+        if (!isValidVCStore(parameter.options?.store)) {
+          console.error(
+            `Invalid saveVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+          );
+          throw new Error(
+            `Invalid saveVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+          );
+        }
+      } else if (
+        Array.isArray(parameter.options?.store) &&
+        parameter.options?.store.length > 0
+      ) {
+        (parameter.options?.store as [string]).forEach((store) => {
+          if (!isValidVCStore(store)) {
             console.error(
               `Invalid saveVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
             );
@@ -345,48 +521,20 @@ export function isValidSaveVCRequest(
               `Invalid saveVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
             );
           }
-        } else if (
-          Array.isArray(parameter.options?.store) &&
-          parameter.options?.store.length > 0
-        ) {
-          (parameter.options?.store as [string]).forEach((store) => {
-            if (!isValidVCStore(store)) {
-              console.error(
-                `Invalid saveVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
-              );
-              throw new Error(
-                `Invalid saveVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
-              );
-            }
-          });
-        } else {
-          console.error(
-            'Invalid saveVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
-          );
-          throw new Error(
-            'Invalid saveVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
-          );
-        }
-      }
-    }
-
-    // Check if accessToken is valid
-    if ('accessToken' in parameter) {
-      if (
-        !(
-          parameter.accessToken !== null &&
-          typeof parameter.accessToken === 'string'
-        )
-      ) {
+        });
+      } else {
         console.error(
-          'Invalid saveVC Params passed. "accessToken" is not in a valid format. It must be a string',
+          'Invalid saveVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
         );
         throw new Error(
-          'Invalid saveVC Params passed. "accessToken" is not in a valid format. It must be a string',
+          'Invalid saveVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
         );
       }
     }
   }
+
+  // Check if accessToken is valid
+  ParamUtils.checkValidString(parameter, 'saveVC', 'accessToken', false);
 }
 
 /**
@@ -408,50 +556,49 @@ export function isValidCreateVCRequest(
 
   const parameter = params as CreateVCRequestParams;
 
-  if (
-    'vcValue' in parameter &&
-    parameter.vcValue !== null &&
-    typeof parameter.vcValue === 'object'
-  ) {
-    // Check if vcKey is valid
-    if ('vcKey' in parameter) {
-      if (!(parameter.vcKey !== null && typeof parameter.vcKey === 'string')) {
-        console.error(
-          'Invalid createVC Params passed. "vcKey" is not in a valid format. It must be a string',
-        );
-        throw new Error(
-          'Invalid createVC Params passed. "vcKey" is not in a valid format. It must be a string',
-        );
-      }
-    }
+  ParamUtils.checkRequiredProperty(parameter, 'createVC', 'vcValue', true);
+  ParamUtils.checkValidString(parameter, 'createVC', 'vcKey', false);
 
-    // Check if credTypes is valid
-    if ('credTypes' in parameter) {
-      if (
-        !(
-          parameter.credTypes !== null &&
-          Array.isArray(parameter.credTypes) &&
-          parameter.credTypes.length > 0
-        )
-      ) {
-        console.error(
-          'Invalid createVC Params passed. "credTypes" is not in a valid format. It must be an array of strings',
-        );
-        throw new Error(
-          'Invalid createVC Params passed. "credTypes" is not in a valid format. It must be an array of strings',
-        );
-      }
-    }
-
-    // Check if options is valid
+  // Check if credTypes is valid
+  if ('credTypes' in parameter) {
     if (
-      'options' in parameter &&
-      parameter.options !== null &&
-      typeof parameter.options === 'object'
+      !(
+        parameter.credTypes !== null &&
+        Array.isArray(parameter.credTypes) &&
+        parameter.credTypes.length > 0
+      )
     ) {
-      if ('store' in parameter.options && parameter.options?.store !== null) {
-        if (typeof parameter.options?.store === 'string') {
-          if (!isValidVCStore(parameter.options?.store)) {
+      console.error(
+        'Invalid createVC Params passed. "credTypes" is not in a valid format. It must be an array of strings',
+      );
+      throw new Error(
+        'Invalid createVC Params passed. "credTypes" is not in a valid format. It must be an array of strings',
+      );
+    }
+  }
+
+  // Check if options is valid
+  if (
+    'options' in parameter &&
+    parameter.options !== null &&
+    typeof parameter.options === 'object'
+  ) {
+    if ('store' in parameter.options && parameter.options?.store !== null) {
+      if (typeof parameter.options?.store === 'string') {
+        if (!isValidVCStore(parameter.options?.store)) {
+          console.error(
+            `Invalid createVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+          );
+          throw new Error(
+            `Invalid createVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+          );
+        }
+      } else if (
+        Array.isArray(parameter.options?.store) &&
+        parameter.options?.store.length > 0
+      ) {
+        (parameter.options?.store as [string]).forEach((store) => {
+          if (!isValidVCStore(store)) {
             console.error(
               `Invalid createVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
             );
@@ -459,51 +606,21 @@ export function isValidCreateVCRequest(
               `Invalid createVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
             );
           }
-        } else if (
-          Array.isArray(parameter.options?.store) &&
-          parameter.options?.store.length > 0
-        ) {
-          (parameter.options?.store as [string]).forEach((store) => {
-            if (!isValidVCStore(store)) {
-              console.error(
-                `Invalid createVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
-              );
-              throw new Error(
-                `Invalid createVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
-              );
-            }
-          });
-        } else {
-          console.error(
-            'Invalid createVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
-          );
-          throw new Error(
-            'Invalid createVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
-          );
-        }
-      }
-    }
-
-    // Check if accessToken is valid
-    if ('accessToken' in parameter) {
-      if (
-        !(
-          parameter.accessToken !== null &&
-          typeof parameter.accessToken === 'string'
-        )
-      ) {
+        });
+      } else {
         console.error(
-          'Invalid createVC Params passed. "accessToken" is not in a valid format. It must be a string',
+          'Invalid createVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
         );
         throw new Error(
-          'Invalid createVC Params passed. "accessToken" is not in a valid format. It must be a string',
+          'Invalid createVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
         );
       }
     }
   }
-}
 
-type VerifyVCRequestParams = { verifiableCredential: W3CVerifiableCredential };
+  // Check if accessToken is valid
+  ParamUtils.checkValidString(parameter, 'createVC', 'accessToken', false);
+}
 
 /**
  * Check Validation of Verify VC request.
@@ -528,18 +645,12 @@ export function isValidVerifyVCRequest(
 
   const parameter = params as VerifyVCRequestParams;
 
-  if (
-    'verifiableCredential' in parameter &&
-    (parameter.verifiableCredential === null ||
-      typeof parameter.verifiableCredential !== 'object')
-  ) {
-    console.error(
-      'Invalid verifyVC Params passed. "verifiableCredential" must be passed an object',
-    );
-    throw new Error(
-      'Invalid verifyVC Params passed. "verifiableCredential" must be passed an object',
-    );
-  }
+  ParamUtils.checkRequiredProperty(
+    parameter,
+    'verifyVC',
+    'verifiableCredential',
+    true,
+  );
 }
 
 /**
@@ -561,27 +672,39 @@ export function isValidRemoveVCRequest(
 
   const parameter = params as IDataManagerDeleteArgs;
 
-  // Check if id exists
-  if ('id' in parameter && parameter.id !== null) {
-    // Check if id is valid
-    if (!Array.isArray(parameter.id) && !(typeof parameter.id === 'string')) {
-      console.error(
-        'Invalid removeVC Params passed. "id" must be a string or an array of strings',
-      );
-      throw new Error(
-        'Invalid removeVC Params passed. "id" must be a string or an array of strings',
-      );
-    }
+  ParamUtils.checkValidString(parameter, 'removeVC', 'id', true);
+  // Check if id is valid
+  if (!Array.isArray(parameter.id) && !(typeof parameter.id === 'string')) {
+    console.error(
+      'Invalid removeVC Params passed. "id" must be a string or an array of strings',
+    );
+    throw new Error(
+      'Invalid removeVC Params passed. "id" must be a string or an array of strings',
+    );
+  }
 
-    // Check if options is valid
-    if (
-      'options' in parameter &&
-      parameter.options !== null &&
-      typeof parameter.options === 'object'
-    ) {
-      if ('store' in parameter.options && parameter.options?.store !== null) {
-        if (typeof parameter.options?.store === 'string') {
-          if (!isValidVCStore(parameter.options?.store)) {
+  // Check if options is valid
+  if (
+    'options' in parameter &&
+    parameter.options !== null &&
+    typeof parameter.options === 'object'
+  ) {
+    if ('store' in parameter.options && parameter.options?.store !== null) {
+      if (typeof parameter.options?.store === 'string') {
+        if (!isValidVCStore(parameter.options?.store)) {
+          console.error(
+            `Invalid removeVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+          );
+          throw new Error(
+            `Invalid removeVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+          );
+        }
+      } else if (
+        Array.isArray(parameter.options?.store) &&
+        parameter.options?.store.length > 0
+      ) {
+        (parameter.options?.store as [string]).forEach((store) => {
+          if (!isValidVCStore(store)) {
             console.error(
               `Invalid removeVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
             );
@@ -589,48 +712,20 @@ export function isValidRemoveVCRequest(
               `Invalid removeVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
             );
           }
-        } else if (
-          Array.isArray(parameter.options?.store) &&
-          parameter.options?.store.length > 0
-        ) {
-          (parameter.options?.store as [string]).forEach((store) => {
-            if (!isValidVCStore(store)) {
-              console.error(
-                `Invalid removeVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
-              );
-              throw new Error(
-                `Invalid removeVC Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
-              );
-            }
-          });
-        } else {
-          console.error(
-            'Invalid removeVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
-          );
-          throw new Error(
-            'Invalid removeVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
-          );
-        }
-      }
-    }
-
-    // Check if accessToken is valid
-    if ('accessToken' in parameter) {
-      if (
-        !(
-          parameter.accessToken !== null &&
-          typeof parameter.accessToken === 'string'
-        )
-      ) {
+        });
+      } else {
         console.error(
-          'Invalid removeVC Params passed. "accessToken" is not in a valid format. It must be a string',
+          'Invalid removeVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
         );
         throw new Error(
-          'Invalid removeVC Params passed. "accessToken" is not in a valid format. It must be a string',
+          'Invalid removeVC Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
         );
       }
     }
   }
+
+  // Check if accessToken is valid
+  ParamUtils.checkValidString(parameter, 'removeVC', 'accessToken', false);
 }
 
 /**
@@ -644,34 +739,14 @@ export function isValidDeleteAllVCsRequest(
   const parameter = params as IDataManagerClearArgs;
 
   // Check if filter is valid
-  if (
-    'filter' in parameter &&
-    parameter.filter !== null &&
-    typeof parameter.filter === 'object'
-  ) {
-    if (
-      !(
-        'type' in parameter.filter &&
-        parameter.filter?.type !== null &&
-        typeof parameter.filter?.type === 'string'
-      )
-    ) {
-      console.error(
-        'Invalid deleteAllVCs Params passed. "filter.type" is either missing or is not a string',
-      );
-      throw new Error(
-        'Invalid deleteAllVCs Params passed. "filter.type" is either missing or is not a string',
-      );
-    }
-
-    if (!('filter' in parameter.filter && parameter.filter?.filter !== null)) {
-      console.error(
-        'Invalid deleteAllVCs Params passed. "filter.filter" is missing',
-      );
-      throw new Error(
-        'Invalid deleteAllVCs Params passed. "filter.filter" is missing',
-      );
-    }
+  if ('filter' in parameter) {
+    ParamUtils.checkValidString(parameter.filter, 'deleteAllVCs', 'type', true);
+    ParamUtils.checkRequiredProperty(
+      parameter.filter,
+      'getVCs',
+      'filter',
+      true,
+    );
   }
 
   // Check if options is valid
@@ -713,24 +788,10 @@ export function isValidDeleteAllVCsRequest(
         );
       }
     }
-
-    // Check if accessToken is valid
-    if ('accessToken' in parameter) {
-      if (
-        !(
-          parameter.accessToken !== null &&
-          typeof parameter.accessToken === 'string'
-        )
-      ) {
-        console.error(
-          'Invalid deleteAllVCs Params passed. "accessToken" is not in a valid format. It must be a string',
-        );
-        throw new Error(
-          'Invalid deleteAllVCs Params passed. "accessToken" is not in a valid format. It must be a string',
-        );
-      }
-    }
   }
+
+  // Check if accessToken is valid
+  ParamUtils.checkValidString(parameter, 'deleteAllVCs', 'accessToken', false);
 }
 
 /**
@@ -905,8 +966,6 @@ export function isValidCreateVPRequest(
   }
 }
 
-type VerifyVPRequestParams = { verifiablePresentation: VerifiablePresentation };
-
 /**
  * Check Validation of Verify VP request.
  *
@@ -930,18 +989,12 @@ export function isValidVerifyVPRequest(
 
   const parameter = params as VerifyVPRequestParams;
 
-  if (
-    'verifiablePresentation' in parameter &&
-    (parameter.verifiablePresentation === null ||
-      typeof parameter.verifiablePresentation !== 'object')
-  ) {
-    console.error(
-      'Invalid verifyVP Params passed. "verifiablePresentation" must be an object',
-    );
-    throw new Error(
-      'Invalid verifyVP Params passed. "verifiablePresentation" must be an object',
-    );
-  }
+  ParamUtils.checkRequiredProperty(
+    parameter,
+    'verifyVP',
+    'verifiablePresentation',
+    true,
+  );
 }
 
 /**
@@ -963,16 +1016,10 @@ export function isValidConfigueGoogleRequest(
 
   const parameter = params as GoogleToken;
 
-  if (
-    'accessToken' in parameter &&
-    (parameter.accessToken === null ||
-      typeof parameter.accessToken !== 'string')
-  ) {
-    console.error(
-      'Invalid configureGoogleAccount Params passed. "accessToken" must be a string',
-    );
-    throw new Error(
-      'Invalid configureGoogleAccount Params passed. "accessToken" must be a string',
-    );
-  }
+  ParamUtils.checkValidString(
+    parameter,
+    'configureGoogleAccount',
+    'accessToken',
+    true,
+  );
 }

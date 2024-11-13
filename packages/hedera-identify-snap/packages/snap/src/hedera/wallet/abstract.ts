@@ -31,7 +31,7 @@ import type { PrivateKey, PublicKey } from '@hashgraph/sdk';
 // - ledger, index: N
 // - others, not supported
 
-export abstract class WalletHedera {
+export abstract class Wallet {
   // produce a transaction signer
   // that can be used to sign transactions
   abstract getTransactionSigner(

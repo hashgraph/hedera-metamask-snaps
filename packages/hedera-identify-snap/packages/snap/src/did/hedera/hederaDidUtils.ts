@@ -20,11 +20,13 @@
 
 import { base58btc } from 'multiformats/bases/base58';
 
-import { CryptoUtils } from '../../utils/cryptoUtils';
 import { addMulticodecPrefix } from '../../utils/formatUtils';
+import { getCompressedPublicKey } from '../../utils/keyPair';
 
-export async function getDidKeyIdentifier(publicKey: string): Promise<string> {
-  const compressedKey = CryptoUtils.getCompressedPublicKey(publicKey);
+export async function getDidHederaIdentifier(
+  publicKey: string,
+): Promise<string> {
+  const compressedKey = getCompressedPublicKey(publicKey);
 
   return Buffer.from(
     base58btc.encode(

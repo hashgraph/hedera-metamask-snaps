@@ -20,25 +20,21 @@
 
 import {
   AccountId,
-  AccountInfo,
   AccountInfoQuery,
   Client,
   Hbar,
+  HbarUnit,
   PrivateKey,
   PublicKey,
-  TransactionReceipt,
-  TransactionReceiptQuery,
-  TransferTransaction,
 } from '@hashgraph/sdk';
-import { BigNumber } from 'bignumber.js';
 
 import {
-  HederaAccountInfo,
-  HederaMirrorInfo,
-  SimpleHederaClient,
-} from '../service';
-
-import { createAccountForPublicKey } from './create-account';
+  AccountInfoJson,
+  StakingInfoJson,
+} from '@hashgraph/sdk/lib/account/AccountInfo';
+import { AccountInfo } from '../../types/hedera';
+import { Utils } from '../../utils/utils';
+import { SimpleHederaClient } from '../service';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   private _client: Client;
@@ -48,6 +44,14 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   constructor(client: Client, privateKey: PrivateKey | null) {
     this._client = client;
     this._privateKey = privateKey;
+  }
+
+  close() {
+    this._client.close();
+  }
+
+  getClient(): Client {
+    return this._client;
   }
 
   getPrivateKey(): PrivateKey | null {
@@ -64,74 +68,59 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     return this._client.operatorAccountId!;
   }
 
-  async getAccountInfo(accountId: string): Promise<HederaAccountInfo> {
-    // Create the account info query
-    const query = new AccountInfoQuery().setAccountId(accountId);
+  async getAccountInfo(accountId: string): Promise<AccountInfo> {
+    const query = new AccountInfoQuery({ accountId });
+    await query.getCost(this._client);
 
-    // Sign with client operator private key and submit the query to a Hedera network
-    const accountInfo: AccountInfo = await query.execute(this._client);
+    const accountInfo = await query.execute(this._client);
+    const accountInfoJson: AccountInfoJson = accountInfo.toJSON();
 
-    return accountInfo as unknown as HederaAccountInfo;
-  }
+    const hbarBalance = Number(accountInfoJson.balance.replace(' ℏ', ''));
+    const stakingInfo = {} as StakingInfoJson;
+    if (accountInfoJson.stakingInfo) {
+      stakingInfo.declineStakingReward =
+        accountInfoJson.stakingInfo.declineStakingReward;
 
-  createAccountForPublicKey(options: {
-    publicKey: PublicKey;
-    initialBalance: BigNumber;
-  }): Promise<HederaMirrorInfo | null> {
-    return createAccountForPublicKey(this._client, options);
-  }
-
-  /**
-   * Create Hedera™ crypto-currency account.
-   *
-   * @param options - Create account options.
-   * @param options.evmAddress - EVM address.
-   * @param options.initialBalance - Initial balance.
-   */
-  async createAccountForEvmAddress(options: {
-    evmAddress: string;
-    initialBalance: BigNumber;
-  }): Promise<HederaMirrorInfo | null> {
-    const privateKey = this.getPrivateKey();
-    if (!privateKey) {
-      console.log("Private key doesn't exist for the operator");
-      return null;
-    }
-
-    const transferTx: TransferTransaction = new TransferTransaction()
-      .addHbarTransfer(
-        this.getAccountId(),
-        new Hbar(options.initialBalance).negated(),
-      )
-      .addHbarTransfer(options.evmAddress, options.initialBalance)
-      .freezeWith(this._client);
-
-    const transferTxSign = await transferTx.sign(privateKey);
-    const transferTxSubmit = await transferTxSign.execute(this._client);
-
-    // Get the child receipt or child record to return the Hedera Account ID for the new account that was created
-    const receipt: TransactionReceipt = await new TransactionReceiptQuery()
-      .setTransactionId(transferTxSubmit.transactionId)
-      .setIncludeChildren(true)
-      .execute(this._client);
-
-    const newAccountId =
-      receipt.children.length > 0 && receipt.children[0].accountId
-        ? receipt.children[0].accountId.toString()
-        : '';
-
-    console.log('newAccountId: ', newAccountId);
-
-    if (!newAccountId) {
-      console.log(
-        "The transaction didn't process successfully so a new accountId was not created",
+      stakingInfo.stakePeriodStart = Utils.timestampToString(
+        accountInfoJson.stakingInfo.stakePeriodStart,
       );
-      return null;
+
+      stakingInfo.pendingReward = Hbar.fromString(
+        accountInfoJson.stakingInfo.pendingReward ?? '0',
+      )
+        .toString(HbarUnit.Hbar)
+        .replace(' ℏ', '');
+      stakingInfo.stakedToMe = Hbar.fromString(
+        accountInfoJson.stakingInfo.stakedToMe ?? '0',
+      )
+        .toString(HbarUnit.Hbar)
+        .replace(' ℏ', '');
+      stakingInfo.stakedAccountId =
+        accountInfoJson.stakingInfo.stakedAccountId ?? '';
+      stakingInfo.stakedNodeId = accountInfoJson.stakingInfo.stakedNodeId ?? '';
     }
 
     return {
-      account: newAccountId,
-      evmAddress: options.evmAddress,
-    } as HederaMirrorInfo;
+      accountId: accountInfoJson.accountId,
+      alias: accountInfoJson.aliasKey ?? '',
+      expirationTime: Utils.timestampToString(accountInfoJson.expirationTime),
+      memo: accountInfoJson.accountMemo,
+      evmAddress: accountInfoJson.contractAccountId
+        ? `0x${accountInfoJson.contractAccountId}`
+        : '',
+      key: {
+        key: accountInfoJson.key
+          ? PublicKey.fromString(accountInfoJson.key).toStringRaw()
+          : '',
+      },
+      balance: {
+        hbars: hbarBalance,
+        timestamp: Utils.timestampToString(new Date()),
+      },
+      autoRenewPeriod: accountInfo.autoRenewPeriod.seconds.toString(),
+      ethereumNonce: accountInfoJson.ethereumNonce ?? '',
+      isDeleted: accountInfoJson.isDeleted,
+      stakingInfo,
+    } as AccountInfo;
   }
 }

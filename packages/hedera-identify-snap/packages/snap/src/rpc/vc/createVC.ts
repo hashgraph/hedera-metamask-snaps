@@ -20,9 +20,8 @@
 
 import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
+import { sha256 } from 'js-sha256';
 import cloneDeep from 'lodash.clonedeep';
-import { v4 as uuidv4 } from 'uuid';
-import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapParams } from '../../interfaces';
 import {
   IDataManagerSaveResult,
@@ -37,8 +36,8 @@ import {
   CreateVCRequestParams,
   CreateVCResponseResult,
 } from '../../types/params';
+import { HederaUtils } from '../../utils/hederaUtils';
 import { getVeramoAgent } from '../../veramo/agent';
-import { sha256 } from 'js-sha256';
 
 /**
  * Function to create VC.
@@ -106,7 +105,7 @@ export async function createVC(
       state,
       account.metamaskAddress,
     );
-    if (validHederaChainID(chainId)) {
+    if (HederaUtils.validHederaChainID(chainId)) {
       const hederaAccountId = accountState.extraData as string;
       issuer.hederaAccountId = hederaAccountId;
       credentialSubject.hederaAccountId = hederaAccountId;

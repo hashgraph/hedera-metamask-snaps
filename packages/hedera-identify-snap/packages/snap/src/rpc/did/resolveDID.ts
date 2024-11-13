@@ -38,6 +38,10 @@ export async function resolveDID(
     did = account.identifier.did;
   }
 
+  let result = {};
+  if (account.method === 'did:hedera') {
+  }
+
   const response = await fetch(
     `https://dev.uniresolver.io/1.0/identifiers/${did}`,
   );
