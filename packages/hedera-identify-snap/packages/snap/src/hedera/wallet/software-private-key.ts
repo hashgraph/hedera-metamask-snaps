@@ -23,7 +23,8 @@ import type { PrivateKey, PublicKey } from '@hashgraph/sdk';
 import { Wallet } from './abstract';
 
 export class PrivateKeySoftwareWallet extends Wallet {
-  private _privateKey: PrivateKey;
+  // eslint-disable-next-line no-restricted-syntax
+  private readonly _privateKey: PrivateKey;
 
   constructor(privateKey: PrivateKey) {
     super();

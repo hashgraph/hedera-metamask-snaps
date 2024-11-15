@@ -18,16 +18,13 @@
  *
  */
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
-
 /**
  * Get current network.
  * @param metamask - Metamask provider.
  * @returns Current network.
  */
 export async function getCurrentNetwork(): Promise<string> {
-  const metamask = (window as any).ethereum as MetaMaskInpageProvider;
-  return (await metamask.request({
+  return (await ethereum.request({
     method: 'eth_chainId',
   })) as string;
 }

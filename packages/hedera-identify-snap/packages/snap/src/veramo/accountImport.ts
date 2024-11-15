@@ -18,16 +18,13 @@
  *
  */
 
-/*
-import { DidError, HcsDid } from '@hashgraph/did-sdk-js';
 import { PrivateKey } from '@hashgraph/sdk';
-import { HederaClientImplFactory } from '../hedera';
-*/
-import { MetaMaskInpageProvider } from '@metamask/providers';
 import { rpcErrors } from '@metamask/rpc-errors';
+import { DidError, HcsDid } from '@tuum-tech/hedera-did-sdk-js';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
 import _ from 'lodash';
 import { getDidKeyIdentifier } from '../did/key/keyDidUtils';
+import { HederaClient } from '../hedera/client/hederaClient';
 
 import {
   Account,
@@ -48,8 +45,7 @@ import { getHederaAccountIfExists } from '../utils/params';
 import { getVeramoAgent } from './agent';
 
 export const getCurrentMetamaskAccount = async (): Promise<string> => {
-  const metamask = (window as any).ethereum as MetaMaskInpageProvider;
-  const accounts = (await metamask.request({
+  const accounts = (await ethereum.request({
     method: 'eth_requestAccounts',
   })) as string[];
   return accounts[0];
@@ -68,7 +64,6 @@ export const getCurrentMetamaskAccount = async (): Promise<string> => {
 export async function veramoImportMetaMaskAccount(
   network: string,
   state: IdentitySnapState,
-  metamask: MetaMaskInpageProvider,
   evmAddress: string,
   accountViaPrivateKey?: AccountViaPrivateKey,
 ): Promise<Account> {
@@ -156,9 +151,15 @@ export async function veramoImportMetaMaskAccount(
   } else if (method === 'did:key') {
     did = `did:key:${await getDidKeyIdentifier(publicKey)}`;
   } else if (method === 'did:hedera') {
-    /*  const pKey = PrivateKey.fromStringECDSA(privateKey);
     const networkInfo: NetworkInfo = HederaUtils.getHederaNetworkInfo(network);
-    const hederaClientFactory = new HederaClientImplFactory(
+    console.log(
+      hederaAccountId,
+      networkInfo.network,
+      privateKey,
+      publicKey,
+      snapAddress,
+    );
+    const hederaClientFactory = new HederaClient(
       hederaAccountId,
       networkInfo.network,
       'ECDSA_SECP256K1',
@@ -169,14 +170,15 @@ export async function veramoImportMetaMaskAccount(
       console.error('Failed to create Hedera client');
       throw new Error('Failed to create Hedera client');
     }
+
     let didToUse = new HcsDid({
-      privateKey: pKey,
+      privateKey: PrivateKey.fromStringECDSA(privateKey),
       client: client.getClient(),
     });
     // Try registering the DID if not registered previously
     try {
       const registeredDid = await didToUse.register();
-      did = registeredDid.getIdentifier();
+      did = registeredDid.getIdentifier() || '';
     } catch (e: any) {
       if (e instanceof DidError) {
         const didDocument = await didToUse.resolve();
@@ -185,7 +187,7 @@ export async function veramoImportMetaMaskAccount(
         console.error(`Failed to register DID: ${e}`);
         throw new Error(`Failed to register DID: ${e}`);
       }
-    } */
+    }
     did = `did:hedera:${hederaAccountId}`;
   }
 

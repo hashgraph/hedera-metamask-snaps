@@ -41,12 +41,7 @@ export abstract class Wallet {
   // get the public key associated with the wallet
   abstract getPublicKey(index: number): Promise<PublicKey | undefined>;
 
-  /**
-   * Get the private key associated with the wallet (if avaialble).
-   *
-   * @param _index - Index.
-   * @returns Private key.
-   */
+  // Get the private key associated with the wallet (if avaialble)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getPrivateKey(_index: number): Promise<PrivateKey | null> {
     return Promise.resolve(null);

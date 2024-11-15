@@ -34,9 +34,8 @@ import {
 } from '@hashgraph/sdk/lib/account/AccountInfo';
 import { AccountInfo } from '../../types/hedera';
 import { Utils } from '../../utils/utils';
-import { SimpleHederaClient } from '../service';
 
-export class SimpleHederaClientImpl implements SimpleHederaClient {
+export class SimpleHederaClient {
   private _client: Client;
 
   private _privateKey: PrivateKey | null;

@@ -19,7 +19,6 @@
  */
 
 import { AccountId, PrivateKey } from '@hashgraph/sdk';
-import { MetaMaskInpageProvider } from '@metamask/providers';
 import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
@@ -123,12 +122,7 @@ export async function getCurrentAccount(
       );
       await initAccountState(state, coinType, metamaskAddress);
     }
-    return await veramoImportMetaMaskAccount(
-      network,
-      state,
-      (window as any).ethereum as MetaMaskInpageProvider,
-      metamaskAddress,
-    );
+    return await veramoImportMetaMaskAccount(network, state, metamaskAddress);
   } catch (e: any) {
     console.error(`Error while trying to get the account: ${e}`);
     throw new Error(`Error while trying to get the account: ${e}`);
@@ -173,7 +167,7 @@ async function connectEVMAccount(
       ]),
       placeholder: '2386d1d21644dc65d...', // You can use '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c' for testing purposes
     };
-    privateKey = PrivateKey.fromString(
+    privateKey = PrivateKey.fromStringECDSA(
       (await snapDialog(dialogParamsForPrivateKey)) as string,
     ).toStringRaw();
   }
@@ -188,7 +182,6 @@ async function connectEVMAccount(
   return await veramoImportMetaMaskAccount(
     network,
     state,
-    (window as any).ethereum as MetaMaskInpageProvider,
     '',
     accountViaPrivateKey,
   );
@@ -255,7 +248,6 @@ async function connectHederaAccount(
   return await veramoImportMetaMaskAccount(
     network,
     state,
-    (window as any).ethereum as MetaMaskInpageProvider,
     '',
     accountViaPrivateKey,
   );

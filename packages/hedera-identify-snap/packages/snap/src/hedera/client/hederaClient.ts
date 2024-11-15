@@ -27,12 +27,11 @@ import {
   TransferTransaction,
 } from '@hashgraph/sdk';
 
-import { SimpleHederaClientImpl } from './client';
-import { HederaClientFactory, SimpleHederaClient } from './service';
-import { Wallet } from './wallet/abstract';
-import { PrivateKeySoftwareWallet } from './wallet/software-private-key';
+import { Wallet } from '../wallet/abstract';
+import { PrivateKeySoftwareWallet } from '../wallet/software-private-key';
+import { SimpleHederaClient } from './simpleHederaClient';
 
-export class HederaClientImplFactory implements HederaClientFactory {
+export class HederaClient {
   readonly #wallet: Wallet | null;
 
   readonly #keyIndex: number;
@@ -103,16 +102,13 @@ export class HederaClientImplFactory implements HederaClientFactory {
       return null;
     }
 
-    // TODO: Fix
-    client
-      .setOperatorWith(this.#accountId, publicKey ?? '', transactionSigner)
-      .setDefaultMaxQueryPayment(new Hbar(5));
+    client.setOperatorWith(this.#accountId, publicKey ?? '', transactionSigner);
 
     if (!(await this.testClientOperatorMatch(client))) {
       return null;
     }
 
-    return new SimpleHederaClientImpl(client, privateKey);
+    return new SimpleHederaClient(client, privateKey);
   }
 
   /**
