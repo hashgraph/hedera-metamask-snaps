@@ -52,7 +52,6 @@ import {
 
 import { HederaDIDProvider } from '../did/hedera/hederaDidProvider';
 import { KeyDIDProvider } from '../did/key/keyDidProvider';
-import { IdentitySnapState } from '../interfaces';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';
 import {
   SnapDIDStore,

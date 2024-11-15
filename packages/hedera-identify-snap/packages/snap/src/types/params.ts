@@ -78,3 +78,12 @@ export type CreateVPRequestParams = {
   options?: CreateVPOptions;
   proofInfo?: ProofInfo;
 };
+
+export type GoogleToken = {
+  accessToken: string;
+};
+
+export type UploadData = {
+  fileName: string;
+  content: string;
+};

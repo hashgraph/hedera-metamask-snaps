@@ -18,20 +18,18 @@
  *
  */
 
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "declaration": true,
-    "inlineSourceMap": true,
-    "incremental": false,
-    "removeComments": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "@metamask/snaps-sdk",
-    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"]
-  },
-  "files": ["./json-typings.d.ts"],
-  "exclude": ["./jest.config.js"],
-  "include": ["**/*.ts", "**/*.tsx"]
-}
+import type { Wallet } from '../domain/wallet/abstract';
+import type { SimpleHederaClient } from '../types/hedera';
+
+export type HederaClientFactory = {
+  // returns null if the account ID does not match the chosen key
+  createClient(options: {
+    wallet: Wallet;
+    // index into the wallet, meaning depends on the wallet type
+    // 0 always means the canonical key for the wallet
+    keyIndex: number;
+    // account ID we wish to associate with the wallet
+    accountId: string;
+    network: string;
+  }): Promise<SimpleHederaClient | null>;
+};

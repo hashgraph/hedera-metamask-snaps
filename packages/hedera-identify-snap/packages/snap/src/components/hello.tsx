@@ -1,6 +1,6 @@
 /*-
  *
- * Hedera Wallet Snap
+ * Hedera Identify Snap
  *
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *

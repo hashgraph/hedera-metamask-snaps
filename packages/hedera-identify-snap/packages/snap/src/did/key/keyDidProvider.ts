@@ -33,7 +33,7 @@ import {
 } from '@veramo/core';
 import { AbstractIdentifierProvider } from '@veramo/did-manager';
 import { base58btc } from 'multiformats/bases/base58';
-import { addMulticodecPrefix } from '../../utils/formatUtils';
+import { Utils } from '../../utils/Utils';
 
 type IContext = IAgentContext<IKeyManager>;
 
@@ -62,7 +62,7 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
 
     const methodSpecificId = Buffer.from(
       base58btc.encode(
-        addMulticodecPrefix(
+        Utils.addMulticodecPrefix(
           'ed25519-pub',
           Buffer.from(key.publicKeyHex, 'hex'),
         ),

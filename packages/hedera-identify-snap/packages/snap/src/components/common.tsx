@@ -1,6 +1,6 @@
 /*-
  *
- * Hedera Wallet Snap
+ * Hedera Identify Snap
  *
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
@@ -44,7 +44,6 @@ export const Bold = MetamaskBold as any;
 export type CommonProps = {
   origin: string;
   network: string;
-  mirrorNodeUrl: string;
   [key: string]: any;
 };
 

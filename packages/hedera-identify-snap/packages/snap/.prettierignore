@@ -1,4 +1,4 @@
 dist
 coverage
-post-process.js
+postBuild.js
 node_modules

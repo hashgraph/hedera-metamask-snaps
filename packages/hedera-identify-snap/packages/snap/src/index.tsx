@@ -19,53 +19,36 @@
  */
 
 import { rpcErrors } from '@metamask/rpc-errors';
-import { OnRpcRequestHandler } from '@metamask/snaps-sdk';
+import type {
+  OnHomePageHandler,
+  OnInstallHandler,
+  OnRpcRequestHandler,
+  OnUpdateHandler,
+  OnUserInputHandler,
+} from '@metamask/snaps-sdk';
+import _ from 'lodash';
 import { HelloUI } from './components/hello';
-import { Account, ExternalAccount, IdentitySnapParams } from './interfaces';
-import { getAccountInfo } from './rpc/account/getAccountInfo';
-import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
-import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
-import { resolveDID } from './rpc/did/resolveDID';
-import { switchDIDMethod } from './rpc/did/switchDIDMethod';
-import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { togglePopups } from './rpc/snap/togglePopups';
-import { createVC } from './rpc/vc/createVC';
-import { createVP } from './rpc/vc/createVP';
-import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
-import { getSupportedProofFormats } from './rpc/vc/getSupportedProofFormats';
-import { getVCs } from './rpc/vc/getVCs';
-import { removeVC } from './rpc/vc/removeVC';
-import { saveVC } from './rpc/vc/saveVC';
-import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
-import { verifyVC } from './rpc/vc/verifyVC';
-import { verifyVP } from './rpc/vc/verifyVP';
-import { getCurrentAccount } from './snap/account';
-import { getCurrentNetwork } from './snap/network';
-import { getStateUnchecked } from './snap/state';
-import { init } from './utils/init';
-import {
-  isExternalAccountFlagSet,
-  isValidConfigueGoogleRequest,
-  isValidCreateVCRequest,
-  isValidCreateVPRequest,
-  isValidDeleteAllVCsRequest,
-  isValidGetVCsRequest,
-  isValidMetamaskAccountParams,
-  isValidRemoveVCRequest,
-  isValidResolveDIDRequest,
-  isValidSaveVCRequest,
-  isValidSwitchMethodRequest,
-  isValidVerifyVCRequest,
-  isValidVerifyVPRequest,
-} from './utils/params';
+import { ShowAccountPrivateKeyUI } from './components/showAccountPrivateKey';
+import { OnHomePageUI } from './custom-ui/onHome';
+import { onInstallUI } from './custom-ui/onInstall';
+import { onUpdateUI } from './custom-ui/onUpdate';
+import { onUserInputUI } from './custom-ui/onUserInput';
+import { SwitchDIDMethodFacade } from './facades/did/SwitchDIDMethodFacade';
+import { GetAccountInfoFacade } from './facades/snap/GetAccountInfoFacade';
+import { TogglePopupsFacade } from './facades/snap/TogglePopupsFacade';
+import { SnapAccounts } from './snap/SnapAccounts';
+import { SnapState } from './snap/SnapState';
+import type { IdentifySnapParams } from './types/state';
+import { EvmUtils } from './utils/EvmUtils';
+import { ParamUtils } from './utils/ParamUtils';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
- *
  * @param args - The request handler args as object.
+ * @param args.origin - The origin of the request, e.g., the website that
+ * invoked the snap.
  * @param args.request - A validated JSON-RPC request object.
- * @param args.origin - Origin of the request.
- * @returns `null` if the request succeeded.
+ * @returns The result of `snap_dialog`.
  * @throws If the request method is not valid for this snap.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({
@@ -76,20 +59,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
 
-  const network = await getCurrentNetwork();
-
-  let state = await getStateUnchecked();
-  if (state === null) {
-    state = await init(origin, network);
+  let state = await SnapState.getStateUnchecked();
+  if (_.isEmpty(state)) {
+    state = await SnapState.initState();
   }
-  console.log('state:', JSON.stringify(state, null, 4));
 
-  const identitySnapParams: IdentitySnapParams = {
+  const identifySnapParams: IdentifySnapParams = {
     origin,
-    network,
     state,
-    account: {} as Account,
   };
+
+  // Get network
+  const network = await EvmUtils.getChainId();
 
   switch (request.method) {
     case 'hello': {
@@ -102,118 +83,74 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       });
     }
     case 'togglePopups': {
-      return await togglePopups(identitySnapParams);
+      return await TogglePopupsFacade.togglePopups(identifySnapParams);
     }
     case 'switchDIDMethod': {
-      isValidSwitchMethodRequest(request.params);
-      return await switchDIDMethod(
-        identitySnapParams,
+      ParamUtils.isValidSwitchMethodRequest(request.params);
+      return await SwitchDIDMethodFacade.switchDIDMethod(
+        identifySnapParams,
         request.params.didMethod,
       );
     }
   }
 
-  let isExternalAccount: boolean;
-  let extraData: unknown;
-  if (isExternalAccountFlagSet(request.params)) {
+  let isExternalAccount = false;
+  if (ParamUtils.isExternalAccountFlagSet(request.params)) {
     isExternalAccount = true;
-    extraData = (request.params as ExternalAccount).externalAccount.data;
-  } else {
-    isExternalAccount = false;
-    isValidMetamaskAccountParams(request.params);
   }
 
-  const account: Account = await getCurrentAccount(
+  // Set current account
+  await SnapAccounts.setCurrentAccount(
     origin,
-    network,
     state,
     request.params,
+    network,
     isExternalAccount,
   );
-  account.extraData = extraData;
 
-  identitySnapParams.account = account;
-
-  const accountInfoPublic = await getAccountInfo(identitySnapParams);
+  const accountInfoPublic =
+    await GetAccountInfoFacade.getAccountInfo(identifySnapParams);
 
   switch (request.method) {
-    case 'getAccountInfo': {
-      return accountInfoPublic;
-    }
-    case 'resolveDID': {
-      isValidResolveDIDRequest(request.params);
-      return await resolveDID(identitySnapParams, request.params.did);
-    }
-
-    case 'getVCs': {
-      isValidGetVCsRequest(request.params);
-      return await getVCs(identitySnapParams, request.params);
-    }
-
-    case 'saveVC': {
-      isValidSaveVCRequest(request.params);
-      return await saveVC(identitySnapParams, request.params);
-    }
-
-    case 'createVC': {
-      isValidCreateVCRequest(request.params);
-      return await createVC(identitySnapParams, request.params);
-    }
-
-    case 'verifyVC': {
-      isValidVerifyVCRequest(request.params);
-      return await verifyVC(
-        identitySnapParams,
-        request.params.verifiableCredential,
-      );
-    }
-
-    case 'removeVC': {
-      isValidRemoveVCRequest(request.params);
-      return await removeVC(identitySnapParams, request.params);
-    }
-
-    case 'deleteAllVCs': {
-      isValidDeleteAllVCsRequest(request.params);
-      return await deleteAllVCs(identitySnapParams, request.params);
-    }
-
-    case 'createVP': {
-      isValidCreateVPRequest(request.params);
-      return await createVP(identitySnapParams, request.params);
-    }
-
-    case 'verifyVP': {
-      isValidVerifyVPRequest(request.params);
-      return await verifyVP(
-        identitySnapParams,
-        request.params.verifiablePresentation,
-      );
-    }
-
-    case 'getAvailableMethods': {
-      return getAvailableDIDMethods();
-    }
-
-    case 'getCurrentDIDMethod': {
-      return getCurrentDIDMethod(identitySnapParams);
-    }
-
-    case 'getSupportedProofFormats': {
-      return getSupportedProofFormats();
-    }
-
-    case 'configureGoogleAccount': {
-      isValidConfigueGoogleRequest(request.params);
-      return await configureGoogleAccount(identitySnapParams, request.params);
-    }
-
-    case 'syncGoogleVCs': {
-      return await syncGoogleVCs(identitySnapParams);
-    }
+    case 'getCurrentAccount':
+      return {
+        currentAccount: accountInfoPublic,
+      };
+    case 'showAccountPrivateKey':
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: (
+            <ShowAccountPrivateKeyUI
+              origin={origin}
+              network={network}
+              privateKey={
+                state.accountState[state.currentAccount.snapEvmAddress][
+                  state.currentAccount.network
+                ].keyStore.privateKey
+              }
+              publicKey={state.currentAccount.publicKey}
+              accountID={state.currentAccount.hederaAccountId}
+              evmAddress={state.currentAccount.snapEvmAddress}
+            />
+          ),
+        },
+      });
+      return {
+        currentAccount: accountInfoPublic,
+      };
 
     default:
       // Throw a known error to avoid crashing the Snap
       throw rpcErrors.methodNotFound(request.method);
   }
 };
+
+export const onHomePage: OnHomePageHandler = OnHomePageUI;
+
+export const onUserInput: OnUserInputHandler = onUserInputUI;
+
+export const onInstall: OnInstallHandler = onInstallUI;
+
+export const onUpdate: OnUpdateHandler = onUpdateUI;

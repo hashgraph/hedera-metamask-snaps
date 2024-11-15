@@ -18,20 +18,24 @@
  *
  */
 
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "declaration": true,
-    "inlineSourceMap": true,
-    "incremental": false,
-    "removeComments": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "@metamask/snaps-sdk",
-    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"]
-  },
-  "files": ["./json-typings.d.ts"],
-  "exclude": ["./jest.config.js"],
-  "include": ["**/*.ts", "**/*.tsx"]
-}
+import type { OnUpdateHandler } from '@metamask/snaps-sdk';
+
+import { heading, panel, text } from '@metamask/snaps-sdk';
+
+export const onUpdateUI: OnUpdateHandler = async () => {
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([
+        heading('Thank you for updating Hedera Identify Snap'),
+        text('New features added in this version:'),
+        text('🚀 Added snap home page'),
+        text('🚀 Updated some dialog boxes'),
+        text(
+          '🚀 Send notifications for certain API calls whenever snap errors out',
+        ),
+      ]),
+    },
+  });
+};

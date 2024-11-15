@@ -27,7 +27,7 @@ const config: SnapConfig = {
   // eslint-disable-next-line no-restricted-globals
   input: resolve(__dirname, 'src/index.tsx'),
   server: {
-    port: 9002,
+    port: 9001,
   },
   polyfills: true,
 };
