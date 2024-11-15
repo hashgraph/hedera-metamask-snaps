@@ -29,7 +29,7 @@ jobs:
     uses: ./.github/workflows/zxc-analyze-snap.yaml
     needs:
       - wallet-snap-test
-    if: ${{ github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name && github.actor != 'dependabot[bot]' }}
+    if: ${{ github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name }}
     with:
       snap-package-dir: hedera-wallet-snap
       snap-report-name: "Wallet Snap"
