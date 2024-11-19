@@ -30,6 +30,7 @@ import {
   Row as MetamaskRow,
   Text as MetamaskText,
 } from '@metamask/snaps-sdk/jsx';
+import { getNetworkNameFromChainId } from '../constants';
 
 export const Box = MetamaskBox as any;
 export const Heading = MetamaskHeading as any;
@@ -55,7 +56,7 @@ const MetamaskUI: SnapComponent<CommonProps> = ({ origin, network }) => {
         <Text>{origin}</Text>
       </Row>
       <Row label="Network">
-        <Text>{network}</Text>
+        <Text>{getNetworkNameFromChainId(network)}</Text>
       </Row>
       <Divider />
     </Box>

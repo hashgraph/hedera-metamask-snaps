@@ -197,7 +197,6 @@ export class SnapAccounts {
     }
 
     return await SnapAccounts.importMetaMaskAccount(
-      origin,
       state,
       network,
       connectedAddress,
@@ -479,7 +478,6 @@ export class SnapAccounts {
 
   /**
    * Veramo Import metamask account.
-   * @param _origin - Source.
    * @param state - HederaWalletSnapState.
    * @param network - Hedera network.
    * @param connectedAddress - Currently connected EVm address.
@@ -490,7 +488,6 @@ export class SnapAccounts {
    * @returns Result.
    */
   public static async importMetaMaskAccount(
-    origin: string,
     state: IdentifySnapState,
     network: string,
     connectedAddress: string,
@@ -542,6 +539,15 @@ export class SnapAccounts {
     state.accountState[connectedAddress][network].accountInfo = accountInfo;
 
     // eslint-disable-next-line require-atomic-updates
+    state.accountState[connectedAddress][network].keyStore = {
+      curve,
+      privateKey,
+      publicKey,
+      address,
+      hederaAccountId: accountInfo.accountId,
+    };
+
+    // eslint-disable-next-line require-atomic-updates
     state.currentAccount = {
       metamaskEvmAddress,
       externalEvmAddress,
@@ -552,15 +558,6 @@ export class SnapAccounts {
       publicKey,
       network,
     } as Account;
-
-    // eslint-disable-next-line require-atomic-updates
-    state.accountState[connectedAddress][network].keyStore = {
-      curve,
-      privateKey,
-      publicKey,
-      address,
-      hederaAccountId: accountInfo.accountId,
-    };
 
     let did = '';
     if (method === 'did:pkh') {
@@ -642,6 +639,8 @@ export class SnapAccounts {
         );
       }
     }
+
+    state.currentAccount.identifier = identifier;
 
     await SnapState.updateState(state);
 

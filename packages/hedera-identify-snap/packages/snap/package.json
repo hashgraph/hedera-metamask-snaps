@@ -71,8 +71,11 @@
     "@veramo/message-handler": "5.1.2",
     "bignumber.js": "^9.1.2",
     "ethers": "^6.13.2",
+    "jsonpath": "^1.1.1",
     "lodash": "^4.17.21",
-    "normalize-url": "^8.0.1"
+    "normalize-url": "^8.0.1",
+    "secp256k1": "^5.0.1",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
@@ -84,8 +87,11 @@
     "@metamask/snaps-cli": "^6.3.1",
     "@metamask/snaps-jest": "^8.3.0",
     "@types/jest": "^29.5.12",
+    "@types/jsonpath": "^0.2.4",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/normalize-url": "^4.2.0",
+    "@types/secp256k1": "^4.0.6",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "eslint": "8.38.0",

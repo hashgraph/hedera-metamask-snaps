@@ -31,11 +31,12 @@ export class GetAccountInfoFacade {
   public static async getAccountInfo(
     identitySnapParams: IdentifySnapParams,
   ): Promise<PublicAccountInfo> {
-    const { origin, state } = identitySnapParams;
+    const { state } = identitySnapParams;
 
     const publicAccountInfo: PublicAccountInfo = {
       metamaskAddress: state.currentAccount.metamaskEvmAddress,
       snapAddress: state.currentAccount.snapEvmAddress,
+      snapPublicKey: state.currentAccount.publicKey,
       did: state.currentAccount.identifier.did,
       method: state.currentAccount.method,
       hederaAccountId: state.currentAccount.hederaAccountId,

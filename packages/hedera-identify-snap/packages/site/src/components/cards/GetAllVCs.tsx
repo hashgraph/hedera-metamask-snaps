@@ -75,7 +75,6 @@ const GetAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         returnStore: true,
       };
       const vcs = (await getVCs(
-        metamaskAddress,
         undefined,
         options,
         externalAccountParams,

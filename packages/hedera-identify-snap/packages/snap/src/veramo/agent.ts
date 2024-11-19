@@ -59,6 +59,7 @@ import {
   SnapPrivateKeyStore,
   SnapVCStore,
 } from '../plugins/veramo/snap-data-store/src/snapDataStore';
+import { IdentifySnapState } from '../types/state';
 
 export type Agent = TAgent<
   IKeyManager &
@@ -76,7 +77,7 @@ export type Agent = TAgent<
  * @param state - IdentitySnapState.
  * @returns Agent.
  */
-export async function getVeramoAgent(state: IdentitySnapState): Promise<Agent> {
+export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 

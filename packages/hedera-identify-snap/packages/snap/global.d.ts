@@ -23,3 +23,6 @@ declare module '*.json' {
   const value: any;
   export default value;
 }
+
+declare module 'secp256k1';
+declare module 'jsonpath';

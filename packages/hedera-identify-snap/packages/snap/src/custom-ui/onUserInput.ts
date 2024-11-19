@@ -22,10 +22,10 @@ import type { OnUserInputHandler } from '@metamask/snaps-sdk';
 
 import { UserInputEventType, copyable, panel, text } from '@metamask/snaps-sdk';
 import _ from 'lodash';
-import { EvmUtils } from 'src/utils/EvmUtils';
 import { SnapAccounts } from '../snap/SnapAccounts';
 import { SnapState } from '../snap/SnapState';
 import type { IdentifySnapParams } from '../types/state';
+import { EvmUtils } from '../utils/EvmUtils';
 
 export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
   // Set origin to be the current page

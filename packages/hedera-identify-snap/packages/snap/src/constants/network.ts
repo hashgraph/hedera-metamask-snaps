@@ -18,23 +18,19 @@
  *
  */
 
-export const isIn = <T>(values: readonly T[], value: any): value is T => {
-  return values.includes(value);
+export const HEDERA_NETWORKS: string[] = ['mainnet', 'testnet', 'previewnet'];
+
+export const HEDERA_CHAIN_IDS: Record<string, string> = {
+  '0x127': 'mainnet',
+  '0x128': 'testnet',
+  '0x129': 'previewnet',
 };
 
-const hederaChainIDs = new Map([
-  ['0x127', 'mainnet'],
-  ['0x128', 'testnet'],
-  ['0x129', 'previewnet'],
-]);
-
-export const getHederaNetwork = (chainId: string): string => {
-  const network = hederaChainIDs.get(chainId);
-  return network || 'mainnet';
+export const DEFAULT_HEDERA_MIRRORNODES: Record<string, string> = {
+  mainnet: 'https://mainnet-public.mirrornode.hedera.com',
+  testnet: 'https://testnet.mirrornode.hedera.com',
+  previewnet: 'https://previewnet.mirrornode.hedera.com',
 };
-
-export const validHederaChainID = (x: string) =>
-  isIn(Array.from(hederaChainIDs.keys()), x);
 
 const networks = {
   '1': 'ethereum',
@@ -191,9 +187,9 @@ const networks = {
   '836542336838601': 'curio',
 } as Record<string, string>;
 
-export const getNetwork = (chainId: string): string => {
+export function getNetworkNameFromChainId(chainIdHex: string): string {
   // Convert hexadecimal chainId to decimal
-  const chainIdDecimal = parseInt(chainId, 16).toString();
+  const chainIdDecimal = parseInt(chainIdHex, 16).toString();
 
   // Find the network name
   const networkName = networks[chainIdDecimal];
@@ -207,4 +203,4 @@ export const getNetwork = (chainId: string): string => {
   } else {
     return `EVM Network: ${chainIdDecimal}`;
   }
-};
+}

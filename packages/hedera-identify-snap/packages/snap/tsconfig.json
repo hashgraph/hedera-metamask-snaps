@@ -31,7 +31,7 @@
     "jsxImportSource": "@metamask/snaps-sdk",
     "typeRoots": ["./node_modules/@types", "../../node_modules/@types"]
   },
-  "files": ["./json-typings.d.ts"],
+  "files": ["./global.d.ts"],
   "exclude": ["./jest.config.js"],
   "include": ["**/*.ts", "**/*.tsx"]
 }

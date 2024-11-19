@@ -18,7 +18,7 @@
  *
  */
 
-import { hederaNetworks } from '../../types/constants';
+import { HEDERA_NETWORKS } from '../../types/constants';
 import { HederaUtils } from '../HederaUtils';
 
 describe('HederaUtils.checkValidString', () => {
@@ -90,7 +90,7 @@ describe('HederaUtils.validHederaNetwork', () => {
   });
 
   it('should return true for each predefined valid network', () => {
-    hederaNetworks.forEach((network) => {
+    HEDERA_NETWORKS.forEach((network) => {
       expect(HederaUtils.validHederaNetwork(network)).toBe(true);
     });
   });

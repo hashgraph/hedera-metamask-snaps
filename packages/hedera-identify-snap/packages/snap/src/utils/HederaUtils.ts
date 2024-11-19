@@ -19,13 +19,13 @@
  */
 
 import _ from 'lodash';
-import { hederaChainIDs, otherChainIDs } from '../config/network';
-import type { HederaAccountInfo } from '../types/account';
 import {
-  DEFAULTHEDERAMIRRORNODES,
-  hederaNetworks,
-  isIn,
-} from '../types/constants';
+  DEFAULT_HEDERA_MIRRORNODES,
+  HEDERA_CHAIN_IDS,
+  HEDERA_NETWORKS,
+} from '../constants/network';
+import type { HederaAccountInfo } from '../types/account';
+import { isIn } from '../types/constants';
 import type {
   HederaNetworkInfo,
   MirrorAccountInfo,
@@ -43,23 +43,18 @@ export class HederaUtils {
   public static getHederaNetworkInfo(chainId: string): HederaNetworkInfo {
     const networkInfo = {
       hederaNetwork: 'mainnet',
-      mirrorNodeUrl: DEFAULTHEDERAMIRRORNODES.mainnet,
+      mirrorNodeUrl: DEFAULT_HEDERA_MIRRORNODES.mainnet,
     } as HederaNetworkInfo;
 
-    networkInfo.hederaNetwork = hederaChainIDs[chainId] || 'mainnet';
+    networkInfo.hederaNetwork = HEDERA_CHAIN_IDS[chainId] || 'mainnet';
     networkInfo.mirrorNodeUrl =
-      DEFAULTHEDERAMIRRORNODES[networkInfo.hederaNetwork];
+      DEFAULT_HEDERA_MIRRORNODES[networkInfo.hederaNetwork];
 
     return networkInfo;
   }
 
-  public static getOtherNetwork = (chainId: string): string => {
-    const network = otherChainIDs[chainId];
-    return network || `Unknown Network (Chain ID: ${chainId})`;
-  };
-
   public static validHederaNetwork(network: string) {
-    return isIn(hederaNetworks, network);
+    return isIn(HEDERA_NETWORKS, network);
   }
 
   public static async getMirrorTransactions(

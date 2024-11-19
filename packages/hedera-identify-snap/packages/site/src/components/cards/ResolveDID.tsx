@@ -58,7 +58,7 @@ const ResolveDID: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const doc = await resolveDID(metamaskAddress, did, externalAccountParams);
+      const doc = await resolveDID(did, externalAccountParams);
       console.log(`Your DID document is : ${JSON.stringify(doc, null, 4)}`);
       showModal({
         title: 'Resolve DID',

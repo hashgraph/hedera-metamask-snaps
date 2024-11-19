@@ -22,8 +22,9 @@ import type { Key } from '@hashgraph/sdk';
 import { PublicKey } from '@hashgraph/sdk';
 import type { HashgraphProto } from '@hashgraph/sdk/lib/Key';
 import { HDNodeWallet, Mnemonic, assertArgument, ethers } from 'ethers';
+import { publicKeyConvert } from 'secp256k1';
 import { DEFAULTCOINTYPE } from '../types/constants';
-import type { MirrorNftInfo, MirrorTokenInfo } from '../types/hedera';
+import type { MirrorTokenInfo } from '../types/hedera';
 import { FetchUtils, type FetchResponse } from './FetchUtils';
 
 export class CryptoUtils {
@@ -119,6 +120,14 @@ export class CryptoUtils {
     return nodeWallet;
   }
 
+  public static getCompressedPublicKey(publicKey: string): string {
+    const hexToUIntArray = new Uint8Array(
+      Buffer.from(publicKey.split('0x')[1], 'hex'),
+    );
+    const pKeyConvert = publicKeyConvert(hexToUIntArray, true);
+    return Buffer.from(pKeyConvert).toString('hex');
+  }
+
   /**
    * Checks whether the provided key is a valid Ethereum public key.
    * @param key - The public key to check.
@@ -202,20 +211,6 @@ export class CryptoUtils {
     }
 
     return byteArray;
-  }
-
-  public static async GetNftSerialNumber(
-    tokenId: string,
-    accountId: string,
-    mirrorNodeUrl: string,
-  ): Promise<MirrorNftInfo[]> {
-    let result = [] as MirrorNftInfo[];
-    const url = `${mirrorNodeUrl}/api/v1/tokens/${encodeURIComponent(tokenId)}/nfts?account.id=${encodeURIComponent(accountId)}`;
-    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
-    if (response.success) {
-      result = response.data.nfts;
-    }
-    return result;
   }
 
   public static async getTokenById(

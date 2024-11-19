@@ -20,15 +20,18 @@
 
 import { base58btc } from 'multiformats/bases/base58';
 
-import { CryptoUtils } from '../../utils/cryptoUtils';
-import { addMulticodecPrefix } from '../../utils/formatUtils';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
 export async function getDidKeyIdentifier(publicKey: string): Promise<string> {
   const compressedKey = CryptoUtils.getCompressedPublicKey(publicKey);
 
   return Buffer.from(
     base58btc.encode(
-      addMulticodecPrefix('secp256k1-pub', Buffer.from(compressedKey, 'hex')),
+      Utils.addMulticodecPrefix(
+        'secp256k1-pub',
+        Buffer.from(compressedKey, 'hex'),
+      ),
     ),
   ).toString();
 }

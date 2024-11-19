@@ -101,14 +101,14 @@ export const getCurrentNetwork = async (): Promise<string> => {
  * Invoke the "hello" method from the snap.
  */
 
-export const sendHello = async (metamaskAddress: string) => {
+export const sendHello = async () => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'hello',
-        params: { metamaskAddress },
+        params: {},
       },
     },
   });
@@ -118,12 +118,12 @@ export const sendHello = async (metamaskAddress: string) => {
  * Invoke the "togglePopups" method from the snap.
  */
 
-export const togglePopups = async (metamaskAddress: string) => {
+export const togglePopups = async () => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
-      request: { method: 'togglePopups', params: { metamaskAddress } },
+      request: { method: 'togglePopups', params: {} },
     },
   });
 };
@@ -131,17 +131,14 @@ export const togglePopups = async (metamaskAddress: string) => {
 /**
  * Invoke the "switchDIDMethod" method from the snap.
  */
-export const switchDIDMethod = async (
-  metamaskAddress: string,
-  didMethod: string,
-) => {
+export const switchDIDMethod = async (didMethod: string) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'switchDIDMethod',
-        params: { metamaskAddress, didMethod },
+        params: { didMethod },
       },
     },
   });
@@ -151,7 +148,6 @@ export const switchDIDMethod = async (
  * Invoke the "getAccountInfo" method from the snap.
  */
 export const getAccountInfo = async (
-  metamaskAddress: string,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -160,7 +156,7 @@ export const getAccountInfo = async (
       snapId: defaultSnapId,
       request: {
         method: 'getAccountInfo',
-        params: { metamaskAddress, ...externalAccountparams },
+        params: { ...externalAccountparams },
       },
     },
   });
@@ -170,7 +166,6 @@ export const getAccountInfo = async (
  * Invoke the "resolveDID" method from the snap.
  */
 export const resolveDID = async (
-  metamaskAddress: string,
   did?: string,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -180,7 +175,7 @@ export const resolveDID = async (
       snapId: defaultSnapId,
       request: {
         method: 'resolveDID',
-        params: { metamaskAddress, did, ...externalAccountparams },
+        params: { did, ...externalAccountparams },
       },
     },
   });
@@ -191,7 +186,6 @@ export const resolveDID = async (
  */
 
 export const getVCs = async (
-  metamaskAddress: string,
   filter: Filter | undefined,
   options: any,
   externalAccountparams?: ExternalAccountParams,
@@ -202,7 +196,7 @@ export const getVCs = async (
       snapId: defaultSnapId,
       request: {
         method: 'getVCs',
-        params: { metamaskAddress, filter, options, ...externalAccountparams },
+        params: { filter, options, ...externalAccountparams },
       },
     },
   });
@@ -213,7 +207,6 @@ export const getVCs = async (
  */
 
 export const saveVC = async (
-  metamaskAddress: string,
   data: unknown,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -224,7 +217,6 @@ export const saveVC = async (
       request: {
         method: 'saveVC',
         params: {
-          metamaskAddress,
           data,
           ...externalAccountparams,
         },
@@ -243,7 +235,6 @@ export type ExampleVCValue = {
  */
 
 export const createVC = async (
-  metamaskAddress: string,
   vcKey: string,
   vcValue: object,
   options: any,
@@ -257,7 +248,6 @@ export const createVC = async (
       request: {
         method: 'createVC',
         params: {
-          metamaskAddress,
           vcKey,
           vcValue,
           options,
@@ -273,17 +263,14 @@ export const createVC = async (
  * Invoke the "verifyVC" method from the snap.
  */
 
-export const verifyVC = async (
-  metamaskAddress: string,
-  vc: VerifiableCredential | {},
-) => {
+export const verifyVC = async (vc: VerifiableCredential | {}) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'verifyVC',
-        params: { metamaskAddress, verifiableCredential: vc },
+        params: { verifiableCredential: vc },
       },
     },
   });
@@ -294,7 +281,6 @@ export const verifyVC = async (
  */
 
 export const removeVC = async (
-  metamaskAddress: string,
   id: string | string[],
   options: IDataManagerDeleteArgs,
   externalAccountparams?: ExternalAccountParams,
@@ -305,7 +291,7 @@ export const removeVC = async (
       snapId: defaultSnapId,
       request: {
         method: 'removeVC',
-        params: { metamaskAddress, id, options, ...externalAccountparams },
+        params: { id, options, ...externalAccountparams },
       },
     },
   });
@@ -316,7 +302,6 @@ export const removeVC = async (
  */
 
 export const deleteAllVCs = async (
-  metamaskAddress: string,
   options: IDataManagerClearArgs,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -326,7 +311,7 @@ export const deleteAllVCs = async (
       snapId: defaultSnapId,
       request: {
         method: 'deleteAllVCs',
-        params: { metamaskAddress, options, ...externalAccountparams },
+        params: { options, ...externalAccountparams },
       },
     },
   });
@@ -337,7 +322,6 @@ export const deleteAllVCs = async (
  */
 
 export const createVP = async (
-  metamaskAddress: string,
   { vcIds, vcs, proofInfo }: CreateVPRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -348,7 +332,6 @@ export const createVP = async (
       request: {
         method: 'createVP',
         params: {
-          metamaskAddress,
           vcIds,
           vcs,
           proofInfo,
@@ -363,17 +346,14 @@ export const createVP = async (
  * Invoke the "verifyVP" method from the snap.
  */
 
-export const verifyVP = async (
-  metamaskAddress: string,
-  vp: VerifiablePresentation | {},
-) => {
+export const verifyVP = async (vp: VerifiablePresentation | {}) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'verifyVP',
-        params: { metamaskAddress, verifiablePresentation: vp },
+        params: { verifiablePresentation: vp },
       },
     },
   });
@@ -384,7 +364,6 @@ export const verifyVP = async (
  */
 
 export const getCurrentDIDMethod = async (
-  metamaskAddress: string,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -393,7 +372,7 @@ export const getCurrentDIDMethod = async (
       snapId: defaultSnapId,
       request: {
         method: 'getCurrentDIDMethod',
-        params: { metamaskAddress, ...externalAccountparams },
+        params: { ...externalAccountparams },
       },
     },
   });
@@ -404,7 +383,6 @@ export const getCurrentDIDMethod = async (
  */
 
 export const configureGoogleAccount = async (
-  metamaskAddress: string,
   accessToken: string,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -414,7 +392,7 @@ export const configureGoogleAccount = async (
       snapId: defaultSnapId,
       request: {
         method: 'configureGoogleAccount',
-        params: { metamaskAddress, accessToken, ...externalAccountparams },
+        params: { accessToken, ...externalAccountparams },
       },
     },
   });
@@ -425,7 +403,6 @@ export const configureGoogleAccount = async (
  */
 
 export const syncGoogleVCs = async (
-  metamaskAddress: string,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -434,7 +411,7 @@ export const syncGoogleVCs = async (
       snapId: defaultSnapId,
       request: {
         method: 'syncGoogleVCs',
-        params: { metamaskAddress, ...externalAccountparams },
+        params: { ...externalAccountparams },
       },
     },
   });

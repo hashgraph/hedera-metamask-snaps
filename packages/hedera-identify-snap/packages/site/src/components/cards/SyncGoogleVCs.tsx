@@ -58,7 +58,7 @@ const SyncGoogleVCs: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const resp = await syncGoogleVCs(metamaskAddress, externalAccountParams);
+      const resp = await syncGoogleVCs(externalAccountParams);
       console.log('Synced with google drive: ', resp);
     } catch (e) {
       console.error(e);

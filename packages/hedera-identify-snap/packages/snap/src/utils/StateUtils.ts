@@ -20,9 +20,14 @@
 
 import cloneDeep from 'lodash.clonedeep';
 
+import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
+import { ManagedPrivateKey } from '@veramo/key-manager';
 import type { Account, HederaAccountInfo } from '../types/account';
 import type {
+  GoogleUserInfo,
+  IdentifyAccountConfig,
   IdentifyAccountState,
+  IdentifySnapConfig,
   IdentifySnapState,
   KeyStore,
 } from '../types/state';
@@ -37,6 +42,17 @@ export class StateUtils {
       hederaAccountId: '',
     } as KeyStore,
     accountInfo: {} as HederaAccountInfo,
+
+    snapKeyStore: {} as Record<string, IKey>,
+    snapPrivateKeyStore: {} as Record<string, ManagedPrivateKey>,
+    identifiers: {} as Record<string, IIdentifier>,
+    vcs: {} as Record<string, W3CVerifiableCredential>,
+    accountConfig: {
+      identity: {
+        vcStore: 'snap',
+        googleUserInfo: {} as GoogleUserInfo,
+      },
+    } as IdentifyAccountConfig,
   } as IdentifyAccountState;
 
   public static getEmptyAccountState(): IdentifyAccountState {
@@ -45,7 +61,7 @@ export class StateUtils {
 
   static readonly #initialSnapState: IdentifySnapState = {
     currentAccount: {} as Account,
-    accountState: {},
+    accountState: {} as Record<string, Record<string, IdentifyAccountState>>,
     snapConfig: {
       dApp: {
         didMethod: 'did:pkh',
@@ -55,7 +71,7 @@ export class StateUtils {
       snap: {
         acceptedTerms: true,
       },
-    },
+    } as IdentifySnapConfig,
   };
 
   public static getInitialSnapState(): IdentifySnapState {

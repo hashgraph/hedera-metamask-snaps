@@ -138,15 +138,11 @@ type ButtonProps = ComponentProps<typeof Button> & {
   buttonText: string;
 };
 
-export const SendHelloButton = ({
-  loading,
-  buttonText,
-  ...props
-}: ButtonProps) => {
+export const SendHelloButton = ({ loading, ...props }: ButtonProps) => {
   return (
     <Button {...props}>
       {loading && <Spinner animation="border" style={{ marginRight: 8 }} />}
-      {buttonText}
+      {props.buttonText}
     </Button>
   );
 };

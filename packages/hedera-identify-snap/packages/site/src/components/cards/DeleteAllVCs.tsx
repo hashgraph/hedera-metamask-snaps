@@ -27,7 +27,10 @@ import {
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
-import { IDataManagerClearResult } from '../../types/veramo';
+import {
+  IDataManagerClearArgs,
+  IDataManagerClearResult,
+} from '../../types/veramo';
 import {
   deleteAllVCs,
   getCurrentMetamaskAccount,
@@ -72,9 +75,8 @@ const DeleteAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         // If you want to remove the VCs from multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
         ...(selectedStore.length ? { store: selectedStore } : {}),
-      };
+      } as IDataManagerClearArgs;
       const isRemoved = (await deleteAllVCs(
-        metamaskAddress,
         options,
         externalAccountParams,
       )) as IDataManagerClearResult[];

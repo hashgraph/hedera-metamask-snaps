@@ -52,7 +52,7 @@ const SwitchDIDMethod: FC<Props> = ({
       setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
-      const switched = await switchDIDMethod(metamaskAddress, didMethod);
+      const switched = await switchDIDMethod(didMethod);
       console.log(`DID Method switched : ${switched}`);
     } catch (e) {
       console.error(e);

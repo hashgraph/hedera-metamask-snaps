@@ -26,12 +26,13 @@ import {
   panel,
   text,
 } from '@metamask/snaps-sdk';
+import { getNetworkNameFromChainId } from '../constants';
 import {
   FEE_DIGIT_LENGTH,
   FEE_DISPLAY_REGEX,
   HBAR_ASSET_STRING,
 } from '../types/constants';
-import type { SimpleTransfer, TxRecord } from '../types/hedera';
+import type { SimpleTransfer } from '../types/hedera';
 
 export class SnapUtils {
   /**
@@ -75,7 +76,7 @@ export class SnapUtils {
   ): Promise<Panel> {
     const panelToShow = [
       text(`Origin: **${origin}**`),
-      text(`Network: **${network}**`),
+      text(`Network: **${getNetworkNameFromChainId(network)}**`),
       divider(),
       ...prompt,
     ];

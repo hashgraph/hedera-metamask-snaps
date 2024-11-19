@@ -35,13 +35,9 @@ import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
-import { IdentitySnapState } from '../../../../interfaces';
-import {
-  getAccountStateByCoinType,
-  getCurrentCoinType,
-  updateState,
-} from '../../../../snap/state';
-import { decodeJWT } from '../../../../utils/jwt';
+import { SnapState } from '../../../../snap/SnapState';
+import { IdentifySnapState } from '../../../../types/state';
+import { decodeJWT } from '../../google-drive-data-store';
 import {
   AbstractDataStore,
   IFilterArgs,
@@ -55,20 +51,18 @@ import {
  * This is usable by {@link @veramo/kms-local} to hold the key data.
  */
 export class SnapKeyStore extends AbstractKeyStore {
-  state: IdentitySnapState;
+  state: IdentifySnapState;
 
-  constructor(state: IdentitySnapState) {
+  constructor(state: IdentifySnapState) {
     super();
     this.state = state;
   }
 
   async getKey({ kid }: { kid: string }): Promise<IKey> {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     const key = accountState.snapKeyStore[kid];
     if (!key) {
       throw Error(`SnapKeyStore - kid '${kid}' not found`);
@@ -77,43 +71,36 @@ export class SnapKeyStore extends AbstractKeyStore {
   }
 
   async deleteKey({ kid }: { kid: string }) {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     if (!accountState.snapKeyStore[kid]) {
       throw Error(`SnapKeyStore - kid '${kid}' not found`);
     }
 
-    const coinType = await getCurrentCoinType();
-    delete this.state.accountState[coinType][account].snapKeyStore[kid];
-    await updateState(this.state);
+    delete this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].snapKeyStore[kid];
+    await SnapState.updateState(this.state);
     return true;
   }
 
   async importKey(args: IKey) {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
-    }
-
-    const coinType = await getCurrentCoinType();
-    this.state.accountState[coinType][account].snapKeyStore[args.kid] = {
+    this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].snapKeyStore[args.kid] = {
       ...args,
     };
-    await updateState(this.state);
+    await SnapState.updateState(this.state);
     return true;
   }
 
   async listKeys(): Promise<Exclude<IKey, 'privateKeyHex'>[]> {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     const safeKeys = Object.values(accountState.snapKeyStore).map((key) => {
       const { privateKeyHex, ...safeKey } = key;
       return safeKey;
@@ -128,22 +115,18 @@ export class SnapKeyStore extends AbstractKeyStore {
  * This is usable by {@link @veramo/kms-local} to hold the key data.
  */
 export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
-  state: IdentitySnapState;
+  state: IdentifySnapState;
 
-  constructor(state: IdentitySnapState) {
+  constructor(state: IdentifySnapState) {
     super();
     this.state = state;
   }
 
   async getKey({ alias }: { alias: string }): Promise<ManagedPrivateKey> {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
-      );
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     const key = accountState.snapPrivateKeyStore[alias];
     if (!key) {
       throw Error(
@@ -154,36 +137,28 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   }
 
   async deleteKey({ alias }: { alias: string }) {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
-      );
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     if (!accountState.snapPrivateKeyStore[alias]) {
       throw Error('SnapPrivateKeyStore - Key not found');
     }
 
-    const coinType = await getCurrentCoinType();
-    delete this.state.accountState[coinType][account].snapPrivateKeyStore[
-      alias
-    ];
-    await updateState(this.state);
+    delete this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].snapPrivateKeyStore[alias];
+    await SnapState.updateState(this.state);
     return true;
   }
 
   async importKey(args: ImportablePrivateKey) {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
-      );
-    }
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
 
     const alias = args.alias || uuidv4();
-    const accountState = await getAccountStateByCoinType(this.state, account);
     const existingEntry = accountState.snapPrivateKeyStore[alias];
     if (existingEntry && existingEntry.privateKeyHex !== args.privateKeyHex) {
       console.error(
@@ -194,26 +169,23 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
       );
     }
 
-    const coinType = await getCurrentCoinType();
-    this.state.accountState[coinType][account].snapPrivateKeyStore[alias] = {
+    this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].snapPrivateKeyStore[alias] = {
       ...args,
       alias,
     };
-    await updateState(this.state);
-    return this.state.accountState[coinType][account].snapPrivateKeyStore[
-      alias
-    ];
+    await SnapState.updateState(this.state);
+    return this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].snapPrivateKeyStore[alias];
   }
 
   async listKeys(): Promise<ManagedPrivateKey[]> {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
-      );
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     return [...Object.values(accountState.snapPrivateKeyStore)];
   }
 }
@@ -224,9 +196,9 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
  * This is usable by {@link @veramo/did-manager} to hold the did key data.
  */
 export class SnapDIDStore extends AbstractDIDStore {
-  state: IdentitySnapState;
+  state: IdentifySnapState;
 
-  constructor(state: IdentitySnapState) {
+  constructor(state: IdentifySnapState) {
     super();
     this.state = state;
   }
@@ -240,14 +212,11 @@ export class SnapDIDStore extends AbstractDIDStore {
     alias: string;
     provider: string;
   }): Promise<IIdentifier> {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
-    }
-    const { identifiers } = await getAccountStateByCoinType(
-      this.state,
-      account,
-    );
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
+    const { identifiers } = accountState;
 
     if (did && !alias) {
       if (!identifiers[did]) {
@@ -276,30 +245,24 @@ export class SnapDIDStore extends AbstractDIDStore {
   }
 
   async deleteDID({ did }: { did: string }) {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     if (!accountState.identifiers[did]) {
       throw Error(
         `SnapDIDStore - not_found: IIdentifier not found with did=${did}`,
       );
     }
 
-    const coinType = await getCurrentCoinType();
-    delete this.state.accountState[coinType][account].identifiers[did];
-    await updateState(this.state);
+    delete this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].identifiers[did];
+    await SnapState.updateState(this.state);
     return true;
   }
 
   async importDID(args: IIdentifier) {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
-    }
-
     const identifier = { ...args };
     for (const key of identifier.keys) {
       if ('privateKeyHex' in key) {
@@ -307,11 +270,10 @@ export class SnapDIDStore extends AbstractDIDStore {
       }
     }
 
-    const coinType = await getCurrentCoinType();
-    console.log('account: ', account, ' did: ', args.did);
-    this.state.accountState[coinType][account].identifiers[args.did] =
-      identifier;
-    await updateState(this.state);
+    this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].identifiers[args.did] = identifier;
+    await SnapState.updateState(this.state);
     return true;
   }
 
@@ -319,12 +281,10 @@ export class SnapDIDStore extends AbstractDIDStore {
     alias?: string;
     provider?: string;
   }): Promise<IIdentifier[]> {
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     let result: IIdentifier[] = [];
     for (const key of Object.keys(accountState.identifiers)) {
       result.push(accountState.identifiers[key]);
@@ -350,23 +310,21 @@ export class SnapDIDStore extends AbstractDIDStore {
  * This is usable by {@link @vc-manager/VCManager} to hold the vc data
  */
 export class SnapVCStore extends AbstractDataStore {
-  state: IdentitySnapState;
+  state: IdentifySnapState;
 
   configure: undefined;
 
-  constructor(state: IdentitySnapState) {
+  constructor(state: IdentifySnapState) {
     super();
     this.state = state;
   }
 
   async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
-    const account = this.state.currentAccount.metamaskAddress;
-    if (!account) {
-      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
     const currentMethod = this.state.currentAccount.method;
 
     // Helper function to decode VC if it's in JWT format
@@ -417,19 +375,12 @@ export class SnapVCStore extends AbstractDataStore {
 
   async saveVC(args: { data: ISaveVC[] }): Promise<string[]> {
     const { data: vcs } = args;
-    const account = this.state.currentAccount.metamaskAddress;
-
-    if (!account) {
-      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
-    }
-
-    const coinType = await getCurrentCoinType();
-    const currentMethod = this.state.currentAccount.method; // 'did:key' or 'did:pkh'
+    const currentMethod = this.state.currentAccount.method;
 
     const ids: string[] = [];
 
     for (const vc of vcs) {
-      let identifier = this.state.currentAccount.snapAddress;
+      let identifier = this.state.currentAccount.snapEvmAddress;
       if (currentMethod === 'did:key') {
         identifier = await getDidKeyIdentifier(
           this.state.currentAccount.publicKey,
@@ -444,28 +395,25 @@ export class SnapVCStore extends AbstractDataStore {
       ) {
         const newId = vc.id || sha256(JSON.stringify(vc));
         ids.push(newId);
-        this.state.accountState[coinType][account].vcs[newId] =
-          vc.vc as W3CVerifiableCredential;
+        this.state.accountState[this.state.currentAccount.snapEvmAddress][
+          this.state.currentAccount.network
+        ].vcs[newId] = vc.vc as W3CVerifiableCredential;
       }
     }
 
-    await updateState(this.state);
+    await SnapState.updateState(this.state);
     return ids;
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {
-    const account = this.state.currentAccount.metamaskAddress;
-
-    if (!account) {
-      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
-    }
-
-    const accountState = await getAccountStateByCoinType(this.state, account);
-    const coinType = await getCurrentCoinType();
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
 
     // Ensure VC exists and matches the current DID method
     const currentMethod = this.state.currentAccount.method;
-    let identifier = this.state.currentAccount.snapAddress;
+    let identifier = this.state.currentAccount.snapEvmAddress;
     if (currentMethod === 'did:key') {
       identifier = await getDidKeyIdentifier(
         this.state.currentAccount.publicKey,
@@ -484,26 +432,29 @@ export class SnapVCStore extends AbstractDataStore {
       return false;
     }
 
-    delete this.state.accountState[coinType][account].vcs[id];
-    await updateState(this.state);
+    delete this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].vcs[id];
 
+    await SnapState.updateState(this.state);
     return true;
   }
 
   public async clearVCs(_args: IFilterArgs): Promise<boolean> {
-    const account = this.state.currentAccount.metamaskAddress;
+    const accountState =
+      this.state.accountState[this.state.currentAccount.snapEvmAddress][
+        this.state.currentAccount.network
+      ];
 
-    if (!account) {
-      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
-    }
-
-    const coinType = await getCurrentCoinType();
     const currentMethod = this.state.currentAccount.method;
 
     // Ensure vc is correctly typed with a conditional check
-    const accountVCs = this.state.accountState[coinType][account].vcs;
-    this.state.accountState[coinType][account].vcs = Object.fromEntries(
-      Object.entries(accountVCs).filter(([_, vc]) => {
+    const { vcs } = accountState;
+
+    this.state.accountState[this.state.currentAccount.snapEvmAddress][
+      this.state.currentAccount.network
+    ].vcs = Object.fromEntries(
+      Object.entries(vcs).filter(([_, vc]) => {
         return (
           vc && // Check vc exists
           typeof vc === 'object' && // Ensure vc is an object
@@ -513,7 +464,7 @@ export class SnapVCStore extends AbstractDataStore {
       }),
     );
 
-    await updateState(this.state);
+    await SnapState.updateState(this.state);
     return true;
   }
 }

@@ -19,18 +19,20 @@
  */
 
 import { base58btc } from 'multiformats/bases/base58';
-
-import { addMulticodecPrefix } from '../../utils/formatUtils';
-import { getCompressedPublicKey } from '../../utils/keyPair';
+import { CryptoUtils } from '../../utils/CryptoUtils';
+import { Utils } from '../../utils/Utils';
 
 export async function getDidHederaIdentifier(
   publicKey: string,
 ): Promise<string> {
-  const compressedKey = getCompressedPublicKey(publicKey);
+  const compressedKey = CryptoUtils.getCompressedPublicKey(publicKey);
 
   return Buffer.from(
     base58btc.encode(
-      addMulticodecPrefix('secp256k1-pub', Buffer.from(compressedKey, 'hex')),
+      Utils.addMulticodecPrefix(
+        'secp256k1-pub',
+        Buffer.from(compressedKey, 'hex'),
+      ),
     ),
   ).toString();
 }

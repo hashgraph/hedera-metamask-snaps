@@ -42,6 +42,7 @@ export type Account = {
 export type PublicAccountInfo = {
   metamaskAddress: string;
   snapAddress: string;
+  snapPublicKey: string;
   did: string;
   method: string;
   hederaAccountId: string;

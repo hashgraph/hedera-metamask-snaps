@@ -37,17 +37,8 @@ export const availableProofFormats = [
 ] as const;
 export const isValidProofFormat = (x: string) => isIn(availableProofFormats, x);
 
-// 60 for ethereum and 3030 for hedera
-export const DEFAULTCOINTYPE = 60;
-export const HEDERACOINTYPE = 3030;
-
-export const hederaNetworks: string[] = ['mainnet', 'testnet', 'previewnet'];
-
-export const DEFAULTHEDERAMIRRORNODES: Record<string, string> = {
-  mainnet: 'https://mainnet-public.mirrornode.hedera.com',
-  testnet: 'https://testnet.mirrornode.hedera.com',
-  previewnet: 'https://previewnet.mirrornode.hedera.com',
-};
+// 3030 for hedera
+export const DEFAULTCOINTYPE = 3030;
 
 export const EMPTY_STRING = '';
 export const FEE_DISPLAY_REGEX = /(\.\d*?[1-9])0+$|\.0*$/u;

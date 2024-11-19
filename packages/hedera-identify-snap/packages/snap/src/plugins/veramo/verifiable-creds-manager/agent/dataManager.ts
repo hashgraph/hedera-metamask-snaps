@@ -189,8 +189,11 @@ export class DataManager implements IAgentPlugin {
       const storePlugin = this.stores[storeName];
 
       try {
-        const result = await storePlugin.deleteVC({ id });
-        res.push({ id, removed: result, store: storeName });
+        let ids = Array.isArray(id) ? id : [id];
+        for (const id of ids) {
+          const result = await storePlugin.deleteVC({ id });
+          res.push({ id, removed: result, store: storeName });
+        }
       } catch (e) {
         console.log(e);
       }

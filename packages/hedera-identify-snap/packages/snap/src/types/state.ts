@@ -69,7 +69,6 @@ export type IdentifyAccountState = {
   vcs: Record<string, W3CVerifiableCredential>;
 
   accountConfig: IdentifyAccountConfig;
-  index?: number;
 };
 
 export type IdentifyAccountConfig = {

@@ -26,19 +26,11 @@ import {
   ParsedDID,
   Resolvable,
 } from 'did-resolver';
-import { getAccountStateByCoinType, getState } from '../../snap/state';
-import { getCurrentMetamaskAccount } from '../../veramo/accountImport';
+import { SnapState } from '../../snap/SnapState';
 
-export const resolveSecp256k1 = async (
-  account: string,
-  did: string,
-): Promise<DIDDocument> => {
-  const accountState = await getAccountStateByCoinType(
-    await getState(),
-    account,
-  );
-  const controllerKeyId = `metamask-${account}`;
-  const publicKey = accountState.snapKeyStore[controllerKeyId].publicKeyHex;
+export const resolveSecp256k1 = async (did: string): Promise<DIDDocument> => {
+  const state = await SnapState.getState();
+  const publicKey = state.currentAccount.publicKey;
 
   // TODO: Change id ?
   const didDocument: DIDDocument = {
@@ -80,7 +72,8 @@ export const resolveDidHedera: DIDResolver = async (
   options: DIDResolutionOptions,
 ): Promise<DIDResolutionResult> => {
   try {
-    const account = await getCurrentMetamaskAccount();
+    const state = await SnapState.getState();
+    const account = state.currentAccount.snapEvmAddress;
     const startsWith = parsed.did.substring(0, 12);
     if (startsWithMap[startsWith] !== undefined) {
       const didDocument = await startsWithMap[startsWith](account, didUrl);

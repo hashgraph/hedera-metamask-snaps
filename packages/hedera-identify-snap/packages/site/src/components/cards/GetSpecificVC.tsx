@@ -80,7 +80,6 @@ const GetSpecificVC: FC<Props> = ({
         returnStore: true,
       };
       const vcs = (await getVCs(
-        metamaskAddress,
         filter,
         options,
         externalAccountParams,
