@@ -70,9 +70,9 @@ export class HederaClientImplFactory implements HederaClientFactory {
   walletFromPrivateKeyString(): Wallet | null {
     let myPrivateKey: PrivateKey;
 
-    if (this.#curve === 'ECDSA_SECP256K1') {
+    if (this.#curve === 'Secp256k1') {
       myPrivateKey = PrivateKey.fromStringECDSA(this.#privateKey);
-    } else if (this.#curve === 'ED25519') {
+    } else if (this.#curve === 'Ed25519') {
       myPrivateKey = PrivateKey.fromStringED25519(this.#privateKey);
     } else {
       console.error('Invalid curve type');
@@ -97,6 +97,29 @@ export class HederaClientImplFactory implements HederaClientFactory {
       client = Client.forMainnet();
     }
 
+    // Ensure only healthy nodes are part of the network
+    const network = client.network;
+    const healthyNetwork: Record<string, string> = {};
+
+    for (const [address, accountId] of Object.entries(network)) {
+      try {
+        // Test connectivity to each node
+        await client.ping(accountId);
+        healthyNetwork[address] = accountId.toString();
+      } catch (err: any) {
+        console.warn(
+          `Node ${address} is unhealthy and will be excluded:`,
+          err.message,
+        );
+      }
+    }
+
+    if (Object.keys(healthyNetwork).length > 0) {
+      client.setNetwork(healthyNetwork);
+    } else {
+      throw new Error('No healthy nodes found for the network.');
+    }
+
     client.setNetworkUpdatePeriod(2000);
 
     const transactionSigner = await this.#wallet.getTransactionSigner(
@@ -111,9 +134,7 @@ export class HederaClientImplFactory implements HederaClientFactory {
     }
 
     // TODO: Fix
-    client
-      .setOperatorWith(this.#accountId, publicKey ?? '', transactionSigner)
-      .setDefaultMaxQueryPayment(new Hbar(5));
+    client.setOperatorWith(this.#accountId, publicKey ?? '', transactionSigner);
 
     if (!(await this.testClientOperatorMatch(client))) {
       return null;

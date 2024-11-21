@@ -18,97 +18,70 @@
  *
  */
 
+import { HederaDidResolver } from '@tuum-tech/hedera-did-sdk-js';
 import {
-  DIDDocument,
   DIDResolutionOptions,
   DIDResolutionResult,
   DIDResolver,
   ParsedDID,
   Resolvable,
 } from 'did-resolver';
-import { SnapState } from '../../snap/SnapState';
+import { IdentifySnapState } from 'src/types/state';
+import { getHcsDidClient } from './hederaDidUtils';
 
-export const resolveSecp256k1 = async (did: string): Promise<DIDDocument> => {
-  const state = await SnapState.getState();
-  const publicKey = state.currentAccount.publicKey;
-
-  // TODO: Change id ?
-  const didDocument: DIDDocument = {
-    id: `did:key:${did}#${did}`,
-    '@context': [
-      'https://www.w3.org/ns/did/v1',
-      'https://w3id.org/security/suites/secp256k1-2019/v1',
-    ],
-    assertionMethod: [`did:key:${did}#${did}`],
-    authentication: [`did:key:${did}#${did}`],
-    capabilityInvocation: [`did:key:${did}#${did}`],
-    capabilityDelegation: [`did:key:${did}#${did}`],
-    keyAgreement: [`did:key:${did}#${did}`],
-    verificationMethod: [
-      {
-        id: `did:key:${did}#${did}`,
-        type: 'EcdsaSecp256k1RecoveryMethod2020',
-        controller: `did:key:${did}#${did}`,
-        publicKeyHex: publicKey.split('0x')[1],
-      },
-    ],
-  };
-  return didDocument;
-};
-
-type ResolutionFunction = (
-  account: string,
-  did: string,
-) => Promise<DIDDocument>;
-
-const startsWithMap: Record<string, ResolutionFunction> = {
-  'did:key:zQ3s': resolveSecp256k1,
-};
-
-export const resolveDidHedera: DIDResolver = async (
-  didUrl: string,
-  parsed: ParsedDID,
-  resolver: Resolvable,
-  options: DIDResolutionOptions,
-): Promise<DIDResolutionResult> => {
-  try {
-    const state = await SnapState.getState();
-    const account = state.currentAccount.snapEvmAddress;
-    const startsWith = parsed.did.substring(0, 12);
-    if (startsWithMap[startsWith] !== undefined) {
-      const didDocument = await startsWithMap[startsWith](account, didUrl);
+/**
+ * Resolves a DID using the HederaDidResolver.
+ *
+ * @param didUrl - The DID URL to resolve.
+ * @param parsed - The parsed DID structure.
+ * @param resolver - The Resolvable instance.
+ * @param options - DID resolution options.
+ * @param state - The IdentifySnapState.
+ * @returns A DID resolution result.
+ */
+export const resolveDidHedera = (state: IdentifySnapState): DIDResolver => {
+  return async (
+    didUrl: string,
+    parsed: ParsedDID,
+    _resolver: Resolvable,
+    options: DIDResolutionOptions,
+  ): Promise<DIDResolutionResult> => {
+    const hederaDidClient = await getHcsDidClient(state);
+    if (!hederaDidClient) {
       return {
         didDocumentMetadata: {},
-        didResolutionMetadata: {},
-        didDocument,
-      } as DIDResolutionResult;
+        didResolutionMetadata: {
+          error: 'invalidDid',
+          message: 'HcsDid client is not provided for resolving the DID',
+        },
+        didDocument: null,
+      };
     }
 
-    return {
-      didDocumentMetadata: {},
-      didResolutionMetadata: {
-        error: 'invalidDid',
-        message: 'unsupported key type for did:key',
-      },
-      didDocument: null,
-    };
-  } catch (err: unknown) {
-    return {
-      didDocumentMetadata: {},
-      didResolutionMetadata: {
-        error: 'invalidDid',
-        message: (err as string).toString(),
-      },
-      didDocument: null,
-    };
-  }
+    try {
+      const client = hederaDidClient.getClient(); // Retrieve the Hedera client
+      const hederaResolver = new HederaDidResolver(client); // Create the resolver
+      return await hederaResolver.resolve(didUrl, parsed, _resolver, options); // Resolve the DID
+    } catch (err: unknown) {
+      return {
+        didDocumentMetadata: {},
+        didResolutionMetadata: {
+          error: 'invalidDid',
+          message: (err as Error).message,
+        },
+        didDocument: null,
+      };
+    }
+  };
 };
 
 /**
  * Provides a mapping to a did:hedera resolver, usable by {@link did-resolver#Resolver}.
  *
+ * @param state - The IdentifySnapState.
+ * @returns A record with the DID method and its resolver.
  * @public
  */
-export function getDidHederaResolver() {
-  return { hedera: resolveDidHedera };
+export function getDidHederaResolver(state: IdentifySnapState) {
+  return { hedera: resolveDidHedera(state) };
 }

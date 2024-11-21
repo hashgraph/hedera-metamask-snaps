@@ -22,6 +22,7 @@ import { AccountId } from '@hashgraph/sdk';
 import { rpcErrors } from '@metamask/rpc-errors';
 import { ethers } from 'ethers';
 import _ from 'lodash';
+import { ECDSA_SECP256K1_KEY_TYPE, ED25519_KEY_TYPE } from '../constants';
 import {
   IDataManagerClearArgs,
   IDataManagerDeleteArgs,
@@ -307,14 +308,14 @@ export class ParamUtils {
             if (
               !(
                 'curve' in parameter.externalAccount &&
-                parameter.externalAccount.curve === 'ECDSA_SECP256K1'
+                parameter.externalAccount.curve === ECDSA_SECP256K1_KEY_TYPE
               )
             ) {
               console.error(
-                'Invalid externalAccount Params passed. If "accountIdOrEvmAddress" is an Ethereum address, the "curve" must be set to "ECDSA_SECP256K1".',
+                `Invalid externalAccount Params passed. If "accountIdOrEvmAddress" is an Ethereum address, the "curve" must be set to "${ECDSA_SECP256K1_KEY_TYPE}".`,
               );
               throw rpcErrors.invalidParams(
-                'Invalid externalAccount Params passed. If "accountIdOrEvmAddress" is an Ethereum address, the "curve" must be set to "ECDSA_SECP256K1".',
+                `Invalid externalAccount Params passed. If "accountIdOrEvmAddress" is an Ethereum address, the "curve" must be set to "${ECDSA_SECP256K1_KEY_TYPE}".`,
               );
             }
           }
@@ -325,14 +326,14 @@ export class ParamUtils {
           ) {
             if (
               typeof parameter.externalAccount.curve !== 'string' ||
-              (parameter.externalAccount.curve !== 'ECDSA_SECP256K1' &&
-                parameter.externalAccount.curve !== 'ED25519')
+              (parameter.externalAccount.curve !== ECDSA_SECP256K1_KEY_TYPE &&
+                parameter.externalAccount.curve !== ED25519_KEY_TYPE)
             ) {
               console.error(
-                'Invalid externalAccount Params passed. "curve" must be a string and must be either "ECDSA_SECP256K1" or "ED25519"',
+                `Invalid externalAccount Params passed. "curve" must be a string and must be either "${ECDSA_SECP256K1_KEY_TYPE}" or "${ED25519_KEY_TYPE}"`,
               );
               throw rpcErrors.invalidParams(
-                'Invalid externalAccount Params passed. "curve" must be a string and must be either "ECDSA_SECP256K1" or "ED25519"',
+                `Invalid externalAccount Params passed. "curve" must be a string and must be either "${ECDSA_SECP256K1_KEY_TYPE}" or "${ED25519_KEY_TYPE}"`,
               );
             }
           }

@@ -23,11 +23,18 @@ import { rpcErrors } from '@metamask/rpc-errors';
 
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
-import { DidError, HcsDid } from '@tuum-tech/hedera-did-sdk-js';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
 import { ethers, Wallet } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
+import {
+  ECDSA_SECP256K1_KEY_TYPE,
+  ED25519_KEY_TYPE,
+} from '../constants/crypto';
+import {
+  getDidHederaIdentifier,
+  getHcsDidClient,
+} from '../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../did/key/keyDidUtils';
 import type {
   Account,
@@ -122,7 +129,7 @@ export class SnapAccounts {
     // Handle external account(non-metamask account)
     if (isExternalAccount) {
       const nonMetamaskAccount = params as ExternalAccount;
-      const { accountIdOrEvmAddress, curve = 'ECDSA_SECP256K1' } =
+      const { accountIdOrEvmAddress, curve = ECDSA_SECP256K1_KEY_TYPE } =
         nonMetamaskAccount.externalAccount;
       if (ethers.isAddress(accountIdOrEvmAddress)) {
         const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
@@ -130,7 +137,7 @@ export class SnapAccounts {
             origin,
             state,
             network,
-            'ECDSA_SECP256K1',
+            ECDSA_SECP256K1_KEY_TYPE,
             Utils.ensure0xPrefix(accountIdOrEvmAddress),
           );
         connectedAddress = _connectedAddress;
@@ -170,7 +177,7 @@ export class SnapAccounts {
         console.log(errMessage);
         throw rpcErrors.internal(errMessage);
       }
-      keyStore.curve = 'ECDSA_SECP256K1';
+      keyStore.curve = ECDSA_SECP256K1_KEY_TYPE;
       keyStore.privateKey = res.privateKey;
       keyStore.publicKey = res.publicKey;
       keyStore.address = res.address.toLowerCase();
@@ -220,7 +227,7 @@ export class SnapAccounts {
     origin: string,
     state: IdentifySnapState,
     network: string,
-    curve: 'ECDSA_SECP256K1' | 'ED25519',
+    curve: string,
     evmAddress: string,
   ): Promise<any> {
     let result = {} as KeyStore;
@@ -261,56 +268,12 @@ export class SnapAccounts {
       )) as string;
 
       try {
-        const { mirrorNodeUrl } = HederaUtils.getHederaNetworkInfo(network);
-
-        const accountInfo: HederaAccountInfo =
-          await HederaUtils.getMirrorAccountInfo(evmAddress, mirrorNodeUrl);
-
-        const publicKey =
-          PrivateKey.fromStringECDSA(privateKey).publicKey.toStringRaw();
-        if (!_.isEmpty(accountInfo)) {
-          const hederaClientFactory = new HederaClientImplFactory(
-            accountInfo.accountId,
-            network,
-            curve,
-            privateKey,
-          );
-
-          const hederaClient = await hederaClientFactory.createClient();
-          if (hederaClient) {
-            result.curve = curve;
-            result.privateKey = privateKey;
-            result.publicKey = publicKey;
-            result.address = Utils.ensure0xPrefix(accountInfo.evmAddress);
-            result.hederaAccountId = accountInfo.accountId;
-            connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
-          } else {
-            const dialogParamsForHederaAccountId: DialogParams = {
-              type: 'alert',
-              content: await SnapUtils.generateCommonPanel(origin, network, [
-                heading('Hedera Account Status'),
-                text(
-                  `The private key you passed is not associated with the Hedera account '${evmAddress}' on '${network}' that uses the elliptic curve '${curve}'`,
-                ),
-              ]),
-            };
-            await SnapUtils.snapDialog(dialogParamsForHederaAccountId);
-
-            const errMessage = `The private key you passed is not associated with the Hedera account '${result.address}' on '${network}' that uses the elliptic curve '${curve}'`;
-            console.error(errMessage);
-            throw rpcErrors.invalidRequest({
-              message: errMessage,
-              data: { network, curve, address: evmAddress, publicKey },
-            });
-          }
-        } else {
-          const wallet: Wallet = new ethers.Wallet(privateKey);
-          result.curve = 'ECDSA_SECP256K1';
-          result.privateKey = privateKey;
-          result.publicKey = wallet.signingKey.publicKey;
-          result.address = wallet.address.toLowerCase();
-          connectedAddress = wallet.address.toLowerCase();
-        }
+        const wallet: Wallet = new ethers.Wallet(privateKey);
+        result.curve = ECDSA_SECP256K1_KEY_TYPE;
+        result.privateKey = privateKey;
+        result.publicKey = wallet.signingKey.publicKey;
+        result.address = wallet.address.toLowerCase();
+        connectedAddress = wallet.address.toLowerCase();
       } catch (error: any) {
         const errMessage = `Could not connect to EVM account. Please try again`;
         console.error('Error occurred: %s', errMessage, String(error));
@@ -332,7 +295,7 @@ export class SnapAccounts {
    * @param origin - Source.
    * @param state - Wallet state.
    * @param network - Hedera network.
-   * @param curve - Public Key curve('ECDSA_SECP256K1' | 'ED25519').
+   * @param curve - Public Key curve('Secp256k1' | 'Ed25519').
    * @param accountId - Hedera Account id.
    * @returns Result.
    */
@@ -340,7 +303,7 @@ export class SnapAccounts {
     origin: string,
     state: IdentifySnapState,
     network: string,
-    curve: 'ECDSA_SECP256K1' | 'ED25519',
+    curve: string,
     accountId: string,
   ): Promise<any> {
     let result = {} as KeyStore;
@@ -387,7 +350,7 @@ export class SnapAccounts {
 
         let publicKey =
           PrivateKey.fromStringECDSA(privateKey).publicKey.toStringRaw();
-        if (curve === 'ED25519') {
+        if (curve === ED25519_KEY_TYPE) {
           publicKey =
             PrivateKey.fromStringED25519(privateKey).publicKey.toStringRaw();
         }
@@ -402,9 +365,9 @@ export class SnapAccounts {
 
         if (
           accountInfo.key.type === 'ProtobufEncoded' &&
-          curve !== 'ECDSA_SECP256K1'
+          curve !== ECDSA_SECP256K1_KEY_TYPE
         ) {
-          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`;
+          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${ECDSA_SECP256K1_KEY_TYPE}' on '${network}'. Please make sure to pass in the correct value for "curve".`;
           console.error(errMessage);
           throw rpcErrors.invalidRequest({
             message: errMessage,
@@ -498,9 +461,11 @@ export class SnapAccounts {
   ): Promise<string> {
     const { curve, privateKey, publicKey, address } = keyStore;
 
-    console.log('Retrieving account info from Hedera Mirror node');
-    const { hederaNetwork, mirrorNodeUrl } =
-      HederaUtils.getHederaNetworkInfo(network);
+    console.log(
+      'Retrieving account info from Hedera Mirror node for address: ',
+      address,
+    );
+    const { mirrorNodeUrl } = HederaUtils.getHederaNetworkInfo(network);
     const accountInfo: HederaAccountInfo =
       await HederaUtils.getMirrorAccountInfo(address, mirrorNodeUrl);
 
@@ -508,7 +473,6 @@ export class SnapAccounts {
     if (_.isEmpty(accountInfo)) {
       if (method === 'did:hedera') {
         const errMessage = `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`;
-        console.error(errMessage);
         if (returnEarly) {
           // eslint-disable-next-line require-atomic-updates
           state.accountState[connectedAddress][network].keyStore = {
@@ -565,40 +529,28 @@ export class SnapAccounts {
     } else if (method === 'did:key') {
       did = `did:key:${await getDidKeyIdentifier(publicKey)}`;
     } else if (method === 'did:hedera') {
-      const hederaClientFactory = new HederaClientImplFactory(
-        accountInfo.accountId,
-        hederaNetwork,
-        curve,
-        privateKey,
+      did = getDidHederaIdentifier(
+        state.accountState[connectedAddress][network],
+        method,
       );
-      const client = await hederaClientFactory.createClient();
-      if (!client) {
-        console.error('Failed to create Hedera client');
-        throw new Error('Failed to create Hedera client');
-      }
-
-      let didToUse = new HcsDid({
-        privateKey: PrivateKey.fromStringECDSA(privateKey),
-        client: client.getClient(),
-      });
-      // Try registering the DID if not registered previously
-      try {
-        const registeredDid = await didToUse.register();
-        did = registeredDid.getIdentifier() || '';
-      } catch (e: any) {
-        if (e instanceof DidError) {
-          const didDocument = await didToUse.resolve();
-          did = didDocument.getId();
-        } else {
+      if (_.isEmpty(did)) {
+        // Register the DID on Hedera Consensus Network
+        const hederaDidClient = await getHcsDidClient(state);
+        if (!hederaDidClient) {
+          console.error('Failed to create HcsDid client');
+          throw new Error('Failed to create HcsDid client');
+        }
+        try {
+          const registeredDid = await hederaDidClient.register();
+          did = registeredDid.getIdentifier() || '';
+        } catch (e: any) {
           console.error(`Failed to register DID: ${e}`);
           throw new Error(`Failed to register DID: ${e}`);
         }
       }
-      did = `did:hedera:${accountInfo.accountId}`;
     }
 
-    console.log('did : ', did);
-    if (!did) {
+    if (_.isEmpty(did)) {
       console.log('Failed to generate DID');
       throw new Error('Failed to generate DID');
     }
@@ -625,7 +577,7 @@ export class SnapAccounts {
           keys: [
             {
               kid: controllerKeyId,
-              type: 'Secp256k1',
+              type: curve,
               kms: 'snap',
               privateKeyHex: privateKey.split('0x')[1],
               publicKeyHex: publicKey.split('0x')[1],

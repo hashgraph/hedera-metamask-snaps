@@ -2955,7 +2955,7 @@ __metadata:
     "@metamask/snaps-cli": ^6.3.1
     "@metamask/snaps-jest": ^8.3.0
     "@metamask/snaps-sdk": ^6.3.0
-    "@tuum-tech/hedera-did-sdk-js": ^0.0.13
+    "@tuum-tech/hedera-did-sdk-js": "file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js"
     "@types/jest": ^29.5.12
     "@types/jsonpath": ^0.2.4
     "@types/lodash.clonedeep": ^4.5.9
@@ -6126,9 +6126,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tuum-tech/hedera-did-sdk-js@npm:^0.0.13":
-  version: 0.0.13
-  resolution: "@tuum-tech/hedera-did-sdk-js@npm:0.0.13"
+"@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap":
+  version: 0.1.0
+  resolution: "@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js#/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::hash=53d6be&locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap"
   dependencies:
     "@hashgraph/sdk": ^2.50.0
     base58-js: ^2.0.0
@@ -6136,7 +6136,7 @@ __metadata:
     did-resolver: ^4.1.0
     js-base64: ^3.7.7
     js-sha256: ^0.11.0
-  checksum: 04dd3eb701cdf86347412cca2a0f0d111c48eac4992a7538d7f50111b4889c18b8d5e5c39e788bba5c2272160c900c7bca822e81a8ba29d5c6090e7bd8c23af5
+  checksum: ce27dffbab398ae933d1db80c2ae9e93afd16387cd3aa44301c12ecc7c23c2a937931679795ce74268a6bb1594eb26f4fee94e8035972f122d877a174095ee3f
   languageName: node
   linkType: hard
 

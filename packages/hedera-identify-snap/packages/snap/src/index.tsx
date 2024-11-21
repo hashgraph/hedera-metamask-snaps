@@ -33,6 +33,7 @@ import { OnHomePageUI } from './custom-ui/onHome';
 import { onInstallUI } from './custom-ui/onInstall';
 import { onUpdateUI } from './custom-ui/onUpdate';
 import { onUserInputUI } from './custom-ui/onUserInput';
+import { ResolveDIDFacade } from './facades/did/ResolveDIDFacade';
 import { SwitchDIDMethodFacade } from './facades/did/SwitchDIDMethodFacade';
 import { GetAccountInfoFacade } from './facades/snap/GetAccountInfoFacade';
 import { TogglePopupsFacade } from './facades/snap/TogglePopupsFacade';
@@ -63,8 +64,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   if (_.isEmpty(state)) {
     state = await SnapState.initState();
   }
-
-  console.log('State:', JSON.stringify(state, null, 4));
 
   const identifySnapParams: IdentifySnapParams = {
     origin,
@@ -110,6 +109,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     isExternalAccount,
   );
 
+  console.log('After State:', JSON.stringify(state, null, 4));
+
   const accountInfoPublic =
     await GetAccountInfoFacade.getAccountInfo(identifySnapParams);
 
@@ -142,6 +143,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return {
         currentAccount: accountInfoPublic,
       };
+
+    case 'resolveDID': {
+      ParamUtils.isValidResolveDIDRequest(request.params);
+      return await ResolveDIDFacade.resolveDID(
+        identifySnapParams,
+        request.params.did,
+      );
+    }
 
     default:
       // Throw a known error to avoid crashing the Snap

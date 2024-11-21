@@ -24,16 +24,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/require-await */
+import { HcsDid } from '@tuum-tech/hedera-did-sdk-js';
 import {
   IAgentContext,
   IIdentifier,
   IKey,
   IKeyManager,
   IService,
+  TKeyType,
 } from '@veramo/core';
 import { AbstractIdentifierProvider } from '@veramo/did-manager';
-import { base58btc } from 'multiformats/bases/base58';
-import { Utils } from '../../utils/Utils';
+import _ from 'lodash';
+import { IdentifySnapState } from '../../types/state';
+import { getHcsDidClient } from './hederaDidUtils';
 
 type IContext = IAgentContext<IKeyManager>;
 
@@ -44,10 +47,31 @@ type IContext = IAgentContext<IKeyManager>;
  */
 export class HederaDIDProvider extends AbstractIdentifierProvider {
   private defaultKms: string;
+  private hederaDidClient?: HcsDid;
+  private keyCurve: string = '';
 
   constructor(options: { defaultKms: string }) {
     super();
     this.defaultKms = options.defaultKms;
+  }
+
+  static async createWithState(options: {
+    defaultKms: string;
+    state: IdentifySnapState;
+  }): Promise<HederaDIDProvider> {
+    const provider = new HederaDIDProvider(options);
+
+    const hederaDidClient = await getHcsDidClient(options.state);
+    if (!hederaDidClient) {
+      console.error('Failed to create HcsDid client');
+      throw new Error('Failed to create HcsDid client');
+    }
+    provider.hederaDidClient = hederaDidClient;
+    provider.keyCurve =
+      options.state.accountState[options.state.currentAccount.snapEvmAddress][
+        options.state.currentAccount.network
+      ].keyStore.curve;
+    return provider;
   }
 
   async createIdentifier(
@@ -55,22 +79,32 @@ export class HederaDIDProvider extends AbstractIdentifierProvider {
     { kms, options }: { kms?: string; options?: any },
     context: IContext,
   ): Promise<Omit<IIdentifier, 'provider'>> {
+    if (!this.hederaDidClient) {
+      console.error('HcsDid client is not initialized');
+      throw new Error('HcsDid client is not initialized');
+    }
+
+    let did = '';
+    // Try registering the DID
+    try {
+      const registeredDid = await this.hederaDidClient!.register();
+      did = registeredDid.getIdentifier() || '';
+    } catch (e: any) {
+      console.error(`Failed to register DID: ${e}`);
+      throw new Error(`Failed to register DID: ${e}`);
+    }
+
+    if (_.isEmpty(did)) {
+      throw new Error('Failed to create Hedera DID');
+    }
+
     const key = await context.agent.keyManagerCreate({
       kms: kms || this.defaultKms,
-      type: 'Ed25519',
+      type: this.keyCurve as TKeyType,
     });
 
-    const methodSpecificId = Buffer.from(
-      base58btc.encode(
-        Utils.addMulticodecPrefix(
-          'ed25519-pub',
-          Buffer.from(key.publicKeyHex, 'hex'),
-        ),
-      ),
-    ).toString();
-
     const identifier: Omit<IIdentifier, 'provider'> = {
-      did: `did:key:${methodSpecificId}`,
+      did,
       controllerKeyId: key.kid,
       keys: [key],
       services: [],
@@ -87,13 +121,20 @@ export class HederaDIDProvider extends AbstractIdentifierProvider {
     },
     context: IAgentContext<IKeyManager>,
   ): Promise<IIdentifier> {
-    throw new Error('KeyDIDProvider updateIdentifier not supported yet.');
+    throw new Error('HederaDIDProvider updateIdentifier not supported yet.');
   }
 
   async deleteIdentifier(
     identifier: IIdentifier,
     context: IContext,
   ): Promise<boolean> {
+    try {
+      await this.hederaDidClient!.delete();
+    } catch (e: any) {
+      console.error(`Failed to delete DID: ${e}`);
+      throw new Error(`Failed to delete DID: ${e}`);
+    }
+
     // eslint-disable-next-line no-restricted-syntax
     for (const { kid } of identifier.keys) {
       // eslint-disable-next-line no-await-in-loop
@@ -110,7 +151,7 @@ export class HederaDIDProvider extends AbstractIdentifierProvider {
     }: { identifier: IIdentifier; key: IKey; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider addKey not supported');
+    throw Error('HederaDIDProvider addKey not supported');
   }
 
   async addService(
@@ -121,20 +162,20 @@ export class HederaDIDProvider extends AbstractIdentifierProvider {
     }: { identifier: IIdentifier; service: IService; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider addService not supported');
+    throw Error('HederaDIDProvider addService not supported');
   }
 
   async removeKey(
     args: { identifier: IIdentifier; kid: string; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider removeKey not supported');
+    throw Error('HederaDIDProvider removeKey not supported');
   }
 
   async removeService(
     args: { identifier: IIdentifier; id: string; options?: any },
     context: IContext,
   ): Promise<any> {
-    throw Error('KeyDIDProvider removeService not supported');
+    throw Error('HederaDIDProvider removeService not supported');
   }
 }

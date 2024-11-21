@@ -18,21 +18,71 @@
  *
  */
 
-import { base58btc } from 'multiformats/bases/base58';
-import { CryptoUtils } from '../../utils/CryptoUtils';
-import { Utils } from '../../utils/Utils';
+import { PrivateKey } from '@hashgraph/sdk';
+import { HcsDid } from '@tuum-tech/hedera-did-sdk-js';
+import { HederaClientImplFactory } from '../../client/HederaClientImplFactory';
+import { ECDSA_SECP256K1_KEY_TYPE } from '../../constants';
+import { IdentifyAccountState, IdentifySnapState } from '../../types/state';
+import { HederaUtils } from '../../utils/HederaUtils';
 
-export async function getDidHederaIdentifier(
-  publicKey: string,
-): Promise<string> {
-  const compressedKey = CryptoUtils.getCompressedPublicKey(publicKey);
+export function getDidHederaIdentifier(
+  accountState: IdentifyAccountState,
+  didMethod: string,
+): string {
+  // Check if the 'identifiers' key exists in the accountState object
+  if ('identifiers' in accountState) {
+    const identifiers = accountState.identifiers; // Access the 'identifiers' object
 
-  return Buffer.from(
-    base58btc.encode(
-      Utils.addMulticodecPrefix(
-        'secp256k1-pub',
-        Buffer.from(compressedKey, 'hex'),
-      ),
-    ),
-  ).toString();
+    // Iterate over the keys in 'identifiers'
+    for (const key in identifiers) {
+      const identifier = identifiers[key];
+      if (identifier.provider === didMethod) {
+        return key;
+      }
+    }
+  }
+  return '';
+}
+
+export async function getHcsDidClient(
+  state: IdentifySnapState,
+): Promise<HcsDid | null> {
+  try {
+    const { currentAccount } = state;
+
+    const accountState =
+      state.accountState[currentAccount.snapEvmAddress][currentAccount.network];
+    if (!accountState) {
+      throw new Error('Account state is missing or invalid');
+    }
+
+    const { hederaNetwork } = HederaUtils.getHederaNetworkInfo(
+      currentAccount.network,
+    );
+
+    const hederaClientFactory = new HederaClientImplFactory(
+      accountState.keyStore.hederaAccountId,
+      hederaNetwork,
+      accountState.keyStore.curve,
+      accountState.keyStore.privateKey,
+    );
+    const client = await hederaClientFactory.createClient();
+    if (!client) {
+      console.error('Failed to create Hedera client');
+      return null;
+    }
+
+    return new HcsDid({
+      network: hederaNetwork,
+      privateKey:
+        accountState.keyStore.curve === ECDSA_SECP256K1_KEY_TYPE
+          ? PrivateKey.fromStringECDSA(accountState.keyStore.privateKey)
+          : PrivateKey.fromStringED25519(accountState.keyStore.privateKey),
+      privateKeyCurve: accountState.keyStore.curve,
+      client: client.getClient(),
+    });
+  } catch (e: any) {
+    console.error(`Failed to setup HcsDid client: ${e.message}`, e);
+    return null;
+  }
 }

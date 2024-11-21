@@ -81,9 +81,15 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 
+  // Initialize DID providers
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   didProviders['did:key'] = new KeyDIDProvider({ defaultKms: 'snap' });
-  didProviders['did:hedera'] = new HederaDIDProvider({ defaultKms: 'snap' });
+  didProviders['did:hedera'] = await HederaDIDProvider.createWithState({
+    defaultKms: 'snap',
+    state: state,
+  });
+
+  // Initialize VC store plugins
   vcStorePlugins.snap = new SnapVCStore(state);
   vcStorePlugins.googleDrive = new GoogleDriveVCStore(state);
 
@@ -109,9 +115,9 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
       }),
       new DIDResolverPlugin({
         resolver: new Resolver({
-          ...pkhDidResolver(),
-          ...keyDidResolver(),
-          ...hederaDidResolver(),
+          ...pkhDidResolver,
+          ...keyDidResolver,
+          ...hederaDidResolver(state),
         }),
       }),
       new DataManager({ store: vcStorePlugins }),

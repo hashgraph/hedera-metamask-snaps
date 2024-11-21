@@ -20,8 +20,6 @@
 
 import type { AccountId, Client, PrivateKey, PublicKey } from '@hashgraph/sdk';
 
-import { HederaAccountStrategy } from '../strategies/HederaAccountStrategy';
-import type { HederaAccountInfo } from '../types/account';
 import type { SimpleHederaClient } from '../types/hedera';
 
 export class SimpleHederaClientImpl implements SimpleHederaClient {
@@ -56,9 +54,5 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   getAccountId(): AccountId {
     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
     return this.#client.operatorAccountId!;
-  }
-
-  public async getAccountInfo(accountId: string): Promise<HederaAccountInfo> {
-    return HederaAccountStrategy.getAccountInfo(this.#client, accountId);
   }
 }

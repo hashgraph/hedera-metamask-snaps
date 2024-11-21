@@ -58,7 +58,7 @@
     "@metamask/providers": "^17.2.0",
     "@metamask/rpc-errors": "^6.3.1",
     "@metamask/snaps-sdk": "^6.3.0",
-    "@tuum-tech/hedera-did-sdk-js": "^0.0.13",
+    "@tuum-tech/hedera-did-sdk-js": "file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js",
     "@veramo/core": "5.1.2",
     "@veramo/credential-eip712": "^6.0.0",
     "@veramo/credential-w3c": "5.1.2",

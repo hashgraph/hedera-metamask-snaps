@@ -49,7 +49,7 @@ export type IdentifySnapConfig = {
 };
 
 export type KeyStore = {
-  curve: 'ECDSA_SECP256K1' | 'ED25519';
+  curve: string;
   privateKey: string;
   publicKey: string;
   address: string;

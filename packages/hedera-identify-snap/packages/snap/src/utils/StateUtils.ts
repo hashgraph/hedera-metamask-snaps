@@ -35,7 +35,7 @@ import type {
 export class StateUtils {
   static readonly #emptyAccountState: IdentifyAccountState = {
     keyStore: {
-      curve: 'ECDSA_SECP256K1',
+      curve: '',
       privateKey: '',
       publicKey: '',
       address: '',

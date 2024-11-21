@@ -175,7 +175,10 @@ export const resolveDID = async (
       snapId: defaultSnapId,
       request: {
         method: 'resolveDID',
-        params: { did, ...externalAccountparams },
+        params: {
+          ...(did ? { did } : {}),
+          ...externalAccountparams,
+        },
       },
     },
   });

@@ -18,7 +18,6 @@
  *
  */
 
-import _ from 'lodash';
 import {
   DEFAULT_HEDERA_MIRRORNODES,
   HEDERA_CHAIN_IDS,
@@ -26,13 +25,8 @@ import {
 } from '../constants/network';
 import type { HederaAccountInfo } from '../types/account';
 import { isIn } from '../types/constants';
-import type {
-  HederaNetworkInfo,
-  MirrorAccountInfo,
-  MirrorTransactionInfo,
-} from '../types/hedera';
+import type { HederaNetworkInfo, MirrorAccountInfo } from '../types/hedera';
 import { FetchUtils, type FetchResponse } from './FetchUtils';
-import { Utils } from './Utils';
 
 export class HederaUtils {
   /**
@@ -55,45 +49,6 @@ export class HederaUtils {
 
   public static validHederaNetwork(network: string) {
     return isIn(HEDERA_NETWORKS, network);
-  }
-
-  public static async getMirrorTransactions(
-    accountId: string,
-    transactionId: string,
-    mirrorNodeUrl: string,
-  ): Promise<MirrorTransactionInfo[]> {
-    let result = [] as MirrorTransactionInfo[];
-    let url = `${mirrorNodeUrl}/api/v1/transactions/`;
-    if (_.isEmpty(transactionId)) {
-      url = `${url}?account.id=${encodeURIComponent(accountId)}&limit=50&order=desc`;
-    } else {
-      url = `${url}${encodeURIComponent(transactionId)}`;
-    }
-
-    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
-    if (!response.success) {
-      return result;
-    }
-
-    try {
-      result = response.data.transactions as MirrorTransactionInfo[];
-
-      result.forEach((transaction) => {
-        transaction.consensus_timestamp = Utils.timestampToString(
-          transaction.consensus_timestamp,
-        );
-        transaction.parent_consensus_timestamp = Utils.timestampToString(
-          transaction.parent_consensus_timestamp,
-        );
-        transaction.valid_start_timestamp = Utils.timestampToString(
-          transaction.valid_start_timestamp,
-        );
-      });
-    } catch (error: any) {
-      console.error('Error in getMirrorTransactions:', String(error));
-    }
-
-    return result;
   }
 
   public static async getMirrorAccountInfo(

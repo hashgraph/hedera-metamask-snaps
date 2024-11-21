@@ -142,6 +142,7 @@ export class SnapState {
     state: IdentifySnapState,
     didMethod: string,
   ) {
+    state.currentAccount.method = didMethod;
     state.snapConfig.dApp.didMethod = didMethod;
     await SnapState.updateState(state);
   }

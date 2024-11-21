@@ -18,17 +18,8 @@
  *
  */
 
-import type {
-  AccountId,
-  Client,
-  CustomFee,
-  Key,
-  PrivateKey,
-  PublicKey,
-  Timestamp,
-} from '@hashgraph/sdk';
+import type { AccountId, Client, PrivateKey, PublicKey } from '@hashgraph/sdk';
 import type { Long } from '@hashgraph/sdk/lib/long';
-import type { BigNumber } from 'bignumber.js';
 
 import type { HederaAccountInfo } from './account';
 
@@ -37,58 +28,10 @@ export type HederaNetworkInfo = {
   mirrorNodeUrl: string;
 };
 
-export type SimpleTransfer = {
-  assetType: 'HBAR' | 'TOKEN' | 'NFT';
-  to: string;
-  amount: number; // amount must be in low denom
-  assetId?: string; // Token or NFT ID (as string)
-  from?: string; // Only for approved allowances
-  decimals?: number; // Only for Token/NFT transfers
-};
-
-export type Token = {
-  token_id: string;
-  balance: number;
-};
-
-export type TokenBalance = {
-  balance: number;
-  decimals: number;
-  tokenId: string;
-  nftSerialNumber: string;
-  name: string;
-  symbol: string;
-  tokenType: string;
-  supplyType: string;
-  totalSupply: string;
-  maxSupply: string;
-};
-
-export type AccountBalance = {
-  // balance here in hbars
-  hbars: number;
-  timestamp: string;
-  tokens: Record<string, TokenBalance>;
-};
-
 export type HederaService = {
-  getNodeStakingInfo(): Promise<MirrorStakingInfo[]>;
-
   getMirrorAccountInfo(
     idOrAliasOrEvmAddress: string,
   ): Promise<HederaAccountInfo>;
-
-  getTokenById(tokenId: string): Promise<MirrorTokenInfo>;
-
-  getNftSerialNumber(
-    tokenId: string,
-    accountId: string,
-  ): Promise<MirrorNftInfo[]>;
-
-  getMirrorTransactions(
-    accountId: string,
-    transactionId: string,
-  ): Promise<MirrorTransactionInfo[]>;
 };
 
 export type SimpleHederaClient = {
@@ -106,37 +49,6 @@ export type SimpleHederaClient = {
 
   // get the associated account ID
   getAccountId(): AccountId;
-};
-
-export type MirrorStakingInfoServiceEndpoint = {
-  ip_address_v4: string;
-  port: number;
-};
-
-export type MirrorStakingInfo = {
-  description: string;
-  file_id: string;
-  max_stake: BigNumber;
-  memo: string;
-  min_stake: BigNumber;
-  node_id: number;
-  node_account_id: string;
-  node_cert_hash: string;
-  public_key: string;
-  reward_rate_start: BigNumber;
-  service_endpoints: MirrorStakingInfoServiceEndpoint[];
-  stake: BigNumber;
-  stake_rewarded: BigNumber;
-  stake_not_rewarded: BigNumber;
-  // staking period uses strings representing seconds.nanos since the epoch
-  staking_period: {
-    from: string;
-    to: string;
-  };
-  timestamp: {
-    from: string;
-    to: string;
-  };
 };
 
 export type MirrorAccountInfo = {
@@ -169,97 +81,4 @@ export type MirrorAccountInfo = {
   links: {
     next: string;
   };
-};
-
-export type MirrorTokenInfo = {
-  admin_key: Key;
-  auto_renew_account: string;
-  auto_renew_period: number;
-  created_timestamp: Timestamp;
-  custom_fees: CustomFee;
-  decimals: string;
-  deleted: boolean;
-  expiry_timestamp: string;
-  fee_schedule_key: Key;
-  freeze_default: boolean;
-  initial_supply: string;
-  max_supply: string;
-  memo: string;
-  modified_timestamp: Timestamp;
-  name: string;
-  pause_key: Key;
-  pause_status: string;
-  supply_key: Key;
-  supply_type: string;
-  symbol: string;
-  token_id: string;
-  total_supply: string;
-  treasury_account_id: string;
-  type: string;
-  wipe_key: Key;
-};
-
-export type MirrorNftInfo = {
-  account_id: string;
-  created_timestamp: string;
-  deleted: boolean;
-  metadata: string;
-  modified_timestamp: string;
-  serial_number: string;
-  token_id: string;
-};
-
-export type MirrorTransactionInfoTransfer = {
-  account: string;
-  amount: number;
-  is_approval: boolean;
-};
-
-export type MirrorTransactionInfoStakingRewardTransfer = {
-  account: string;
-  amount: number;
-};
-
-export type MirrorTransactionInfo = {
-  bytes: any;
-  consensus_timestamp: string;
-  parent_consensus_timestamp: string;
-  transaction_hash: string;
-  valid_start_timestamp: string;
-  charged_tx_fee: number;
-  transaction_id: string;
-  memo_base64: string;
-  result: string;
-  entity_id: string;
-  name: string;
-  max_fee: string;
-  valid_duration_seconds: number;
-  node: string;
-  transfers: MirrorTransactionInfoTransfer[];
-  token_transfers: [];
-  staking_reward_transfers: MirrorTransactionInfoStakingRewardTransfer[];
-  nft_transfers: [];
-  assessed_custom_fees: [];
-  nonce: number;
-  scheduled: boolean;
-  links: {
-    next: string;
-  };
-};
-
-export type MirrorTopicMessage = {
-  chunk_info: {
-    initial_transaction_id: string;
-    nonce: number;
-    number: number;
-    total: number;
-    scheduled: boolean;
-  };
-  consensus_timestamp: string;
-  message: string;
-  payer_account_id: string;
-  running_hash: string;
-  running_hash_version: number;
-  sequence_number: number;
-  topic_id: string;
 };
