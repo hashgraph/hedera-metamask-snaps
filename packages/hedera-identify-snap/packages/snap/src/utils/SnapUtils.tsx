@@ -26,13 +26,11 @@ import {
   panel,
   text,
 } from '@metamask/snaps-sdk';
+import { VerifiableCredential } from '@veramo/core';
+import _ from 'lodash';
+import cloneDeep from 'lodash.clonedeep';
 import { getNetworkNameFromChainId } from '../constants';
-import {
-  FEE_DIGIT_LENGTH,
-  FEE_DISPLAY_REGEX,
-  HBAR_ASSET_STRING,
-} from '../types/constants';
-import type { SimpleTransfer } from '../types/hedera';
+import { IDataManagerQueryResult } from '../plugins/veramo/verifiable-creds-manager';
 
 export class SnapUtils {
   /**
@@ -80,6 +78,93 @@ export class SnapUtils {
       divider(),
       ...prompt,
     ];
+    return panel(panelToShow);
+  }
+
+  /**
+   * Function to generate snap dialog panel for VC related functions.
+   *
+   * @param origin - The origin of where the call is being made from.
+   * @param header - Header text of the metamask dialog box(eg. 'Retrieve Verifiable Credentials').
+   * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
+   * @param description - Description text of the metamask dialog box(eg. 'Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is 2').
+   * @param vcs - The Verifiable Credentials to show on the metamask dialog box.
+   */
+  public static async generateVCPanel(
+    origin: string,
+    network: string,
+    header: string,
+    prompt: string,
+    description: string,
+    vcs: IDataManagerQueryResult[],
+  ): Promise<Panel> {
+    const vcsToUse = cloneDeep(vcs);
+    const panelToShow = [
+      text(`Origin: ${origin}`),
+      text(`Network: **${getNetworkNameFromChainId(network)}**`),
+      divider(),
+      heading(header),
+      text(prompt),
+      divider(),
+      text(description),
+    ];
+    vcsToUse.forEach((vc, index) => {
+      const vcData = vc.data as VerifiableCredential;
+      delete vcData.credentialSubject.id;
+      delete vcData.credentialSubject.hederaAccountId;
+      panelToShow.push(divider());
+
+      const credentialNumber = (index + 1).toString();
+      panelToShow.push(text(`Credential #${credentialNumber}`));
+      panelToShow.push(divider());
+
+      panelToShow.push(text('ID: '));
+      panelToShow.push(
+        text(_.isEmpty(vc.metadata.id) ? credentialNumber : vc.metadata.id),
+      );
+
+      panelToShow.push(text('STORAGE: '));
+      panelToShow.push(text(vc.metadata.store as string));
+
+      panelToShow.push(text('TYPE:'));
+      panelToShow.push(text(JSON.stringify(vcData.type)));
+
+      panelToShow.push(text('SUBJECT:'));
+      panelToShow.push(text(JSON.stringify(vcData.credentialSubject)));
+
+      panelToShow.push(text('ISSUANCE DATE:'));
+      const issuanceDate = new Date(
+        vcData.issuanceDate as string,
+      ).toLocaleString(undefined, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'long',
+        hour: '2-digit',
+        hour12: false,
+        minute: '2-digit',
+        second: '2-digit',
+      });
+      panelToShow.push(text(issuanceDate));
+
+      panelToShow.push(text('EXPIRATION DATE:'));
+      let expirationDate = 'Does not expire';
+      if (vcData.expirationDate) {
+        expirationDate = new Date(
+          vcData.expirationDate as string,
+        ).toLocaleString(undefined, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          weekday: 'long',
+          hour: '2-digit',
+          hour12: false,
+          minute: '2-digit',
+          second: '2-digit',
+        });
+      }
+      panelToShow.push(text(expirationDate));
+    });
     return panel(panelToShow);
   }
 
@@ -185,20 +270,5 @@ export class SnapUtils {
         message: content,
       },
     });
-  }
-
-  public static formatFeeDisplay(
-    feeToDisplay: number,
-    transfer: SimpleTransfer,
-  ) {
-    return text(
-      `Service Fee: ${feeToDisplay
-        .toFixed(FEE_DIGIT_LENGTH)
-        .replace(FEE_DISPLAY_REGEX, '$1')} ${
-        transfer.assetType === HBAR_ASSET_STRING
-          ? HBAR_ASSET_STRING
-          : (transfer.assetId as string)
-      }`,
-    );
   }
 }

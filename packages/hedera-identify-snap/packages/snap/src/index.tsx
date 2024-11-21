@@ -37,6 +37,8 @@ import { ResolveDIDFacade } from './facades/did/ResolveDIDFacade';
 import { SwitchDIDMethodFacade } from './facades/did/SwitchDIDMethodFacade';
 import { GetAccountInfoFacade } from './facades/snap/GetAccountInfoFacade';
 import { TogglePopupsFacade } from './facades/snap/TogglePopupsFacade';
+import { CreateVCFacade } from './facades/vc/CreateVCFacade';
+import { GetVCsFacade } from './facades/vc/GetVCsFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
 import type { IdentifySnapParams } from './types/state';
@@ -150,6 +152,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         identifySnapParams,
         request.params.did,
       );
+    }
+
+    case 'createVC': {
+      ParamUtils.isValidCreateVCRequest(request.params);
+      return await CreateVCFacade.createVC(identifySnapParams, request.params);
+    }
+
+    case 'getVCs': {
+      ParamUtils.isValidGetVCsRequest(request.params);
+      return await GetVCsFacade.getVCs(identifySnapParams, request.params);
     }
 
     default:

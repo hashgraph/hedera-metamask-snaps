@@ -2988,6 +2988,7 @@ __metadata:
     jest: ^29.7.0
     jest-junit: ^16.0.0
     jest-mock: ^29.7.0
+    js-sha256: ^0.11.0
     jsonpath: ^1.1.1
     lodash: ^4.17.21
     lodash.clonedeep: ^4.5.0
@@ -6127,8 +6128,8 @@ __metadata:
   linkType: hard
 
 "@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap":
-  version: 0.1.0
-  resolution: "@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js#/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::hash=53d6be&locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap"
+  version: 0.1.1
+  resolution: "@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js#/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::hash=811c16&locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap"
   dependencies:
     "@hashgraph/sdk": ^2.50.0
     base58-js: ^2.0.0
@@ -6136,7 +6137,7 @@ __metadata:
     did-resolver: ^4.1.0
     js-base64: ^3.7.7
     js-sha256: ^0.11.0
-  checksum: ce27dffbab398ae933d1db80c2ae9e93afd16387cd3aa44301c12ecc7c23c2a937931679795ce74268a6bb1594eb26f4fee94e8035972f122d877a174095ee3f
+  checksum: 3501bd23a6cb204b4802b9e40c6e708e8d6a92dd59b5f62368d189ccf51dade7770ef4a7f3d90a3966a93b67d058ca2049d63796a64f896b2467f90572bba002
   languageName: node
   linkType: hard
 
