@@ -27,7 +27,6 @@ import {
   IResolver,
   TAgent,
 } from '@veramo/core';
-import { CredentialIssuerEIP712 } from '@veramo/credential-eip712';
 
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
@@ -110,7 +109,7 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
       }),
       new DIDManager({
         store: new SnapDIDStore(state),
-        defaultProvider: 'metamask',
+        defaultProvider: 'did:pkh',
         providers: didProviders,
       }),
       new DIDResolverPlugin({
@@ -122,7 +121,6 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
       }),
       new DataManager({ store: vcStorePlugins }),
       new CredentialPlugin(),
-      new CredentialIssuerEIP712(),
       new MessageHandler({
         messageHandlers: [new JwtMessageHandler(), new W3cMessageHandler()],
       }),

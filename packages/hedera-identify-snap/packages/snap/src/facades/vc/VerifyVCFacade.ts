@@ -38,6 +38,7 @@ export class VerifyVCFacade {
     const agent = await getVeramoAgent(state);
 
     // Verify the verifiable credential(VC)
+    console.log('vc: ', JSON.stringify(vc, null, 4));
     const result = await agent.verifyCredential({ credential: vc });
     if (result.verified === false) {
       console.log(

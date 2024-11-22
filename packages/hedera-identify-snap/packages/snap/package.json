@@ -60,7 +60,6 @@
     "@metamask/snaps-sdk": "^6.3.0",
     "@tuum-tech/hedera-did-sdk-js": "^0.1.1",
     "@veramo/core": "5.1.2",
-    "@veramo/credential-eip712": "^6.0.0",
     "@veramo/credential-w3c": "5.1.2",
     "@veramo/did-jwt": "5.1.2",
     "@veramo/did-manager": "5.1.2",
@@ -74,9 +73,7 @@
     "js-sha256": "^0.11.0",
     "jsonpath": "^1.1.1",
     "lodash": "^4.17.21",
-    "normalize-url": "^8.0.1",
-    "secp256k1": "^5.0.1",
-    "uuid": "^11.0.3"
+    "secp256k1": "^5.0.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
@@ -90,9 +87,7 @@
     "@types/jest": "^29.5.12",
     "@types/jsonpath": "^0.2.4",
     "@types/lodash.clonedeep": "^4.5.9",
-    "@types/normalize-url": "^4.2.0",
     "@types/secp256k1": "^4.0.6",
-    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "eslint": "8.38.0",

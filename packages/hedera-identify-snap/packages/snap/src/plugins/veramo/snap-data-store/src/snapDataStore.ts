@@ -33,7 +33,6 @@ import {
 } from '@veramo/key-manager';
 import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
-import { v4 as uuidv4 } from 'uuid';
 import { getDidHederaIdentifier } from '../../../../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
 import { SnapState } from '../../../../snap/SnapState';
@@ -159,7 +158,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
         this.state.currentAccount.network
       ];
 
-    const alias = args.alias || uuidv4();
+    const alias = args.alias || sha256(JSON.stringify(args));
     const existingEntry = accountState.snapPrivateKeyStore[alias];
     if (existingEntry && existingEntry.privateKeyHex !== args.privateKeyHex) {
       console.error(
