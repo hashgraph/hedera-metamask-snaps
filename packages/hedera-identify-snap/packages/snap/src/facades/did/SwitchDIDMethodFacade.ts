@@ -18,7 +18,6 @@
  *
  */
 
-import { rpcErrors } from '@metamask/rpc-errors';
 import { DialogParams, divider, heading, text } from '@metamask/snaps-sdk';
 import { SnapState } from '../../snap/SnapState';
 import { availableMethods, isValidMethod } from '../../types/constants';
@@ -29,7 +28,7 @@ export class SwitchDIDMethodFacade {
   /**
    * Function to switch method.
    *
-   * @param identitySnapParams - Identity snap params.
+   * @param identifySnapParams - Identify snap params.
    * @param didMethod - DID method.
    */
   public static async switchDIDMethod(
@@ -67,14 +66,13 @@ export class SwitchDIDMethodFacade {
         ),
       };
 
-      const confirmed = await SnapUtils.snapDialog(dialogParams);
-      if (!confirmed) {
-        const errMessage = 'User rejected the transaction';
-        console.error(errMessage);
-        throw rpcErrors.transactionRejected(errMessage);
+      if (
+        state.snapConfig.dApp.disablePopups ||
+        (await SnapUtils.snapDialog(dialogParams))
+      ) {
+        await SnapState.updateDIDMethod(state, didMethod);
+        return true;
       }
-      await SnapState.updateDIDMethod(state, didMethod);
-      return true;
     }
     return false;
   }

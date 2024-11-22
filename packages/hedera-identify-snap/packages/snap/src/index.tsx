@@ -35,12 +35,19 @@ import { onUpdateUI } from './custom-ui/onUpdate';
 import { onUserInputUI } from './custom-ui/onUserInput';
 import { ResolveDIDFacade } from './facades/did/ResolveDIDFacade';
 import { SwitchDIDMethodFacade } from './facades/did/SwitchDIDMethodFacade';
+import { ConfigureGAccountFacde } from './facades/gdrive/ConfigureGAccountFacade';
+import { SyncVCsInGDriveFacade } from './facades/gdrive/SyncVCsInGDriveFacade';
 import { GetAccountInfoFacade } from './facades/snap/GetAccountInfoFacade';
 import { TogglePopupsFacade } from './facades/snap/TogglePopupsFacade';
-import { CreateVCFacade } from './facades/vc/CreateVCFacade';
 import { GetVCsFacade } from './facades/vc/GetVCsFacade';
+import { RemoveVCsFacade } from './facades/vc/RemoveVCsFacade';
+import { SaveVCFacade } from './facades/vc/SaveVCFacade';
+import { VerifyVCFacade } from './facades/vc/VerifyVCFacade';
+import { CreateVPFacade } from './facades/vp/CreateVPFacade';
+import { VerifyVPFacade } from './facades/vp/VerifyVPFacade';
 import { SnapAccounts } from './snap/SnapAccounts';
 import { SnapState } from './snap/SnapState';
+import { availableMethods, availableProofFormats } from './types/constants';
 import type { IdentifySnapParams } from './types/state';
 import { EvmUtils } from './utils/EvmUtils';
 import { ParamUtils } from './utils/ParamUtils';
@@ -111,13 +118,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     isExternalAccount,
   );
 
-  console.log('After State:', JSON.stringify(state, null, 4));
-
   const accountInfoPublic =
     await GetAccountInfoFacade.getAccountInfo(identifySnapParams);
 
   switch (request.method) {
-    case 'getCurrentAccount':
+    case 'getAccountInfo':
       return {
         currentAccount: accountInfoPublic,
       };
@@ -154,14 +159,82 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       );
     }
 
-    case 'createVC': {
-      ParamUtils.isValidCreateVCRequest(request.params);
-      return await CreateVCFacade.createVC(identifySnapParams, request.params);
-    }
-
     case 'getVCs': {
       ParamUtils.isValidGetVCsRequest(request.params);
       return await GetVCsFacade.getVCs(identifySnapParams, request.params);
+    }
+
+    case 'createVC': {
+      ParamUtils.isValidCreateVCRequest(request.params);
+      return await SaveVCFacade.createVC(identifySnapParams, request.params);
+    }
+
+    case 'saveVC': {
+      ParamUtils.isValidSaveVCRequest(request.params);
+      return await SaveVCFacade.saveVC(identifySnapParams, request.params);
+    }
+
+    case 'verifyVC': {
+      ParamUtils.isValidVerifyVCRequest(request.params);
+      return await VerifyVCFacade.verifyVC(
+        identifySnapParams,
+        request.params.verifiableCredential,
+      );
+    }
+
+    case 'removeVC': {
+      ParamUtils.isValidRemoveVCRequest(request.params);
+      return await RemoveVCsFacade.removeSpecificVC(
+        identifySnapParams,
+        request.params,
+      );
+    }
+
+    case 'deleteAllVCs': {
+      ParamUtils.isValidDeleteAllVCsRequest(request.params);
+      return await RemoveVCsFacade.removeAllVCs(
+        identifySnapParams,
+        request.params,
+      );
+    }
+
+    case 'createVP': {
+      ParamUtils.isValidCreateVPRequest(request.params);
+      return await CreateVPFacade.createVP(identifySnapParams, request.params);
+    }
+
+    case 'verifyVP': {
+      ParamUtils.isValidVerifyVPRequest(request.params);
+      return await VerifyVPFacade.verifyVP(
+        identifySnapParams,
+        request.params.verifiablePresentation,
+      );
+    }
+
+    case 'getAvailableMethods': {
+      return availableMethods.map((key) => key);
+    }
+
+    case 'getCurrentDIDMethod': {
+      return state.snapConfig.dApp.didMethod;
+    }
+
+    case 'getSupportedProofFormats': {
+      return availableProofFormats.map((key) => key);
+    }
+
+    case 'configureGoogleAccount': {
+      ParamUtils.isValidConfigueGoogleRequest(request.params);
+      return await ConfigureGAccountFacde.configureGoogleAccount(
+        identifySnapParams,
+        request.params,
+      );
+    }
+
+    case 'syncGoogleVCs': {
+      return await SyncVCsInGDriveFacade.syncVCsBetweenSnapAndGDrive(
+        identifySnapParams,
+      );
     }
 
     default:

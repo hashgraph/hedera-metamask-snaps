@@ -97,29 +97,6 @@ export class HederaClientImplFactory implements HederaClientFactory {
       client = Client.forMainnet();
     }
 
-    // Ensure only healthy nodes are part of the network
-    const network = client.network;
-    const healthyNetwork: Record<string, string> = {};
-
-    for (const [address, accountId] of Object.entries(network)) {
-      try {
-        // Test connectivity to each node
-        await client.ping(accountId);
-        healthyNetwork[address] = accountId.toString();
-      } catch (err: any) {
-        console.warn(
-          `Node ${address} is unhealthy and will be excluded:`,
-          err.message,
-        );
-      }
-    }
-
-    if (Object.keys(healthyNetwork).length > 0) {
-      client.setNetwork(healthyNetwork);
-    } else {
-      throw new Error('No healthy nodes found for the network.');
-    }
-
     client.setNetworkUpdatePeriod(2000);
 
     const transactionSigner = await this.#wallet.getTransactionSigner(

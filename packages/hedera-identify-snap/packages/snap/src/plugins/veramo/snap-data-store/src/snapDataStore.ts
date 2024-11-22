@@ -34,6 +34,7 @@ import {
 import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
+import { getDidHederaIdentifier } from '../../../../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
 import { SnapState } from '../../../../snap/SnapState';
 import { IdentifySnapState } from '../../../../types/state';
@@ -382,8 +383,13 @@ export class SnapVCStore extends AbstractDataStore {
     for (const vc of vcs) {
       let identifier = this.state.currentAccount.snapEvmAddress;
       if (currentMethod === 'did:key') {
-        identifier = await getDidKeyIdentifier(
-          this.state.currentAccount.publicKey,
+        identifier = getDidKeyIdentifier(this.state.currentAccount.publicKey);
+      } else if (currentMethod === 'did:hedera') {
+        identifier = getDidHederaIdentifier(
+          this.state.accountState[this.state.currentAccount.snapEvmAddress][
+            this.state.currentAccount.network
+          ],
+          currentMethod,
         );
       }
 
@@ -415,8 +421,13 @@ export class SnapVCStore extends AbstractDataStore {
     const currentMethod = this.state.currentAccount.method;
     let identifier = this.state.currentAccount.snapEvmAddress;
     if (currentMethod === 'did:key') {
-      identifier = await getDidKeyIdentifier(
-        this.state.currentAccount.publicKey,
+      identifier = getDidKeyIdentifier(this.state.currentAccount.publicKey);
+    } else if (currentMethod === 'did:hedera') {
+      identifier = getDidHederaIdentifier(
+        this.state.accountState[this.state.currentAccount.snapEvmAddress][
+          this.state.currentAccount.network
+        ],
+        currentMethod,
       );
     }
 

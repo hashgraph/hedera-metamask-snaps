@@ -25,7 +25,7 @@ export class ResolveDIDFacade {
   /**
    * Function to toggle popups.
    *
-   * @param identitySnapParams - Identity snap params.
+   * @param identifySnapParams - Identify snap params.
    */
   public static async resolveDID(
     identitySnapParams: IdentifySnapParams,

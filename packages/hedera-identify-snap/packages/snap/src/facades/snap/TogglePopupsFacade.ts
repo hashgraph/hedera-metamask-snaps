@@ -28,7 +28,7 @@ export class TogglePopupsFacade {
   /**
    * Function to toggle popups.
    *
-   * @param identitySnapParams - Identity snap params.
+   * @param identifySnapParams - Identify snap params.
    */
   public static async togglePopups(
     identitySnapParams: IdentifySnapParams,

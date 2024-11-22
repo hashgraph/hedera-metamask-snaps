@@ -37,7 +37,9 @@ export function getDidHederaIdentifier(
     for (const key in identifiers) {
       const identifier = identifiers[key];
       if (identifier.provider === didMethod) {
-        return key;
+        // Extract the part after the last colon
+        const strippedKey = key.split(':').pop() || ''; // Get the last part of the key
+        return strippedKey;
       }
     }
   }

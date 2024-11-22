@@ -465,7 +465,8 @@ export class SnapAccounts {
       'Retrieving account info from Hedera Mirror node for address: ',
       address,
     );
-    const { mirrorNodeUrl } = HederaUtils.getHederaNetworkInfo(network);
+    const { hederaNetwork, mirrorNodeUrl } =
+      HederaUtils.getHederaNetworkInfo(network);
     const accountInfo: HederaAccountInfo =
       await HederaUtils.getMirrorAccountInfo(address, mirrorNodeUrl);
 
@@ -527,12 +528,12 @@ export class SnapAccounts {
     if (method === 'did:pkh') {
       did = `did:pkh:eip155:${EvmUtils.convertChainIdFromHex(network)}:${address}`;
     } else if (method === 'did:key') {
-      did = `did:key:${await getDidKeyIdentifier(publicKey)}`;
+      did = `did:key:${getDidKeyIdentifier(publicKey)}`;
     } else if (method === 'did:hedera') {
-      did = getDidHederaIdentifier(
+      did = `did:hedera:${hederaNetwork}:${getDidHederaIdentifier(
         state.accountState[connectedAddress][network],
         method,
-      );
+      )}`;
       if (_.isEmpty(did)) {
         // Register the DID on Hedera Consensus Network
         const hederaDidClient = await getHcsDidClient(state);

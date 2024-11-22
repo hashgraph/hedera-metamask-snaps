@@ -32,7 +32,7 @@ export class GetVCsFacade {
   /**
    * Function to get VCs.
    *
-   * @param identitySnapParams - Identity snap params.
+   * @param identifySnapParams - Identify snap params.
    */
   public static async getVCs(
     identifySnapParams: IdentifySnapParams,
@@ -72,8 +72,10 @@ export class GetVCsFacade {
       ),
     };
 
-    const confirmed = await SnapUtils.snapDialog(dialogParams);
-    if (state.snapConfig.dApp.disablePopups || confirmed) {
+    if (
+      state.snapConfig.dApp.disablePopups ||
+      (await SnapUtils.snapDialog(dialogParams))
+    ) {
       return vcs;
     }
 

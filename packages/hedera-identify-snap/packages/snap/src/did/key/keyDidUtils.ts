@@ -23,7 +23,7 @@ import { base58btc } from 'multiformats/bases/base58';
 import { CryptoUtils } from '../../utils/CryptoUtils';
 import { Utils } from '../../utils/Utils';
 
-export async function getDidKeyIdentifier(publicKey: string): Promise<string> {
+export function getDidKeyIdentifier(publicKey: string): string {
   const compressedKey = CryptoUtils.getCompressedPublicKey(publicKey);
 
   return Buffer.from(

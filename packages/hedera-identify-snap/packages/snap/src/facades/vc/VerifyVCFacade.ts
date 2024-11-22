@@ -18,30 +18,33 @@
  *
  */
 
-import { PublicAccountInfo } from '../../types/account';
+import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentifySnapParams } from '../../types/state';
+import { getVeramoAgent } from '../../veramo/agent';
 
-export class GetAccountInfoFacade {
+export class VerifyVCFacade {
   /**
-   * Get account info such as address, did, public key, etc.
+   * Function to verify VC.
    *
    * @param identifySnapParams - Identify snap params.
-   * @returns Public Account Info.
    */
-  public static async getAccountInfo(
-    identitySnapParams: IdentifySnapParams,
-  ): Promise<PublicAccountInfo> {
-    const { state } = identitySnapParams;
+  public static async verifyVC(
+    identifySnapParams: IdentifySnapParams,
+    vc: W3CVerifiableCredential,
+  ): Promise<boolean> {
+    const { state } = identifySnapParams;
 
-    const publicAccountInfo: PublicAccountInfo = {
-      metamaskAddress: state.currentAccount.metamaskEvmAddress,
-      snapAddress: state.currentAccount.snapEvmAddress,
-      snapPublicKey: state.currentAccount.publicKey,
-      did: state.currentAccount.identifier.did,
-      method: state.currentAccount.method,
-      hederaAccountId: state.currentAccount.hederaAccountId,
-    };
+    // Get Veramo agent
+    const agent = await getVeramoAgent(state);
 
-    return publicAccountInfo;
+    // Verify the verifiable credential(VC)
+    const result = await agent.verifyCredential({ credential: vc });
+    if (result.verified === false) {
+      console.log(
+        'VC Verification Error: ',
+        JSON.stringify(result.error, null, 4),
+      );
+    }
+    return result.verified;
   }
 }

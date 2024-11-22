@@ -22,6 +22,7 @@ import { VerifiableCredential } from '@veramo/core';
 import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
 
+import { getDidHederaIdentifier } from '../../../../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
 import { IdentifySnapState } from '../../../../types/state';
 import {
@@ -150,8 +151,13 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     for (const vc of vcs) {
       let identifier = this.state.currentAccount.snapEvmAddress;
       if (currentMethod === 'did:key') {
-        identifier = await getDidKeyIdentifier(
-          this.state.currentAccount.publicKey,
+        identifier = getDidKeyIdentifier(this.state.currentAccount.publicKey);
+      } else if (currentMethod === 'did:hedera') {
+        identifier = getDidHederaIdentifier(
+          this.state.accountState[this.state.currentAccount.snapEvmAddress][
+            this.state.currentAccount.network
+          ],
+          currentMethod,
         );
       }
 
@@ -196,8 +202,13 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const currentMethod = this.state.currentAccount.method;
     let identifier = this.state.currentAccount.snapEvmAddress;
     if (currentMethod === 'did:key') {
-      identifier = await getDidKeyIdentifier(
-        this.state.currentAccount.publicKey,
+      identifier = getDidKeyIdentifier(this.state.currentAccount.publicKey);
+    } else if (currentMethod === 'did:hedera') {
+      identifier = getDidHederaIdentifier(
+        this.state.accountState[this.state.currentAccount.snapEvmAddress][
+          this.state.currentAccount.network
+        ],
+        currentMethod,
       );
     }
 
