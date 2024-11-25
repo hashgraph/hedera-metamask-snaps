@@ -35,6 +35,11 @@ export const resolveSecp256k1 = async (
   const state = await SnapState.getState();
   const publicKey = state.currentAccount.publicKey;
 
+  // Remove 0x prefix from the public key if it's present
+  const publicKeyHex = publicKey.startsWith('0x')
+    ? publicKey.slice(2)
+    : publicKey;
+
   // TODO: Change id ?
   const didDocument: DIDDocument = {
     id: `did:key:${did}#${did}`,
@@ -52,7 +57,7 @@ export const resolveSecp256k1 = async (
         id: `did:key:${did}#${did}`,
         type: 'EcdsaSecp256k1RecoveryMethod2020',
         controller: `did:key:${did}#${did}`,
-        publicKeyHex: publicKey.split('0x')[1],
+        publicKeyHex: publicKeyHex,
       },
     ],
   };

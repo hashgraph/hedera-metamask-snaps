@@ -21,6 +21,7 @@
 import {
   createAgent,
   ICredentialIssuer,
+  ICredentialPlugin,
   IDataStore,
   IDIDManager,
   IKeyManager,
@@ -65,7 +66,7 @@ export type Agent = TAgent<
     IDIDManager &
     IResolver &
     IDataManager &
-    ICredentialIssuer &
+    ICredentialPlugin &
     IDataStore
 >;
 
@@ -97,7 +98,7 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
       IDIDManager &
       IResolver &
       IDataManager &
-      ICredentialIssuer &
+      ICredentialPlugin &
       IDataStore
   >({
     plugins: [

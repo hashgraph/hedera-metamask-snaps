@@ -80,7 +80,6 @@ export async function getHcsDidClient(
         accountState.keyStore.curve === ECDSA_SECP256K1_KEY_TYPE
           ? PrivateKey.fromStringECDSA(accountState.keyStore.privateKey)
           : PrivateKey.fromStringED25519(accountState.keyStore.privateKey),
-      privateKeyCurve: accountState.keyStore.curve,
       client: client.getClient(),
     });
   } catch (e: any) {

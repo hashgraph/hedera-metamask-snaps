@@ -132,6 +132,14 @@ export class SnapAccounts {
       const { accountIdOrEvmAddress, curve = ECDSA_SECP256K1_KEY_TYPE } =
         nonMetamaskAccount.externalAccount;
       if (ethers.isAddress(accountIdOrEvmAddress)) {
+        if (curve !== ECDSA_SECP256K1_KEY_TYPE) {
+          const errMessage = `You must connect to an EVM account using the curve '${ECDSA_SECP256K1_KEY_TYPE}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
+            data: { network, curve, accountIdOrEvmAddress },
+          });
+        }
         const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
           await SnapAccounts.connectEVMAccount(
             origin,
@@ -143,6 +151,19 @@ export class SnapAccounts {
         connectedAddress = _connectedAddress;
         keyStore = _keyStore;
       } else {
+        if (
+          (state.snapConfig.dApp.didMethod === 'did:key' ||
+            state.snapConfig.dApp.didMethod === 'did:pkh') &&
+          curve !== ECDSA_SECP256K1_KEY_TYPE
+        ) {
+          const errMessage = `You must connect using the curve '${ECDSA_SECP256K1_KEY_TYPE}' for did method '${state.snapConfig.dApp.didMethod}'. Please make sure to pass in the correct value for "curve".`;
+          console.error(errMessage);
+          throw rpcErrors.invalidRequest({
+            message: errMessage,
+            data: { network, curve, accountIdOrEvmAddress },
+          });
+        }
+
         try {
           const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
             await SnapAccounts.connectHederaAccount(
@@ -534,7 +555,7 @@ export class SnapAccounts {
         state.accountState[connectedAddress][network],
         method,
       )}`;
-      if (_.isEmpty(did)) {
+      if (_.isEmpty(did.split(':').pop())) {
         // Register the DID on Hedera Consensus Network
         const hederaDidClient = await getHcsDidClient(state);
         if (!hederaDidClient) {
@@ -558,9 +579,8 @@ export class SnapAccounts {
 
     // Get Veramo agent
     const agent = await getVeramoAgent(state);
-    const controllerKeyId = `metamask-${address}`;
     console.log(
-      `Importing using did=${did}, provider=${method}, controllerKeyId=${controllerKeyId}...`,
+      `Importing using did=${did}, provider=${method}, controllerKeyId=${did}...`,
     );
 
     let identifier: IIdentifier;
@@ -569,22 +589,28 @@ export class SnapAccounts {
       identifier = await agent.didManagerGet({
         did,
       });
+      console.log('identifier from didManagerGet: ', identifier);
     } catch (error) {
       try {
         identifier = await agent.didManagerImport({
           did,
           provider: method,
-          controllerKeyId,
+          controllerKeyId: did,
           keys: [
             {
-              kid: controllerKeyId,
+              kid: did,
               type: curve,
               kms: 'snap',
-              privateKeyHex: privateKey.split('0x')[1],
-              publicKeyHex: publicKey.split('0x')[1],
+              privateKeyHex: privateKey.startsWith('0x')
+                ? privateKey.split('0x')[1]
+                : privateKey,
+              publicKeyHex: publicKey.startsWith('0x')
+                ? publicKey.split('0x')[1]
+                : publicKey,
             } as MinimalImportableKey,
           ],
         });
+        console.log('identifier from didManagerImport: ', identifier);
       } catch (e) {
         console.log(`Error while creating identifier: ${(e as Error).message}`);
         throw new Error(

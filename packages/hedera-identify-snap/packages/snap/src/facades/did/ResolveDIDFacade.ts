@@ -33,24 +33,15 @@ export class ResolveDIDFacade {
   ): Promise<any> {
     const { state } = identitySnapParams;
 
+    const agent = await getVeramoAgent(state);
+
     let did = didUrl;
     // GET DID if not exists
     if (!did) {
       did = state.currentAccount.identifier.did;
     }
 
-    let result = {};
-    if (state.currentAccount.method === 'did:hedera') {
-      const agent = await getVeramoAgent(state);
-      const didResolve = await agent.resolveDid({ didUrl: did });
-      result = JSON.parse(JSON.stringify(didResolve));
-    } else {
-      const response = await fetch(
-        `https://dev.uniresolver.io/1.0/identifiers/${did}`,
-      );
-      result = await response.json();
-    }
-
-    return result;
+    const result = await agent.resolveDid({ didUrl: did });
+    return JSON.parse(JSON.stringify(result));
   }
 }

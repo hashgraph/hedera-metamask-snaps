@@ -24,8 +24,6 @@ import type { HashgraphProto } from '@hashgraph/sdk/lib/Key';
 import { HDNodeWallet, Mnemonic, assertArgument, ethers } from 'ethers';
 import { publicKeyConvert } from 'secp256k1';
 import { DEFAULTCOINTYPE } from '../types/constants';
-import type { MirrorTokenInfo } from '../types/hedera';
-import { FetchUtils, type FetchResponse } from './FetchUtils';
 
 export class CryptoUtils {
   /**
@@ -211,19 +209,6 @@ export class CryptoUtils {
     }
 
     return byteArray;
-  }
-
-  public static async getTokenById(
-    tokenId: string,
-    mirrorNodeUrl: string,
-  ): Promise<MirrorTokenInfo> {
-    let result = {} as MirrorTokenInfo;
-    const url = `${mirrorNodeUrl}/api/v1/tokens/${encodeURIComponent(tokenId)}`;
-    const response: FetchResponse = await FetchUtils.fetchDataFromUrl(url);
-    if (response.success) {
-      result = response.data;
-    }
-    return result;
   }
 
   /**

@@ -2955,7 +2955,7 @@ __metadata:
     "@metamask/snaps-cli": ^6.3.1
     "@metamask/snaps-jest": ^8.3.0
     "@metamask/snaps-sdk": ^6.3.0
-    "@tuum-tech/hedera-did-sdk-js": ^0.1.1
+    "@tuum-tech/hedera-did-sdk-js": "file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js"
     "@types/jest": ^29.5.12
     "@types/jsonpath": ^0.2.4
     "@types/lodash.clonedeep": ^4.5.9
@@ -6115,17 +6115,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tuum-tech/hedera-did-sdk-js@npm:^0.1.1":
+"@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap":
   version: 0.1.1
-  resolution: "@tuum-tech/hedera-did-sdk-js@npm:0.1.1"
+  resolution: "@tuum-tech/hedera-did-sdk-js@file:/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js#/home/kpachhai/repos/github.com/tuum-tech/hedera-did-sdk-js::hash=044e36&locator=%40hashgraph%2Fhedera-identify-snap%40workspace%3Apackages%2Fsnap"
   dependencies:
     "@hashgraph/sdk": ^2.50.0
     base58-js: ^2.0.0
     dayjs: ^1.11.13
     did-resolver: ^4.1.0
+    elliptic: ^6.6.1
     js-base64: ^3.7.7
     js-sha256: ^0.11.0
-  checksum: 0b7e58cbef3c82655bcda05793d77b52445719134eef7c095e94b08c219f3473cb88824963fc10537cee09475080ded07ab2f2e41c07723d5c43499d73d3f153
+    multiformats: ^9.9.0
+  checksum: a377272980bb5c8c62415550e9d4ddf1bc3249eaf743110b55686a06787840af5a1593c9a4b8892c2fda3c0fb80c3fecb90bd6eb081dfcffaa073b6d49baa2e3
   languageName: node
   linkType: hard
 
@@ -11016,7 +11018,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elliptic@npm:^6.5.7":
+"elliptic@npm:^6.5.7, elliptic@npm:^6.6.1":
   version: 6.6.1
   resolution: "elliptic@npm:6.6.1"
   dependencies:
@@ -17052,7 +17054,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multiformats@npm:^9.4.2, multiformats@npm:^9.6.2, multiformats@npm:^9.6.5":
+"multiformats@npm:^9.4.2, multiformats@npm:^9.6.2, multiformats@npm:^9.6.5, multiformats@npm:^9.9.0":
   version: 9.9.0
   resolution: "multiformats@npm:9.9.0"
   checksum: d3e8c1be400c09a014f557ea02251a2710dbc9fca5aa32cc702ff29f636c5471e17979f30bdcb0a9cbb556f162a8591dc2e1219c24fc21394a56115b820bb84e
