@@ -112,7 +112,7 @@ export class CryptoUtils {
     let nodeWallet = HDNodeWallet.fromMnemonic(Mnemonic.fromEntropy(entropy));
     nodeWallet = CryptoUtils.derivePathForWallet(
       nodeWallet,
-      `m/44/${DEFAULTCOINTYPE}/0/0/0`,
+      `m/44'/${DEFAULTCOINTYPE}'/0'/0/0`,
     );
 
     return nodeWallet;

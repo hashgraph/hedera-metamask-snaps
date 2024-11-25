@@ -26,7 +26,7 @@ import {
   ParsedDID,
   Resolvable,
 } from 'did-resolver';
-import { IdentifySnapState } from 'src/types/state';
+import { SnapState } from '../../snap/SnapState';
 import { getHcsDidClient } from './hederaDidUtils';
 
 /**
@@ -39,13 +39,14 @@ import { getHcsDidClient } from './hederaDidUtils';
  * @param state - The IdentifySnapState.
  * @returns A DID resolution result.
  */
-export const resolveDidHedera = (state: IdentifySnapState): DIDResolver => {
-  return async (
-    didUrl: string,
-    parsed: ParsedDID,
-    _resolver: Resolvable,
-    options: DIDResolutionOptions,
-  ): Promise<DIDResolutionResult> => {
+export const resolveDidHedera: DIDResolver = async (
+  didUrl: string,
+  parsed: ParsedDID,
+  resolver: Resolvable,
+  options: DIDResolutionOptions,
+): Promise<DIDResolutionResult> => {
+  try {
+    const state = await SnapState.getState();
     const hederaDidClient = await getHcsDidClient(state);
     if (!hederaDidClient) {
       return {
@@ -57,22 +58,19 @@ export const resolveDidHedera = (state: IdentifySnapState): DIDResolver => {
         didDocument: null,
       };
     }
-
-    try {
-      const client = hederaDidClient.getClient(); // Retrieve the Hedera client
-      const hederaResolver = new HederaDidResolver(client); // Create the resolver
-      return await hederaResolver.resolve(didUrl, parsed, _resolver, options); // Resolve the DID
-    } catch (err: unknown) {
-      return {
-        didDocumentMetadata: {},
-        didResolutionMetadata: {
-          error: 'invalidDid',
-          message: (err as Error).message,
-        },
-        didDocument: null,
-      };
-    }
-  };
+    const client = hederaDidClient.getClient(); // Retrieve the Hedera client
+    const hederaResolver = new HederaDidResolver(client); // Create the resolver
+    return await hederaResolver.resolve(didUrl, parsed, resolver, options); // Resolve the DID
+  } catch (err: unknown) {
+    return {
+      didDocumentMetadata: {},
+      didResolutionMetadata: {
+        error: 'invalidDid',
+        message: (err as Error).message,
+      },
+      didDocument: null,
+    };
+  }
 };
 
 /**
@@ -82,6 +80,6 @@ export const resolveDidHedera = (state: IdentifySnapState): DIDResolver => {
  * @returns A record with the DID method and its resolver.
  * @public
  */
-export function getDidHederaResolver(state: IdentifySnapState) {
-  return { hedera: resolveDidHedera(state) };
+export function getDidHederaResolver() {
+  return { hedera: resolveDidHedera };
 }

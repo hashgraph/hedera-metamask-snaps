@@ -32,13 +32,8 @@ export const resolveSecp256k1 = async (
   account: string,
   did: string,
 ): Promise<DIDDocument> => {
-  const state = await SnapState.getState();
-  const publicKey = state.currentAccount.publicKey;
-
   // Remove 0x prefix from the public key if it's present
-  const publicKeyHex = publicKey.startsWith('0x')
-    ? publicKey.slice(2)
-    : publicKey;
+  const publicKeyHex = account.startsWith('0x') ? account.slice(2) : account;
 
   // TODO: Change id ?
   const didDocument: DIDDocument = {
@@ -81,10 +76,12 @@ export const resolveDidKey: DIDResolver = async (
 ): Promise<DIDResolutionResult> => {
   try {
     const state = await SnapState.getState();
-    const account = state.currentAccount.snapEvmAddress;
     const startsWith = parsed.did.substring(0, 12);
     if (startsWithMap[startsWith] !== undefined) {
-      const didDocument = await startsWithMap[startsWith](account, didUrl);
+      const didDocument = await startsWithMap[startsWith](
+        state.currentAccount.publicKey,
+        didUrl,
+      );
       return {
         didDocumentMetadata: {},
         didResolutionMetadata: {},

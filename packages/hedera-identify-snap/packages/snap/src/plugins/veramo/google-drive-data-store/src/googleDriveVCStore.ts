@@ -39,7 +39,7 @@ import {
   uploadToGoogleDrive,
   verifyToken,
 } from './googleUtils';
-import { decodeJWT } from './jwt';
+import { Utils } from '../../../../utils/Utils';
 
 /**
  * An implementation of {@link AbstractDataStore} that holds everything in snap state.
@@ -84,7 +84,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const decodeVC = (k: string) => {
       let vc = googleVCs[k] as unknown;
       if (typeof vc === 'string') {
-        vc = decodeJWT(vc);
+        vc = Utils.decodeJWT(vc);
       }
       return { metadata: { id: k }, data: vc };
     };

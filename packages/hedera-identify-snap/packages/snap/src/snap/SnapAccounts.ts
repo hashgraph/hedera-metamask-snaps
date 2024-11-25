@@ -23,7 +23,7 @@ import { rpcErrors } from '@metamask/rpc-errors';
 
 import type { DialogParams } from '@metamask/snaps-sdk';
 import { copyable, divider, heading, text } from '@metamask/snaps-sdk';
-import { IIdentifier, MinimalImportableKey } from '@veramo/core';
+import { IIdentifier, MinimalImportableKey, TKeyType } from '@veramo/core';
 import { ethers, Wallet } from 'ethers';
 import _ from 'lodash';
 import { HederaClientImplFactory } from '../client/HederaClientImplFactory';
@@ -131,15 +131,15 @@ export class SnapAccounts {
       const nonMetamaskAccount = params as ExternalAccount;
       const { accountIdOrEvmAddress, curve = ECDSA_SECP256K1_KEY_TYPE } =
         nonMetamaskAccount.externalAccount;
+      if (curve !== ECDSA_SECP256K1_KEY_TYPE) {
+        const errMessage = `You must connect using the curve '${ECDSA_SECP256K1_KEY_TYPE}' for did method '${state.snapConfig.dApp.didMethod}'. Please make sure to pass in the correct value for "curve".`;
+        console.error(errMessage);
+        throw rpcErrors.invalidRequest({
+          message: errMessage,
+          data: { network, curve, accountIdOrEvmAddress },
+        });
+      }
       if (ethers.isAddress(accountIdOrEvmAddress)) {
-        if (curve !== ECDSA_SECP256K1_KEY_TYPE) {
-          const errMessage = `You must connect to an EVM account using the curve '${ECDSA_SECP256K1_KEY_TYPE}'. Please make sure to pass in the correct value for "curve".`;
-          console.error(errMessage);
-          throw rpcErrors.invalidRequest({
-            message: errMessage,
-            data: { network, curve, accountIdOrEvmAddress },
-          });
-        }
         const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
           await SnapAccounts.connectEVMAccount(
             origin,
@@ -151,26 +151,13 @@ export class SnapAccounts {
         connectedAddress = _connectedAddress;
         keyStore = _keyStore;
       } else {
-        if (
-          (state.snapConfig.dApp.didMethod === 'did:key' ||
-            state.snapConfig.dApp.didMethod === 'did:pkh') &&
-          curve !== ECDSA_SECP256K1_KEY_TYPE
-        ) {
-          const errMessage = `You must connect using the curve '${ECDSA_SECP256K1_KEY_TYPE}' for did method '${state.snapConfig.dApp.didMethod}'. Please make sure to pass in the correct value for "curve".`;
-          console.error(errMessage);
-          throw rpcErrors.invalidRequest({
-            message: errMessage,
-            data: { network, curve, accountIdOrEvmAddress },
-          });
-        }
-
         try {
           const { connectedAddress: _connectedAddress, keyStore: _keyStore } =
             await SnapAccounts.connectHederaAccount(
               origin,
               state,
               network,
-              curve,
+              ECDSA_SECP256K1_KEY_TYPE,
               (accountIdOrEvmAddress as string).toLowerCase(),
             );
           connectedAddress = _connectedAddress;
@@ -199,7 +186,7 @@ export class SnapAccounts {
         throw rpcErrors.internal(errMessage);
       }
       keyStore.curve = ECDSA_SECP256K1_KEY_TYPE;
-      keyStore.privateKey = res.privateKey;
+      keyStore.privateKey = res.privateKey.split('0x')[1];
       keyStore.publicKey = res.publicKey;
       keyStore.address = res.address.toLowerCase();
       connectedAddress = res.address.toLowerCase();
@@ -227,7 +214,6 @@ export class SnapAccounts {
     return await SnapAccounts.importMetaMaskAccount(
       state,
       network,
-      connectedAddress,
       metamaskEvmAddress,
       externalEvmAddress,
       keyStore,
@@ -291,7 +277,9 @@ export class SnapAccounts {
       try {
         const wallet: Wallet = new ethers.Wallet(privateKey);
         result.curve = ECDSA_SECP256K1_KEY_TYPE;
-        result.privateKey = privateKey;
+        result.privateKey = privateKey.startsWith('0x')
+          ? privateKey.split('0x')[1]
+          : privateKey;
         result.publicKey = wallet.signingKey.publicKey;
         result.address = wallet.address.toLowerCase();
         connectedAddress = wallet.address.toLowerCase();
@@ -417,11 +405,11 @@ export class SnapAccounts {
         const hederaClient = await hederaClientFactory.createClient();
 
         if (hederaClient) {
-          result.privateKey = hederaClient
-            ?.getPrivateKey()
-            ?.toStringRaw() as string;
+          result.privateKey = privateKey.startsWith('0x')
+            ? privateKey.split('0x')[1]
+            : privateKey;
           result.curve = curve;
-          result.publicKey = hederaClient.getPublicKey().toStringRaw();
+          result.publicKey = publicKey;
           result.hederaAccountId = accountId;
           result.address = Utils.ensure0xPrefix(accountInfo.evmAddress);
           connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
@@ -464,7 +452,6 @@ export class SnapAccounts {
    * Veramo Import metamask account.
    * @param state - HederaWalletSnapState.
    * @param network - Hedera network.
-   * @param connectedAddress - Currently connected EVm address.
    * @param metamaskEvmAddress - Metamask EVM address.
    * @param externalEvmAddress - External EVM address.
    * @param keyStore - Keystore for private, public keys and EVM address.
@@ -474,7 +461,6 @@ export class SnapAccounts {
   public static async importMetaMaskAccount(
     state: IdentifySnapState,
     network: string,
-    connectedAddress: string,
     metamaskEvmAddress: string,
     externalEvmAddress: string,
     keyStore: KeyStore,
@@ -482,10 +468,6 @@ export class SnapAccounts {
   ): Promise<string> {
     const { curve, privateKey, publicKey, address } = keyStore;
 
-    console.log(
-      'Retrieving account info from Hedera Mirror node for address: ',
-      address,
-    );
     const { hederaNetwork, mirrorNodeUrl } =
       HederaUtils.getHederaNetworkInfo(network);
     const accountInfo: HederaAccountInfo =
@@ -497,7 +479,7 @@ export class SnapAccounts {
         const errMessage = `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`;
         if (returnEarly) {
           // eslint-disable-next-line require-atomic-updates
-          state.accountState[connectedAddress][network].keyStore = {
+          state.accountState[address][network].keyStore = {
             curve,
             privateKey,
             publicKey,
@@ -522,10 +504,10 @@ export class SnapAccounts {
     }
 
     // eslint-disable-next-line require-atomic-updates
-    state.accountState[connectedAddress][network].accountInfo = accountInfo;
+    state.accountState[address][network].accountInfo = accountInfo;
 
     // eslint-disable-next-line require-atomic-updates
-    state.accountState[connectedAddress][network].keyStore = {
+    state.accountState[address][network].keyStore = {
       curve,
       privateKey,
       publicKey,
@@ -552,7 +534,7 @@ export class SnapAccounts {
       did = `did:key:${getDidKeyIdentifier(publicKey)}`;
     } else if (method === 'did:hedera') {
       did = `did:hedera:${hederaNetwork}:${getDidHederaIdentifier(
-        state.accountState[connectedAddress][network],
+        state.accountState[address][network],
         method,
       )}`;
       if (_.isEmpty(did.split(':').pop())) {
@@ -579,44 +561,36 @@ export class SnapAccounts {
 
     // Get Veramo agent
     const agent = await getVeramoAgent(state);
+    const controllerKeyId = `metamask-${address}`;
     console.log(
-      `Importing using did=${did}, provider=${method}, controllerKeyId=${did}...`,
+      `Importing using did=${did}, provider=${method}, controllerKeyId=${controllerKeyId}...`,
     );
 
     let identifier: IIdentifier;
+    console.log('did: ', did);
     // Get identifier if it exists
     try {
-      identifier = await agent.didManagerGet({
+      identifier = await agent.didManagerImport({
         did,
+        provider: method,
+        controllerKeyId,
+        keys: [
+          {
+            kid: controllerKeyId,
+            type: curve as TKeyType,
+            kms: 'snap',
+            privateKeyHex: privateKey,
+            publicKeyHex: publicKey,
+          } as MinimalImportableKey,
+        ],
       });
-      console.log('identifier from didManagerGet: ', identifier);
     } catch (error) {
-      try {
-        identifier = await agent.didManagerImport({
-          did,
-          provider: method,
-          controllerKeyId: did,
-          keys: [
-            {
-              kid: did,
-              type: curve,
-              kms: 'snap',
-              privateKeyHex: privateKey.startsWith('0x')
-                ? privateKey.split('0x')[1]
-                : privateKey,
-              publicKeyHex: publicKey.startsWith('0x')
-                ? publicKey.split('0x')[1]
-                : publicKey,
-            } as MinimalImportableKey,
-          ],
-        });
-        console.log('identifier from didManagerImport: ', identifier);
-      } catch (e) {
-        console.log(`Error while creating identifier: ${(e as Error).message}`);
-        throw new Error(
-          `Error while creating identifier: ${(e as Error).message}`,
-        );
-      }
+      console.log(
+        `Error while creating identifier: ${(error as Error).message}`,
+      );
+      throw new Error(
+        `Error while creating identifier: ${(error as Error).message}`,
+      );
     }
 
     state.currentAccount.identifier = identifier;

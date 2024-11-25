@@ -37,8 +37,7 @@ export const availableProofFormats = [
 ] as const;
 export const isValidProofFormat = (x: string) => isIn(availableProofFormats, x);
 
-// 3030 for hedera
-export const DEFAULTCOINTYPE = 3030;
+export const DEFAULTCOINTYPE = 60;
 
 export const EMPTY_STRING = '';
 export const FEE_DISPLAY_REGEX = /(\.\d*?[1-9])0+$|\.0*$/u;

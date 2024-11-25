@@ -390,7 +390,6 @@ export class ParamUtils {
 
     // Check if filter is valid
     if ('filter' in parameter) {
-      ParamUtils.checkValidString(parameter.filter, 'getVCs', 'type', true);
       ParamUtils.checkRequiredProperty(
         parameter.filter,
         'getVCs',

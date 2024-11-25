@@ -18,24 +18,27 @@
  *
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/require-await */
 import {
   IAgentContext,
   IIdentifier,
   IKey,
   IKeyManager,
   IService,
-} from '@veramo/core';
+  RequireOnly,
+} from '@veramo/core-types';
 import { AbstractIdentifierProvider } from '@veramo/did-manager';
-import { base58btc } from 'multiformats/bases/base58';
-import { Utils } from '../../utils/Utils';
+import { bytesToMultibase, hexToBytes } from '@veramo/utils';
+import { SigningKey } from 'ethers';
 
 type IContext = IAgentContext<IKeyManager>;
+type CreateKeyDidOptions = {
+  keyType?: keyof typeof keyCodecs;
+  privateKeyHex?: string;
+};
+
+const keyCodecs = {
+  Secp256k1: 'secp256k1-pub',
+} as const;
 
 /**
  * {@link @veramo/did-manager#DIDManager} identifier provider for `did:key` identifiers
@@ -51,26 +54,37 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
   }
 
   async createIdentifier(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { kms, options }: { kms?: string; options?: any },
+    { kms, options }: { kms?: string; options?: CreateKeyDidOptions },
     context: IContext,
   ): Promise<Omit<IIdentifier, 'provider'>> {
-    const key = await context.agent.keyManagerCreate({
-      kms: kms || this.defaultKms,
-      type: 'Ed25519',
-    });
+    const keyType =
+      (options?.keyType && keyCodecs[options?.keyType] && options.keyType) ||
+      'Secp256k1';
+    const key = await this.importOrGenerateKey(
+      {
+        kms: kms || this.defaultKms,
+        options: {
+          keyType,
+          ...(options?.privateKeyHex && {
+            privateKeyHex: options.privateKeyHex,
+          }),
+        },
+      },
+      context,
+    );
 
-    const methodSpecificId = Buffer.from(
-      base58btc.encode(
-        Utils.addMulticodecPrefix(
-          'ed25519-pub',
-          Buffer.from(key.publicKeyHex, 'hex'),
-        ),
-      ),
-    ).toString();
+    const publicKeyHex =
+      key.type === 'Secp256k1'
+        ? SigningKey.computePublicKey('0x' + key.publicKeyHex, true)
+        : key.publicKeyHex;
+    const methodSpecificId: string = bytesToMultibase(
+      hexToBytes(publicKeyHex),
+      'base58btc',
+      keyCodecs[keyType],
+    );
 
     const identifier: Omit<IIdentifier, 'provider'> = {
-      did: `did:key:${methodSpecificId}`,
+      did: 'did:key:' + methodSpecificId,
       controllerKeyId: key.kid,
       keys: [key],
       services: [],
@@ -94,9 +108,7 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
     identifier: IIdentifier,
     context: IContext,
   ): Promise<boolean> {
-    // eslint-disable-next-line no-restricted-syntax
     for (const { kid } of identifier.keys) {
-      // eslint-disable-next-line no-await-in-loop
       await context.agent.keyManagerDelete({ kid });
     }
     return true;
@@ -136,5 +148,25 @@ export class KeyDIDProvider extends AbstractIdentifierProvider {
     context: IContext,
   ): Promise<any> {
     throw Error('KeyDIDProvider removeService not supported');
+  }
+
+  private async importOrGenerateKey(
+    args: {
+      kms: string;
+      options: RequireOnly<CreateKeyDidOptions, 'keyType'>;
+    },
+    context: IContext,
+  ): Promise<IKey> {
+    if (args.options.privateKeyHex) {
+      return context.agent.keyManagerImport({
+        kms: args.kms || this.defaultKms,
+        type: args.options.keyType,
+        privateKeyHex: args.options.privateKeyHex,
+      });
+    }
+    return context.agent.keyManagerCreate({
+      kms: args.kms || this.defaultKms,
+      type: args.options.keyType,
+    });
   }
 }

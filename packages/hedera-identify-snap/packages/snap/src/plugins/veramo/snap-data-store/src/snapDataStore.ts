@@ -37,7 +37,7 @@ import { getDidHederaIdentifier } from '../../../../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
 import { SnapState } from '../../../../snap/SnapState';
 import { IdentifySnapState } from '../../../../types/state';
-import { decodeJWT } from '../../google-drive-data-store';
+import { Utils } from '../../../../utils/Utils';
 import {
   AbstractDataStore,
   IFilterArgs,
@@ -331,7 +331,7 @@ export class SnapVCStore extends AbstractDataStore {
     const decodeVC = (k: string) => {
       let vc = accountState.vcs[k] as unknown;
       if (typeof vc === 'string') {
-        vc = decodeJWT(vc);
+        vc = Utils.decodeJWT(vc);
       }
       return { metadata: { id: k }, data: vc };
     };

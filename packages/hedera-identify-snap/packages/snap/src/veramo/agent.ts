@@ -20,7 +20,6 @@
 
 import {
   createAgent,
-  ICredentialIssuer,
   ICredentialPlugin,
   IDataStore,
   IDIDManager,
@@ -32,17 +31,13 @@ import {
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
-import {
-  PkhDIDProvider,
-  getDidPkhResolver as pkhDidResolver,
-} from '@veramo/did-provider-pkh';
+import { getDidPkhResolver, PkhDIDProvider } from '@veramo/did-provider-pkh';
 import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { Resolver } from 'did-resolver';
-import { getDidHederaResolver as hederaDidResolver } from '../did/hedera/hederaDidResolver';
-import { getDidKeyResolver as keyDidResolver } from '../did/key/keyDidResolver';
+import { getDidHederaResolver } from '../did/hedera/hederaDidResolver';
 
 import {
   AbstractDataStore,
@@ -52,6 +47,7 @@ import {
 
 import { HederaDIDProvider } from '../did/hedera/hederaDidProvider';
 import { KeyDIDProvider } from '../did/key/keyDidProvider';
+import { getDidKeyResolver } from '../did/key/keyDidResolver';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';
 import {
   SnapDIDStore,
@@ -84,10 +80,19 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
   // Initialize DID providers
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   didProviders['did:key'] = new KeyDIDProvider({ defaultKms: 'snap' });
-  didProviders['did:hedera'] = await HederaDIDProvider.createWithState({
-    defaultKms: 'snap',
-    state: state,
-  });
+  // Prepare the resolver map dynamically
+  const resolverMap = {
+    ...getDidPkhResolver(),
+    ...getDidKeyResolver(),
+  };
+
+  if (state.snapConfig.dApp.didMethod === 'did:hedera') {
+    didProviders['did:hedera'] = await HederaDIDProvider.createWithState({
+      defaultKms: 'snap',
+      state: state,
+    });
+    Object.assign(resolverMap, getDidHederaResolver());
+  }
 
   // Initialize VC store plugins
   vcStorePlugins.snap = new SnapVCStore(state);
@@ -114,11 +119,7 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
         providers: didProviders,
       }),
       new DIDResolverPlugin({
-        resolver: new Resolver({
-          ...pkhDidResolver,
-          ...keyDidResolver,
-          ...hederaDidResolver(state),
-        }),
+        resolver: new Resolver(resolverMap),
       }),
       new DataManager({ store: vcStorePlugins }),
       new CredentialPlugin(),

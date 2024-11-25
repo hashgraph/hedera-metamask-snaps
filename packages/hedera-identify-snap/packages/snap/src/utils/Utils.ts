@@ -18,6 +18,9 @@
  *
  */
 
+import { VerifiableCredential } from '@veramo/core';
+import { normalizeCredential } from 'did-jwt-vc';
+import cloneDeep from 'lodash.clonedeep';
 import { CodecName, MULTICODECS } from '../constants';
 
 export class Utils {
@@ -84,4 +87,21 @@ export class Utils {
 
     return Buffer.concat([prefix, data], prefix.length + data.length);
   };
+
+  /**
+   * Function to decode JWT.
+   *
+   * @param jwt - JWT string.
+   * @returns Verifiable Credential.
+   */
+  public static decodeJWT(jwt: string): VerifiableCredential {
+    try {
+      const normalizedVC = normalizeCredential(jwt);
+      const vc = cloneDeep(normalizedVC);
+
+      return vc;
+    } catch (e) {
+      throw new Error('Invalid JWT');
+    }
+  }
 }
