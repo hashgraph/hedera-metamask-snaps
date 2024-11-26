@@ -45,9 +45,8 @@ import {
   IDataManager,
 } from '../plugins/veramo/verifiable-creds-manager';
 
+import { getDidKeyResolver, KeyDIDProvider } from '@veramo/did-provider-key';
 import { HederaDIDProvider } from '../did/hedera/hederaDidProvider';
-import { KeyDIDProvider } from '../did/key/keyDidProvider';
-import { getDidKeyResolver } from '../did/key/keyDidResolver';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';
 import {
   SnapDIDStore,

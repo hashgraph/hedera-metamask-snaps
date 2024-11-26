@@ -131,7 +131,10 @@ export class SnapAccounts {
       const nonMetamaskAccount = params as ExternalAccount;
       const { accountIdOrEvmAddress, curve = ECDSA_SECP256K1_KEY_TYPE } =
         nonMetamaskAccount.externalAccount;
-      if (curve !== ECDSA_SECP256K1_KEY_TYPE) {
+      if (
+        state.snapConfig.dApp.didMethod !== 'did:key' &&
+        curve !== ECDSA_SECP256K1_KEY_TYPE
+      ) {
         const errMessage = `You must connect using the curve '${ECDSA_SECP256K1_KEY_TYPE}' for did method '${state.snapConfig.dApp.didMethod}'. Please make sure to pass in the correct value for "curve".`;
         console.error(errMessage);
         throw rpcErrors.invalidRequest({
@@ -187,7 +190,7 @@ export class SnapAccounts {
       }
       keyStore.curve = ECDSA_SECP256K1_KEY_TYPE;
       keyStore.privateKey = res.privateKey.split('0x')[1];
-      keyStore.publicKey = res.publicKey;
+      keyStore.publicKey = res.publicKey.split('0x')[1];
       keyStore.address = res.address.toLowerCase();
       connectedAddress = res.address.toLowerCase();
       keyStore.hederaAccountId = await SnapAccounts.getHederaAccountIdIfExists(
@@ -280,7 +283,9 @@ export class SnapAccounts {
         result.privateKey = privateKey.startsWith('0x')
           ? privateKey.split('0x')[1]
           : privateKey;
-        result.publicKey = wallet.signingKey.publicKey;
+        result.publicKey = wallet.signingKey.publicKey.startsWith('0x')
+          ? wallet.signingKey.publicKey.split('0x')[1]
+          : wallet.signingKey.publicKey;
         result.address = wallet.address.toLowerCase();
         connectedAddress = wallet.address.toLowerCase();
       } catch (error: any) {
@@ -363,6 +368,9 @@ export class SnapAccounts {
           publicKey =
             PrivateKey.fromStringED25519(privateKey).publicKey.toStringRaw();
         }
+        publicKey = publicKey.startsWith('0x')
+          ? publicKey.split('0x')[1]
+          : publicKey;
         if (_.isEmpty(accountInfo)) {
           const errMessage = `This Hedera account is not yet active. Please activate it by sending some HBAR to this account on '${network}'. Account Id: ${accountId} Public Key: ${publicKey}`;
           console.error(errMessage);
@@ -409,7 +417,9 @@ export class SnapAccounts {
             ? privateKey.split('0x')[1]
             : privateKey;
           result.curve = curve;
-          result.publicKey = publicKey;
+          result.publicKey = publicKey.startsWith('0x')
+            ? publicKey.split('0x')[1]
+            : publicKey;
           result.hederaAccountId = accountId;
           result.address = Utils.ensure0xPrefix(accountInfo.evmAddress);
           connectedAddress = Utils.ensure0xPrefix(accountInfo.evmAddress);
@@ -531,7 +541,7 @@ export class SnapAccounts {
     if (method === 'did:pkh') {
       did = `did:pkh:eip155:${EvmUtils.convertChainIdFromHex(network)}:${address}`;
     } else if (method === 'did:key') {
-      did = `did:key:${getDidKeyIdentifier(publicKey)}`;
+      did = `did:key:${getDidKeyIdentifier(publicKey, curve)}`;
     } else if (method === 'did:hedera') {
       did = `did:hedera:${hederaNetwork}:${getDidHederaIdentifier(
         state.accountState[address][network],

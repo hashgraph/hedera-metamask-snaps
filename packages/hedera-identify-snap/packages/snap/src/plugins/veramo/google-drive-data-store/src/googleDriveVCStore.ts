@@ -25,6 +25,7 @@ import jsonpath from 'jsonpath';
 import { getDidHederaIdentifier } from '../../../../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
 import { IdentifySnapState } from '../../../../types/state';
+import { Utils } from '../../../../utils/Utils';
 import {
   AbstractDataStore,
   IConfigureArgs,
@@ -39,7 +40,6 @@ import {
   uploadToGoogleDrive,
   verifyToken,
 } from './googleUtils';
-import { Utils } from '../../../../utils/Utils';
 
 /**
  * An implementation of {@link AbstractDataStore} that holds everything in snap state.
@@ -151,7 +151,12 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     for (const vc of vcs) {
       let identifier = this.state.currentAccount.snapEvmAddress;
       if (currentMethod === 'did:key') {
-        identifier = getDidKeyIdentifier(this.state.currentAccount.publicKey);
+        identifier = getDidKeyIdentifier(
+          this.state.currentAccount.publicKey,
+          this.state.accountState[this.state.currentAccount.snapEvmAddress][
+            this.state.currentAccount.network
+          ].keyStore.curve,
+        );
       } else if (currentMethod === 'did:hedera') {
         identifier = getDidHederaIdentifier(
           this.state.accountState[this.state.currentAccount.snapEvmAddress][
@@ -202,7 +207,12 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const currentMethod = this.state.currentAccount.method;
     let identifier = this.state.currentAccount.snapEvmAddress;
     if (currentMethod === 'did:key') {
-      identifier = getDidKeyIdentifier(this.state.currentAccount.publicKey);
+      identifier = getDidKeyIdentifier(
+        this.state.currentAccount.publicKey,
+        this.state.accountState[this.state.currentAccount.snapEvmAddress][
+          this.state.currentAccount.network
+        ].keyStore.curve,
+      );
     } else if (currentMethod === 'did:hedera') {
       identifier = getDidHederaIdentifier(
         this.state.accountState[this.state.currentAccount.snapEvmAddress][

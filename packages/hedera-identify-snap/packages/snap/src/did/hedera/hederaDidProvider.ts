@@ -39,6 +39,15 @@ import { IdentifySnapState } from '../../types/state';
 import { getHcsDidClient } from './hederaDidUtils';
 
 type IContext = IAgentContext<IKeyManager>;
+type CreateHederaDidOptions = {
+  keyType?: keyof typeof keyCodecs;
+  privateKeyHex?: string;
+};
+
+const keyCodecs = {
+  Ed25519: 'ed25519-pub',
+  Secp256k1: 'secp256k1-pub',
+} as const;
 
 /**
  * {@link @veramo/did-manager#DIDManager} identifier provider for `did:hedera` identifiers
