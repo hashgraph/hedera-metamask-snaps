@@ -79,19 +79,17 @@ export async function getVeramoAgent(state: IdentifySnapState): Promise<Agent> {
   // Initialize DID providers
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   didProviders['did:key'] = new KeyDIDProvider({ defaultKms: 'snap' });
+  didProviders['did:hedera'] = new HederaDIDProvider({
+    defaultKms: 'snap',
+    state,
+  });
+
   // Prepare the resolver map dynamically
   const resolverMap = {
     ...getDidPkhResolver(),
     ...getDidKeyResolver(),
+    ...getDidHederaResolver(),
   };
-
-  if (state.snapConfig.dApp.didMethod === 'did:hedera') {
-    didProviders['did:hedera'] = await HederaDIDProvider.createWithState({
-      defaultKms: 'snap',
-      state: state,
-    });
-    Object.assign(resolverMap, getDidHederaResolver());
-  }
 
   // Initialize VC store plugins
   vcStorePlugins.snap = new SnapVCStore(state);

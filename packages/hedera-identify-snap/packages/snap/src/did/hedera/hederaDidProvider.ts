@@ -24,14 +24,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/require-await */
-import { HcsDid } from '@tuum-tech/hedera-did-sdk-js';
 import {
   IAgentContext,
   IIdentifier,
   IKey,
   IKeyManager,
   IService,
-  TKeyType,
 } from '@veramo/core';
 import { AbstractIdentifierProvider } from '@veramo/did-manager';
 import _ from 'lodash';
@@ -41,7 +39,6 @@ import { getHcsDidClient } from './hederaDidUtils';
 type IContext = IAgentContext<IKeyManager>;
 type CreateHederaDidOptions = {
   keyType?: keyof typeof keyCodecs;
-  privateKeyHex?: string;
 };
 
 const keyCodecs = {
@@ -56,47 +53,33 @@ const keyCodecs = {
  */
 export class HederaDIDProvider extends AbstractIdentifierProvider {
   private defaultKms: string;
-  private hederaDidClient?: HcsDid;
-  private keyCurve: string = '';
+  private state: IdentifySnapState;
 
-  constructor(options: { defaultKms: string }) {
+  constructor(options: { defaultKms: string; state: IdentifySnapState }) {
     super();
     this.defaultKms = options.defaultKms;
-  }
-
-  static async createWithState(options: {
-    defaultKms: string;
-    state: IdentifySnapState;
-  }): Promise<HederaDIDProvider> {
-    const provider = new HederaDIDProvider(options);
-
-    const hederaDidClient = await getHcsDidClient(options.state);
-    if (!hederaDidClient) {
-      console.error('Failed to create HcsDid client');
-      throw new Error('Failed to create HcsDid client');
-    }
-    provider.hederaDidClient = hederaDidClient;
-    provider.keyCurve =
-      options.state.accountState[options.state.currentAccount.snapEvmAddress][
-        options.state.currentAccount.network
-      ].keyStore.curve;
-    return provider;
+    this.state = options.state;
   }
 
   async createIdentifier(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { kms, options }: { kms?: string; options?: any },
+    { kms, options }: { kms?: string; options?: CreateHederaDidOptions },
     context: IContext,
   ): Promise<Omit<IIdentifier, 'provider'>> {
-    if (!this.hederaDidClient) {
-      console.error('HcsDid client is not initialized');
-      throw new Error('HcsDid client is not initialized');
+    const keyType =
+      (options?.keyType && keyCodecs[options?.keyType] && options.keyType) ||
+      'Secp256k1';
+
+    const hederaDidClient = await getHcsDidClient(this.state);
+    if (!hederaDidClient) {
+      console.error('Failed to create HcsDid client');
+      throw new Error('Failed to create HcsDid client');
     }
 
     let did = '';
     // Try registering the DID
     try {
-      const registeredDid = await this.hederaDidClient!.register();
+      const registeredDid = await hederaDidClient.register();
       did = registeredDid.getIdentifier() || '';
     } catch (e: any) {
       console.error(`Failed to register DID: ${e}`);
@@ -109,7 +92,7 @@ export class HederaDIDProvider extends AbstractIdentifierProvider {
 
     const key = await context.agent.keyManagerCreate({
       kms: kms || this.defaultKms,
-      type: this.keyCurve as TKeyType,
+      type: keyType,
     });
 
     const identifier: Omit<IIdentifier, 'provider'> = {
@@ -138,7 +121,12 @@ export class HederaDIDProvider extends AbstractIdentifierProvider {
     context: IContext,
   ): Promise<boolean> {
     try {
-      await this.hederaDidClient!.delete();
+      const hederaDidClient = await getHcsDidClient(this.state);
+      if (!hederaDidClient) {
+        console.error('Failed to create HcsDid client');
+        throw new Error('Failed to create HcsDid client');
+      }
+      await hederaDidClient.delete();
     } catch (e: any) {
       console.error(`Failed to delete DID: ${e}`);
       throw new Error(`Failed to delete DID: ${e}`);
