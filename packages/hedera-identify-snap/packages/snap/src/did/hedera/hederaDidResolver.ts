@@ -27,7 +27,17 @@ import {
   Resolvable,
 } from 'did-resolver';
 import { SnapState } from '../../snap/SnapState';
-import { getHcsDidClient } from './hederaDidUtils';
+import { getHederaClient } from './hederaDidUtils';
+
+enum SupportedVerificationMethods {
+  'JsonWebKey2020',
+  'EcdsaSecp256k1VerificationKey2020',
+  'Ed25519VerificationKey2020',
+}
+
+export type DIDHederaResolverOptions = DIDResolutionOptions & {
+  publicKeyFormat?: keyof typeof SupportedVerificationMethods; // defaults to 'JsonWebKey2020'
+};
 
 /**
  * Resolves a DID using the HederaDidResolver.
@@ -43,23 +53,24 @@ export const resolveDidHedera: DIDResolver = async (
   didUrl: string,
   parsed: ParsedDID,
   resolver: Resolvable,
-  options: DIDResolutionOptions,
+  options: DIDHederaResolverOptions,
 ): Promise<DIDResolutionResult> => {
   try {
     const state = await SnapState.getState();
-    const hederaDidClient = await getHcsDidClient(state);
-    if (!hederaDidClient) {
+    const hederaClient = await getHederaClient(state);
+    if (!hederaClient) {
       return {
         didDocumentMetadata: {},
         didResolutionMetadata: {
           error: 'invalidDid',
-          message: 'HcsDid client is not provided for resolving the DID',
+          message: 'Hedera client is not provided for resolving the DID',
         },
         didDocument: null,
       };
     }
-    const client = hederaDidClient.getClient(); // Retrieve the Hedera client
+    const client = hederaClient.getClient(); // Retrieve the Hedera client
     const hederaResolver = new HederaDidResolver(client); // Create the resolver
+    options.publicKeyFormat = options.publicKeyFormat || 'JsonWebKey2020';
     return await hederaResolver.resolve(didUrl, parsed, resolver, options); // Resolve the DID
   } catch (err: unknown) {
     return {

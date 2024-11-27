@@ -40,24 +40,7 @@ export class ResolveDIDFacade {
     if (!did) {
       did = state.currentAccount.identifier.did;
     }
-    let result = {};
-
-    if (state.snapConfig.dApp.didMethod === 'did:key') {
-      let publicKeyFormat = 'EcdsaSecp256k1VerificationKey2020';
-      if (
-        state.accountState[state.currentAccount.snapEvmAddress][
-          state.currentAccount.network
-        ].keyStore.curve.toLowerCase() === 'ed25519'
-      ) {
-        publicKeyFormat = 'Ed25519VerificationKey2020';
-      }
-      result = await agent.resolveDid({
-        didUrl: did,
-        options: { publicKeyFormat },
-      });
-    } else {
-      result = await agent.resolveDid({ didUrl: did });
-    }
+    const result = await agent.resolveDid({ didUrl: did });
 
     return JSON.parse(JSON.stringify(result));
   }
