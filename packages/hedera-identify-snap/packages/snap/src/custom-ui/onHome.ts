@@ -61,14 +61,14 @@ export const OnHomePageUI: OnHomePageHandler = async () => {
     true,
   );
 
-  const walletSnapParams: IdentifySnapParams = {
+  const identifySnapParams: IdentifySnapParams = {
     origin,
     state,
   };
 
   try {
     const accountInfo: PublicAccountInfo =
-      await GetAccountInfoFacade.getAccountInfo(walletSnapParams);
+      await GetAccountInfoFacade.getAccountInfo(identifySnapParams);
 
     return {
       content: panel([

@@ -29,7 +29,7 @@ import { EvmUtils } from '../utils/EvmUtils';
 
 export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
   // Set origin to be the current page
-  const origin = 'Hedera Wallet Snap';
+  const origin = 'Hedera Identify Snap';
 
   let state = await SnapState.getStateUnchecked();
   if (_.isEmpty(state)) {

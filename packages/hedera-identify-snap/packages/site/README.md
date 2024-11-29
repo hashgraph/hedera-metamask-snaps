@@ -4,6 +4,12 @@ This project was bootstrapped with [Gatsby](https://www.gatsbyjs.com/).
 
 ## Available Scripts
 
+Copy the .env.example file and update the value of `GATSBY_GOOGLE_DRIVE_CLIENT_ID` if you're testing `Configure Google Account API` from the example site:
+
+```sh
+cp .env.example .env.development
+```
+
 In the project directory, you can run:
 
 ### `yarn start`

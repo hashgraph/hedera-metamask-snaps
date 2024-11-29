@@ -74,7 +74,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     state = await SnapState.initState();
   }
 
-  console.log('state: ', JSON.stringify(state, null, 2));
   const identifySnapParams: IdentifySnapParams = {
     origin,
     state,

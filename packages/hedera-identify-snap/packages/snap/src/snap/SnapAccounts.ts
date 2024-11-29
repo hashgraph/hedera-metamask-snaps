@@ -486,7 +486,7 @@ export class SnapAccounts {
     const method = state.snapConfig.dApp.didMethod;
     if (_.isEmpty(accountInfo)) {
       if (method === 'did:hedera') {
-        const errMessage = `Could not get account info from Hedera Mirror Node on '${network}'. Address: ${address}. Please try again.`;
+        const errMessage = `Could not get account info from Hedera Mirror Node on '${hederaNetwork}'. Address: ${address}. Please ensure that this account has been activated on ledger.`;
         if (returnEarly) {
           // eslint-disable-next-line require-atomic-updates
           state.accountState[address][network].keyStore = {
@@ -558,8 +558,34 @@ export class SnapAccounts {
           const registeredDid = await hederaDidClient.register();
           did = registeredDid.getIdentifier() || '';
         } catch (e: any) {
-          console.error(`Failed to register DID: ${e}`);
-          throw new Error(`Failed to register DID: ${e}`);
+          const errMessage = `Failed to register DID on Hedera ${hederaNetwork} network.`;
+          console.error(`${errMessage}: ${JSON.stringify(e)}`);
+
+          // Use normalized errorStatus for the check
+          if (
+            String(e.status || '')
+              .trim()
+              .toUpperCase() === 'INSUFFICIENT_PAYER_BALANCE'
+          ) {
+            throw rpcErrors.transactionRejected({
+              message: `Insufficient funds to create DID on Hedera ${hederaNetwork}. Please ensure that the account has enough HBAR to create the DID.`,
+              data: {
+                hederaNetwork,
+                address,
+                publicKey,
+                accountId: accountInfo.accountId,
+              },
+            });
+          } else {
+            throw rpcErrors.transactionRejected({
+              message: errMessage,
+              data: {
+                hederaNetwork,
+                address,
+                publicKey,
+              },
+            });
+          }
         }
       }
     }
