@@ -25,7 +25,7 @@ export type FetchResponse = {
 };
 
 /**
- * Provides utilities for interacting with Hedera Wallet Snap functionalities.
+ * Provides utilities for interacting with Hedera Identify Snap functionalities.
  */
 export class FetchUtils {
   /**
