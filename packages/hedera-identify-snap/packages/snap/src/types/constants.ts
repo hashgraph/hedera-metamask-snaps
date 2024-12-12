@@ -30,11 +30,7 @@ export const isValidVCStore = (x: string) => isIn(availableVCStores, x);
 export const availableMethods = ['did:pkh', 'did:key', 'did:hedera'] as const;
 export const isValidMethod = (x: string) => isIn(availableMethods, x);
 
-export const availableProofFormats = [
-  'jwt' as ProofFormat,
-  'lds' as ProofFormat,
-  'EthereumEip712Signature2021' as ProofFormat,
-] as const;
+export const availableProofFormats = ['jwt' as ProofFormat] as const;
 export const isValidProofFormat = (x: string) => isIn(availableProofFormats, x);
 
 export const DEFAULTCOINTYPE = 60;

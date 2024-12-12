@@ -48,6 +48,7 @@ export class SwitchDIDMethodFacade {
       );
     }
 
+    let result = true;
     if (method !== didMethod) {
       const panelToShow = SnapUtils.initializePanelToShow();
       panelToShow.push(
@@ -71,9 +72,11 @@ export class SwitchDIDMethodFacade {
         (await SnapUtils.snapDialog(dialogParams))
       ) {
         await SnapState.updateDIDMethod(state, didMethod);
-        return true;
+        result = true;
+      } else {
+        result = false;
       }
     }
-    return false;
+    return result;
   }
 }

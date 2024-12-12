@@ -146,6 +146,7 @@ export class SaveVCFacade {
     if (saved.length === 0) {
       throw new Error('Failed to save the VC');
     }
+
     // Retrieve the created Verifiable Credential
     const result: CreateVCResponseResult = {
       data: verifiableCredential as W3CVerifiableCredential,

@@ -28,8 +28,10 @@ export const onUpdateUI: OnUpdateHandler = async () => {
     params: {
       type: 'alert',
       content: panel([
-        heading('Thank you for updating Hedera Identify Snap'),
+        heading('Thank you for updating Identify Snap'),
         text('New features added in this version:'),
+        text('🚀 Added support for did:key method'),
+        text('🚀 Added support for did:hedera method'),
         text('🚀 Added snap home page'),
         text('🚀 Updated some dialog boxes'),
         text(

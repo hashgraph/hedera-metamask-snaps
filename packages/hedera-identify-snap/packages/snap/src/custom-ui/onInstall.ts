@@ -27,17 +27,17 @@ export const onInstallUI: OnInstallHandler = async () => {
     params: {
       type: 'alert',
       content: panel([
-        heading('Thank you for installing Hedera Wallet Snap'),
+        heading('Thank you for installing Identify Snap'),
         text(
-          'To learn about the Snap, refer to [Hedera Wallet Snap Documentation](https://docs.tuum.tech/hedera-wallet-snap/basics/introduction).',
+          'To learn about the Snap, refer to [Identify Snap Documentation](https://docs.tuum.tech/identify/basics/introduction).',
         ),
         divider(),
         text(
-          '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Hedera Wallet inside MetaMask',
+          '🔑 Applications do NOT have access to your private keys. Everything is stored inside the sandbox environment of Identify inside MetaMask',
         ),
         divider(),
         text(
-          '⦿ Note that Hedera Wallet Snap does not have direct access to the private key of the MetaMask accounts so it generates a new snap account that is associated with the currently connected MetaMask account so the account created by the snap will have a different address compared to your MetaMask account address.',
+          '⦿ Note that Identify Snap does not have direct access to the private key of the MetaMask accounts so it generates a new snap account that is associated with the currently connected MetaMask account so the account created by the snap will have a different address compared to your MetaMask account address.',
         ),
         divider(),
         text(
