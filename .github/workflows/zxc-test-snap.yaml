@@ -34,16 +34,16 @@ jobs:
     runs-on: smart-contracts-linux-medium
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
           egress-policy: audit
           disable-sudo: true
 
       - name: Checkout Code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Node
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: 18
 
@@ -51,7 +51,7 @@ jobs:
         run: npm install -g corepack && corepack enable
 
       - name: Yarn Cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
         with:
           path: ${{ env.PROJECT_DIRECTORY }}/.yarn/cache
           key: yarn-cache-${{ runner.os }}-${{ runner.arch }}-${{ inputs.snap-package-dir }}-${{ hashFiles(format('packages/{0}/yarn.lock', inputs.snap-package-dir)) }}
@@ -60,7 +60,7 @@ jobs:
             yarn-cache-${{ runner.os }}-${{ inputs.snap-package-dir }}-
 
       - name: Node Modules Cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
         with:
           path: |
             ${{ env.PROJECT_DIRECTORY }}/node_modules
@@ -80,13 +80,13 @@ jobs:
         run: yarn test
 
       - name: Publish Snap Unit Test Reports
-        uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: ${{ inputs.snap-report-name }} Unit Test Reports
           path: ${{ env.SNAP_DIRECTORY }}/junit*.xml
 
       - name: Publish Snap Coverage Reports
-        uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: ${{ inputs.snap-report-name }} Coverage Reports
           path: ${{ env.SNAP_DIRECTORY }}/coverage
