@@ -29,20 +29,7 @@ const config: SnapConfig = {
   server: {
     port: 9002,
   },
-  polyfills: {
-    buffer: true,
-    crypto: true,
-    http: true,
-    https: true,
-    zlib: true,
-    util: true,
-    url: true,
-    punycode: true,
-    events: true,
-    stream: true,
-    assert: true,
-    string_decoder: true,
-  },
+  polyfills: true,
 };
 
 export default config;

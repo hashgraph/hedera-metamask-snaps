@@ -42,7 +42,7 @@ module.exports = {
     '!.eslintrc.js',
     'coverage/',
     'dist/',
-    './post-process.js',
+    './postBuild.js',
     'jest.config.js',
   ],
 };

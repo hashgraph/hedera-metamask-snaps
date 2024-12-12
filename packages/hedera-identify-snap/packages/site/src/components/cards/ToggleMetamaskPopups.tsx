@@ -48,7 +48,7 @@ const ToggleMetamaskPopups: FC<Props> = ({
       setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
-      await togglePopups(metamaskAddress);
+      await togglePopups();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });

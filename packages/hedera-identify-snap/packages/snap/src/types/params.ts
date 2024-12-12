@@ -18,11 +18,35 @@
  *
  */
 
-import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
+import {
+  ProofFormat,
+  VerifiablePresentation,
+  W3CVerifiableCredential,
+} from '@veramo/core';
 import {
   QueryMetadata,
   SaveOptions,
 } from '../plugins/veramo/verifiable-creds-manager';
+
+export type MirrorNodeParams = { mirrorNodeUrl?: string };
+
+export type NetworkParams = {
+  network: string;
+};
+
+export type ResolveDIDRequestParams = { did?: string };
+
+export type SwitchMethodRequestParams = {
+  didMethod: string;
+};
+
+export type VerifyVCRequestParams = {
+  verifiableCredential: W3CVerifiableCredential;
+};
+
+export type VerifyVPRequestParams = {
+  verifiablePresentation: VerifiablePresentation;
+};
 
 export type CreateVCRequestParams = {
   vcValue: object;
@@ -53,4 +77,13 @@ export type CreateVPRequestParams = {
   vcs?: W3CVerifiableCredential[];
   options?: CreateVPOptions;
   proofInfo?: ProofInfo;
+};
+
+export type GoogleToken = {
+  accessToken: string;
+};
+
+export type UploadData = {
+  fileName: string;
+  content: string;
 };

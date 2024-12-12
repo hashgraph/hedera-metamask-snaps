@@ -1,4 +1,4 @@
-# @tuum-tech/identify
+# @hashgraph/identify
 
 This repository contains code for Identify Snap that offers various features such as configuring hedera account, getting current did method, getting DID, resolving DID, getting Verifiable Credentials, creating Verifiable Credentials out of some arbitary JSON object, generating Verifiable Presentations from Verifiable Credentials and verifying VCs and verifying VPs.
 Refer to the [Identify Snap Wiki](https://docs.tuum.tech/identify/) for more info on how the snap works and how to
@@ -91,6 +91,7 @@ process; see those repositories for more information about how they work.
 - Babel is used for transpiling TypeScript to JavaScript, so when building with the CLI,
   `transpilationMode` must be set to `localOnly` (default) or `localAndDeps`.
 - For the global `wallet` type to work, you have to add the following to your `tsconfig.json`:
+
   ```json
   {
     "files": ["./node_modules/@metamask/snap-types/global.d.ts"]

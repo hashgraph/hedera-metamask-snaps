@@ -30,13 +30,15 @@ export const isValidVCStore = (x: string) => isIn(availableVCStores, x);
 export const availableMethods = ['did:pkh', 'did:key', 'did:hedera'] as const;
 export const isValidMethod = (x: string) => isIn(availableMethods, x);
 
-// 60 for ethereum and 3030 for hedera
-export const DEFAULTCOINTYPE = 60;
-export const HEDERACOINTYPE = 3030;
-
-export const availableProofFormats = [
-  'jwt' as ProofFormat,
-  'lds' as ProofFormat,
-  'EthereumEip712Signature2021' as ProofFormat,
-] as const;
+export const availableProofFormats = ['jwt' as ProofFormat] as const;
 export const isValidProofFormat = (x: string) => isIn(availableProofFormats, x);
+
+export const DEFAULTCOINTYPE = 60;
+
+export const EMPTY_STRING = '';
+export const FEE_DISPLAY_REGEX = /(\.\d*?[1-9])0+$|\.0*$/u;
+export const FEE_DIGIT_LENGTH = 8;
+export const HBAR_ASSET_STRING = 'HBAR';
+export const NFT_ASSET_STRING = 'NFT';
+
+export const MAX_RETRIES = 3;

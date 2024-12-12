@@ -21,8 +21,11 @@
 import { VerifiableCredential } from '@veramo/core';
 import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
+
+import { getDidHederaIdentifier } from '../../../../did/hedera/hederaDidUtils';
 import { getDidKeyIdentifier } from '../../../../did/key/keyDidUtils';
-import { IdentitySnapState } from '../../../../interfaces';
+import { IdentifySnapState } from '../../../../types/state';
+import { Utils } from '../../../../utils/Utils';
 import {
   AbstractDataStore,
   IConfigureArgs,
@@ -37,7 +40,6 @@ import {
   uploadToGoogleDrive,
   verifyToken,
 } from './googleUtils';
-import { decodeJWT } from './jwt';
 
 /**
  * An implementation of {@link AbstractDataStore} that holds everything in snap state.
@@ -45,11 +47,11 @@ import { decodeJWT } from './jwt';
  * This is usable by {@link @vc-manager/VCManager} to hold the vc data
  */
 export class GoogleDriveVCStore extends AbstractDataStore {
-  state: IdentitySnapState;
+  state: IdentifySnapState;
   accessToken: string;
   email: string;
 
-  constructor(state: IdentitySnapState) {
+  constructor(state: IdentifySnapState) {
     super();
     this.state = state;
     this.accessToken = '';
@@ -58,7 +60,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
 
   async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
-    const account = this.state.currentAccount.metamaskAddress;
+    const account = this.state.currentAccount.snapEvmAddress;
 
     if (!account) {
       throw Error(
@@ -82,7 +84,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const decodeVC = (k: string) => {
       let vc = googleVCs[k] as unknown;
       if (typeof vc === 'string') {
-        vc = decodeJWT(vc);
+        vc = Utils.decodeJWT(vc);
       }
       return { metadata: { id: k }, data: vc };
     };
@@ -124,7 +126,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
 
   async saveVC(args: { data: ISaveVC[] }): Promise<string[]> {
     const { data: vcs } = args;
-    const account = this.state.currentAccount.metamaskAddress;
+    const account = this.state.currentAccount.snapEvmAddress;
 
     if (!account) {
       throw Error(
@@ -147,10 +149,20 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const currentMethod = this.state.currentAccount.method;
 
     for (const vc of vcs) {
-      let identifier = this.state.currentAccount.snapAddress;
+      let identifier = this.state.currentAccount.snapEvmAddress;
       if (currentMethod === 'did:key') {
-        identifier = await getDidKeyIdentifier(
+        identifier = getDidKeyIdentifier(
           this.state.currentAccount.publicKey,
+          this.state.accountState[this.state.currentAccount.snapEvmAddress][
+            this.state.currentAccount.network
+          ].keyStore.curve,
+        );
+      } else if (currentMethod === 'did:hedera') {
+        identifier = getDidHederaIdentifier(
+          this.state.accountState[this.state.currentAccount.snapEvmAddress][
+            this.state.currentAccount.network
+          ],
+          currentMethod,
         );
       }
 
@@ -174,7 +186,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {
-    const account = this.state.currentAccount.metamaskAddress;
+    const account = this.state.currentAccount.snapEvmAddress;
 
     if (!account) {
       throw Error(
@@ -193,10 +205,20 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     const currentMethod = this.state.currentAccount.method;
-    let identifier = this.state.currentAccount.snapAddress;
+    let identifier = this.state.currentAccount.snapEvmAddress;
     if (currentMethod === 'did:key') {
-      identifier = await getDidKeyIdentifier(
+      identifier = getDidKeyIdentifier(
         this.state.currentAccount.publicKey,
+        this.state.accountState[this.state.currentAccount.snapEvmAddress][
+          this.state.currentAccount.network
+        ].keyStore.curve,
+      );
+    } else if (currentMethod === 'did:hedera') {
+      identifier = getDidHederaIdentifier(
+        this.state.accountState[this.state.currentAccount.snapEvmAddress][
+          this.state.currentAccount.network
+        ],
+        currentMethod,
       );
     }
 
@@ -222,7 +244,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   public async clearVCs(_args: IFilterArgs): Promise<boolean> {
-    const account = this.state.currentAccount.metamaskAddress;
+    const account = this.state.currentAccount.snapEvmAddress;
 
     if (!account) {
       throw Error(

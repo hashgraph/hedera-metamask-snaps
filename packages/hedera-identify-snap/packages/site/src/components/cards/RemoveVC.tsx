@@ -80,7 +80,6 @@ const RemoveVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
       } as IDataManagerDeleteArgs;
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
-        metamaskAddress,
         id,
         options,
         externalAccountParams,

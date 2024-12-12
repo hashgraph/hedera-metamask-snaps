@@ -18,17 +18,21 @@
  *
  */
 
-import { base58btc } from 'multiformats/bases/base58';
+import { bytesToMultibase, hexToBytes } from '@veramo/utils';
 
-import { addMulticodecPrefix } from '../../utils/formatUtils';
-import { getCompressedPublicKey } from '../../utils/keyPair';
+const keyCodecs = {
+  Ed25519: 'ed25519-pub',
+  X25519: 'x25519-pub',
+  Secp256k1: 'secp256k1-pub',
+} as const;
 
-export async function getDidKeyIdentifier(publicKey: string): Promise<string> {
-  const compressedKey = getCompressedPublicKey(publicKey);
-
-  return Buffer.from(
-    base58btc.encode(
-      addMulticodecPrefix('secp256k1-pub', Buffer.from(compressedKey, 'hex')),
-    ),
-  ).toString();
+export function getDidKeyIdentifier(
+  publicKey: string,
+  keyType: string,
+): string {
+  return bytesToMultibase(
+    hexToBytes(publicKey),
+    'base58btc',
+    keyCodecs[keyType as keyof typeof keyCodecs],
+  );
 }

@@ -63,7 +63,6 @@ const ConfigureGoogleAccount: FC<Props> = ({
         externalAccountRef.current?.handleGetAccountParams();
 
       const configured = await configureGoogleAccount(
-        metamaskAddress,
         tokenResponse.access_token,
         externalAccountParams,
       );
@@ -91,7 +90,7 @@ const ConfigureGoogleAccount: FC<Props> = ({
         button: (
           <SendHelloButton
             buttonText="Configure Google Account"
-            onClick={handleConfigureGoogleAccount}
+            onClick={() => handleConfigureGoogleAccount()}
             disabled={!state.installedSnap}
             loading={loading}
           />

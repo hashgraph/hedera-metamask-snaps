@@ -19,7 +19,7 @@
  */
 
 export { ConfigureGoogleAccount } from './ConfigureGoogleAccount';
-export { ConnectIdentitySnap } from './ConnectIdentitySnap';
+export { ConnectIdentitySnap } from './ConnectIdentifySnap';
 export { CreateVC } from './CreateVC';
 export { DeleteAllVCs } from './DeleteAllVCs';
 export { GetAccountInfo } from './GetAccountInfo';

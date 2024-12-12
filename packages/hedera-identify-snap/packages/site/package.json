@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@metamask/providers": "^17.2.0",
-    "@react-oauth/google": "^0.7.0",
+    "@react-oauth/google": "^0.12.1",
     "@veramo/core": "5.1.2",
     "axios": "^1.2.4",
     "bootstrap": "^5.3.3",

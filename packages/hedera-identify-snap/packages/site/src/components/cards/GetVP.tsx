@@ -69,7 +69,6 @@ const GetVP: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
       console.log('vcIds: ', vcId);
       // console.log('vc: ', vc);
       const vp = (await createVP(
-        metamaskAddress,
         {
           // vcIds: vcId.trim().split(','),
           vcs: [vc as W3CVerifiableCredential],

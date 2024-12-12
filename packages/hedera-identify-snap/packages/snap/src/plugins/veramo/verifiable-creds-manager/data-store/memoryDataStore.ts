@@ -18,8 +18,8 @@
  *
  */
 
+import { sha256 } from 'js-sha256';
 import jsonpath from 'jsonpath';
-import { v4 } from 'uuid';
 import {
   AbstractDataStore,
   IDeleteArgs,
@@ -38,7 +38,7 @@ export class MemoryDataStore extends AbstractDataStore {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async saveVC(args: ISaveArgs): Promise<string[]> {
-    const id = v4();
+    const id = sha256(JSON.stringify(args));
     this.data[id] = args.data;
     return [id];
   }

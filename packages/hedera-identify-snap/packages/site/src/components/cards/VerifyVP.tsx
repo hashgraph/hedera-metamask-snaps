@@ -51,7 +51,7 @@ const VerifyVP: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
       setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
-      const verified = await verifyVP(metamaskAddress, vp);
+      const verified = await verifyVP(vp);
       console.log('VP Verified: ', verified);
       showModal({
         title: 'Verify VP',

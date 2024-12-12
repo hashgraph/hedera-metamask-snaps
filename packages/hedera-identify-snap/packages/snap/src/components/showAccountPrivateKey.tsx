@@ -1,6 +1,6 @@
 /*-
  *
- * Hedera Wallet Snap
+ * Hedera Identify Snap
  *
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
@@ -33,35 +33,21 @@ import {
 type Props = CommonProps & {
   privateKey: string;
   publicKey: string;
-  accountID: string;
   evmAddress: string;
 };
 
 const MetamaskUI: SnapComponent<Props> = ({
   origin,
   network,
-  mirrorNodeUrl,
   privateKey,
   publicKey,
-  accountID,
   evmAddress,
 }) => {
   return (
     <Box>
-      <CommonUI
-        origin={origin}
-        network={network}
-        mirrorNodeUrl={mirrorNodeUrl}
-      />
+      <CommonUI origin={origin} network={network} />
       <Heading>Show Account Private Key</Heading>
-      <Box>
-        <Text>Account ID</Text>
-        <Copyable value={accountID} />
-      </Box>
-      <Row
-        label="EVM Address"
-        tooltip="This is the EVM address that corresponds to the Hedera account ID"
-      >
+      <Row label="EVM Address">
         <Address address={evmAddress} />
       </Row>
       <Box>

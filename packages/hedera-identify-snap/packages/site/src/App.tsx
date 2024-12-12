@@ -44,6 +44,11 @@ export type AppProps = {
 export const App: FunctionComponent<AppProps> = ({ children }) => {
   const toggleTheme = useContext(ToggleThemeContext);
 
+  console.log(
+    'process.env.GATSBY_GOOGLE_DRIVE_CLIENT_ID',
+    process.env.GATSBY_GOOGLE_DRIVE_CLIENT_ID,
+  );
+
   return (
     <>
       <GlobalStyle />

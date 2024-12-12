@@ -84,7 +84,6 @@ const CreateVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
       };
       const credTypes = ['ProfileNamesCredential'];
       const saved: CreateVCResponseResult = (await createVC(
-        metamaskAddress,
         vcKey,
         vcValue,
         options,

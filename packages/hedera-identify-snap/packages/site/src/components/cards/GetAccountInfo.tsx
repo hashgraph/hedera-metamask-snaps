@@ -63,10 +63,7 @@ const GetAccountInfo: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      const accountInfo = await getAccountInfo(
-        metamaskAddress,
-        externalAccountParams,
-      );
+      const accountInfo = await getAccountInfo(externalAccountParams);
       console.log(`Your account info:`, accountInfo);
       setAccountInfo(accountInfo as PublicAccountInfo);
       showModal({

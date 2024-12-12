@@ -31,11 +31,7 @@
     "jsxImportSource": "@metamask/snaps-sdk",
     "typeRoots": ["./node_modules/@types", "../../node_modules/@types"]
   },
-  "files": ["./json-typings.d.ts"],
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "global.d.ts",
-    "../site/src/types/veramo.ts"
-  ]
+  "files": ["./global.d.ts"],
+  "exclude": ["./jest.config.js"],
+  "include": ["**/*.ts", "**/*.tsx"]
 }
