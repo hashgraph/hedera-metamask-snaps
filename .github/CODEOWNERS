@@ -2,17 +2,17 @@
 ##### Global Protection Rule ######
 ###################################
 # NOTE: This rule is overriden by the more specific rules below. This is the catch-all rule for all files not covered by the more specific rules below
-*                                               @hashgraph/hedera-smart-contracts-product
+*                                               @hashgraph/hedera-smart-contracts-managers
 
 ###############################
 ##### Hedera Wallet Snap ######
 ###############################
-/packages/hedera-wallet-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera
+/packages/hedera-wallet-snap/                   @hashgraph/hedera-smart-contracts-managers
 
 ###############################
 ##### Hedera Identify Snap ######
 ###############################
-/packages/hedera-identify-snap/                   @Nana-EC @kpachhai @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera
+/packages/hedera-identify-snap/                   @hashgraph/hedera-smart-contracts-managers
 
 #########################
 #####  Core Files  ######
@@ -21,7 +21,7 @@
 # NOTE: Must be placed last to ensure enforcement over all other rules
 
 # Protection Rules for Github Configuration Files and Actions Workflows
-/.github/                                       @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+/.github/                                       @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
 
 # Top level NPM configuration files
 /package.json                                   @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
