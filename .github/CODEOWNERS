@@ -2,17 +2,17 @@
 ##### Global Protection Rule ######
 ###################################
 # NOTE: This rule is overriden by the more specific rules below. This is the catch-all rule for all files not covered by the more specific rules below
-*                                               @hashgraph/hedera-smart-contracts-managers
+*                                               @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product
 
 ###############################
 ##### Hedera Wallet Snap ######
 ###############################
-/packages/hedera-wallet-snap/                   @hashgraph/hedera-smart-contracts-managers
+/packages/hedera-wallet-snap/                   @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
 
 ###############################
 ##### Hedera Identify Snap ######
 ###############################
-/packages/hedera-identify-snap/                   @hashgraph/hedera-smart-contracts-managers
+/packages/hedera-identify-snap/                 @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera
 
 #########################
 #####  Core Files  ######
@@ -21,31 +21,32 @@
 # NOTE: Must be placed last to ensure enforcement over all other rules
 
 # Protection Rules for Github Configuration Files and Actions Workflows
-/.github/                                       @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+/.github/                                       @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product
+/.github/workflows/.                            @hashgraph/devops-ci @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
 
 # Top level NPM configuration files
 /package.json                                   @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
 /package-lock.json                              @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
 
 # Codacy Tool Configurations
-/config/                                        @hashgraph/release-engineering-managers
-.remarkrc                                       @hashgraph/release-engineering-managers
-/.prettierrc                                    @hashgraph/hedera-smart-contracts-managers
-/.eslintrc.js                                   @hashgraph/release-engineering-managers
+/config/                                        @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
+.remarkrc                                       @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
+/.prettierrc                                    @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
+/.eslintrc.js                                   @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
 
 # Semantic Release Configuration
-.releaserc                                      @hashgraph/release-engineering-managers
+.releaserc                                      @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
 
 # Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
 /CODEOWNERS                                     @hashgraph/release-engineering-managers
 
 # Protect the repository root files
-/README.md                                      @hashgraph/hedera-smart-contracts-managers
+/README.md                                      @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
 **/LICENSE                                      @hashgraph/hedera-smart-contracts-managers
 
 # CodeCov configuration
-**/codecov.yml                                  @hashgraph/release-engineering-managers
+**/codecov.yml                                  @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers
 
 # Git Ignore definitions
-**/.gitignore                                   @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
-**/.gitignore.*                                 @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+**/.gitignore                                   @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
+**/.gitignore.*                                 @hashgraph/devops-ci @hashgraph/devops-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
