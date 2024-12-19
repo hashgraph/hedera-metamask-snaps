@@ -2489,9 +2489,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hashgraph/cryptography@npm:1.4.8-beta.7":
-  version: 1.4.8-beta.7
-  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.7"
+"@hashgraph/cryptography@npm:1.4.8-beta.10":
+  version: 1.4.8-beta.10
+  resolution: "@hashgraph/cryptography@npm:1.4.8-beta.10"
   dependencies:
     asn1js: ^3.0.5
     bignumber.js: ^9.1.1
@@ -2515,7 +2515,7 @@ __metadata:
       optional: true
     expo-random:
       optional: true
-  checksum: fc4aca4182c16f23c8e7f73e2bbf628e33cf3e6a7b4f2be5ede3188e99c9a2a5f064d0b66d5039c36523fae4be3146523dc190b31fa37059b998b741652505f2
+  checksum: e0bc4bd3adcf80894c4eb133df81ffa394fe61e86229be40d54d42820df471fa0cdf6bca1d6681bff2fd79a375ae2d94685cbf46f45cef438bada839417c4de3
   languageName: node
   linkType: hard
 
@@ -2529,7 +2529,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap-site@workspace:packages/site"
   dependencies:
-    "@hashgraph/sdk": ^2.50.0
+    "@hashgraph/sdk": ^2.56.0
     "@metamask/eslint-config": ^12.2.0
     "@metamask/eslint-config-jest": ^12.1.0
     "@metamask/eslint-config-nodejs": ^12.1.0
@@ -2585,7 +2585,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hashgraph/hedera-wallet-snap@workspace:packages/snap"
   dependencies:
-    "@hashgraph/sdk": ^2.50.0
+    "@hashgraph/sdk": ^2.56.0
     "@jest/globals": ^29.7.0
     "@metamask/auto-changelog": ^3.4.4
     "@metamask/eslint-config": ^12.2.0
@@ -2629,36 +2629,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hashgraph/proto@npm:2.15.0-beta.3":
-  version: 2.15.0-beta.3
-  resolution: "@hashgraph/proto@npm:2.15.0-beta.3"
+"@hashgraph/proto@npm:2.16.0-beta.4":
+  version: 2.16.0-beta.4
+  resolution: "@hashgraph/proto@npm:2.16.0-beta.4"
   dependencies:
-    long: ^4.0.0
-    protobufjs: ^7.2.5
-  checksum: e3f647905919b068c6eecee449ced13085968f4ee75d719ff32e609c0fe9fec1b909829523e52638bcd6de5122b06e660dddecaa68d725b77a73d09358988988
+    long: ^5.2.3
+    protobufjs: 7.2.5
+  checksum: 5fdbee3f915d49e47f17a5f81db1baa7434ffaa331aad734fc5dbe889d846fe036b43592dfd6c0cd37e7e850f47a316e9d97491b3dd307193daac50ec0bc5d25
   languageName: node
   linkType: hard
 
-"@hashgraph/sdk@npm:^2.50.0":
-  version: 2.50.0
-  resolution: "@hashgraph/sdk@npm:2.50.0"
+"@hashgraph/sdk@npm:^2.56.0":
+  version: 2.56.0
+  resolution: "@hashgraph/sdk@npm:2.56.0"
   dependencies:
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/rlp": ^5.7.0
     "@grpc/grpc-js": 1.8.2
-    "@hashgraph/cryptography": 1.4.8-beta.7
-    "@hashgraph/proto": 2.15.0-beta.3
+    "@hashgraph/cryptography": 1.4.8-beta.10
+    "@hashgraph/proto": 2.16.0-beta.4
     axios: ^1.6.4
     bignumber.js: ^9.1.1
     bn.js: ^5.1.1
     crypto-js: ^4.2.0
     js-base64: ^3.7.4
-    long: ^4.0.0
+    long: ^5.2.3
     pino: ^8.14.1
     pino-pretty: ^10.0.0
-    protobufjs: ^7.2.5
+    protobufjs: 7.2.5
     rfc4648: ^1.5.3
     utf8: ^3.0.0
   peerDependencies:
@@ -2666,7 +2666,7 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 592f7d0106f4e9264612059e3b5210af7ddb210d8cfa6d78bbe7a1491462169d5ff65d8372ef2817beec945c75e808f505b37d7133c0c573bcfa37ba7670cc63
+  checksum: 8b163c7635d79b48210cea401c9c50efc70d312a3ff90c698e327102920758ddb7185e7dacedba57d760a8d5e93bf8706d0ed3ef786108acdf625603f54fcd2c
   languageName: node
   linkType: hard
 
@@ -14815,14 +14815,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "long@npm:4.0.0"
-  checksum: 16afbe8f749c7c849db1f4de4e2e6a31ac6e617cead3bdc4f9605cb703cd20e1e9fc1a7baba674ffcca57d660a6e5b53a9e236d7b25a295d3855cca79cc06744
-  languageName: node
-  linkType: hard
-
-"long@npm:^5.0.0":
+"long@npm:^5.0.0, long@npm:^5.2.3":
   version: 5.2.3
   resolution: "long@npm:5.2.3"
   checksum: 885ede7c3de4facccbd2cacc6168bae3a02c3e836159ea4252c87b6e34d40af819824b2d4edce330bfb5c4d6e8ce3ec5864bdcf9473fa1f53a4f8225860e5897
@@ -17248,6 +17241,26 @@ __metadata:
   version: 1.2.4
   resolution: "proto-list@npm:1.2.4"
   checksum: 4d4826e1713cbfa0f15124ab0ae494c91b597a3c458670c9714c36e8baddf5a6aad22842776f2f5b137f259c8533e741771445eb8df82e861eea37a6eaba03f7
+  languageName: node
+  linkType: hard
+
+"protobufjs@npm:7.2.5":
+  version: 7.2.5
+  resolution: "protobufjs@npm:7.2.5"
+  dependencies:
+    "@protobufjs/aspromise": ^1.1.2
+    "@protobufjs/base64": ^1.1.2
+    "@protobufjs/codegen": ^2.0.4
+    "@protobufjs/eventemitter": ^1.1.0
+    "@protobufjs/fetch": ^1.1.0
+    "@protobufjs/float": ^1.0.2
+    "@protobufjs/inquire": ^1.1.0
+    "@protobufjs/path": ^1.1.2
+    "@protobufjs/pool": ^1.1.0
+    "@protobufjs/utf8": ^1.1.0
+    "@types/node": ">=13.7.0"
+    long: ^5.0.0
+  checksum: 3770a072114061faebbb17cfd135bc4e187b66bc6f40cd8bac624368b0270871ec0cfb43a02b9fb4f029c8335808a840f1afba3c2e7ede7063b98ae6b98a703f
   languageName: node
   linkType: hard
 
