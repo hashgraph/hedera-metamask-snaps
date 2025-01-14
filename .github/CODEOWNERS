@@ -22,7 +22,7 @@
 
 # Protection Rules for Github Configuration Files and Actions Workflows
 /.github/                                       @hashgraph/platform-ci @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product
-/.github/workflows/                             @hashgraph/platform-ci @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers @hashgraph/hedera-smart-contracts-product @hashgraph/tuum-tech-hedera 
+/.github/workflows/                             @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
 
 # Top level NPM configuration files
 /package.json                                   @hashgraph/release-engineering-managers @hashgraph/hedera-smart-contracts-managers
