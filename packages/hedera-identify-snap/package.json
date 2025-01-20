@@ -1,6 +1,6 @@
 {
   "name": "@hashgraph/hedera-identify-snap-monorepo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Hedera Identify Snap unlocks DID functionality via Metamask that any other apps can interact with, thereby turning Metamask into a decentralized identity wallet.",
   "homepage": "https://github.com/hashgraph/hedera-metamask-snaps#readme",

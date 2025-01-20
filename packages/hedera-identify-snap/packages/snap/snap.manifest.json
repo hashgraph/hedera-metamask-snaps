@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "proposedName": "Identify",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "git+https://github.com/hashgraph/hedera-metamask-snaps.git"
   },
   "source": {
-    "shasum": "HckPgmpWIe7lm8WM66drq1/oJXd3+IslLf7zdCjOUN4=",
+    "shasum": "ZgjQhtxIvBtmIzj7humg2Qf/Vu4pzzNNBHIDeTyb6ek=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
