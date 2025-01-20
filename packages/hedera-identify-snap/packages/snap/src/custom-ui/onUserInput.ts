@@ -124,13 +124,19 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           const params = {
             did: event.value.did || state.currentAccount.identifier.did,
           } as ResolveDIDRequestParams;
+          console.log('params', JSON.stringify(params, null, 2));
           ParamUtils.isValidResolveDIDRequest(params);
+          console.log('verified valid resolve did request');
           const result = await ResolveDIDFacade.resolveDID(
             identifySnapParams,
             params.did,
           );
+          console.log('result', JSON.stringify(result, null, 2));
           if (!_.isEmpty(result)) {
-            panelToShow.push(text('Result: '), copyable(result));
+            panelToShow.push(
+              text('Result: '),
+              copyable({ value: JSON.stringify(result) }),
+            );
           } else {
             panelToShow.push(text('Failed to resolve DID'));
           }
@@ -158,7 +164,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           if (!_.isEmpty(result)) {
             panelToShow.push(
               text('Result: '),
-              copyable(JSON.stringify(result.data)),
+              copyable({ value: JSON.stringify(result.data) }),
             );
           } else {
             panelToShow.push(text('Failed to create VC'));
@@ -182,7 +188,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
             result.forEach((vc: IDataManagerQueryResult, index: number) => {
               panelToShow.push(
                 text(`VC #${index + 1}:`),
-                copyable(JSON.stringify(vc.data)),
+                copyable({ value: JSON.stringify(vc.data) }),
                 divider(),
               );
             });
@@ -220,7 +226,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           if (!_.isEmpty(result)) {
             panelToShow.push(
               text('Result: '),
-              copyable(JSON.stringify(result)),
+              copyable({ value: JSON.stringify(result) }),
             );
           } else {
             panelToShow.push(text('Failed to create VP'));
@@ -243,9 +249,10 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           text(
             'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
           ),
-          copyable(
-            state.accountState[snapAddress][network].keyStore.privateKey,
-          ),
+          copyable({
+            value: state.accountState[snapAddress][network].keyStore.privateKey,
+            sensitive: true,
+          }),
         );
         break;
       }
