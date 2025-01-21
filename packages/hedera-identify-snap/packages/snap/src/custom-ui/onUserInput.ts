@@ -124,14 +124,11 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           const params = {
             did: event.value.did || state.currentAccount.identifier.did,
           } as ResolveDIDRequestParams;
-          console.log('params', JSON.stringify(params, null, 2));
           ParamUtils.isValidResolveDIDRequest(params);
-          console.log('verified valid resolve did request');
           const result = await ResolveDIDFacade.resolveDID(
             identifySnapParams,
             params.did,
           );
-          console.log('result', JSON.stringify(result, null, 2));
           if (!_.isEmpty(result)) {
             panelToShow.push(
               text('Result: '),
@@ -245,15 +242,30 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
   } else if (event.type === UserInputEventType.ButtonClickEvent) {
     switch (event.name) {
       case 'btn-export-snap-account-private-key': {
-        panelToShow.push(
-          text(
-            'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
-          ),
-          copyable({
-            value: state.accountState[snapAddress][network].keyStore.privateKey,
-            sensitive: true,
-          }),
-        );
+        const privateKey =
+          state.accountState[snapAddress]?.[network]?.keyStore?.privateKey;
+
+        if (privateKey) {
+          panelToShow.push(
+            text(
+              'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
+            ),
+            copyable({
+              value: privateKey,
+              sensitive: true,
+            }),
+          );
+
+          // Safely overwrite the private key
+          const keyStore = state.accountState[snapAddress]?.[network]?.keyStore;
+          if (keyStore) {
+            keyStore.privateKey = ''; // Overwrite with an empty string
+          }
+        } else {
+          panelToShow.push(text('Private key unavailable or already cleared.'));
+        }
+
+        await SnapState.updateState(state); // Update the state after changes
         break;
       }
       default: {
