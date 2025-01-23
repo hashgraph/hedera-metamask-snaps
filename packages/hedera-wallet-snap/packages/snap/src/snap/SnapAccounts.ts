@@ -282,38 +282,11 @@ export class SnapAccounts {
         }
 
         if (
-          accountInfo.key.type === 'ProtobufEncoded' &&
+          (_.isEmpty(accountInfo.key.type) ||
+            accountInfo.key.type === 'ProtobufEncoded') &&
           curve !== 'ECDSA_SECP256K1'
         ) {
           const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using 'ECDSA_SECP256K1' on '${network}'. Please make sure to pass in the correct value for "curve".`;
-          console.error(errMessage);
-          throw rpcErrors.invalidRequest({
-            message: errMessage,
-            data: { network, curve, address: evmAddress, publicKey },
-          });
-        }
-
-        if (
-          accountInfo.key.type !== 'ProtobufEncoded' &&
-          accountInfo.key.type !== curve
-        ) {
-          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
-            accountInfo.key.type ?? ''
-          }' on '${network}'. Please make sure to pass in the correct value for "curve".`;
-          console.error(errMessage);
-          throw rpcErrors.invalidRequest({
-            message: errMessage,
-            data: { network, curve, address: evmAddress, publicKey },
-          });
-        }
-
-        if (
-          accountInfo.key.type !== 'ProtobufEncoded' &&
-          accountInfo.key.type !== curve
-        ) {
-          const errMessage = `You passed '${curve}' as the digital signature algorithm to use but the account was derived using '${
-            accountInfo.key.type ?? ''
-          }' on '${network}'. Please make sure to pass in the correct value for "curve".`;
           console.error(errMessage);
           throw rpcErrors.invalidRequest({
             message: errMessage,

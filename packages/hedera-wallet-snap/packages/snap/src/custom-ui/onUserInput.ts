@@ -32,6 +32,18 @@ import { HederaUtils } from '../utils/HederaUtils';
 import { SnapUtils } from '../utils/SnapUtils';
 
 export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
+  // Ensure valid event structure
+  if (!event?.name) {
+    console.warn('Invalid event detected:', event);
+    return;
+  }
+
+  // Ignore InputChangeEvent explicitly
+  if (event.type === UserInputEventType.InputChangeEvent) {
+    console.warn('Ignoring InputChangeEvent:', event.name);
+    return;
+  }
+
   // Set origin to be the current page
   const origin = 'Hedera Wallet Snap';
 
@@ -96,20 +108,33 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
   if (event.type === UserInputEventType.ButtonClickEvent) {
     switch (event.name) {
       case 'btn-export-snap-account-private-key': {
-        await snap.request({
-          method: 'snap_dialog',
-          params: {
-            type: 'alert',
-            content: panel([
-              text(
-                'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
-              ),
-              copyable(
-                state.accountState[snapAddress][network].keyStore.privateKey,
-              ),
-            ]),
-          },
-        });
+        const privateKey =
+          state.accountState[snapAddress]?.[network]?.keyStore?.privateKey;
+
+        if (privateKey) {
+          await snap.request({
+            method: 'snap_dialog',
+            params: {
+              type: 'alert',
+              content: panel([
+                text(
+                  'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
+                ),
+                copyable({
+                  value: privateKey,
+                  sensitive: true,
+                }),
+              ]),
+            },
+          });
+          // Safely overwrite the private key
+          const keyStore = state.accountState[snapAddress]?.[network]?.keyStore;
+          if (keyStore) {
+            keyStore.privateKey = ''; // Overwrite with an empty string
+          }
+        } else {
+          console.error('Private key unavailable or already cleared.');
+        }
         break;
       }
       default:
