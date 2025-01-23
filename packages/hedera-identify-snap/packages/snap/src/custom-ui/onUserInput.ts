@@ -130,7 +130,10 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
             params.did,
           );
           if (!_.isEmpty(result)) {
-            panelToShow.push(text('Result: '), copyable(result));
+            panelToShow.push(
+              text('Result: '),
+              copyable({ value: JSON.stringify(result) }),
+            );
           } else {
             panelToShow.push(text('Failed to resolve DID'));
           }
@@ -158,7 +161,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           if (!_.isEmpty(result)) {
             panelToShow.push(
               text('Result: '),
-              copyable(JSON.stringify(result.data)),
+              copyable({ value: JSON.stringify(result.data) }),
             );
           } else {
             panelToShow.push(text('Failed to create VC'));
@@ -182,7 +185,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
             result.forEach((vc: IDataManagerQueryResult, index: number) => {
               panelToShow.push(
                 text(`VC #${index + 1}:`),
-                copyable(JSON.stringify(vc.data)),
+                copyable({ value: JSON.stringify(vc.data) }),
                 divider(),
               );
             });
@@ -220,7 +223,7 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
           if (!_.isEmpty(result)) {
             panelToShow.push(
               text('Result: '),
-              copyable(JSON.stringify(result)),
+              copyable({ value: JSON.stringify(result) }),
             );
           } else {
             panelToShow.push(text('Failed to create VP'));
@@ -239,14 +242,30 @@ export const onUserInputUI: OnUserInputHandler = async ({ event }) => {
   } else if (event.type === UserInputEventType.ButtonClickEvent) {
     switch (event.name) {
       case 'btn-export-snap-account-private-key': {
-        panelToShow.push(
-          text(
-            'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
-          ),
-          copyable(
-            state.accountState[snapAddress][network].keyStore.privateKey,
-          ),
-        );
+        const privateKey =
+          state.accountState[snapAddress]?.[network]?.keyStore?.privateKey;
+
+        if (privateKey) {
+          panelToShow.push(
+            text(
+              'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.',
+            ),
+            copyable({
+              value: privateKey,
+              sensitive: true,
+            }),
+          );
+
+          // Safely overwrite the private key
+          const keyStore = state.accountState[snapAddress]?.[network]?.keyStore;
+          if (keyStore) {
+            keyStore.privateKey = ''; // Overwrite with an empty string
+          }
+        } else {
+          panelToShow.push(text('Private key unavailable or already cleared.'));
+        }
+
+        await SnapState.updateState(state); // Update the state after changes
         break;
       }
       default: {
