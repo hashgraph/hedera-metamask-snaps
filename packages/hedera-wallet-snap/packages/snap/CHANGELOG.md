@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.2](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.6.2...v0.6.2) (2025-01-23)
+
+### :page_with_curl: Documentation
+
+- Refer to the [Hedera Wallet Snap Wiki](https://docs.tuum.tech/hedera-wallet-snap/) for more info on how the snap works and how to integrate it into your own application.
+
+### :rocket: Features
+
+### :bug: Bug Fixes
+
+- Private key is now declared to be sensitive on Metamask dialog box
+- Private key is cleared from memory after displaying
+
 ## [0.6.1](https://github.com/hashgraph/hedera-metamask-snaps/compare/v0.6.1...v0.6.1) (2024-10-10)
 
 ### :page_with_curl: Documentation
