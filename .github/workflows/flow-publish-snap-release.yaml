@@ -1,0 +1,45 @@
+name: "Publish Snap Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish-wallet-snap:
+        type: boolean
+        required: false
+        description: "Publish the hedera-wallet-snap package"
+      publish-identify-snap:
+        type: boolean
+        required: false
+        description: "Publish the hedera-identify-snap package"
+      dry-run-enabled:
+        description: "Dry Run Enabled"
+        type: boolean
+        required: false
+        default: true
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: write
+
+jobs:
+  publish-snap:
+    name: Publish Snap Directory
+    runs-on: smart-contracts-linux-medium
+    strategy:
+      matrix:
+        include:
+          - snap_name: 'Wallet Snap'
+            path: 'hedera-wallet-snap'
+            publish: ${{ inputs.publish-wallet-snap == true }}
+          - snap_name: 'Identify Snap'
+            path: 'hedera-identify-snap'
+            publish: ${{ inputs.publish-identify-snap == true }}
+
+    steps:
+      - name: Publish ${{ matrix.snap_name }}
+        if: ${{ matrix.enabled == 'true' }}
+        run: echo "Publishing snap_name"
+
