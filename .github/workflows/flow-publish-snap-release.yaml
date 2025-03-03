@@ -92,14 +92,14 @@ jobs:
         env:
           PROJECT_DIRECTORY: packages/${{ matrix.path }}
           SNAP_DIRECTORY: packages/${{ matrix.path }}/packages/snap
-          DRY_RUN: ${{ inputs.dry-run-enabled }}
+          DRY_RUN: ${{ github.event.inputs.dry-run-enabled }}
         run: |
           cd ${SNAP_DIRECTORY}
           yarn install
           yarn run build
 
           PUBLISH_ARGS="--access public --no-git-checks"
-          [[ "${{ github.event.inputs.dry-run-enabled }}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
+          [[ "${DRY_RUN}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
           
           # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
           echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
