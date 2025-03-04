@@ -151,7 +151,7 @@ jobs:
           ref: ${{ github.event.inputs.tag || '' }}
 
       - name: Install PNPM
-        uses: step-security/action-setup@303e8a1dabc4295b9b4ca0f4198fd42f7861406e # v4.0.0
+        uses: step-security/action-setup@1beb3ebc4de86b0e37560725eeef1b11332702a3 # v4.0.1
         with:
           version: 8.10.0
 
