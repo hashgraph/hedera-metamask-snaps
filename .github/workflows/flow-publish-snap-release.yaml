@@ -21,7 +21,7 @@ defaults:
     shell: bash
 
 permissions:
-  contents: write
+  contents: read
 
 env:
   NODE_VERSION: 18
