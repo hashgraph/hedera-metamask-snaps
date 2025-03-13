@@ -36,16 +36,18 @@ jobs:
       - name: Generate Matrix
         id: set-matrix
         run: |
-          MATRIX=$(jq -n '[]')
-          if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]]; then
-            MATRIX=$(jq -n --argjson matrix "$(MATRIX)" \
-              '$matrix + [{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"}]')
+          if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]] && [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
+            MATRIX='{"matrix":\
+                    [{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"},\
+                    {"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]}'
+          elif [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]]; then
+            MATRIX='{"matrix":\
+                    [{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"}]}'
+          elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
+            MATRIX='{"matrix":\
+                    [{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]}'
           fi
-          if [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
-            MATRIX=$(jq -n --argjson matrix "$(MATRIX)" \
-              '$matrix + [{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]')
-          fi
-          echo "matrix=$(echo "$MATRIX" | jq -c)" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
 
   publish-snap:
     needs: prepare-matrix
