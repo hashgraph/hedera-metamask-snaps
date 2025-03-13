@@ -107,5 +107,6 @@ jobs:
           echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
           echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
           
-          pnpm install
-          pnpm publish ${PUBLISH_ARGS}
+          npm install
+          echo "$PUBLISH_ARGS"
+          # npm publish ${PUBLISH_ARGS}
