@@ -21,7 +21,7 @@ defaults:
     shell: bash
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   NODE_VERSION: 18
@@ -87,7 +87,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_ACCESS_TOKEN }} # does not exist yet :|
+          #token: ${{ secrets.GH_ACCESS_TOKEN }} # does not exist yet :|
 
       - name: Publish ${{ matrix.snap_name }}
         if: ${{ matrix.enabled && !cancelled() }}
