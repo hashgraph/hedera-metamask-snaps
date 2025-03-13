@@ -36,14 +36,16 @@ jobs:
       - name: Generate Matrix
         id: set-matrix
         run: |
-          MATRIX='[]'
+          MATRIX=$(jq -n '[]')
           if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]]; then
-            MATRIX=$(echo $MATRIX | jq '. + [{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"}]')
+            MATRIX=$(jq -n --argjson matrix "$(MATRIX)" \
+              '$matrix + [{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"}]')
           fi
           if [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
-            MATRIX=$(echo $MATRIX | jq '. + [{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]')
+            MATRIX=$(jq -n --argjson matrix "$(MATRIX)" \
+              '$matrix + [{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]')
           fi
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          echo "matrix=$(echo "$MATRIX" | jq -c)" >> $GITHUB_OUTPUT
 
   publish-snap:
     needs: prepare-matrix
