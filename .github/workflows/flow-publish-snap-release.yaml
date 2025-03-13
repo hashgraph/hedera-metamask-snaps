@@ -38,7 +38,7 @@ jobs:
         run: |
           MATRIX='[]'
           if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]]; then
-            MATRIX=$(echo $MATRIX | jq '. + [{"snap_name": "Wallet Snap, path: "hedera-wallet-snap"}]')
+            MATRIX=$(echo $MATRIX | jq '. + [{"snap_name": "Wallet Snap", path: "hedera-wallet-snap"}]')
           fi
           if [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
             MATRIX=$(echo $MATRIX | jq '. + [{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]')
