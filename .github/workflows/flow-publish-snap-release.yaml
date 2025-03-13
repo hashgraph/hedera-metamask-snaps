@@ -109,4 +109,4 @@ jobs:
           
           npm install
           echo "$PUBLISH_ARGS"
-          # npm publish ${PUBLISH_ARGS}
+          npm publish ${PUBLISH_ARGS}
