@@ -36,6 +36,7 @@ jobs:
       - name: Generate Matrix
         id: set-matrix
         run: |
+          MATRIX="{}"
           if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]] && [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
             MATRIX='{"matrix":\
                     [{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"},\
