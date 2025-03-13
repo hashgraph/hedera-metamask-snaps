@@ -1,7 +1,5 @@
 name: "Publish Snap Release"
 
-INTENTIONALLY BREAKING
-
 on:
   workflow_dispatch:
     inputs:
