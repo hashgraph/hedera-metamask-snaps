@@ -44,6 +44,7 @@ jobs:
           elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]}'
           fi
+          echo "$MATRIX"
           echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
 
   publish-snap:
@@ -53,7 +54,7 @@ jobs:
 
     strategy:
       matrix:
-        include: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
+        include: ${{ fromJson(needs.prepare-matrix.outputs.matrix).matrix }}
 
     steps:
       - name: Harden Runner
