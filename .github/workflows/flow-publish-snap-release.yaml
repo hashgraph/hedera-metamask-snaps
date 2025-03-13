@@ -38,11 +38,11 @@ jobs:
         run: |
           MATRIX='{"matrix":[]}'
           if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]] && [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
-            MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"},{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]}'
+            MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true},{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
           elif [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]]; then
-            MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap"}]}'
+            MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true}]}'
           elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
-            MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap"}]}'
+            MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
           fi
           echo "$MATRIX"
           echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
@@ -64,7 +64,7 @@ jobs:
           disable-sudo: true
 
       - name: Publish ${{ matrix.snap_name }}
-        if: ${{ matrix.enabled == 'true' }}
+        if: ${{ matrix.enabled == true }}
         env:
           SNAP_NAME: ${{ matrix.snap_name }}
         run: echo "Begin publishing ${SNAP_NAME}"
@@ -83,7 +83,7 @@ jobs:
         run: pnpm install -g yarn
 
       - name: Checkout Code
-        if: ${{ matrix.enabled == 'true' }}
+        if: ${{ matrix.enabled == true }}
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
