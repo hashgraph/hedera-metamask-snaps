@@ -56,7 +56,7 @@ jobs:
           echo "$MATRIX"
           echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
           
-          echo "### Matrix Generated" >> $GITHUB_STEP_SUMMARY
+          echo "### Snapshots to publish" >> $GITHUB_STEP_SUMMARY
           echo "Publish Wallet Snap: $PUB_WALLET" >> $GITHUB_STEP_SUMMARY
           echo "Publish Identify Snap: $PUB_IDENTIFY" >> $GITHUB_STEP_SUMMARY
 
