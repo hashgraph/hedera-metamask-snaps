@@ -99,13 +99,19 @@ jobs:
           cd ${SNAP_DIRECTORY}
           yarn install
           yarn run build
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            yarn pack --dry-run
+          else
+            PUBLISH_ARGS="--access public --no-git-checks"
+          
+            # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
+            echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
+            echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
+          
+            echo "$PUBLISH_ARGS"
+            yarn pack
+            yarn npm publish $PUBLISH_ARGS
+          fi
 
-          PUBLISH_ARGS="--access public --no-git-checks"
-          [[ "${DRY_RUN}" == "true" ]] && PUBLISH_ARGS="${PUBLISH_ARGS} --dry-run"
+
           
-          # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
-          echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
-          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
-          
-          echo "$PUBLISH_ARGS"
-          npm publish ${PUBLISH_ARGS}
