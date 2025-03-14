@@ -42,6 +42,9 @@ jobs:
             MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true}]}'
           elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
+          else
+            echo "No Snap Package to Publish"
+            exit 1
           fi
           echo "$MATRIX"
           echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
@@ -81,7 +84,6 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-          #token: ${{ secrets.GH_ACCESS_TOKEN }} # does not exist yet :|
 
       - name: Publish ${{ matrix.snap_name }}
         if: ${{ matrix.enabled && !cancelled() }}
