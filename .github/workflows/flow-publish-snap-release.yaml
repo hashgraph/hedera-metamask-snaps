@@ -43,6 +43,7 @@ jobs:
           elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
           else
+            echo "No Snap Package to Publish"
             echo "### Matrix could not be generated:" >> $GITHUB_STEP_SUMMARY
             echo "No Snap Package to Publish" >> $GITHUB_STEP_SUMMARY
             exit 1
@@ -109,6 +110,13 @@ jobs:
             yarn pack
             yarn npm publish $PUBLISH_ARGS
           fi
+          
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "### Published ${SNAP_NAME} Snap" >> $GITHUB_STEP_SUMMARY
+          echo "Version is: $PKG_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "Dry Run Enabled: $DRY_RUN" >> $GITHUB_STEP_SUMMARY
+          
 
 
           
