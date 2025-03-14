@@ -48,11 +48,11 @@ jobs:
         id: set-matrix
         run: |
           MATRIX='{"matrix":[]}'
-          if [[ "$PUB_WALLET" == "true" ]] && [[ "$PUB_IDENTIFY" == "true" ]]; then
+          if [[ "${PUB_WALLET}" == "true" ]] && [[ "${PUB_IDENTIFY}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true},{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
-          elif [[ "$PUB_WALLET" == "true" ]]; then
+          elif [[ "${PUB_WALLET}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true}]}'
-          elif [[ "$PUB_IDENTIFY" == "true" ]]; then
+          elif [[ "${PUB_IDENTIFY}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
           else
             echo "No Snap Package to Publish"
@@ -60,12 +60,12 @@ jobs:
             echo "No Snap Package to Publish" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-          echo "$MATRIX"
-          echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
+          echo "${MATRIX}"
+          echo "matrix=$(echo "${MATRIX}" | jq -c)" >> "$GITHUB_OUTPUT"
           
           echo "### Snapshots to publish" >> $GITHUB_STEP_SUMMARY
-          echo "Publish Wallet Snap: $PUB_WALLET" >> $GITHUB_STEP_SUMMARY
-          echo "Publish Identify Snap: $PUB_IDENTIFY" >> $GITHUB_STEP_SUMMARY
+          echo "Publish Wallet Snap: ${PUB_WALLET}" >> $GITHUB_STEP_SUMMARY
+          echo "Publish Identify Snap: ${PUB_IDENTIFY}" >> $GITHUB_STEP_SUMMARY
 
   publish-snap:
     needs: prepare-matrix
@@ -122,13 +122,13 @@ jobs:
             echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
             echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
           
-            echo "$PUBLISH_ARGS"
+            echo "${PUBLISH_ARGS}"
             yarn pack
-            yarn npm publish $PUBLISH_ARGS
+            yarn npm publish ${PUBLISH_ARGS}
           fi
           
           PKG_VERSION=$(node -p "require('./package.json').version")
           
           echo "### Published ${SNAP_NAME} Snap" >> $GITHUB_STEP_SUMMARY
-          echo "Version is: $PKG_VERSION" >> $GITHUB_STEP_SUMMARY
-          echo "Dry Run Enabled: $DRY_RUN" >> $GITHUB_STEP_SUMMARY
+          echo "Version is: ${PKG_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "Dry Run Enabled: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
