@@ -43,7 +43,8 @@ jobs:
           elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
           else
-            echo "No Snap Package to Publish"
+            echo "### Matrix could not be generated:" >> $GITHUB_STEP_SUMMARY
+            echo "No Snap Package to Publish" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
           echo "$MATRIX"
