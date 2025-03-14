@@ -15,6 +15,10 @@ on:
         description: "Dry Run Enabled"
         type: string
         default: "false"
+    secrets:
+      npm-token:
+        description: "NPM Token"
+        required: true
 
 defaults:
   run:
@@ -62,6 +66,7 @@ jobs:
           SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
           SNAP_NAME: ${{ inputs.snap-package-name }}
           DRY_RUN: ${{ inputs.dry-run-enabled }}
+          NPM_TOKEN: ${{ secrets.npm-token }}
         run: |
           cd ${SNAP_DIRECTORY}
           yarn install

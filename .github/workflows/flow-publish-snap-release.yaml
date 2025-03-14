@@ -35,6 +35,8 @@ jobs:
       snap-package-name: "Wallet Snap"
       snap-package-dir: "hedera-wallet-snap"
       dry-run-enabled: "${{ github.event.inputs.dry-run-enabled }}"
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
 
   publish-identify-snap:
     name: Publish Identify Snap
@@ -44,3 +46,5 @@ jobs:
       snap-package-name: "Identify Snap"
       snap-package-dir: "hedera-identify-snap"
       dry-run-enabled: "${{ github.event.inputs.dry-run-enabled }}"
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
