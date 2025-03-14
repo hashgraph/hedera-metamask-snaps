@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       snap-package-dir:
-        description: "The directory of the snap package to lint:"
+        description: "The directory of the snap package to publish:"
         type: string
         required: true
       snap-package-name:
