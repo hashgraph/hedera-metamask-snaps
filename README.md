@@ -36,7 +36,6 @@ The inputs to this workflow are:
 As additional snaps are added to the repo, the workflow can be updated to include additional inputs for publishing these snaps.
 
 - Add a new input to the `Publish Snap Release` workflow in the `.github/workflows/publish-snap-release.yml` file.
-- Update the `Generate Matrix` step to include the new snap package in the matrix of snaps to publish.
 
 Note: Currently all hedera-metamask-snaps snap packages are configured with yarn. If a snap is introduced that is configured with
 npm or pnpm the `Publish Snap Release` workflow will need to be updated to support this.
