@@ -1,5 +1,5 @@
 name: ZXC Publish Snap
-INTENTIONALLY BROKEN
+
 on:
   workflow_call:
     inputs:
