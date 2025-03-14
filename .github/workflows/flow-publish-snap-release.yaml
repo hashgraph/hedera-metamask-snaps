@@ -6,10 +6,12 @@ on:
       publish-wallet-snap:
         type: boolean
         required: false
+        default: false
         description: "Publish the hedera-wallet-snap package"
       publish-identify-snap:
         type: boolean
         required: false
+        default: false
         description: "Publish the hedera-identify-snap package"
       dry-run-enabled:
         description: "Dry Run Enabled"
@@ -31,16 +33,19 @@ jobs:
     runs-on: smart-contracts-linux-medium
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      PUB_WALLET: ${{ github.event.inputs.publish-wallet-snap }}
+      PUB_IDENTIFY: ${{ github.event.inputs.publish-identify-snap }}
     steps:
       - name: Generate Matrix
         id: set-matrix
         run: |
           MATRIX='{"matrix":[]}'
-          if [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]] && [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
+          if [[ "$PUB_WALLET" == "true" ]] && [[ "$PUB_IDENTIFY" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true},{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
-          elif [[ "${{ github.event.inputs.publish-wallet-snap }}" == "true" ]]; then
+          elif [[ "$PUB_WALLET" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true}]}'
-          elif [[ "${{ github.event.inputs.publish-identify-snap }}" == "true" ]]; then
+          elif [[ "$PUB_IDENTIFY" == "true" ]]; then
             MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
           else
             echo "No Snap Package to Publish"
@@ -50,6 +55,10 @@ jobs:
           fi
           echo "$MATRIX"
           echo "matrix=$(echo "$MATRIX" | jq -c)" >> "$GITHUB_OUTPUT"
+          
+          echo "### Matrix Generated" >> $GITHUB_STEP_SUMMARY
+          echo "Publish Wallet Snap: $PUB_WALLET" >> $GITHUB_STEP_SUMMARY
+          echo "Publish Identify Snap: $PUB_IDENTIFY" >> $GITHUB_STEP_SUMMARY
 
   publish-snap:
     needs: prepare-matrix
@@ -116,7 +125,3 @@ jobs:
           echo "### Published ${SNAP_NAME} Snap" >> $GITHUB_STEP_SUMMARY
           echo "Version is: $PKG_VERSION" >> $GITHUB_STEP_SUMMARY
           echo "Dry Run Enabled: $DRY_RUN" >> $GITHUB_STEP_SUMMARY
-          
-
-
-          
