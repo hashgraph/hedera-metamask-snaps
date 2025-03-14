@@ -59,8 +59,8 @@ jobs:
       - name: Publish ${{ inputs.snap-package-name }}
         if: ${{ !cancelled() }}
         env:
-          PROJECT_DIRECTORY: packages/${{ inputs.snap-package-dir }}
           SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
+          SNAP_NAME: ${{ inputs.snap-package-name }}
           DRY_RUN: ${{ inputs.dry-run-enabled }}
         run: |
           cd ${SNAP_DIRECTORY}
@@ -82,6 +82,6 @@ jobs:
           
           PKG_VERSION=$(node -p "require('./package.json').version")
           
-          echo "### Published ${SNAP_NAME} Snap" >> $GITHUB_STEP_SUMMARY
+          echo "### Published ${SNAP_NAME}" >> $GITHUB_STEP_SUMMARY
           echo "Version is: ${PKG_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "Dry Run Enabled: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
