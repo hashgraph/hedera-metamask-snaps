@@ -26,109 +26,21 @@ defaults:
 permissions:
   contents: write
 
-env:
-  NODE_VERSION: 18
-
 jobs:
-  prepare-matrix:
-    runs-on: smart-contracts-linux-medium
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    env:
-      PUB_WALLET: ${{ github.event.inputs.publish-wallet-snap }}
-      PUB_IDENTIFY: ${{ github.event.inputs.publish-identify-snap }}
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
-        with:
-          egress-policy: audit
-          disable-sudo: true
+  publish-wallet-snap:
+    name: Publish Wallet Snap
+    if: ${{ !cancelled() && github.event.inputs.publish-wallet-snap == true }}
+    uses: ./.github/workflows/zxc-publish-snap.yaml
+    with:
+      snap-package-name: "Wallet Snap"
+      snap-package-dir: "hedera-wallet-snap"
+      dry-run-enabled: ${{ github.event.inputs.dry-run-enabled }}
 
-      - name: Generate Matrix
-        id: set-matrix
-        run: |
-          MATRIX='{"matrix":[]}'
-          if [[ "${PUB_WALLET}" == "true" ]] && [[ "${PUB_IDENTIFY}" == "true" ]]; then
-            MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true},{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
-          elif [[ "${PUB_WALLET}" == "true" ]]; then
-            MATRIX='{"matrix":[{"snap_name": "Wallet Snap", "path": "hedera-wallet-snap", "enabled": true}]}'
-          elif [[ "${PUB_IDENTIFY}" == "true" ]]; then
-            MATRIX='{"matrix":[{"snap_name": "Identify Snap", "path": "hedera-identify-snap", "enabled": true}]}'
-          else
-            echo "No Snap Package to Publish"
-            echo "### Matrix could not be generated:" >> $GITHUB_STEP_SUMMARY
-            echo "No Snap Package to Publish" >> $GITHUB_STEP_SUMMARY
-            exit 1
-          fi
-          echo "${MATRIX}"
-          echo "matrix=$(echo "${MATRIX}" | jq -c)" >> "$GITHUB_OUTPUT"
-          
-          echo "### Snapshots to publish" >> $GITHUB_STEP_SUMMARY
-          echo "Publish Wallet Snap: ${PUB_WALLET}" >> $GITHUB_STEP_SUMMARY
-          echo "Publish Identify Snap: ${PUB_IDENTIFY}" >> $GITHUB_STEP_SUMMARY
-
-  publish-snap:
-    needs: prepare-matrix
-    name: Publish Snap Directory
-    runs-on: smart-contracts-linux-medium
-
-    strategy:
-      matrix:
-        include: ${{ fromJson(needs.prepare-matrix.outputs.matrix).matrix }}
-
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
-        with:
-          egress-policy: audit
-          disable-sudo: true
-
-      - name: Publish ${{ matrix.snap_name }}
-        if: ${{ matrix.enabled == true }}
-        env:
-          SNAP_NAME: ${{ matrix.snap_name }}
-        run: echo "Begin publishing ${SNAP_NAME}"
-
-      - name: Setup Node
-        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install Yarn
-        run: npm install -g yarn
-
-      - name: Checkout Code
-        if: ${{ matrix.enabled == true }}
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          fetch-depth: 0
-
-      - name: Publish ${{ matrix.snap_name }}
-        if: ${{ matrix.enabled && !cancelled() }}
-        env:
-          PROJECT_DIRECTORY: packages/${{ matrix.path }}
-          SNAP_DIRECTORY: packages/${{ matrix.path }}/packages/snap
-          DRY_RUN: ${{ github.event.inputs.dry-run-enabled }}
-        run: |
-          cd ${SNAP_DIRECTORY}
-          yarn install
-          yarn run build
-          if [[ "${DRY_RUN}" == "true" ]]; then
-            yarn pack --dry-run
-          else
-            PUBLISH_ARGS="--access public --no-git-checks"
-          
-            # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
-            echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
-            echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
-          
-            echo "${PUBLISH_ARGS}"
-            yarn pack
-            yarn npm publish ${PUBLISH_ARGS}
-          fi
-          
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          
-          echo "### Published ${SNAP_NAME} Snap" >> $GITHUB_STEP_SUMMARY
-          echo "Version is: ${PKG_VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "Dry Run Enabled: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
+  publish-identify-snap:
+    name: Publish Identify Snap
+    if: ${{ !cancelled() && github.event.inputs.publish-identify-snap == true }}
+    uses: ./.github/workflows/zxc-publish-snap.yaml
+    with:
+      snap-package-name: "Identify Snap"
+      snap-package-dir: "hedera-identify-snap"
+      dry-run-enabled: ${{ github.event.inputs.dry-run-enabled }}
