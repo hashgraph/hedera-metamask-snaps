@@ -1,0 +1,50 @@
+name: "Publish Snap Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish-wallet-snap:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the hedera-wallet-snap package"
+      publish-identify-snap:
+        type: boolean
+        required: false
+        default: false
+        description: "Publish the hedera-identify-snap package"
+      dry-run-enabled:
+        description: "Dry Run Enabled"
+        type: boolean
+        default: false
+        required: false
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: write
+
+jobs:
+  publish-wallet-snap:
+    name: Publish Wallet Snap
+    if: ${{ !cancelled() && github.event.inputs.publish-wallet-snap == 'true' }}
+    uses: ./.github/workflows/zxc-publish-snap.yaml
+    with:
+      snap-package-name: "Wallet Snap"
+      snap-package-dir: "hedera-wallet-snap"
+      dry-run-enabled: "${{ github.event.inputs.dry-run-enabled }}"
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
+
+  publish-identify-snap:
+    name: Publish Identify Snap
+    if: ${{ !cancelled() && github.event.inputs.publish-identify-snap == 'true' }}
+    uses: ./.github/workflows/zxc-publish-snap.yaml
+    with:
+      snap-package-name: "Identify Snap"
+      snap-package-dir: "hedera-identify-snap"
+      dry-run-enabled: "${{ github.event.inputs.dry-run-enabled }}"
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}

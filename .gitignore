@@ -141,3 +141,6 @@ coverage/
 # MacOS X Metadata files
 .DS_Store
 
+# Ignore lock files
+**/package-lock.json
+**/yarn.lock

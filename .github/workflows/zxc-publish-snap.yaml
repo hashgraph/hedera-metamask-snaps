@@ -1,0 +1,92 @@
+name: ZXC Publish Snap
+
+on:
+  workflow_call:
+    inputs:
+      snap-package-dir:
+        description: "The directory of the snap package to publish:"
+        type: string
+        required: true
+      snap-package-name:
+        description: "The name of the snap package to publish:"
+        type: string
+        required: true
+      dry-run-enabled:
+        description: "Dry Run Enabled"
+        type: string
+        default: "false"
+    secrets:
+      npm-token:
+        description: "NPM Token"
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: 20
+
+jobs:
+  publish-snap:
+    name: Publish Snap Directory
+    runs-on: smart-contracts-linux-medium
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        with:
+          egress-policy: audit
+          disable-sudo: true
+
+      - name: Publish ${{ inputs.snap-package-name }}
+        env:
+          SNAP_NAME: ${{ inputs.snap-package-name }}
+        run: echo "Begin publishing ${SNAP_NAME}"
+
+      - name: Setup Node
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Publish ${{ inputs.snap-package-name }}
+        if: ${{ !cancelled() }}
+        env:
+          SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
+          SNAP_NAME: ${{ inputs.snap-package-name }}
+          DRY_RUN: ${{ inputs.dry-run-enabled }}
+          NPM_TOKEN: ${{ secrets.npm-token }}
+        run: |
+          cd ${SNAP_DIRECTORY}
+          yarn install
+          yarn run build
+          if [[ "${DRY_RUN}" == "true" ]]; then
+            yarn pack --dry-run
+          else
+            PUBLISH_ARGS="--access public --no-git-checks"
+          
+            # Add the registry authentication stanza with variable substitution to the .npmrc configuration file.
+            echo "@hashgraph:registry=https://registry.npmjs.org/" >> ".npmrc"
+            echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ".npmrc"
+          
+            echo "${PUBLISH_ARGS}"
+            yarn pack
+            yarn npm publish ${PUBLISH_ARGS}
+          fi
+          
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "### Published ${SNAP_NAME}" >> $GITHUB_STEP_SUMMARY
+          echo "Version is: ${PKG_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "Dry Run Enabled: ${DRY_RUN}" >> $GITHUB_STEP_SUMMARY
