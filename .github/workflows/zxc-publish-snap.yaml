@@ -38,9 +38,9 @@ jobs:
           egress-policy: audit
           disable-sudo: true
 
-      - name: Publish ${{ inputs.snap-package-name }}
+      - name: Publish ${{ github.event.inputs.snap-package-name }}
         env:
-          SNAP_NAME: ${{ inputs.snap-package-name }}
+          SNAP_NAME: ${{ github.event.inputs.snap-package-name }}
         run: echo "Begin publishing ${SNAP_NAME}"
 
       - name: Setup Node
@@ -56,12 +56,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Publish ${{ inputs.snap-package-name }}
+      - name: Publish ${{ github.event.inputs.snap-package-name }}
         if: ${{ !cancelled() }}
         env:
-          PROJECT_DIRECTORY: packages/${{ inputs.snap-package-dir }}
-          SNAP_DIRECTORY: packages/${{ inputs.snap-package-dir }}/packages/snap
-          DRY_RUN: ${{ inputs.dry-run-enabled }}
+          PROJECT_DIRECTORY: packages/${{ github.event.inputs.snap-package-dir }}
+          SNAP_DIRECTORY: packages/${{ github.event.inputs.snap-package-dir }}/packages/snap
+          DRY_RUN: ${{ github.event.inputs.dry-run-enabled }}
         run: |
           cd ${SNAP_DIRECTORY}
           yarn install
