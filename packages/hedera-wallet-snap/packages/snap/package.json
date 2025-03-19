@@ -44,7 +44,7 @@
     "test:ci": "yarn test --silent"
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.50.0",
+    "@hashgraph/sdk": "^2.61.0",
     "@metamask/key-tree": "^9.1.2",
     "@metamask/providers": "^17.2.0",
     "@metamask/rpc-errors": "^6.3.1",
