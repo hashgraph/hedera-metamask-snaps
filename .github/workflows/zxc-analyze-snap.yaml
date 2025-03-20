@@ -60,13 +60,13 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Fetch Snap Unit Test Reports
-        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ${{ inputs.snap-report-name }} Unit Test Reports
           path: ${{ env.SNAP_DIRECTORY }}/junit*.xml
 
       - name: Fetch Snap Coverage Reports
-        uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
         with:
           name: ${{ inputs.snap-report-name }} Coverage Reports
           path: ${{ env.SNAP_DIRECTORY }}/coverage
