@@ -2969,7 +2969,7 @@ __metadata:
     "@veramo/did-provider-key": 6.0.0
     "@veramo/did-provider-pkh": 5.1.2
     "@veramo/did-resolver": 5.1.2
-    "@veramo/key-manager": 5.1.2
+    "@veramo/key-manager": 6.0.0
     "@veramo/kms-local": 5.1.2
     "@veramo/message-handler": 5.1.2
     bignumber.js: ^9.1.2
@@ -7042,20 +7042,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/key-manager@npm:5.1.2":
-  version: 5.1.2
-  resolution: "@veramo/key-manager@npm:5.1.2"
+"@veramo/key-manager@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@veramo/key-manager@npm:6.0.0"
   dependencies:
-    "@ethersproject/bytes": ^5.7.0
-    "@ethersproject/strings": ^5.7.0
-    "@ethersproject/transactions": ^5.7.0
-    "@stablelib/ed25519": ^1.0.3
-    "@veramo/core-types": ^5.1.2
+    "@noble/curves": ^1.1.0
+    "@veramo/core-types": ^6.0.0
+    "@veramo/utils": ^6.0.0
     debug: ^4.3.4
-    did-jwt: ^6.9.0
-    uint8arrays: ^3.0.0
+    did-jwt: ^8.0.0
+    ethers: ^6.11.1
+    uint8arrays: ^4.0.6
     uuid: ^9.0.0
-  checksum: b8a418cf7299c573a1a3df6f26d85620f6edc33b0323f999a530a60cd057acfcc84a2412eab01d51b9c797e11bb39f47a8538620f3bf20bf516bc980abcf2318
+  checksum: 9ad36d25060d228ba5d38ac41fc1d7b70fe9811160541624fd73d507442ba12b25b48e18869e0141b224c0bf9a9f6fce99f4963fc801c2590ead42b38ec56d87
   languageName: node
   linkType: hard
 
