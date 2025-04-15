@@ -2894,7 +2894,7 @@ __metadata:
     "@react-oauth/google": ^0.12.1
     "@svgr/webpack": ^8.1.0
     "@testing-library/dom": ^10.4.0
-    "@testing-library/jest-dom": ^6.5.0
+    "@testing-library/jest-dom": ^6.6.3
     "@testing-library/react": ^16.0.1
     "@testing-library/user-event": ^14.5.2
     "@types/jest": ^29.5.12
@@ -5884,9 +5884,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/jest-dom@npm:^6.5.0":
-  version: 6.5.0
-  resolution: "@testing-library/jest-dom@npm:6.5.0"
+"@testing-library/jest-dom@npm:^6.6.3":
+  version: 6.6.3
+  resolution: "@testing-library/jest-dom@npm:6.6.3"
   dependencies:
     "@adobe/css-tools": ^4.4.0
     aria-query: ^5.0.0
@@ -5895,7 +5895,7 @@ __metadata:
     dom-accessibility-api: ^0.6.3
     lodash: ^4.17.21
     redent: ^3.0.0
-  checksum: c2d14103ebe3358852ec527ff7512f64207a39932b2f7b6dff7e73ba91296b01a71bad9a9584b6ee010681380a906c1740af50470adc6db660e1c7585d012ebf
+  checksum: c1dc4260b05309a0084416639006cd105849acc5b102bef682a3b19bd6fce07ff6762085fc7f2599546c995a2fc66fdb1d70e50e22a634a0098524056cc9e511
   languageName: node
   linkType: hard
 
