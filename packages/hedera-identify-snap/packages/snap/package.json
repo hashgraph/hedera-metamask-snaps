@@ -66,7 +66,7 @@
     "@veramo/did-provider-key": "6.0.0",
     "@veramo/did-provider-pkh": "5.1.2",
     "@veramo/did-resolver": "5.1.2",
-    "@veramo/key-manager": "5.1.2",
+    "@veramo/key-manager": "6.0.0",
     "@veramo/kms-local": "5.1.2",
     "@veramo/message-handler": "5.1.2",
     "bignumber.js": "^9.1.2",
