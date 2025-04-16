@@ -2971,7 +2971,7 @@ __metadata:
     "@veramo/did-resolver": 5.1.2
     "@veramo/key-manager": 5.1.2
     "@veramo/kms-local": 5.1.2
-    "@veramo/message-handler": 5.1.2
+    "@veramo/message-handler": 6.0.0
     bignumber.js: ^9.1.2
     did-jwt-vc: ^4.0.4
     did-resolver: ^4.1.0
@@ -7101,13 +7101,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/message-handler@npm:5.1.2":
-  version: 5.1.2
-  resolution: "@veramo/message-handler@npm:5.1.2"
+"@veramo/message-handler@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@veramo/message-handler@npm:6.0.0"
   dependencies:
-    "@veramo/core-types": ^5.1.2
+    "@veramo/core-types": ^6.0.0
     debug: ^4.3.4
-  checksum: 54e0e723f42e1900f3f2c81716ca22939ac02e9d7880f09332971e1112836e328b50f3b735f4dbd1ebd024bc743b0e8c520c007ff5e9f73dd79b1b0ad4fdf885
+  checksum: a118537d99615a60e3cc5c8794c705a6ce53b2bd4932abcf5937c694d60d709edc3dd4895e3eb368ccba342b71fb7aa1091b09a3d6e2647bdb8df6064c1a0fcc
   languageName: node
   linkType: hard
 
