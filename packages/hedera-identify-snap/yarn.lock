@@ -2972,7 +2972,7 @@ __metadata:
     "@veramo/key-manager": 5.1.2
     "@veramo/kms-local": 5.1.2
     "@veramo/message-handler": 5.1.2
-    bignumber.js: ^9.1.2
+    bignumber.js: ^9.3.0
     did-jwt-vc: ^4.0.4
     did-resolver: ^4.1.0
     eslint: 8.38.0
@@ -8539,10 +8539,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bignumber.js@npm:^9.1.1, bignumber.js@npm:^9.1.2":
+"bignumber.js@npm:^9.1.1":
   version: 9.1.2
   resolution: "bignumber.js@npm:9.1.2"
   checksum: 582c03af77ec9cb0ebd682a373ee6c66475db94a4325f92299621d544aa4bd45cb45fd60001610e94aef8ae98a0905fa538241d9638d4422d57abbeeac6fadaf
+  languageName: node
+  linkType: hard
+
+"bignumber.js@npm:^9.3.0":
+  version: 9.3.0
+  resolution: "bignumber.js@npm:9.3.0"
+  checksum: 580d783d60246e758e527fa879ae0d282d8f250f555dd0fcee1227d680186ceba49ed7964c6d14e2e8d8eac7a2f4dd6ef1b7925dc52f5fc28a5a87639dd2dbd1
   languageName: node
   linkType: hard
 
