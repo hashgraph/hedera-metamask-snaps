@@ -2967,7 +2967,7 @@ __metadata:
     "@veramo/did-jwt": 5.1.2
     "@veramo/did-manager": 5.1.2
     "@veramo/did-provider-key": 6.0.0
-    "@veramo/did-provider-pkh": 5.1.2
+    "@veramo/did-provider-pkh": 6.0.0
     "@veramo/did-resolver": 5.1.2
     "@veramo/key-manager": 5.1.2
     "@veramo/kms-local": 5.1.2
@@ -6935,7 +6935,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-discovery@npm:^5.1.2, @veramo/did-discovery@npm:^5.6.0":
+"@veramo/did-discovery@npm:^5.1.2":
   version: 5.6.0
   resolution: "@veramo/did-discovery@npm:5.6.0"
   dependencies:
@@ -6978,16 +6978,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-manager@npm:^5.1.2":
-  version: 5.6.0
-  resolution: "@veramo/did-manager@npm:5.6.0"
-  dependencies:
-    "@veramo/core-types": ^5.6.0
-    "@veramo/did-discovery": ^5.6.0
-  checksum: 87e31394199227982f97a9882aa3d5d45f077e9f5c20d5e8340efb5a0c9c9de4b97ba21f8a6823fc16416291e1ad1212b7c7bc64e43561b70dc8236602d69024
-  languageName: node
-  linkType: hard
-
 "@veramo/did-manager@npm:^6.0.0":
   version: 6.0.0
   resolution: "@veramo/did-manager@npm:6.0.0"
@@ -7012,20 +7002,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-provider-pkh@npm:5.1.2":
-  version: 5.1.2
-  resolution: "@veramo/did-provider-pkh@npm:5.1.2"
+"@veramo/did-provider-pkh@npm:6.0.0":
+  version: 6.0.0
+  resolution: "@veramo/did-provider-pkh@npm:6.0.0"
   dependencies:
-    "@ethersproject/abstract-provider": ^5.7.0
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/signing-key": ^5.7.0
-    "@ethersproject/transactions": ^5.7.0
-    "@veramo/core-types": ^5.1.2
-    "@veramo/did-manager": ^5.1.2
+    "@veramo/core-types": ^6.0.0
+    "@veramo/did-manager": ^6.0.0
     caip: ^1.1.0
     debug: ^4.3.3
-    did-resolver: ^4.0.1
-  checksum: a054b41806c452342e7fbbe51a40dd8c076f7a8af5b4062ab52fe513ccbc67d4a799fd85ca847800e9fb8852fc0822ab90a038a3c640725af1847b5d83664885
+    did-resolver: ^4.1.0
+    ethers: ^6.11.1
+  checksum: a5d8b1cf22ff50c7dd9b7649292506e7baa171d67819e58fe309b05d8b5bfd8636ba8c98ead35f1fa7d0e580c9d6e4811d391d74ee06459d79e3302e1683f680
   languageName: node
   linkType: hard
 
