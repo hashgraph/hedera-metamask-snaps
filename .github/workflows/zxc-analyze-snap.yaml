@@ -75,7 +75,7 @@ jobs:
         run: ls -la ${{ env.SNAP_DIRECTORY }}/coverage ${{ env.SNAP_DIRECTORY }}/junit*.xml
 
       - name: Publish Unit Test Results
-        uses: step-security/publish-unit-test-result-action@cc82caac074385ae176d39d2d143ad05e1130b2d # v2.18.0
+        uses: step-security/publish-unit-test-result-action@e88bfc6c0dffc68a1067d63526c80c81f248da11 # v2.20.0
         with:
           check_name: "${{ inputs.snap-report-name }} Unit Test Results"
           files: "packages/${{ inputs.snap-package-dir }}/**/junit-snap.xml"
