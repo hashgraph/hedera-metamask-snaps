@@ -2919,7 +2919,7 @@ __metadata:
     gatsby-plugin-manifest: ^5.13.1
     gatsby-plugin-styled-components: ^6.13.1
     gatsby-plugin-svgr: ^3.0.0-beta.0
-    prettier: ^3.3.3
+    prettier: ^3.6.1
     prettier-plugin-packagejson: ^2.5.0
     react: ^18.3.1
     react-bootstrap: ^2.10.4
@@ -2992,7 +2992,7 @@ __metadata:
     jsonpath: ^1.1.1
     lodash: ^4.17.21
     lodash.clonedeep: ^4.5.0
-    prettier: ^3.3.3
+    prettier: ^3.6.1
     prettier-plugin-packagejson: ^2.5.2
     rimraf: ^6.0.1
     secp256k1: ^5.0.1
@@ -18790,12 +18790,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.3.3":
-  version: 3.3.3
-  resolution: "prettier@npm:3.3.3"
+"prettier@npm:^3.6.1":
+  version: 3.6.1
+  resolution: "prettier@npm:3.6.1"
   bin:
     prettier: bin/prettier.cjs
-  checksum: bc8604354805acfdde6106852d14b045bb20827ad76a5ffc2455b71a8257f94de93f17f14e463fe844808d2ccc87248364a5691488a3304f1031326e62d9276e
+  checksum: 3b487e03078168467c7efed62207cab4fe9da0c304bd5d1c7ab55647fce9f78cc19caf801890d7bb49653b506b098d796277d998722f87eddf8fa5b2c66744b1
   languageName: node
   linkType: hard
 
