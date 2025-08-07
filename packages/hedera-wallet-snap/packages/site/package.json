@@ -25,7 +25,7 @@
     ]
   },
   "dependencies": {
-    "@hashgraph/sdk": "^2.50.0",
+    "@hashgraph/sdk": "^2.70.0",
     "@metamask/providers": "^17.2.0",
     "bignumber.js": "^9.1.2",
     "bootstrap": "^5.3.3",
