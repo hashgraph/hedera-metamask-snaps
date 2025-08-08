@@ -190,7 +190,7 @@ jobs:
           pnpm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
-        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
+        uses: ncipollo/release-action@bcfe5470707e8832e12347755757cec0eb3c22af # v1.18.0
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         with:
           tag: ${{ needs.validate-release.outputs.tag }}
