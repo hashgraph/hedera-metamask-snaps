@@ -24,6 +24,7 @@ defaults:
     shell: bash
 
 permissions:
+  id-token: write
   contents: write
 
 jobs:
@@ -36,7 +37,7 @@ jobs:
       snap-package-dir: "hedera-wallet-snap"
       dry-run-enabled: "${{ github.event.inputs.dry-run-enabled }}"
     secrets:
-      npm-token: ${{ secrets.NPM_TOKEN }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   publish-identify-snap:
     name: Publish Identify Snap
@@ -47,4 +48,4 @@ jobs:
       snap-package-dir: "hedera-identify-snap"
       dry-run-enabled: "${{ github.event.inputs.dry-run-enabled }}"
     secrets:
-      npm-token: ${{ secrets.NPM_TOKEN }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
