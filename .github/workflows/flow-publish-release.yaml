@@ -59,7 +59,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Setup JQ
-        uses: dcarbone/install-jq-action@4e6d52de309a4c46bb056c80e038ddb2717d8195 # v3.1.0
+        uses: step-security/install-jq-action@fd50feb4e8cd2b0e1e72df42db468e62c71d58f4 # v3.2.0
         with:
           version: 1.7
 
@@ -190,7 +190,7 @@ jobs:
           pnpm publish ${{ steps.publish.outputs.args }}
 
       - name: Generate Github Release
-        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
+        uses: step-security/release-action@03a57407052f15d1537fd5469a6fbbc536aba326 # v1.20.0
         if: ${{ github.event.inputs.dry-run-enabled != 'true' }}
         with:
           tag: ${{ needs.validate-release.outputs.tag }}
