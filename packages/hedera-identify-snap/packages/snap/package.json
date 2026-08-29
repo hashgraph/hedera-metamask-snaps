@@ -68,7 +68,7 @@
     "@veramo/did-resolver": "5.1.2",
     "@veramo/key-manager": "5.1.2",
     "@veramo/kms-local": "5.1.2",
-    "@veramo/message-handler": "5.1.2",
+    "@veramo/message-handler": "6.0.0",
     "bignumber.js": "^9.1.2",
     "did-jwt-vc": "^4.0.4",
     "did-resolver": "^4.1.0",
